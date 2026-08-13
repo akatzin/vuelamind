@@ -119,6 +119,7 @@ En los **tres** sitios: el registro de decisiones, la nota del componente y **el
 |---|---|
 | Un repositorio | Se escribe el archivo y **se propone allí como pull request** — no se empuja directo a un canon ajeno. Con su frontmatter, sus cuatro secciones, y **anonimizado como conjunto** antes de abrirlo |
 | `ninguno` | Se escribe igual y se queda en casa. **No se omite**: un dominio aislado también necesita su libro de errores, y si algún día se conecta, ya lo tiene |
+| Un repositorio, **pero sin cuenta para proponer** | Igual que el anterior en la práctica: se escribe y se guarda. **La diferencia es la salida** — al reportar, decir que quedó *pendiente de proponer*, no *descartado*. Siguen jalándose las correcciones del canon con normalidad; lo único que falta es el viaje de vuelta, y ese se puede hacer más tarde sin que el parche pierda validez |
 | Sin declarar | **Es un hueco, no un permiso.** Se escribe el parche, se reporta que no hay destino declarado y se pregunta una vez — no se asume ni que sí ni que no |
 
 **Lo que no cambia según el destino:** el parche se escribe siempre. Adónde va es una decisión de transporte; **escribirlo es una decisión de honestidad**.

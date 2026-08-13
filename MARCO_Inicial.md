@@ -1112,6 +1112,19 @@ Desde el corte 3.0 el canon vive en un repositorio git, y un parche nuevo **se p
 
 - **`origen:`** en un parche propuesto es el handle de quien lo firma, o `anonimo` — nunca el nombre de una organización o un área.
 - **Antes de abrir el PR, anonimiza el conjunto, no el fragmento.** Dos detalles inocentes por separado pueden identificar tu operación juntos, y el que los une suele ser un nombre que quedó en otro archivo por parecer inofensivo. Publicar es irreversible: la revisión va antes del primer push.
+> [!important] Consumir no cuesta nada; proponer sí pide una cuenta — y no pasa nada si no la hay
+> **Bajar el método es libre y anónimo.** Cualquiera puede clonar el canon público —el oficial o el que su dominio haya configurado— y recibir cada corrección sin registrarse en ningún sitio, sin pedir permiso y sin dejar rastro. **Consumir el método no requiere cuenta de nadie.**
+>
+> **Proponer un parche sí la pide**, porque un pull request necesita una identidad en la plataforma donde vive el canon. Quien no la tenga —o no la quiera— **no queda fuera del método, solo del canal de vuelta**:
+>
+> - **Sigue jalando** todas las correcciones publicadas, igual que el resto.
+> - **Escribe sus parches igual**, en su propia carpeta, con su frontmatter y sus cuatro secciones. **No se omiten por no poder enviarlos**: son su libro de errores, y valen sobre todo para el dominio que los sufrió.
+> - Ese corpus local es **legado propio**: acumula lo aprendido en casa y sirve para releer, para enseñar a la siguiente instancia y para no repetir.
+>
+> **Y no es una puerta que se cierre.** Si algún día abre una cuenta, esos parches acumulados **siguen siendo proponibles tal cual** — llevan fecha, caso y forma de verificarse desde el día que se escribieron. Un parche no caduca por haber esperado.
+>
+> Por eso el manifiesto lo distingue: **`ninguno` es una decisión** —lo aprendido se queda en casa a propósito—, y **no tener cuenta es una circunstancia**. El resultado inmediato se parece; la salida no.
+
 - **Descartar con razón vale más que aplicar por cortesía** — también para el canon: un PR rechazado con su porqué escrito enseña más que uno fusionado por amabilidad.
 
 `version` sube en uno cada vez que se corrige el **texto** del parche. Los cambios de **metadatos** —añadir `incorporado:`, normalizar `origen:`, retirar un campo podrido— **no la suben**: la versión habla del contenido, y un bump cosmético haría gritar "corregido después" a los validadores de todos los dominios a la vez.

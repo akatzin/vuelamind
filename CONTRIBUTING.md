@@ -43,6 +43,26 @@ organisations, teams, hosts, paths, IPs and domains; **keep the mechanism of the
 measured consequence, and the signal that gave it away** — that is what teaches. Publishing
 is irreversible: the review happens before the push, not after the first report.
 
+## You need an account to propose — and nothing breaks if you do not have one
+
+**Consuming the method is free and anonymous.** Anyone can clone the canon and receive every
+correction without registering anywhere. **Reading does not require an account.**
+
+**Proposing does**, because a pull request needs an identity on the platform. If you do not
+have one — or do not want one — you are not out of the method, only out of the return
+channel:
+
+- You keep **pulling** every published correction, like everyone else.
+- You **write your patches anyway**, in your own `parches/` folder, with their frontmatter
+  and their four sections. Do not skip them for being unable to send them: they are your
+  error book, and they matter most to the domain that paid for them.
+- That local corpus is **your own legacy** — it accumulates what your domain learned, and it
+  teaches the next instance that opens your vault.
+
+**And it is not a closed door.** If you open an account later, those accumulated patches are
+**still proposable as they are**: they carry the date, the case and the verification from the
+day they were written. A patch does not expire for having waited.
+
 ## You do not have to contribute here
 
 The framework can be consumed without sending anything back, and a domain can point its
@@ -102,6 +122,25 @@ ser un nombre propio que quedó en otro archivo por parecer inofensivo. Quita no
 personas, organizaciones, equipos, hosts, rutas, IPs y dominios; **conserva el mecanismo del
 error, la consecuencia medida y la señal que lo delató** — eso es lo que enseña. Publicar es
 irreversible: la revisión va antes del push, no después del primer reporte.
+
+## Proponer pide una cuenta — y no pasa nada si no la tienes
+
+**Consumir el método es libre y anónimo.** Cualquiera puede clonar el canon y recibir cada
+corrección sin registrarse en ningún sitio. **Leer no requiere cuenta.**
+
+**Proponer sí**, porque un pull request necesita una identidad en la plataforma. Quien no la
+tenga —o no la quiera— no queda fuera del método, solo del canal de vuelta:
+
+- Sigue **jalando** todas las correcciones publicadas, igual que el resto.
+- **Escribe sus parches igual**, en su propia carpeta `parches/`, con su frontmatter y sus
+  cuatro secciones. No se omiten por no poder enviarlos: son su libro de errores, y valen
+  sobre todo para el dominio que los sufrió.
+- Ese corpus local es **legado propio** — acumula lo que su dominio aprendió, y le enseña a
+  la siguiente instancia que abra ese vault.
+
+**Y no es una puerta cerrada.** Si algún día abres una cuenta, esos parches acumulados
+**siguen siendo proponibles tal cual**: llevan fecha, caso y forma de verificarse desde el día
+que se escribieron. Un parche no caduca por haber esperado.
 
 ## No estás obligado a contribuir aquí
 
