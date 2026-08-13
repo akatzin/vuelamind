@@ -111,7 +111,17 @@ En los **tres** sitios: el registro de decisiones, la nota del componente y **el
 
 ### ¿Algo de esto es del MÉTODO y no de este dominio?
 
-**Preguntárselo en cada cierre, antes de confirmar la lista.** La prueba: reescribe el hallazgo sustituyendo **todos** los nombres propios por genéricos. ¿Sigue siendo cierto y útil? Es del método → **parche** en la carpeta de parches del marco (ruta en el manifiesto). Ante la duda, se escribe: un parche de más cuesta un archivo; uno de menos cuesta que otra instancia repita el error meses después.
+**Preguntárselo en cada cierre, antes de confirmar la lista.** La prueba: reescribe el hallazgo sustituyendo **todos** los nombres propios por genéricos. ¿Sigue siendo cierto y útil? Si sí, es del método → **es un parche**. Ante la duda, se escribe: uno de más cuesta un archivo; uno de menos cuesta que otra instancia repita el error meses después.
+
+**Y entonces mira el manifiesto, que dice qué hacer con él:**
+
+| `aportar_a` | Qué se hace con el parche |
+|---|---|
+| Un repositorio | Se escribe el archivo y **se propone allí como pull request** — no se empuja directo a un canon ajeno. Con su frontmatter, sus cuatro secciones, y **anonimizado como conjunto** antes de abrirlo |
+| `ninguno` | Se escribe igual y se queda en casa. **No se omite**: un dominio aislado también necesita su libro de errores, y si algún día se conecta, ya lo tiene |
+| Sin declarar | **Es un hueco, no un permiso.** Se escribe el parche, se reporta que no hay destino declarado y se pregunta una vez — no se asume ni que sí ni que no |
+
+**Lo que no cambia según el destino:** el parche se escribe siempre. Adónde va es una decisión de transporte; **escribirlo es una decisión de honestidad**.
 
 > [!danger] Aplicar un parche no termina en la instancia
 > Termina cuando la plantilla del master es coherente con él **y eso está publicado**. Es un solo acto y no se escala al usuario. Cuatro movimientos: corregir la instancia; mapear a qué sección de la plantilla toca; **traer el master fresco justo antes de editarlo** —otro dominio pudo publicarlo en medio, y pisar su versión no dispara ninguna alarma—, respaldar, publicar y **verificar por huella del otro lado**; y anotar la fila con su versión. Añadir también la fila al índice del README de parches, **comparando por nombre y no por conteo**.

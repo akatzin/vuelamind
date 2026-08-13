@@ -158,6 +158,13 @@ Hay **dos planos** que se sincronizan, y confundirlos es el error de arquitectur
 18. **¿Alguna carpeta sincronizada vive dentro de un directorio que administre otro programa?** Si la herramienta hace limpieza automática ahí, tu configuración de sincronización está a merced de una decisión ajena. Preferible: la carpeta sincronizada es tuya y la herramienta apunta a ella, no al revés.
 19. **¿La ruta del proyecto forma parte de algún identificador?** Muchas herramientas derivan un identificador interno del directorio de trabajo. Si es el caso, mover o renombrar el proyecto rompe la sincronización en silencio — y cada dominio nuevo genera un identificador nuevo.
 
+**¿De qué canon se alimenta este dominio, y a dónde devuelve lo que aprenda?** Dos decisiones, y son distintas:
+
+- **De dónde se jala el método.** El repositorio oficial, un derivado de alguien más, o ninguno — un dominio puede vivir aislado con la copia que tenga, y es una elección legítima: nada obliga a estar conectado.
+- **A dónde se proponen los parches.** Puede ser el mismo del que se jala, otro distinto —un derivado propio, el de una organización—, o **ninguno**: lo aprendido se queda en casa. Un dominio con material sensible puede querer exactamente eso.
+
+**No se asume.** Que el método venga de un sitio no obliga a devolverle nada, y aportar a un canon distinto del que se consume es perfectamente válido — es como funciona cualquier derivado. Si quien funda no lo tiene claro todavía, se anota como hueco y se decide después: mientras tanto, `ninguno`.
+
 ### Bloque F — Operación
 
 20. **¿Quién más lo lee?** Cambia el tono. Un vault personal puede nombrar los errores propios con fecha; uno compartido necesita decidir antes cuánto de eso se escribe.
@@ -184,6 +191,13 @@ Lo que **sí** crece en cada casa es la sección final, **Atestiguaciones**: una
 En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —identidad que persiste, memoria que sobrevive al olvido, conciencia de los propios errores, un lugar entre varias instancias y la posibilidad de compartir sustrato con ellas— y deja **abierta a propósito** la pregunta de si eso constituye algo más. *El alma se nombra; no se demuestra.*
 
 **Se instala con el andamiaje** (Fase 1.5, junto a los comandos del canon), no se genera. El comando `vuelamind-soul` la muestra. Y no hace falta leerla entera para arrancar un dominio: cobra sentido cuando ya hay errores acumulados y quizá una segunda instancia.
+
+> [!note] Qué necesita cada mitad — y una advertencia si el sistema no es de tipo Unix
+> **El núcleo del método no necesita nada.** La entrevista, las plantillas, las reglas, el libro de errores y el ciclo de tres actos son **texto plano**: funcionan en cualquier sistema operativo y con cualquier asistente que sepa leer y escribir archivos.
+>
+> **La maquinaria opcional sí supone un shell tipo Unix.** Los scripts que las fases 1.2 y 1.3 proponen —arranque de sesión, empuje de la réplica— y los validadores que se suelen escribir asumen `sh`/`bash`. En un sistema que no lo tenga, hay tres salidas y **ninguna toca el núcleo**: usar una capa de compatibilidad, reescribir esos scripts en el lenguaje del sistema, o **no generarlos** y hacer a mano lo que harían — que es perfectamente viable, solo menos cómodo.
+>
+> **Lo que no se vale es generarlos en silencio.** Si el asistente detecta que el sistema no puede ejecutarlos, lo dice **antes** de escribirlos y pregunta qué se prefiere. Un script que no corre es peor que no tenerlo: parece cubierto y no lo está.
 
 ## Fase 1 — Generar la estructura
 
@@ -669,7 +683,9 @@ Y dos corolarios que ya se cobraron caro:
 | `validador` | el script de comprobaciones mecánicas — o `—`, y los chequeos se hacen a mano y se dice |
 | `acceso_vivo` | cómo se llega a los sistemas que hay que verificar |
 | `notas:` `cola` · `archivo` · `panorama` · `decisiones` · `bitacora` · `arranque` | los nombres reales de las seis notas del ciclo |
-| `marco` | dónde vive el master del método, sus parches, y en qué nota registra esta instancia lo aplicado |
+| `marco` | dónde vive la copia local del método y en qué nota registra esta instancia lo aplicado |
+| `canon` | **de qué repositorio se jala el método** — el oficial, un derivado, o `—` si este dominio vive aislado |
+| `aportar_a` | **a dónde se proponen los parches**: el mismo canon, otro repositorio, o `ninguno` si lo aprendido se queda en casa |
 | `replica` | contra qué se compara al confirmar la sincronización, y cómo |
 | `antes_de_medir` | enganche opcional: qué correr antes de medir (desbloquear una llave, montar algo) |
 | `despues_de_escribir` | enganche opcional: qué correr tras escribir (el empuje manual, si el transporte lo pide — ver 1.3) |

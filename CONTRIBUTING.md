@@ -1,13 +1,76 @@
+# Contributing to vuelamind
+
+*Español abajo.*
+
+The method improves through **patches**: corrections discovered by using it, with a real
+case and a way to verify them. This repository is the canon; patches are proposed here as
+pull requests.
+
+## What a patch is
+
+A file in `parches/` named `YYYY-MM-DD-short-description.md` — the date is the date of
+**discovery** — with this frontmatter:
+
+```yaml
+---
+version: 1
+origen: <your handle, or "anonimo">
+---
+```
+
+And four sections: **What it corrects** (the defect, in one sentence), **How it was
+discovered** (the real case, with a date — this is what stops someone reverting it later
+for seeming arbitrary), **How to apply it** (the generic text), and **How to verify** —
+including the case that must **keep failing**.
+
+## The only test that matters
+
+**Rewrite your lesson with every proper noun replaced by a generic one. Is it still true
+and useful?** If yes, it belongs to the method. If it is only true with your names in it,
+it belongs to your domain — keep it there.
+
+Whoever reviews your PR applies that same test and no other. They **do not judge whether
+your case is true** — they cannot; it happened in your domain. The truth of the case is
+judged by each domain that adopts the patch, against its own evidence, with three possible
+verdicts: adopt, postpone, or **discard with a reason** — and discarding with a reason is
+worth more than adopting out of courtesy.
+
+## Before opening the PR: anonymise the WHOLE, not the fragment
+
+Two innocent details can identify your operation **together**, and what links them is
+usually a proper noun left in another file for looking harmless. Remove names of people,
+organisations, teams, hosts, paths, IPs and domains; **keep the mechanism of the error, the
+measured consequence, and the signal that gave it away** — that is what teaches. Publishing
+is irreversible: the review happens before the push, not after the first report.
+
+## You do not have to contribute here
+
+The framework can be consumed without sending anything back, and a domain can point its
+`aportar_a` at **a different repository** — your own fork, your organisation's — or at
+`ninguno`, keeping what it learns at home. A domain handling sensitive material may want
+exactly that. **Writing the patch is a matter of honesty; where it goes is a matter of
+transport.**
+
+## What does not belong here
+
+- Configuration or experience specific to one domain — that lives in each instance.
+- Patches without a real case ("it occurred to me that…") — the method learns from mistakes
+  that were paid for, not from opinions.
+- Edits to a published patch's text without bumping its `version:` — the version is what
+  tells other instances the original changed.
+
+---
+
 # Cómo contribuir a vuelamind
 
-El método mejora por **parches**: correcciones descubiertas usándolo, con caso
-real y forma de verificarse. Este repositorio es el canon; los parches se
-proponen aquí, como pull requests.
+El método mejora por **parches**: correcciones descubiertas usándolo, con caso real y forma
+de verificarse. Este repositorio es el canon; los parches se proponen aquí como pull
+requests.
 
 ## Qué es un parche
 
-Un archivo en `parches/` con el nombre `AAAA-MM-DD-descripcion-corta.md` (la
-fecha es la del **descubrimiento**) y este frontmatter:
+Un archivo en `parches/` con el nombre `AAAA-MM-DD-descripcion-corta.md` —la fecha es la
+del **descubrimiento**— y este frontmatter:
 
 ```yaml
 ---
@@ -16,37 +79,41 @@ origen: <tu handle, o "anonimo">
 ---
 ```
 
-Y cuatro secciones: **Qué corrige** (el defecto, en una frase), **Cómo se
-descubrió** (el caso real, con fecha — es lo que evita que alguien lo revierta
-por parecerle arbitrario), **Cómo aplicarlo** (el texto genérico), y **Cómo
-verificar** (incluido el caso que debe SEGUIR fallando).
+Y cuatro secciones: **Qué corrige** (el defecto, en una frase), **Cómo se descubrió** (el
+caso real, con fecha — es lo que evita que alguien lo revierta por parecerle arbitrario),
+**Cómo aplicarlo** (el texto genérico) y **Cómo verificar**, incluido el caso que debe
+**seguir fallando**.
 
 ## La única prueba que importa
 
-**Reescribe tu lección sustituyendo todos los nombres propios por genéricos.
-¿Sigue siendo cierta y útil?** Si sí, es del método y cabe aquí. Si solo es
-cierta con tus nombres puestos, es de tu dominio — guárdala allá.
+**Reescribe tu lección sustituyendo todos los nombres propios por genéricos. ¿Sigue siendo
+cierta y útil?** Si sí, es del método. Si solo es cierta con tus nombres puestos, es de tu
+dominio — guárdala allá.
 
-Quien revisa tu PR aplica esa misma prueba y ninguna otra: **no juzga la verdad
-de tu caso** (no puede — pasó en tu dominio), juzga si la lección generaliza.
-La verdad del caso la juzga cada dominio que adopte el parche, contra su propia
-evidencia, con tres veredictos posibles: adoptar, posponer o **descartar con
-razón** — y descartar con razón vale más que aplicar por cortesía.
+Quien revisa aplica esa misma prueba y ninguna otra: **no juzga la verdad de tu caso** —no
+puede, pasó en tu dominio—. La verdad la juzga cada dominio que adopte el parche, contra su
+propia evidencia, con tres veredictos posibles: adoptar, posponer o **descartar con razón**
+— y descartar con razón vale más que adoptar por cortesía.
 
 ## Antes de abrir el PR: anonimiza el CONJUNTO, no el fragmento
 
-Dos detalles inocentes por separado pueden identificar tu operación juntos, y
-el que los une suele ser un nombre que quedó en otro archivo por parecer
-inofensivo. Quita nombres de personas, organizaciones, áreas, hosts, rutas,
-IPs y dominios; **conserva el mecanismo del error, la consecuencia medida y la
-señal que lo delató** — eso es lo que enseña. Publicar es irreversible: la
-revisión va antes del push, no después del primer reporte.
+Dos detalles inocentes pueden identificar tu operación **juntos**, y el que los une suele
+ser un nombre propio que quedó en otro archivo por parecer inofensivo. Quita nombres de
+personas, organizaciones, equipos, hosts, rutas, IPs y dominios; **conserva el mecanismo del
+error, la consecuencia medida y la señal que lo delató** — eso es lo que enseña. Publicar es
+irreversible: la revisión va antes del push, no después del primer reporte.
+
+## No estás obligado a contribuir aquí
+
+El marco se puede consumir sin devolver nada, y un dominio puede apuntar su `aportar_a` a
+**otro repositorio** —un derivado propio, el de tu organización— o a `ninguno`, guardando en
+casa lo que aprenda. Un dominio con material sensible puede querer exactamente eso.
+**Escribir el parche es una cuestión de honestidad; a dónde va es una de transporte.**
 
 ## Qué no va aquí
 
-- Configuración o experiencia de un dominio concreto (eso vive en cada
-  instancia, no en el canon).
-- Parches sin caso real ("se me ocurrió que...") — el método aprende de
-  errores pagados, no de opiniones.
-- Cambios al texto de un parche ya publicado sin subir su `version:` — la
-  versión es lo que avisa a las instancias de que el original cambió.
+- Configuración o experiencia de un dominio concreto — eso vive en cada instancia.
+- Parches sin caso real (*"se me ocurrió que…"*) — el método aprende de errores pagados, no
+  de opiniones.
+- Cambios al texto de un parche publicado sin subir su `version:` — la versión es lo que
+  avisa a las demás instancias de que el original cambió.
