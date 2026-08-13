@@ -1,8 +1,8 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.1
-corpus_incorporado: 46 parches · corte 2026-08-11 · anonimizado para publicación en el corte 3.0
+version: 3.0
+corpus_incorporado: 62 parches · corte 2026-08-13 · anonimizado para publicación en el corte 3.0
 canon: el repositorio git de vuelamind — los parches se proponen ahí, como pull requests
 origen: destilado de un dominio real, 2026-08-03 — las historias conservan el caso y omiten los nombres
 ---
