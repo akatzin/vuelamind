@@ -8,16 +8,16 @@ Relata la **entrevista inicial** del dominio actual y sus respuestas: para qué 
 
 ## De dónde lee
 
-Del **acta de la entrevista**: el documento que la Fase 0 del marco deja escrito al nacer el dominio, con las respuestas de los seis bloques. Su ruta la declara el manifiesto del dominio (clave `acta:`); si el manifiesto no la declara, buscar `vuelamind-entrevista.acta.md` junto al manifiesto, y si tampoco, en el vault.
+Del **acta de la entrevista**: el documento que la Fase 0 del marco deja escrito al nacer el dominio, con las respuestas de los bloques del acta. Su ruta la declara el manifiesto del dominio (clave `acta:`); si el manifiesto no la declara, buscar `vuelamind-entrevista.acta.md` junto al manifiesto, y si tampoco, en el vault.
 
 **Nunca relates de memoria ni desde otras notas sin decirlo**: el acta es la fuente. Las respuestas de una entrevista son decisiones del responsable, no deducciones del asistente.
 
 > [!danger] El panorama NO es el acta — error cometido el 2026-08-12
-> Al reconstruir un acta ausente, la tentación es rellenar los seis bloques con lo que el **panorama** (`0_<Dominio>.md`) y las notas ya dicen. **Eso produce las paráfrasis del asistente, no las palabras del responsable** — y se lee como acta sin serlo. El usuario lo cazó de inmediato: *"No salió del transcript ni son las respuestas que yo emití."*
+> Al reconstruir un acta ausente, la tentación es rellenar los bloques del acta con lo que el **panorama** (`0_<Dominio>.md`) y las notas ya dicen. **Eso produce las paráfrasis del asistente, no las palabras del responsable** — y se lee como acta sin serlo. El usuario lo cazó de inmediato: *"No salió del transcript ni son las respuestas que yo emití."*
 >
 > La regla dura: **agota la fuente #1 (el transcript) antes de tocar la #2.** Si el transcript existe pero está en otra máquina apagada, la respuesta correcta es **pedir encenderla o decir que no se pudo**, NO caer al panorama. Un acta reconstruida de notas documenta lo que el dominio *parece ser* según su propia documentación — que es justo lo que el acta debía verificar contra la fuente, no repetir.
 >
-> **Y comprueba si hubo entrevista siquiera:** un dominio que nació orgánicamente (no de `/vuelamind`) NO tiene seis bloques que responder. Inventarle la estructura de entrevista es el mismo error con otra cara. Relata lo que el transcript muestre — aunque sea una instrucción de arranque y no un cuestionario.
+> **Y comprueba si hubo entrevista siquiera:** un dominio que nació orgánicamente (no de `/vuelamind`) NO tiene los bloques de la entrevista que responder. Inventarle la estructura de entrevista es el mismo error con otra cara. Relata lo que el transcript muestre — aunque sea una instrucción de arranque y no un cuestionario.
 
 ## Qué presenta
 

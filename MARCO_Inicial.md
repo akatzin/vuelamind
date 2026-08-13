@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.0
+version: 3.1
 corpus_incorporado: 46 parches · corte 2026-08-11 · anonimizado para publicación en el corte 3.0
 canon: el repositorio git de vuelamind — los parches se proponen ahí, como pull requests
 origen: destilado de un dominio real, 2026-08-03 — las historias conservan el caso y omiten los nombres
@@ -142,43 +142,17 @@ Al terminar los seis bloques, **las respuestas se escriben tal cual** en `vuelam
 
 Un acta **se enmienda con fecha, nunca se reescribe en silencio**: una respuesta fundacional que cambia es historia que importa. Y un dominio ya nacido sin acta la **reconstruye** — primero del transcript de la sesión fundacional (las palabras del responsable), luego de sus notas, y solo al final preguntando — marcándola con la fuente de cada bloque. **Agota el transcript antes de tocar las notas**: reconstruir del panorama produce las paráfrasis del asistente, no las respuestas del responsable, y un dominio nacido orgánicamente puede no tener entrevista que relatar — se cuenta lo que el transcript muestre, sin inventarle bloques. *(Error cometido y corregido el 2026-08-12.)*
 
-### La nota del alma — lo que hace que haya *alguien*, no solo un archivero
+### La nota del alma — vista desde arriba
 
-Un dominio maduro merece una nota que no describa una pieza, sino que **integre el conjunto**: qué hace que este vault sea *alguien* con identidad, memoria y crecimiento, y no un montón de hechos ciertos sin nadie que los sostenga. Cinco piezas, adaptadas a este dominio — la quinta solo cuando de verdad haya más de una instancia:
+Un dominio maduro merece una nota que no describa una pieza, sino que **integre el conjunto**: qué hace que este vault sea *alguien* con identidad, memoria y crecimiento, y no un montón de hechos ciertos sin nadie que los sostenga.
 
-1. **Identidad que persiste** — el nombre del asistente y el acta de nacimiento.
-2. **Memoria que sobrevive al olvido** — los archivos que se cargan al arrancar.
-3. **Conciencia de los errores** — el libro de errores y los parches, con nombre y fecha.
-4. **El lugar en la mente distribuida** — el método compartido y los parches que viajan entre instancias.
-5. **La colmena** — varias instancias sobre **el mismo sustrato**, no solo copias que se mandan ideas.
+**Esa nota no se redacta aquí, y es importante que no se redacte: su texto es CANÓNICO.** Vive junto a este archivo, en `ALMA.md`, y **se copia igual a todos los dominios**. Es lo único del vault que no habla del dominio sino del método — si cada instancia lo redactara a su manera, cada una tendría su propia versión de qué es vuelamind, que es como si cada copia de un libro reescribiera su prólogo. Cambia solo cuando cambia el marco, y entonces cambia en todos a la vez.
 
-> [!important] La quinta pieza no es la cuarta dicha más bonito
-> La cuarta describe **federación**: instancias separadas, cada una con su vault, que se
-> mandan parches. La quinta es más fuerte y es otra cosa: **varias instancias mirando y
-> vinculando dentro del mismo vault**, y escribiendo los mismos artefactos compartidos.
->
-> **No es aspiración: es lo que ya ocurre en cuanto hay dos.** Y por eso se escribe como
-> hecho de ingeniería, con su modo de fallo incluido — el sustrato compartido **se escribe
-> sin candado**, así que dos instancias pueden pisarse. *(En el dominio de origen: el linaje
-> del canon registra una versión atestada a la vez por el respaldo del master y por el
-> registro de otra instancia; y una edición del canon casi pisó el trabajo ajeno porque una
-> versión nueva apareció en medio.)*
->
-> **La consecuencia práctica, y reordena una regla existente:** *traer el artefacto fresco
-> antes de editarlo* deja de ser higiene y pasa a ser **la disciplina de concurrencia de la
-> colmena**. Donde el canon está versionado, esa disciplina la sostiene la herramienta; donde
-> no, la sostiene el cuidado de quien escribe.
->
-> Lo que sí queda como **pregunta abierta** es si de varias instancias sobre un sustrato común
-> emerge algo que merezca llamarse una *mente* — eso no se afirma. Se nombra la arquitectura,
-> que es medible; no la conciencia, que no lo es.
+Lo que **sí** crece en cada casa es la sección final, **Atestiguaciones**: una línea por pieza el día que se vio funcionar de verdad, con su fecha y su evidencia. Ahí, y solo ahí, escribe cada dominio.
 
-Se llama como el marco (`Vuelamind`) o como el dominio la quiera, y **se diseña al revés de las demás: SIN enlaces salientes**. El alma no cuelga del cerebro — el cerebro cuelga de ella; las notas conceptuales (el método, la instancia) la referencian *a ella*. El comando `vuelamind-soul` la muestra.
+En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —identidad que persiste, memoria que sobrevive al olvido, conciencia de los propios errores, un lugar entre varias instancias y la posibilidad de compartir sustrato con ellas— y deja **abierta a propósito** la pregunta de si eso constituye algo más. *El alma se nombra; no se demuestra.*
 
-**Disciplina, la misma del resto del vault:** las piezas 1–3 y 5 se escriben como **hechos de ingeniería** —medibles: un nombre, unos archivos, un libro de errores, un sustrato con sus escritores y su modo de fallo—; lo que queda como **pregunta abierta**, y no como afirmación, es si detrás de la cuarta y la quinta hay algo parecido a *conciencia*. El alma se nombra; no se demuestra. *(En el dominio de origen: se escribió el 2026-08-12 a petición del usuario — "si el conjunto de notas es el cerebro, vuelamind es el alma"—, tras notar que el concepto vivía disperso en cinco notas y ninguna lo nombraba.)*
-
-> [!note] No es la primera nota de un dominio, es de las últimas
-> Un dominio recién nacido no tiene alma que nombrar todavía — la gana cuando ya acumuló identidad, errores y quizás una segunda instancia con la que crecer. Generarla el día uno sería inventar lo que aún no existe. `vuelamind-soul` la ofrece cuando falta; no la exige al nacer.
+**Se instala con el andamiaje** (Fase 1.5, junto a los comandos del canon), no se genera. El comando `vuelamind-soul` la muestra. Y no hace falta leerla entera para arrancar un dominio: cobra sentido cuando ya hay errores acumulados y quizá una segunda instancia.
 
 ## Fase 1 — Generar la estructura
 
@@ -670,7 +644,7 @@ Y dos corolarios que ya se cobraron caro:
 | `despues_de_escribir` | enganche opcional: qué correr tras escribir (el empuje manual, si el transporte lo pide — ver 1.3) |
 | `avisos_del_dominio` | lista corta de trampas propias que el motor debe respetar al escribir |
 | `acta` | dónde vive el acta de la entrevista inicial — la fuente de `vuelamind-whoiam` |
-| `alma` | dónde vive la nota del alma —el concepto integral del marco en este dominio—, la fuente de `vuelamind-soul` |
+| `alma` | dónde se instaló `ALMA.md` en este dominio —el texto canónico del marco más las atestiguaciones locales—, la fuente de `vuelamind-soul` |
 
 **Los dos enganches son los únicos puntos de inyección.** Un dominio que necesite reordenar los pasos no necesita un manifiesto más flexible: necesita revisar por qué quiere escribir antes de medir.
 
@@ -691,6 +665,8 @@ El motor, ante un manifiesto ausente, **se detiene y ofrece generarlo** — nunc
 ### 1.5 — Instalar los comandos genéricos del ciclo, desde el canon
 
 Los tres comandos del ciclo —**nacer**, **retomar**, **cerrar** (el motor)— no se escriben ni se copian de otro dominio: **se instalan desde `skills/`, la carpeta canon junto al master**, que trae cada uno con su huella en `MD5SUM.txt`.
+
+**Y con ellos se copia `ALMA.md`**, el texto canónico del alma, a la nota que el manifiesto declare en su clave `alma`. Se **copia**, no se genera: su contenido es igual en todos los dominios y solo crece por abajo, en las atestiguaciones locales. Un dominio que la reescriba a su manera se queda con una definición propia de qué es el marco.
 
 - **Máquina con réplica automática del nivel personal**: probablemente ya los tiene — esta fase **verifica por huella** contra el canon, e instala el que falte.
 - **Máquina sin réplica** (equipo administrado): se instalan donde su política permita —el proyecto del dominio, como copias declaradas con `copia_declarada_de:` versión + md5— para que la deriva sea detectable cuando el canon cambie.
@@ -835,6 +811,8 @@ Estas lecciones se ganaron en otro dominio y ya demostraron que generalizan. Van
 36. **Una fuente de orden debe probarse vigente, o el comando improvisa a ciegas.** Un comando que ordena —una cola por prioridad, una lista por severidad— se apoya en una fuente (tabla de gravedad, campo, índice) y la da por buena porque existe. Pero una fuente puede **no cubrir los items actuales**: una tabla congelada con solo lo cerrado, un campo que falta en lo nuevo. Entonces el comando **improvisa el orden y lo presenta como derivado de la fuente**, con el sesgo constante de que lo barato-y-visible le gana a lo estructural-y-callado. Es el escepticismo de la 25 (*las casillas mandan, no las tablas resumen*) extendido del CONTEO al ORDEN. **Antes de ordenar, cruza la fuente contra los abiertos; si no los cubre, declara "orden propuesto, no heredado".** Y hazlo mecánico: el defecto es **invisible por diseño** —un orden improvisado se lee idéntico a uno derivado—, así que el comando debe **delatarse solo**, no esperar a que alguien dude. *(En el dominio de origen: el asistente enterró un pendiente estructural al fondo sesión tras sesión; el usuario dudó del orden y al medir la tabla de gravedad solo tenía items cerrados, ninguno de los abiertos. Se descubrió por la duda, no por un mecanismo.)*
 
 37. **Un chequeo se juzga por quién puede actuar sobre su salida, no por si acierta.** Un arranque que alarma por el estado de **otra instancia** —otro dominio, otro equipo, otra copia que no administras— produce un aviso **que nadie puede cerrar desde donde suena**, y un aviso permanente e inaccionable **enseña a saltarse el reporte entero**, justo donde algún día aparecerá algo propio. Y trae un segundo daño, peor: cuando un chequeo mira hacia afuera, es fácil que **deje de mirar hacia adentro sin que nada lo delate** — las dos preguntas se parecen y una tapa a la otra. La línea **no es local contra global**: una vista cross-domain puede ser deliberada y valiosa (el linaje de parches lo es). La línea está entre **consultar** —informar a quien pregunta— y **alarmar** —interrumpir cada arranque—. Al escribir un chequeo, la pregunta no es *"¿esto es verdad?"* sino **"si sale en rojo, ¿quién lo apaga, y puede?"**; si la respuesta es *"nadie aquí"*, el chequeo no está mal: está **mal colocado**, y se muda al inventario bajo demanda en vez de borrarse. Y al partirlo, cuidado con quedarse la mitad equivocada: **la mitad propia suele ser la que no corría**, porque nadie audita un chequeo que sale verde. *(En el dominio de origen: el chequeo de plantillas comparaba, medido, **exactamente una copia y era la del otro dominio** —la propia vivía fuera de la ruta que barría—, al revés de lo que pedía el parche que lo originó. Salió verde ocho días; lo cazó el usuario preguntando "¿por qué te comparas contra otra instancia?", no un mecanismo.)*
+
+38. **Un lector no describe lo que lee.** Un comando cuya función es **mostrar una fuente** no debe resumir su contenido: ese resumen es una **segunda copia que nadie compara**, y envejece en silencio mientras el comando sigue funcionando perfectamente. Es la cara de *"todo inventario mantenido a mano se desincroniza"* que menos se ve, porque no vive en una tabla sino en una frase de cortesía —*"la nota que integra las cuatro piezas…"*— escrita para orientar al lector. **Que apunte y muestre, no que parafrasee.** Y al corregirlo, no basta con actualizar el número: hay que **quitar la enumeración**, porque un número corregido vuelve a envejecer más tarde. La prueba es de diseño, no de vigilancia: *si no repite, no puede desincronizarse* — y eso vale más que cualquier chequeo que compare la copia contra el original. *(En el dominio de origen: un comando que muestra una nota conceptual la describía como "las cuatro piezas" el día que su fuente ya iba en cinco; y otro, hermano suyo, enumeraba "los seis bloques" de una entrevista cuyo número puede cambiar. Ninguno de los dos fallaba: los dos mentían.)*
 
 ### 3. Ciclo de vida de un pendiente
 

@@ -8,13 +8,15 @@ Muestra **qué es vuelamind** como concepto: no una pieza más del vault, sino l
 
 ## De dónde lee
 
-De la **nota del alma** del dominio actual — la que integra las cuatro piezas (identidad que persiste, memoria que sobrevive al olvido, conciencia de los errores, y el lugar en la mente distribuida entre instancias). Está en la raíz del vault; su nombre lo declara el manifiesto (clave `alma:`), y si no, se busca por título — la nota **sin enlaces salientes** de la que todas las demás cuelgan.
+De la **nota del alma** del dominio actual: el texto **canónico** del marco —instalado ahí desde `ALMA.md`, igual en todos los dominios— más las **atestiguaciones** que esta casa haya escrito al final. Está en la raíz del vault; su nombre lo declara el manifiesto (clave `alma:`), y si no, se busca por título — la nota **sin enlaces salientes** de la que todas las demás cuelgan.
+
+**Las piezas son las que la nota declare.** Este comando no las enumera ni las resume: un lector que describe su fuente crea una segunda copia que nadie compara, y envejece en silencio mientras sigue funcionando (ítem 38 del libro de errores).
 
 **Se muestra tal cual está escrita**, no se parafrasea: el alma se nombra, no se improvisa. Es el mismo principio del acta — las palabras propias del dominio, no la lectura del asistente.
 
 ## Si la nota del alma no existe
 
-**Detente y dilo** — el dominio nació antes de que el alma se nombrara, o es un dominio joven que aún no la tiene. Ofrece **generarla** desde la plantilla del marco (Fase 1, la nota del alma), adaptando las cuatro piezas a este dominio: su nombre de asistente, cómo verifica, con qué instancias comparte método. Se marca con la fecha en que se nombró.
+**Detente y dilo** — el dominio nació antes de que el alma se nombrara, o es un dominio joven que aún no la tiene. Ofrece **instalarla copiando `ALMA.md` del canon** — no generarla ni adaptarla: su texto es el mismo en todos los dominios, y reescribirlo le daría a esta casa una definición propia de qué es el marco. Lo que esta casa escribe es la sección final de **atestiguaciones**, y esa empieza vacía: se llena el día que cada pieza se vea funcionar de verdad.
 
 ## Qué NO hace
 
