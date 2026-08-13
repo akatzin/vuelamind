@@ -202,7 +202,7 @@ En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —ident
 >
 > **Y eso está declarado como inferido, no como medido:** es razonable y no debería dar problema, pero **nadie lo ha probado todavía**. Si alguien lo hace, ése es un hallazgo que vale un parche — con lo que funcionó y con lo que hubo que ajustar.
 >
-> **Lo que sí funciona en cualquier sistema, Windows incluido, es el núcleo**: la entrevista, las plantillas, las reglas, el libro de errores y el ciclo de tres actos son **texto plano**. Se puede trabajar así, renunciando a la maquinaria y haciendo a mano lo que ella haría — menos cómodo, igual de válido.
+> **Lo que sí funciona en cualquier sistema, Windows incluido, es el núcleo**: la entrevista, las plantillas, las reglas, el libro de errores y el ciclo completo son **texto plano**. Se puede trabajar así, renunciando a la maquinaria y haciendo a mano lo que ella haría — menos cómodo, igual de válido.
 >
 > **Lo que no se vale es generar en silencio scripts que no van a correr.** Si el asistente detecta que el sistema no puede ejecutarlos, lo dice **antes** de escribirlos: un script que no corre es peor que no tenerlo, porque parece cubierto y no lo está.
 

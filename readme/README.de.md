@@ -14,7 +14,7 @@ vuelamind bricht beides zugleich — nicht mit einer App, sondern mit geschriebe
 
 ## Was du bekommst
 
-Ein Vault aus reinem Text und ein Zyklus aus drei Akten: einmal **geboren werden**; zu Beginn jeder Sitzung **wiederaufnehmen** — den aktuellen Zustand messen statt der Erinnerung trauen; und beim Abschluss **abgleichen**.
+Ein Vault aus reinem Text und ein Zyklus aus vier Akten: einmal **geboren werden**; zu Beginn jeder Sitzung **wiederaufnehmen** — den aktuellen Zustand messen statt der Erinnerung trauen; und beim Abschluss **abgleichen**.
 
 Darin: eine nach echter Schwere geordnete Arbeitswarteschlange, ein Entscheidungsregister, das festhält *was mich umstimmen würde*, und **ein Fehlerbuch mit 38 Lektionen, jede mit einem echten Fehler bezahlt**. Genau das ist das Wertvolle: die Struktur baust du an einem Nachmittag nach, die Narben nicht.
 

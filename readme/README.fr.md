@@ -14,7 +14,7 @@ vuelamind casse les deux à la fois — non par une application, mais par une di
 
 ## Ce que vous obtenez
 
-Un vault en texte brut et un cycle en trois actes : **naître** une fois ; **reprendre** au début de chaque session — en mesurant l'état actuel plutôt qu'en se fiant au souvenir ; et **réconcilier** à la clôture.
+Un vault en texte brut et un cycle en quatre actes : **naître** une fois ; **reprendre** au début de chaque session — en mesurant l'état actuel plutôt qu'en se fiant au souvenir ; et **réconcilier** à la clôture.
 
 Dedans : une file de travail classée par gravité réelle, un registre de décisions qui note *ce qui me ferait changer d'avis*, et **un livre d'erreurs de 38 leçons, chacune payée par une vraie bévue**. C'est cette dernière partie qui vaut : la structure se refait en une après-midi, les cicatrices non.
 

@@ -30,12 +30,13 @@ provenance: **measured**, **inferred**, or **reported**.
 
 ## What you get
 
-A vault of plain text files and a three-act cycle:
+A vault of plain text files and a cycle of four acts:
 
 - **Born**, once — an interview that produces your domain's birth record, in your words.
 - **Resumed**, at the start of every session — the assistant measures the current state
   instead of trusting what it remembers.
 - **Reconciled**, at the close — what aged gets corrected, what was learned gets written.
+- **Joined**, when another machine comes in — the first step of a hive.
 
 Inside: a work queue ordered by real severity, a decision log that records *what would
 change my mind*, and **an error book — 38 lessons, each one paid for by a real mistake**.
