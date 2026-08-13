@@ -111,7 +111,14 @@ En los **tres** sitios: el registro de decisiones, la nota del componente y **el
 
 ### ¿Algo de esto es del MÉTODO y no de este dominio?
 
-**Preguntárselo en cada cierre, antes de confirmar la lista.** La prueba: reescribe el hallazgo sustituyendo **todos** los nombres propios por genéricos. ¿Sigue siendo cierto y útil? Si sí, es del método → **es un parche**. Ante la duda, se escribe: uno de más cuesta un archivo; uno de menos cuesta que otra instancia repita el error meses después.
+**Se hace en TODOS los cierres, sin excepción, y su resultado va al reporte final — también cuando es «nada».**
+
+> [!danger] Esto no es un recordatorio: es un paso con salida obligatoria
+> Un paso cuyo resultado **no aparece en el reporte** es un paso opcional, por mucho que el texto diga *siempre*. Si saltárselo produce una salida idéntica a haberlo hecho, **se va a saltar** — no por mala fe, sino porque nada lo distingue.
+>
+> Por eso el cierre **no está completo** sin la línea del método en el paso 6. La diferencia entre *«no hubo nada del método»* y *«no lo miré»* es toda, y solo se ve si se escribe.
+
+**Se recorren los hallazgos de la sesión uno por uno**, no en bloque ni de memoria: cada corrección, cada error propio, cada regla que se descubrió a medio trabajar. La prueba: reescribe el hallazgo sustituyendo **todos** los nombres propios por genéricos. ¿Sigue siendo cierto y útil? Si sí, es del método → **es un parche**. Ante la duda, se escribe: uno de más cuesta un archivo; uno de menos cuesta que otra instancia repita el error meses después.
 
 **Y entonces mira el manifiesto, que dice qué hacer con él:**
 
@@ -159,6 +166,16 @@ Que el vault local y su réplica coincidan — **por huella, no por fe**. El có
 ## 6. Reportar
 
 **Qué se corrigió y qué se dejó igual**, separando cambios de documentación de cambios en sistemas — son actos con reversibilidad distinta. Si algo se afirmó antes sin verificar y resultó falso, decirlo explícitamente en vez de corregirlo en silencio.
+
+**Y una línea obligatoria sobre el método** — siempre, aunque la respuesta sea que no hubo nada:
+
+| Lo que pasó | Qué se reporta |
+|---|---|
+| Salió un parche | Cuál, qué corrige, y **dónde quedó**: propuesto, guardado en casa, o pendiente de proponer |
+| No salió ninguno | **«Del método, nada esta vez»** — es un resultado válido y el más frecuente |
+| Hubo dudas y no se resolvieron | Cuál fue la duda. **Ante la duda se escribe el parche**: uno de más cuesta un archivo, uno de menos cuesta que otra instancia repita el error meses después |
+
+**Un reporte sin esa línea es un cierre incompleto**, y quien lo lea debe poder notarlo. Es la única forma de distinguir un dominio que no produjo lecciones de uno que dejó de buscarlas.
 
 Si no había nada que corregir, decir eso: es un resultado válido y significa que el marco se está manteniendo solo.
 
