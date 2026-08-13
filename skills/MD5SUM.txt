@@ -1,0 +1,9 @@
+1a96109aa9b8a0a870505ae6e72767f5  README.md
+4b0336c11c3b58ea28e0cf0ac7ccb988  vuelamind-accidente.md
+32d5b8bbe5c5e04d5c4ce9023d38e5e7  vuelamind-commit.md
+7e70b393cbc48058df3fcc73ef73092a  vuelamind-load.md
+0be5d6bac742f8c2b962735f98ed87cc  vuelamind-skills.md
+3f3bd36d9569d9e418e38d22813c363c  vuelamind-soul.md
+93cdbf481db22dbfc63a45d4f0785cb5  vuelamind-upgrade.md
+15eaae6eda95474efae4b03a5b91e313  vuelamind-whoiam.md
+30521c25d79c2a45c9ef1d04a403ed84  vuelamind.md
