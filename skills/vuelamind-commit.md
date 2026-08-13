@@ -88,6 +88,15 @@ La lista de notas a tocar **no sale solo de lo que la sesión tuvo abierto**: sa
 1. **Hacia afuera**: sus `[[enlaces]]` salientes — ¿alguna vecina habla del mismo tema y quedaría desactualizada, o tiene un *"por confirmar"* que este cambio responde?
 2. **Hacia adentro**: quién la enlaza (`grep` del nombre de la nota sobre el vault) — ¿alguien cita como hecho lo que este cambio vuelve falso?
 
+3. **Hacia la regla** — y este barrido es de otra naturaleza. Si lo que cambió **no es un hecho sino una regla** —una memoria, una convención, un vocabulario, un umbral—, **el radio no es el grafo: es el corpus**. Lo escrito bajo la regla anterior no tiene ningún enlace que lo delate; sigue ahí, coherente consigo mismo y desalineado con la regla nueva.
+
+   **Se busca por el término que cambió, no por el nombre del archivo.** Si el vocabulario pasó de una palabra a otra, se barre la vieja; si cambió un umbral, se barren las cifras que lo citaban; si cambió una convención de escritura, se barre su forma. **Y se busca en las dos direcciones**: lo que usa la forma vieja, y lo que ya usaba la nueva sin que nadie lo hubiera declarado.
+
+   > [!warning] Este es el barrido que más se salta, porque nada se pone en rojo
+   > Una regla que cambia **no rompe nada visible**: los conteos cuadran, los enlaces resuelven, el validador sale verde. El desalineamiento vive en el contenido, y el contenido no se valida solo.
+   >
+   > **Si el barrido devuelve muchos, no es motivo para posponerlo entero:** se corrige lo que la regla vuelve *falso* —que es urgente— y se anota como pendiente lo que solo vuelve *inconsistente*. Lo que no se vale es cambiar la regla y dejar el corpus sin mirar, porque entonces la regla nueva convive con su contradicción y **la siguiente sesión no sabrá cuál de las dos manda**.
+
 Lo que el barrido encuentre **entra a la lista del paso 3 como fila propia**, con su porqué. Mirar la estructura de carpetas no basta — nada en un nombre de archivo dice "esto es relevante"; la relación temática vive en el grafo. Y si el tema no tiene nota de la que salir, eso también es hallazgo: un track sin nodo no aparece en ningún censo.
 
 > *En el dominio de origen: una auditoría de un aparato de red se iba a escribir solo en el panorama, con dos notas vecinas cargando semanas un "por confirmar" que la auditoría acababa de resolver — los wikilinks de la nota ya leída las delataban, y nadie los siguió. Semanas después, un permiso de acceso se concedió sobre una premisa que otra nota marcaba como no verificada: el grafo las conectaba, la sesión no.*
