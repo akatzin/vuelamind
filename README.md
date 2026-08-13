@@ -54,6 +54,16 @@ No server, no tooling, no account. An assistant and two local folders.
 The cycle commands in `skills/` are written for Claude Code, but the method is plain text
 and does not depend on which model reads it.
 
+## One machine, or several
+
+Everything above assumes one: an assistant and two local folders. **That promise holds for being born** — nothing else is needed to start.
+
+**A second machine needs to reach what the first one has**: the vault, the scaffolding — its manifest, its validator, its memory — and, if your domain verifies against live systems, the credentials to do that. *How* it reaches them is yours to pick: a shared folder, a mount, a clone, an automatic replica. The framework does not decide the transport.
+
+`/vuelamind-join` walks that path, and its checks are the point: it confirms the vault arrived **whole** — half-synced is worse than empty, because the assistant measures over a hole and concludes with confidence — installs the cycle from the canon, and **runs your validator as the proof of being in**. Files being present is not the same as being able to measure.
+
+A machine that can read the vault but cannot reach the systems is still a legitimate instance — it just has to **say so** when it declares itself, because from then on it documents without verifying.
+
 ## Requirements
 
 An assistant, two local folders, and **a Unix-like shell** — macOS or Linux.

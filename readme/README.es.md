@@ -28,6 +28,16 @@ Sin servidor, sin herramientas, sin cuenta. Un asistente y dos carpetas locales.
 
 **La pregunta cero es en qué idioma quieres trabajar**, y a partir de ahí todo sale en el tuyo.
 
+## Una máquina, o varias
+
+Todo lo anterior supone una: un asistente y dos carpetas locales. **Esa promesa vale para nacer** — no hace falta nada más para empezar.
+
+**Una segunda máquina necesita alcanzar lo que tiene la primera**: el vault, el andamiaje —su manifiesto, su validador, su memoria— y, si tu dominio verifica contra sistemas vivos, las credenciales para hacerlo. *Cómo* los alcanza lo eliges tú: una carpeta compartida, un montaje, un clon, una réplica automática. El marco no decide el transporte.
+
+`/vuelamind-join` recorre ese camino, y sus comprobaciones son lo valioso: confirma que el vault llegó **entero** —a medio sincronizar es peor que vacío, porque el asistente mide sobre un hueco y concluye con confianza—, instala el ciclo desde el canon y **corre tu validador como prueba de estar dentro**. Que los archivos estén no es lo mismo que poder medir.
+
+Una máquina que lee el vault pero no alcanza los sistemas sigue siendo una instancia legítima — solo tiene que **decirlo** al declararse, porque a partir de ahí documenta sin verificar.
+
 ## Requisitos
 
 Un asistente, dos carpetas locales y **un shell tipo Unix** — macOS o Linux.

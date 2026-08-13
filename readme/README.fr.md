@@ -28,6 +28,16 @@ Ni serveur, ni outils, ni compte. Un assistant et deux dossiers locaux.
 
 **La question zéro porte sur la langue de travail**, et tout le reste sort dans la vôtre.
 
+## Une machine, ou plusieurs
+
+Tout ce qui précède en suppose une : un assistant et deux dossiers locaux. **Cette promesse vaut pour naître** — rien d'autre n'est nécessaire pour commencer.
+
+**Une deuxième machine doit atteindre ce que possède la première** : le vault, l'échafaudage —son manifeste, son validateur, sa mémoire— et, si votre domaine vérifie contre des systèmes vivants, les accès pour le faire. *Comment* elle les atteint, c'est vous qui le choisissez : dossier partagé, montage, clone, réplique automatique. Le cadre ne décide pas du transport.
+
+`/vuelamind-join` parcourt ce chemin, et ses vérifications sont l'essentiel : il confirme que le vault est arrivé **entier** —à moitié synchronisé est pire que vide, car l'assistant mesure sur un trou et conclut avec assurance—, installe le cycle depuis le canon et **exécute votre validateur comme preuve d'être dedans**. Que les fichiers soient là ne veut pas dire qu'on peut mesurer.
+
+Une machine qui lit le vault sans atteindre les systèmes reste une instance légitime — elle doit seulement **le dire** en se déclarant.
+
 ## Prérequis
 
 Un assistant, deux dossiers locaux et **un shell de type Unix** — macOS ou Linux.

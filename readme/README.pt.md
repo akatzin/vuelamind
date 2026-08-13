@@ -28,6 +28,16 @@ Sem servidor, sem ferramentas, sem conta. Um assistente e duas pastas locais.
 
 **A pergunta zero é em que idioma você quer trabalhar**, e a partir daí tudo sai no seu.
 
+## Uma máquina, ou várias
+
+Tudo acima supõe uma: um assistente e duas pastas locais. **Essa promessa vale para nascer** — nada mais é preciso para começar.
+
+**Uma segunda máquina precisa alcançar o que a primeira tem**: o vault, o andaime —seu manifesto, seu validador, sua memória— e, se o seu domínio verifica contra sistemas vivos, as credenciais para isso. *Como* os alcança é escolha sua: pasta compartilhada, montagem, clone, réplica automática. O framework não decide o transporte.
+
+`/vuelamind-join` percorre esse caminho, e suas verificações são o ponto: confirma que o vault chegou **inteiro** —pela metade é pior que vazio, porque o assistente mede sobre um buraco e conclui com confiança—, instala o ciclo a partir do cânone e **roda o seu validador como prova de estar dentro**. Os arquivos estarem lá não é o mesmo que poder medir.
+
+Uma máquina que lê o vault mas não alcança os sistemas ainda é uma instância legítima — só precisa **dizê-lo** ao se declarar.
+
 ## Requisitos
 
 Um assistente, duas pastas locais e **um shell tipo Unix** — macOS ou Linux.

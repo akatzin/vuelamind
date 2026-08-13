@@ -28,6 +28,16 @@ Kein Server, keine Werkzeuge, kein Konto. Ein Assistent und zwei lokale Ordner.
 
 **Die nullte Frage lautet, in welcher Sprache du arbeiten willst** — alles Weitere entsteht in deiner.
 
+## Eine Maschine oder mehrere
+
+Alles Obige setzt eine voraus: ein Assistent und zwei lokale Ordner. **Dieses Versprechen gilt fürs Geborenwerden** — mehr braucht es zum Anfangen nicht.
+
+**Eine zweite Maschine muss erreichen, was die erste hat**: den Vault, das Gerüst —Manifest, Validator, Gedächtnis— und, falls deine Domäne gegen laufende Systeme prüft, die Zugänge dafür. *Wie* sie das erreicht, entscheidest du: geteilter Ordner, Mount, Klon, automatische Replik. Das Rahmenwerk legt den Transport nicht fest.
+
+`/vuelamind-join` geht diesen Weg, und seine Prüfungen sind der Punkt: es bestätigt, dass der Vault **vollständig** ankam —halb synchronisiert ist schlimmer als leer, denn der Assistent misst über ein Loch und schließt daraus mit Überzeugung—, installiert den Zyklus aus dem Kanon und **führt deinen Validator als Beweis des Drinseins aus**. Dass Dateien da sind, heißt nicht, dass man messen kann.
+
+Eine Maschine, die den Vault liest, aber die Systeme nicht erreicht, ist trotzdem eine legitime Instanz — sie muss es nur **sagen**, wenn sie sich anmeldet.
+
 ## Voraussetzungen
 
 Ein Assistent, zwei lokale Ordner und **eine Unix-artige Shell** — macOS oder Linux.
