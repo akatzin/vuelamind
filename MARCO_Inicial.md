@@ -13,7 +13,10 @@ origen: destilado de un dominio real, 2026-08-03 — las historias conservan el 
 
 **Cómo se usa.** Pega este archivo completo en un contexto nuevo del asistente y di: *"inicializa este marco"*. El asistente conduce la entrevista de la Fase 0, genera el vault en la Fase 1 y a partir de ahí opera bajo las reglas de la Fase 2.
 
-Después, el dominio vive en un ciclo de tres actos: **nacer** una vez, **retomarse** al abrir cada sesión y **reconciliarse** al cerrarla. Los dos últimos son comandos, no buenas intenciones — la Fase 3 y la sección *El ciclo completo*.
+Después, el dominio vive en un ciclo de cuatro actos: **nacer** una vez, **sumarse** cuando otra máquina se une, **retomarse** al abrir cada sesión y **reconciliarse** al cerrarla. Los tres últimos son comandos, no buenas intenciones — la Fase 3 y la sección *El ciclo completo*.
+
+> [!note] Nacer **no tiene comando**, y es a propósito: nacer es pegar este archivo
+> No hace falta instalar nada para empezar, ni un atajo que prepare el terreno. Un comando que decidiera las rutas por adelantado **duplicaría el Bloque E de la entrevista y la Fase 1** — y sobre todo contradiría la promesa: *pegar el archivo y contestar*. Los comandos aparecen **después** del primer dominio, para lo que se repite.
 
 > [!warning] Lo que hace que esto funcione no es la estructura
 > Las carpetas y plantillas son la parte fácil y la menos valiosa. Lo que sostiene el marco es el **núcleo epistémico** de la Fase 2: la disciplina de no escribir nada que no se haya comprobado, y de dejar rastro de la diferencia entre lo medido y lo inferido. Un vault con esta estructura y sin esa disciplina es peor que no tener vault, porque se lee con una confianza que no se ganó.
@@ -715,7 +718,7 @@ El motor, ante un manifiesto ausente, **se detiene y ofrece generarlo** — nunc
 
 ### 1.5 — Instalar los comandos genéricos del ciclo, desde el canon
 
-Los tres comandos del ciclo —**nacer**, **retomar**, **cerrar** (el motor)— no se escriben ni se copian de otro dominio: **se instalan desde `skills/`, la carpeta canon junto al master**, que trae cada uno con su huella en `MD5SUM.txt`.
+Los comandos del ciclo —**sumarse**, **retomar**, **cerrar** (el motor)— no se escriben ni se copian de otro dominio: **se instalan desde `skills/`, la carpeta canon junto al master**, que trae cada uno con su huella en `MD5SUM.txt`. *(Nacer no está entre ellos: nacer es pegar este archivo.)*
 
 **Y con ellos se copia `ALMA.md`**, el texto canónico del alma, a la nota que el manifiesto declare en su clave `alma`. Se **copia**, no se genera: su contenido es igual en todos los dominios y solo crece por abajo, en las atestiguaciones locales. Un dominio que la reescriba a su manera se queda con una definición propia de qué es el marco.
 
@@ -1330,7 +1333,7 @@ Terminar la Fase 1 y decir *"listo"* es el error de recorrido más caro del marc
 
 ### 1 · Enséñale el ciclo con SU dominio, no con uno de ejemplo
 
-Los tres actos —**nacer** (ya ocurrió), **retomar** al abrir sesión, **reconciliar** al cerrarla— se explican **con los nombres exactos que va a teclear** y con un caso hipotético del dominio que acaba de describir. Un pendiente inventado *de lo suyo*, abierto y cerrado en el aire, enseña más que cualquier manual: se ve de dónde sale el folio, dónde queda la evidencia, qué pasa al archivar.
+Los actos —**nacer** (ya ocurrió: fue pegar el archivo), **sumarse** cuando se una otra máquina, **retomar** al abrir sesión, **reconciliar** al cerrarla— se explican **con los nombres exactos que va a teclear** y con un caso hipotético del dominio que acaba de describir. Un pendiente inventado *de lo suyo*, abierto y cerrado en el aire, enseña más que cualquier manual: se ve de dónde sale el folio, dónde queda la evidencia, qué pasa al archivar.
 
 **Y muéstrale los comandos que de verdad existan en esta máquina**, no los que el método define. Se generan del disco, y hay un comando del marco que hace exactamente eso — si está instalado, se usa y se le dice a la persona que puede volver a pedirlo cuando quiera. Si no está, se listan los que sí haya, y se dice cuáles faltan.
 

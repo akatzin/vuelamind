@@ -8,4 +8,3 @@
 749de85d2bb99897f186dfe9f5f2d571  vuelamind-soul.md
 93cdbf481db22dbfc63a45d4f0785cb5  vuelamind-upgrade.md
 0c120ee1c23133a4a2df027100abb678  vuelamind-whoiam.md
-30521c25d79c2a45c9ef1d04a403ed84  vuelamind.md
