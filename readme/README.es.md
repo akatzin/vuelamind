@@ -28,6 +28,23 @@ Sin servidor, sin herramientas, sin cuenta. Un asistente y dos carpetas locales.
 
 **La pregunta cero es en qué idioma quieres trabajar**, y a partir de ahí todo sale en el tuyo.
 
+## Requisitos
+
+Un asistente, dos carpetas locales y **un shell tipo Unix** — macOS o Linux.
+
+**Windows no es compatible de forma nativa.** Los scripts que el marco genera asumen
+`sh`/`bash` y rutas POSIX. La vía conocida es correr tu asistente **dentro de un contenedor
+Linux** (Docker, por ejemplo) y trabajar ahí: todo lo que el marco necesita vive dentro del
+contenedor, y el sistema anfitrión deja de importar.
+
+Esa vía está **inferida, no probada**: debería funcionar y nada sugiere lo contrario, pero
+nadie la ha corrido todavía. Si tú lo haces, eso vale un parche — con lo que funcionó y lo
+que hubo que ajustar.
+
+El **núcleo** sí corre en cualquier sistema, Windows incluido: la entrevista, las plantillas,
+las reglas y el libro de errores son texto plano. Estarías renunciando a la maquinaria
+opcional y haciendo a mano lo que ella haría — menos cómodo, igual de válido.
+
 ## Cómo mejora
 
 Por **parches**: lecciones con caso real, fecha y forma de verificarse, propuestas como pull requests. El único criterio de admisión es la prueba de genericidad — *reescribe tu lección sin nombres propios: ¿sobrevive?* — y **descartar con razón vale más que adoptar por cortesía**.

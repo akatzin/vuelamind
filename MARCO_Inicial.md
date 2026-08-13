@@ -192,12 +192,16 @@ En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —ident
 
 **Se instala con el andamiaje** (Fase 1.5, junto a los comandos del canon), no se genera. El comando `vuelamind-soul` la muestra. Y no hace falta leerla entera para arrancar un dominio: cobra sentido cuando ya hay errores acumulados y quizá una segunda instancia.
 
-> [!note] Qué necesita cada mitad — y una advertencia si el sistema no es de tipo Unix
-> **El núcleo del método no necesita nada.** La entrevista, las plantillas, las reglas, el libro de errores y el ciclo de tres actos son **texto plano**: funcionan en cualquier sistema operativo y con cualquier asistente que sepa leer y escribir archivos.
+> [!warning] Sistema operativo: no es compatible con Windows nativo
+> **El método necesita un shell tipo Unix.** Los scripts que las fases 1.2 y 1.3 generan —arranque de sesión, empuje de la réplica— y los validadores que cada dominio escribe asumen `sh`/`bash`, rutas con `/` y utilidades POSIX. En Windows nativo **no corren**, y no tiene sentido fingir lo contrario.
 >
-> **La maquinaria opcional sí supone un shell tipo Unix.** Los scripts que las fases 1.2 y 1.3 proponen —arranque de sesión, empuje de la réplica— y los validadores que se suelen escribir asumen `sh`/`bash`. En un sistema que no lo tenga, hay tres salidas y **ninguna toca el núcleo**: usar una capa de compatibilidad, reescribir esos scripts en el lenguaje del sistema, o **no generarlos** y hacer a mano lo que harían — que es perfectamente viable, solo menos cómodo.
+> **La vía conocida es un contenedor Linux**: correr el asistente dentro de uno —por ejemplo con Docker— y trabajar ahí, montando las carpetas del dominio. Todo lo que el marco necesita existe dentro del contenedor y el sistema anfitrión deja de importar.
 >
-> **Lo que no se vale es generarlos en silencio.** Si el asistente detecta que el sistema no puede ejecutarlos, lo dice **antes** de escribirlos y pregunta qué se prefiere. Un script que no corre es peor que no tenerlo: parece cubierto y no lo está.
+> **Y eso está declarado como inferido, no como medido:** es razonable y no debería dar problema, pero **nadie lo ha probado todavía**. Si alguien lo hace, ése es un hallazgo que vale un parche — con lo que funcionó y con lo que hubo que ajustar.
+>
+> **Lo que sí funciona en cualquier sistema, Windows incluido, es el núcleo**: la entrevista, las plantillas, las reglas, el libro de errores y el ciclo de tres actos son **texto plano**. Se puede trabajar así, renunciando a la maquinaria y haciendo a mano lo que ella haría — menos cómodo, igual de válido.
+>
+> **Lo que no se vale es generar en silencio scripts que no van a correr.** Si el asistente detecta que el sistema no puede ejecutarlos, lo dice **antes** de escribirlos: un script que no corre es peor que no tenerlo, porque parece cubierto y no lo está.
 
 ## Fase 1 — Generar la estructura
 

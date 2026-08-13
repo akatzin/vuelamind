@@ -28,6 +28,16 @@ Ni serveur, ni outils, ni compte. Un assistant et deux dossiers locaux.
 
 **La question zéro porte sur la langue de travail**, et tout le reste sort dans la vôtre.
 
+## Prérequis
+
+Un assistant, deux dossiers locaux et **un shell de type Unix** — macOS ou Linux.
+
+**Windows n’est pas pris en charge nativement.** Les scripts générés par le cadre supposent `sh`/`bash` et des chemins POSIX. La voie connue consiste à exécuter votre assistant **dans un conteneur Linux** (Docker, par exemple) et à y travailler : tout ce dont le cadre a besoin vit dans le conteneur, et le système hôte cesse d’importer.
+
+Cette voie est **inférée, non testée** : elle devrait fonctionner, mais personne ne l’a encore réellement exécutée. Si vous le faites, cela mérite un correctif.
+
+Le **noyau**, lui, fonctionne partout, Windows compris : l’entretien, les gabarits, les règles et le livre d’erreurs sont du texte brut. Vous renonceriez seulement à la machinerie optionnelle — moins commode, tout aussi valable.
+
 ## Comment il s'améliore
 
 Par **correctifs** : des leçons avec cas réel, date et méthode de vérification, proposées en pull request. Le seul critère d'admission est l'épreuve de généricité — *réécrivez votre leçon sans aucun nom propre : survit-elle ?* — et **écarter avec une raison vaut mieux qu'adopter par politesse**.

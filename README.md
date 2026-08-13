@@ -53,6 +53,23 @@ No server, no tooling, no account. An assistant and two local folders.
 The cycle commands in `skills/` are written for Claude Code, but the method is plain text
 and does not depend on which model reads it.
 
+## Requirements
+
+An assistant, two local folders, and **a Unix-like shell** — macOS or Linux.
+
+**Windows is not supported natively.** The scripts the framework generates assume `sh`/`bash`
+and POSIX paths. The known way around it is running your assistant **inside a Linux
+container** (Docker, for instance) and working there — everything the framework needs lives
+inside the container, and the host stops mattering.
+
+That container route is **inferred, not tested**: it should work and nothing suggests
+otherwise, but nobody has actually run it yet. If you do, that is worth a patch — with what
+worked and what had to be adjusted.
+
+The **core** does run anywhere, Windows included: the interview, the templates, the rules and
+the error book are plain text. You would be giving up the optional machinery and doing by
+hand what it would do — less comfortable, just as valid.
+
 ---
 
 ## What it looks like — a small domain, end to end

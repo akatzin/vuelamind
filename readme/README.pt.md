@@ -28,6 +28,16 @@ Sem servidor, sem ferramentas, sem conta. Um assistente e duas pastas locais.
 
 **A pergunta zero é em que idioma você quer trabalhar**, e a partir daí tudo sai no seu.
 
+## Requisitos
+
+Um assistente, duas pastas locais e **um shell tipo Unix** — macOS ou Linux.
+
+**Windows não é compatível nativamente.** Os scripts que o framework gera assumem `sh`/`bash` e caminhos POSIX. A via conhecida é rodar seu assistente **dentro de um contêiner Linux** (Docker, por exemplo) e trabalhar ali: tudo o que o framework precisa vive dentro do contêiner, e o sistema hospedeiro deixa de importar.
+
+Essa via está **inferida, não testada**: deveria funcionar e nada sugere o contrário, mas ninguém a rodou ainda. Se você o fizer, isso vale um patch.
+
+O **núcleo** roda em qualquer sistema, Windows incluído: a entrevista, os modelos, as regras e o livro de erros são texto puro. Você estaria abrindo mão da maquinaria opcional — menos cômodo, igualmente válido.
+
 ## Como ele melhora
 
 Por **patches**: lições com caso real, data e forma de verificação, propostas como pull requests. O único critério de admissão é a prova de genericidade — *reescreva sua lição sem nomes próprios: ela sobrevive?* — e **descartar com razão vale mais do que adotar por cortesia**.
