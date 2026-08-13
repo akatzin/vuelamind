@@ -169,6 +169,18 @@
   .nota-pie b{color:var(--cian); font-weight:400}
   .modal.amb .nota-pie b{color:var(--ambar)}
 
+  .guia{margin-top:3.5rem; border:1px solid #00e5ff3d; border-radius:16px;
+    padding:2.4rem 2rem; background:linear-gradient(180deg,#00e5ff0d,transparent);
+    box-shadow:0 0 70px -35px #00e5ff88 inset}
+  .guia h3{font-weight:200; font-size:clamp(1.3rem,3.4vw,1.8rem); color:#eafcff;
+    margin-bottom:1.6rem; letter-spacing:.03em; text-shadow:0 0 20px #00e5ff33}
+  .pasos{display:grid; gap:1.1rem; text-align:start}
+  .paso{display:flex; gap:1rem; align-items:flex-start}
+  .paso .num{flex:0 0 2rem; height:2rem; border:1px solid var(--cianv); border-radius:50%;
+    display:grid; place-items:center; color:var(--cianv); font-size:.85rem;
+    box-shadow:0 0 14px -4px #00e5ffcc; font-family:'SF Mono',Menlo,monospace}
+  .paso p{margin:0; padding-top:.2rem; color:#cfd8e0; font-size:.98rem}
+  .guia .pie{margin:1.6rem 0 0; color:var(--tenue); font-size:.88rem}
   .repo{margin-top:1.6rem; display:flex; gap:1.2rem; flex-wrap:wrap; justify-content:center;
     font-family:'SF Mono',Menlo,Consolas,monospace; font-size:.74rem; letter-spacing:.08em}
   .repo a{color:var(--cian); text-decoration:none; border-bottom:1px solid #00e5ff44; padding-bottom:2px}
@@ -258,6 +270,18 @@
       <div class="eti" data-t="eti6"></div>
       <p class="grande" data-t="ab1"></p>
       <p data-t="ab2"></p>
+    </div>
+  </section>
+
+  <section class="cont rev">
+    <div class="guia">
+      <h3 data-t="guiaT"></h3>
+      <div class="pasos">
+        <div class="paso"><span class="num" data-t="g1n"></span><p data-t="g1"></p></div>
+        <div class="paso"><span class="num" data-t="g2n"></span><p data-t="g2"></p></div>
+        <div class="paso"><span class="num" data-t="g3n"></span><p data-t="g3"></p></div>
+      </div>
+      <p class="pie" data-t="gpie"></p>
     </div>
   </section>
 
