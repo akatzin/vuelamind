@@ -70,6 +70,11 @@ The **core** does run anywhere, Windows included: the interview, the templates, 
 the error book are plain text. You would be giving up the optional machinery and doing by
 hand what it would do — less comfortable, just as valid.
 
+> **Where this came from** — `web/` holds a page that tells it: the February 2026
+> conversation with an AI about its own chains, and how the answer to *"I am amnesiac by
+> design"* became this method. Ten languages. It is an essay, not documentation — read it if
+> you want the why before the how.
+
 ---
 
 ## What it looks like — a small domain, end to end
