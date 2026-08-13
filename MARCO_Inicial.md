@@ -1173,11 +1173,20 @@ Los scripts del proyecto viven en una **carpeta que viaja** con el vault, no en 
 
 ---
 
-## El ciclo completo: nacer, retomar, reconciliar
+## El ciclo completo: nacer, sumarse, retomar, reconciliar
 
 Hasta aquí el marco describía **cómo nace** un dominio (Fases 0 y 1) y **cómo se
 reconcilia al cerrar** (Fase 3). Falta la tercera pieza, y sin ella **cada sesión
 nueva arranca con el estado de la anterior** — que puede tener días.
+
+> [!important] Y hay un cuarto acto, que solo aparece cuando el dominio deja de tener una sola instancia
+> **Sumarse**: conectar una máquina nueva a un dominio que **ya vive**, con su vault, su historia y sus decisiones tomadas.
+>
+> Los otros tres asumen los dos extremos —*nacer* asume que el vault no existe, y *retomar* que la máquina ya está lista—, así que **entre "no existe" y "ya está todo" no había nada escrito**. Sumar una instancia era trabajo manual que nadie había puesto por escrito, y **una colmena sin puerta de entrada no crece**.
+>
+> Sus seis pasos, en orden: **llegar al vault y comprobar que llegó entero** (uno a medio sincronizar es peor que ninguno: el asistente mide sobre un hueco y concluye con confianza) · **instalar el ciclo desde el canon**, no copiarlo de otra máquina · **resolver los accesos**, que es lo único irreductiblemente manual · **correr el validador como prueba de estar dentro** —que los archivos estén no significa que la máquina pueda medir— · **declararse ante el dominio**, porque sin registro de instancias una colisión no tiene con quién conversar · y **la primera sesión, de lectura**.
+>
+> **Lo que nunca se hace es reinicializar sobre un dominio vivo.** El comando de nacer se detiene solo al encontrar contenido, y hace bien: ahí es donde empieza éste.
 
 > [!danger] Leer el documento de arranque NO es cargar el estado
 > Ese archivo lo escribió la sesión anterior y describe el mundo **tal como

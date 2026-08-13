@@ -2,6 +2,7 @@
 4b0336c11c3b58ea28e0cf0ac7ccb988  vuelamind-accidente.md
 6a2e33bd8041f9dcf064a85c166e1301  vuelamind-commit.md
 1c2ce9b513323bacda27f03dee6be4ad  vuelamind-help.md
+0ff2fd325ea995f55bfde87430f06847  vuelamind-join.md
 4b145209394371267c1df011f651c6de  vuelamind-load.md
 0be5d6bac742f8c2b962735f98ed87cc  vuelamind-skills.md
 749de85d2bb99897f186dfe9f5f2d571  vuelamind-soul.md
