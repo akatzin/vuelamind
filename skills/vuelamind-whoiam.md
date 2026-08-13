@@ -17,7 +17,7 @@ Del **acta de la entrevista**: el documento que la Fase 0 del marco deja escrito
 >
 > La regla dura: **agota la fuente #1 (el transcript) antes de tocar la #2.** Si el transcript existe pero está en otra máquina apagada, la respuesta correcta es **pedir encenderla o decir que no se pudo**, NO caer al panorama. Un acta reconstruida de notas documenta lo que el dominio *parece ser* según su propia documentación — que es justo lo que el acta debía verificar contra la fuente, no repetir.
 >
-> **Y comprueba si hubo entrevista siquiera:** un dominio que nació orgánicamente (no de `/vuelamind`) NO tiene los bloques de la entrevista que responder. Inventarle la estructura de entrevista es el mismo error con otra cara. Relata lo que el transcript muestre — aunque sea una instrucción de arranque y no un cuestionario.
+> **Y comprueba si hubo entrevista siquiera:** un dominio que nació orgánicamente (sin pasar por la entrevista del marco) NO tiene los bloques de la entrevista que responder. Inventarle la estructura de entrevista es el mismo error con otra cara. Relata lo que el transcript muestre — aunque sea una instrucción de arranque y no un cuestionario.
 
 ## Qué presenta
 

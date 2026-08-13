@@ -3,8 +3,8 @@
 17f05331dfaa02a5a174e2dbb6c675ff  vuelamind-commit.md
 1c2ce9b513323bacda27f03dee6be4ad  vuelamind-help.md
 0ff2fd325ea995f55bfde87430f06847  vuelamind-join.md
-4b145209394371267c1df011f651c6de  vuelamind-load.md
+6ef959680cc9ab35ef5f254159977809  vuelamind-load.md
 0be5d6bac742f8c2b962735f98ed87cc  vuelamind-skills.md
 749de85d2bb99897f186dfe9f5f2d571  vuelamind-soul.md
 93cdbf481db22dbfc63a45d4f0785cb5  vuelamind-upgrade.md
-0c120ee1c23133a4a2df027100abb678  vuelamind-whoiam.md
+8966b85ac5740f91b044a9a1c834836a  vuelamind-whoiam.md

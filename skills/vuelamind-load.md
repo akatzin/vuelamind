@@ -4,7 +4,7 @@ description: Carga el arranque de sesión del dominio actual — lee su initProm
 
 # /vuelamind-load — retomar el trabajo en un dominio
 
-Pone al asistente al día en el dominio donde está, **sin que el usuario tenga que pegar nada**. Es el compañero de `/vuelamind`: aquél crea el andamio de un dominio nuevo, éste **retoma** uno que ya vive.
+Pone al asistente al día en el dominio donde está, **sin que el usuario tenga que pegar nada**. Es el compañero del acto de nacer —que no es un comando, sino pegar el master— y de `/vuelamind-join`: aquéllos ponen un dominio en pie, éste **retoma** uno que ya vive.
 
 > [!important] No es solo leer un archivo
 > Cargar el `initPrompt` a secas deja al asistente con el contexto de la última
@@ -89,7 +89,7 @@ Y entonces **preguntar por dónde seguir**. No empezar a trabajar por cuenta pro
 ## Qué NO hace
 
 - **No escribe nada.** Es de lectura. Lo que corrige documentación es el checkpoint.
-- **No inicializa un dominio.** Eso es `/vuelamind` y la entrevista posterior.
+- **No inicializa un dominio.** Eso es pegar el master y contestar la entrevista. Y para sumar una máquina a un dominio que ya existe, `/vuelamind-join`.
 - **No aplica parches solo.** Los presenta; la decisión es del usuario.
 
 ## Por qué está en el nivel personal
