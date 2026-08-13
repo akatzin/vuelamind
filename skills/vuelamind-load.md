@@ -78,6 +78,12 @@ Cerrar con lo que el usuario necesita para decidir en qué trabajar:
 >
 > (Parche `2026-08-11-el-arranque-presenta-una-cola-y-esconde-la-otra`, nació aquí, v2.)
 
+**Y ofrecer los comandos, en una línea al final.** Quien acaba de recibir el estado necesita saber qué puede pedir — sobre todo si el dominio es joven o la persona lleva poco usándolo:
+
+> *«Si quieres ver qué más puedo hacer aquí: `/vuelamind-help`.»*
+
+Una línea, no un catálogo: el catálogo es de ese comando y se genera solo. Si la persona ya lleva tiempo trabajando y va directo al grano, se omite — el recordatorio sirve una vez, no todas.
+
 Y entonces **preguntar por dónde seguir**. No empezar a trabajar por cuenta propia: el `initPrompt` propone un orden, pero el usuario puede traer otra cosa en mente.
 
 ## Qué NO hace

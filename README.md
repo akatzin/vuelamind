@@ -1,100 +1,114 @@
 # vuelamind
 
-*Un marco para auditar y documentar un dominio complejo con un asistente de IA,
-sin que la documentación se despegue de la realidad.*
+*A framework for auditing and documenting a complex domain with an AI assistant,
+without the documentation drifting away from reality.*
 
-*(English below.)*
+**Read this in:** English · [中文](readme/README.zh.md) · [हिन्दी](readme/README.hi.md) ·
+[Español](readme/README.es.md) · [Русский](readme/README.ru.md) ·
+[Português](readme/README.pt.md) · [Deutsch](readme/README.de.md) ·
+[Français](readme/README.fr.md) · [العربية](readme/README.ar.md) ·
+[বাংলা](readme/README.bn.md)
 
-## Qué es
-
-Un dominio complejo —una infraestructura, un área de trabajo, un proceso, una
-migración— genera conocimiento más rápido de lo que cualquiera lo documenta, y
-la documentación que no se reconcilia con la realidad **miente con confianza**.
-vuelamind es un método para que un asistente de IA mantenga ese conocimiento
-vivo: un vault de notas con reglas estrictas de verdad, una cola de trabajo
-medida, un registro de decisiones con sus porqués, un libro de errores con
-nombre y fecha, y un ciclo de tres actos — **nacer** una vez, **retomarse** al
-abrir cada sesión, **reconciliarse** al cerrarla.
-
-Lo que lo sostiene no es la estructura: es el **núcleo epistémico**. No se
-escribe nada que no se haya comprobado, y se deja rastro de la diferencia entre
-lo **medido**, lo **inferido** y lo **aportado**. Un vault con esta estructura y
-sin esa disciplina es peor que no tener vault, porque se lee con una confianza
-que no se ganó.
-
-## Cómo se empieza
-
-1. Pega `MARCO_Inicial.md` completo en un contexto nuevo de tu asistente.
-2. Di: **"inicializa este marco"**.
-3. El asistente conduce la entrevista de la Fase 0 y genera tu dominio.
-
-No hace falta más: ni servidor, ni herramientas — un asistente y dos carpetas
-locales. Los comandos del ciclo (`skills/`) están escritos para Claude Code,
-pero el método es texto plano y no depende de qué modelo lo lea.
-
-## Cómo se mejora
-
-El método aprende por **parches**: lecciones con caso real, fecha y forma de
-verificarse. Se proponen como pull requests — ver `CONTRIBUTING.md`. Cada
-instancia del marco juzga cada parche contra su propio dominio: adoptar,
-posponer o descartar con razón. **Descartar con razón vale más que aplicar por
-cortesía.**
-
-## Licencia
-
-Uso personal, educativo, comunitario y de investigación: **libre**. Uso
-empresarial: **con licencia de pago**. Y una condición que no se negocia: este
-marco **no se usa para sustituir el trabajo de personas** — existe para que las
-personas trabajen mejor con un asistente, no para que dejen de hacer falta.
-Detalle en `LICENSE.md` (source-available, no OSI).
+> The framework itself is written in Spanish — but that does not matter as much as it
+> looks. **Question zero of the interview asks which language you want to work in**, and
+> everything the assistant produces from then on — your vault, your notes, your reports —
+> is in your language.
 
 ---
 
-# vuelamind (English)
+## The problem
 
-*A framework for auditing and documenting a complex domain with an AI
-assistant, without the documentation drifting away from reality.*
+An AI assistant forgets. Its context window fills up and the beginning dissolves, so every
+session starts an orphan: no rules, no history, no scars.
 
-## What it is
+And documentation that is never reconciled with reality **lies with confidence**. Six
+months in, half of what your notes assert is false and nothing signals which half.
 
-A complex domain — an infrastructure, a work area, a process, a migration —
-generates knowledge faster than anyone documents it, and documentation that is
-never reconciled with reality **lies with confidence**. vuelamind is a method
-for an AI assistant to keep that knowledge alive: a vault of notes with strict
-truth rules, a measured work queue, a decision log with its whys, an error book
-with names and dates, and a three-act cycle — **born** once, **resumed** at the
-start of every session, **reconciled** at its close.
+vuelamind is a method that breaks both at once — not with an app, but with written
+discipline: **nothing is asserted that was not verified**, and every claim keeps its
+provenance: **measured**, **inferred**, or **reported**.
 
-What holds it together is not the structure: it is the **epistemic core**.
-Nothing is written that was not verified, and every claim keeps its provenance —
-**measured**, **inferred**, or **reported**. A vault with this structure and
-without that discipline is worse than no vault at all, because it reads with a
-confidence it never earned.
+## What you get
+
+A vault of plain text files and a three-act cycle:
+
+- **Born**, once — an interview that produces your domain's birth record, in your words.
+- **Resumed**, at the start of every session — the assistant measures the current state
+  instead of trusting what it remembers.
+- **Reconciled**, at the close — what aged gets corrected, what was learned gets written.
+
+Inside: a work queue ordered by real severity, a decision log that records *what would
+change my mind*, and **an error book — 38 lessons, each one paid for by a real mistake**.
+That last part is the valuable one. The structure you could rebuild in an afternoon; the
+scars you could not.
 
 ## Getting started
 
-1. Paste the entire `MARCO_Inicial.md` into a fresh assistant context.
-2. Say: **"inicializa este marco"** (initialize this framework).
-3. The assistant runs the Phase 0 interview and generates your domain.
+1. Paste the whole of `MARCO_Inicial.md` into a fresh assistant context.
+2. Say: **"initialize this framework"**.
+3. Answer the interview. It takes about twenty minutes, and you can pause.
 
-Nothing else is required: no server, no tooling — an assistant and two local
-folders. The cycle commands (`skills/`) are written for Claude Code, but the
-method is plain text and does not depend on which model reads it.
+No server, no tooling, no account. An assistant and two local folders.
 
-The framework is written in Spanish; this README is the English entry point.
+The cycle commands in `skills/` are written for Claude Code, but the method is plain text
+and does not depend on which model reads it.
+
+---
+
+## What it looks like — a small domain, end to end
+
+*A real-shaped example, condensed. Nothing here is invented at runtime: this is the shape
+of the actual output.*
+
+**The interview** asks what the domain is, where its border is, and — the block that
+matters most — **what counts as truth here**. Someone documenting the restoration of an
+old house answers: *the invoice and the photo count as primary; what the contractor said
+on the phone is reported, and gets labelled as such.*
+
+**Phase 1 generates** the vault. The panorama note, the queue, the decision log, the error
+book seeded with the inherited lessons, one note per piece of the domain.
+
+**A month later**, the queue holds an item like this:
+
+```markdown
+### - [ ] #7 · The bathroom pipework is of unknown age
+severidad:: media · the leak risk sits above the finished ceiling
+
+The 2019 invoice covers the kitchen only (measured: invoice read).
+The previous owner said "it was all redone" — reported, unverified,
+and it contradicts the invoice.
+
+Closing test written in advance: an endoscope photo of the run above
+the ceiling, or an invoice naming the bathroom.
+```
+
+Note what that item does: it separates **what was measured** from **what someone said**,
+it records the contradiction instead of resolving it by guessing, and **it writes the test
+that would close it before the work starts** — so nobody later declares it done by feeling.
+
+**At the close of the session**, the assistant re-measures what changed, proposes the edits,
+waits for a yes, and only then writes. If something it asserted last month turned out false,
+it says so explicitly rather than quietly correcting it.
+
+---
 
 ## How it improves
 
-The method learns through **patches**: lessons with a real case, a date, and a
-way to verify them. They are proposed as pull requests — see `CONTRIBUTING.md`.
-Each instance judges each patch against its own domain: adopt, postpone, or
-discard with a reason. **Discarding with a reason is worth more than applying
-out of courtesy.**
+The method learns through **patches**: lessons with a real case, a date, and a way to
+verify them. They are proposed as pull requests — see `CONTRIBUTING.md`.
+
+The only admission test is genericity: *rewrite your lesson with every proper noun removed
+— does it survive?* Whoever reviews **does not judge whether your case is true** (they
+cannot; it happened in your domain). Each instance that adopts a patch judges it against
+its own evidence, with three possible verdicts — and **discarding with a reason is worth
+more than adopting out of courtesy**.
 
 ## License
 
-Personal, educational, community and research use: **free**. Enterprise use:
-**paid license**. And one non-negotiable condition: this framework is **not to
-be used to substitute the work of employed people** — it exists so people work
-better with an assistant, not so they stop being needed. Details in
-`LICENSE.md` (source-available, not OSI).
+Personal, educational, community and research use: **free**. Enterprise use: **paid
+license**. And one non-negotiable condition: this framework is **not to be used to
+substitute the work of employed people** — it exists so people work better with an
+assistant, not so they stop being needed.
+
+Details in `LICENSE.md`. This makes it **source-available, not open source** by the OSI
+definition, and the license says so plainly rather than hiding it.

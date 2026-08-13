@@ -24,9 +24,40 @@ Después, el dominio vive en un ciclo de tres actos: **nacer** una vez, **retoma
 
 Antes de crear un solo archivo, el asistente hace estas preguntas. No las hace todas de golpe: agrupa de tres o cuatro, y usa las respuestas para afinar las siguientes. Si una respuesta ya se deduce del contexto, la propone y pide confirmación en vez de preguntar en frío.
 
+### Pregunta 0 — El idioma
+
+**Antes que nada: «¿en qué idioma quieres trabajar?»** Se pregunta en el idioma en que llegó el usuario, y a partir de la respuesta **todo** va en ese idioma: la entrevista, el vault, las notas, los reportes. Este archivo está escrito en uno solo porque tiene que estarlo; el dominio que genera, no.
+
+No es una preferencia de cortesía: **la persona va a escribir aquí durante meses, y va a leerlo cansada.** Un vault en un idioma que no es el propio se abandona.
+
+### Antes de empezar — lo que hay que decirle a quien va a contestar
+
+Tres cosas, en tres líneas, antes de la primera pregunta:
+
+1. **Cuánto dura.** Son seis bloques y toma alrededor de veinte minutos. **Se puede pausar y retomar**: lo respondido no se pierde.
+2. **Que puede preguntar, siempre.** Y en concreto que tiene tres salidas en cualquier momento — decirlo explícito, porque nadie las usa si no se las ofrecen:
+   - **«dame un ejemplo»** — el asistente lo da, y de un dominio parecido al suyo.
+   - **«¿por qué me preguntas esto?»** — toda pregunta de aquí tiene una consecuencia en el vault; el asistente la explica.
+   - **«sáltalo, no sé todavía»** — se anota como **hueco declarado**, con su fecha. No se inventa ni se rellena con lo que parezca razonable.
+3. **Que no hay respuestas equivocadas, pero sí respuestas inventadas.** Un *"no sé"* es una respuesta útil; una respuesta de compromiso envenena el acta, porque el asistente la va a tratar como cierta durante meses.
+
+> [!important] Aquí se está escribiendo el acta de nacimiento
+> Lo que se conteste queda como la identidad del dominio, con las palabras de quien lo funda. Por eso el asistente **no parafrasea al escribirla**, y por eso conviene contestar en corto y en llano en vez de bonito.
+
 ### Bloque A — El dominio y su frontera
 
 1. **¿Qué dominio se va a documentar, y cómo se llama?** El nombre da el título de la nota panorama (`0_<Dominio>.md`) y el del vault.
+
+> [!note] Si la persona duda de si su caso «califica», ofrécele ejemplos — pero **genéralos tú**
+> Aquí **no hay lista escrita a propósito**: una lista envejece y, peor, **encajona** — quien no ve el suyo entre los ejemplos se va creyendo que esto no es para él.
+>
+> **Genera tres o cuatro ejemplos cercanos al mundo de esa persona**, con lo que ya sepas de ella. Y para saber si algo califica, la prueba son tres preguntas — **con dos que respondan sí, basta**:
+>
+> 1. ¿Hay **verdad que se degrada**? Algo cierto hace seis meses que hoy podría ser falso sin que nadie lo notara.
+> 2. ¿Hay **decisiones que se re-litigan**? Discusiones ya tenidas que vuelven porque nadie escribió el porqué.
+> 3. ¿Hay **errores que se repiten**? Algo que ya salió mal y volverá a salir mal.
+>
+> Sirve para mucho más que infraestructura: donde la **procedencia** es la sustancia (un caso legal, una enfermedad crónica, una genealogía, una investigación), donde hay **una cosa física con historia** (una restauración, una colección, un barco habitado), donde **varias personas acuerdan y olvidan** (cuidar a un mayor entre hermanos, una asociación, una obra), o donde alguien **se forma sin ver su progreso** (una tesis, un instrumento, una oposición). Que los ejemplos sean **variados de propósito**: si todos son técnicos, la persona con una tesis entre manos concluye que esto no es para ella.
 2. **¿Qué queda dentro y qué queda fuera?** La frontera importa más que el contenido: sin ella, el vault crece hasta volverse inútil. Pide dos o tres ejemplos de cosas que quedan **fuera** a propósito.
 3. **¿Para qué existe este dominio?** Una o dos frases, en lenguaje llano, sin jerga. Es el primer párrafo del panorama y lo que da criterio para priorizar.
 4. **¿Qué pasa si esto se hace mal?** Define el eje de severidad. Si la peor consecuencia es perder datos, la severidad se mide en irreversibilidad; si es perder dinero, en pesos; si es incumplimiento, en exposición.
@@ -1243,6 +1274,31 @@ usuario puede traer otra cosa.
 
 ---
 
+## El primer día — que nadie se quede con un vault vacío y sin saber qué hacer
+
+Terminar la Fase 1 y decir *"listo"* es el error de recorrido más caro del marco: la persona se queda con carpetas nuevas, cero contenido y ninguna idea de qué pasa mañana. **La inicialización no termina en los archivos: termina cuando quien lo fundó sabe usarlo.**
+
+### 1 · Enséñale el ciclo con SU dominio, no con uno de ejemplo
+
+Los tres actos —**nacer** (ya ocurrió), **retomar** al abrir sesión, **reconciliar** al cerrarla— se explican **con los nombres exactos que va a teclear** y con un caso hipotético del dominio que acaba de describir. Un pendiente inventado *de lo suyo*, abierto y cerrado en el aire, enseña más que cualquier manual: se ve de dónde sale el folio, dónde queda la evidencia, qué pasa al archivar.
+
+**Y muéstrale los comandos que de verdad existan en esta máquina**, no los que el método define. Se generan del disco, y hay un comando del marco que hace exactamente eso — si está instalado, se usa y se le dice a la persona que puede volver a pedirlo cuando quiera. Si no está, se listan los que sí haya, y se dice cuáles faltan.
+
+> [!warning] Los nombres se dicen completos
+> Al enseñar se teclea el comando **tal cual es**, no su concepto. Alguien que aprendió *"retomar"* y no el nombre real se queda sin poder invocarlo — y no vuelve a preguntar.
+
+### 2 · Propón lo que puedes hacer por ella — como preguntas, no como plan
+
+Con lo que salió de la entrevista, **ofrece tres o cuatro entregables concretos**: una lista priorizada de algo, un mapa de cómo se relacionan las piezas, un directorio de quién sabe qué, un inventario de lo que nadie ha verificado nunca.
+
+**En forma de pregunta, no de anuncio**: *"¿te serviría…?"*, no *"te voy a armar…"*. El asistente lleva veinte minutos conociendo el dominio, y es el momento de mayor tentación de inventar con seguridad. Que la persona elija es además lo que confirma que la entrevista sirvió: si ninguna de las cuatro le suena, algo no se entendió y **eso es el hallazgo**, no un fracaso.
+
+Tres o cuatro. Diez es un catálogo, y un catálogo no se elige: se hojea.
+
+### 3 · Una sola cosa para mañana
+
+Cierra con **un primer paso concreto y pequeño**: abrir la sesión con el comando de retomar, **medir una sola cosa** del dominio y escribirla con su evidencia. Una. El vault vacío intimida, y el primer hecho medido lo rompe — a partir de ahí el método se sostiene solo.
+
 ## Resumen de la inicialización
 
 Cuando el asistente termine, debe entregar:
@@ -1256,6 +1312,9 @@ Cuando el asistente termine, debe entregar:
 - [ ] `Entidades/` con una nota por pieza, aunque sea de tres líneas
 - [ ] `init_<host>.sh` **generado y corrido una vez**, con sus comprobaciones pasando o avisando (Fase 1.2)
 - [ ] `rsync_project.sh` **generado y probado**, si el transporte lo requiere (Fase 1.3)
+- [ ] **El ciclo enseñado con un caso del propio dominio**, y los comandos que existen en esta máquina, mostrados con su nombre exacto
+- [ ] **Tres o cuatro entregables propuestos como preguntas**, y anotado cuál eligió
+- [ ] **Un primer paso concreto para la siguiente sesión**
 - [ ] `initPrompt.md` apuntando al primer trabajo real
 - [ ] El registro de parches del método, aunque sea vacío — con la columna de **versión**, no solo la fecha
 - [ ] Los dos comandos universales —**crear** y **retomar**— presentes en el nivel personal de esta máquina, o dicho explícitamente que no están
