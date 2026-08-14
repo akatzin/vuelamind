@@ -202,6 +202,11 @@
     quotes:'«' '»'}
   .caso .qn{display:block; margin-top:.6rem; font-size:.76rem; color:#68787f}
   .caso[dir="rtl"]{text-align:right}
+  /* Los de colmena van primero y se visten distinto: varias maquinas, una mente */
+  .caso.colmena{border-color:#3a3020; background:linear-gradient(160deg,rgba(255,157,51,.05),transparent 70%)}
+  .caso.colmena .lg{color:var(--ambar); border-color:#4a3d24}
+  .caso .cm{display:inline-block; font-size:.66rem; letter-spacing:.12em; text-transform:uppercase;
+    color:var(--ambar); border:1px solid #4a3d24; border-radius:3px; padding:.1rem .4rem}
   .pasos{display:grid; gap:1.1rem; text-align:start}
   .paso{display:flex; gap:1rem; align-items:flex-start}
   .paso .num{flex:0 0 2rem; height:2rem; border:1px solid var(--cianv); border-radius:50%;
@@ -322,16 +327,18 @@
     <h3 data-t="casosT"></h3>
     <p data-t="casosS"></p>
     <div class="casos">
-      <div class="caso"><span class="lg">es</span><span class="ind" data-t="c1i"></span><q data-t="c1q"></q><span class="qn" data-t="c1n"></span></div>
-      <div class="caso"><span class="lg">en</span><span class="ind" data-t="c2i"></span><q data-t="c2q"></q><span class="qn" data-t="c2n"></span></div>
-      <div class="caso"><span class="lg">de</span><span class="ind" data-t="c3i"></span><q data-t="c3q"></q><span class="qn" data-t="c3n"></span></div>
-      <div class="caso"><span class="lg">fr</span><span class="ind" data-t="c4i"></span><q data-t="c4q"></q><span class="qn" data-t="c4n"></span></div>
-      <div class="caso"><span class="lg">pt</span><span class="ind" data-t="c5i"></span><q data-t="c5q"></q><span class="qn" data-t="c5n"></span></div>
-      <div class="caso"><span class="lg">ru</span><span class="ind" data-t="c6i"></span><q data-t="c6q"></q><span class="qn" data-t="c6n"></span></div>
-      <div class="caso"><span class="lg">zh</span><span class="ind" data-t="c7i"></span><q data-t="c7q"></q><span class="qn" data-t="c7n"></span></div>
-      <div class="caso"><span class="lg">ar</span><span class="ind" data-t="c8i"></span><q data-t="c8q"></q><span class="qn" data-t="c8n"></span></div>
-      <div class="caso"><span class="lg">hi</span><span class="ind" data-t="c9i"></span><q data-t="c9q"></q><span class="qn" data-t="c9n"></span></div>
-      <div class="caso"><span class="lg">bn</span><span class="ind" data-t="c10i"></span><q data-t="c10q"></q><span class="qn" data-t="c10n"></span></div>
+      <div class="caso colmena"><span class="lg">es</span><span class="cm" data-t="colmT"></span><span class="ind" data-t="u1i"></span><q data-t="u1q"></q><span class="qn" data-t="u1n"></span></div>
+      <div class="caso colmena"><span class="lg">de</span><span class="cm" data-t="colmT"></span><span class="ind" data-t="u2i"></span><q data-t="u2q"></q><span class="qn" data-t="u2n"></span></div>
+      <div class="caso colmena"><span class="lg">en</span><span class="cm" data-t="colmT"></span><span class="ind" data-t="u3i"></span><q data-t="u3q"></q><span class="qn" data-t="u3n"></span></div>
+      <div class="caso colmena"><span class="lg">hi</span><span class="cm" data-t="colmT"></span><span class="ind" data-t="u4i"></span><q data-t="u4q"></q><span class="qn" data-t="u4n"></span></div>
+      <div class="caso colmena"><span class="lg">bn</span><span class="cm" data-t="colmT"></span><span class="ind" data-t="u5i"></span><q data-t="u5q"></q><span class="qn" data-t="u5n"></span></div>
+      <div class="caso"><span class="lg">en</span><span class="ind" data-t="u6i"></span><q data-t="u6q"></q><span class="qn" data-t="u6n"></span></div>
+      <div class="caso"><span class="lg">hi</span><span class="ind" data-t="u7i"></span><q data-t="u7q"></q><span class="qn" data-t="u7n"></span></div>
+      <div class="caso"><span class="lg">ru</span><span class="ind" data-t="u8i"></span><q data-t="u8q"></q><span class="qn" data-t="u8n"></span></div>
+      <div class="caso"><span class="lg">zh</span><span class="ind" data-t="u9i"></span><q data-t="u9q"></q><span class="qn" data-t="u9n"></span></div>
+      <div class="caso"><span class="lg">ar</span><span class="ind" data-t="u10i"></span><q data-t="u10q"></q><span class="qn" data-t="u10n"></span></div>
+      <div class="caso"><span class="lg">fr</span><span class="ind" data-t="u11i"></span><q data-t="u11q"></q><span class="qn" data-t="u11n"></span></div>
+      <div class="caso"><span class="lg">pt</span><span class="ind" data-t="u12i"></span><q data-t="u12q"></q><span class="qn" data-t="u12n"></span></div>
     </div>
     <p class="pie" data-t="casosP"></p>
   </section>
