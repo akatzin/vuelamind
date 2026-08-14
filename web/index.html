@@ -174,6 +174,21 @@
     box-shadow:0 0 70px -35px #00e5ff88 inset}
   .guia h3{font-weight:200; font-size:clamp(1.3rem,3.4vw,1.8rem); color:#eafcff;
     margin-bottom:1.6rem; letter-spacing:.03em; text-shadow:0 0 20px #00e5ff33}
+  /* Casos de uso: cada tarjeta conserva su idioma original a proposito.
+     Traducirlas borraria justo lo que demuestran — que el metodo se contesta
+     en el idioma de quien lo usa. */
+  .casos{display:grid; grid-template-columns:repeat(auto-fit,minmax(270px,1fr)); gap:1rem;
+    text-align:start; margin-top:1.8rem}
+  .caso{border:1px solid #1d2b33; border-radius:10px; padding:1.1rem 1.2rem;
+    background:linear-gradient(160deg,rgba(0,229,255,.035),transparent 70%)}
+  .caso .lg{display:inline-block; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+    font-size:.68rem; letter-spacing:.12em; color:var(--cianv); border:1px solid #24404a;
+    border-radius:3px; padding:.1rem .4rem; margin-inline-end:.5rem; text-transform:uppercase}
+  .caso .ind{font-size:.72rem; color:#7d8f99; letter-spacing:.06em; text-transform:uppercase}
+  .caso q{display:block; margin-top:.7rem; color:#cfd8e0; font-size:.94rem; line-height:1.55;
+    quotes:'«' '»'}
+  .caso .qn{display:block; margin-top:.6rem; font-size:.76rem; color:#68787f}
+  .caso[dir="rtl"]{text-align:right}
   .pasos{display:grid; gap:1.1rem; text-align:start}
   .paso{display:flex; gap:1rem; align-items:flex-start}
   .paso .num{flex:0 0 2rem; height:2rem; border:1px solid var(--cianv); border-radius:50%;
@@ -275,6 +290,44 @@
       <p class="grande" data-t="ab1"></p>
       <p data-t="ab2"></p>
     </div>
+  </section>
+
+  <section class="cont rev">
+    <h3 data-t="casosT"></h3>
+    <p data-t="casosS"></p>
+    <div class="casos">
+      <div class="caso" lang="es"><span class="lg">es</span><span class="ind">Comercio de barrio</span>
+        <q>Mi tlapalería, quiero llevar el control del inventario y de quién me debe dinero</q>
+        <span class="qn">Juanito · ferretería · México</span></div>
+      <div class="caso" lang="en"><span class="lg">en</span><span class="ind">Craft · restoration</span>
+        <q>I'm restoring a wooden boat from 1962 and I keep forgetting what I already checked and what I paid for</q>
+        <span class="qn">Margaret · 1962 sloop · UK</span></div>
+      <div class="caso" lang="de"><span class="lg">de</span><span class="ind">Fintech · Infrastruktur</span>
+        <q>Ich will unsere Incidents so festhalten, dass wir nicht alle drei Monate denselben Ausfall neu diskutieren</q>
+        <span class="qn">Lena · SRE · Berlin</span></div>
+      <div class="caso" lang="fr"><span class="lg">fr</span><span class="ind">Recherche universitaire</span>
+        <q>Je veux suivre ma thèse : ce que j'ai vérifié aux archives, et pourquoi j'ai écarté certaines pistes</q>
+        <span class="qn">Amélie · doctorat · Paris</span></div>
+      <div class="caso" lang="pt"><span class="lg">pt</span><span class="ind">Saúde</span>
+        <q>Quero organizar os protocolos de tratamento da clínica e saber quais deram resultado</q>
+        <span class="qn">Rodrigo · fisioterapia · São Paulo</span></div>
+      <div class="caso" lang="ru"><span class="lg">ru</span><span class="ind">Юриспруденция</span>
+        <q>Хочу вести дело так, чтобы через год помнить, почему мы выбрали именно эту линию защиты</q>
+        <span class="qn">Ольга · товарный знак · Москва</span></div>
+      <div class="caso" lang="zh"><span class="lg">zh</span><span class="ind">医疗检验 · 合规</span>
+        <q>我想把实验室的质控记录和审核要求管起来，别每次审核前才手忙脚乱</q>
+        <span class="qn">陈医生 · 检验科 · 上海</span></div>
+      <div class="caso" lang="ar" dir="rtl"><span class="lg">ar</span><span class="ind">طب الأسنان</span>
+        <q>عايز أنظّم خطط العلاج في العيادة وأعرف إيه اللي نجح مع الحالات المشابهة</q>
+        <span class="qn">د. سامي · عيادة أسنان · القاهرة</span></div>
+      <div class="caso" lang="hi"><span class="lg">hi</span><span class="ind">घरेलू देखभाल</span>
+        <q>पापा को भूलने की बीमारी है और हम तीन भाई-बहन मिलकर देखभाल करते हैं — तय बातें बार-बार न दोहरानी पड़ें</q>
+        <span class="qn">प्रिया · तीन भाई-बहन · पुणे</span></div>
+      <div class="caso" lang="bn"><span class="lg">bn</span><span class="ind">তৈরি পোশাক · সরবরাহ</span>
+        <q>ক্রেতাদের অডিট আর সাপ্লায়ারদের তথ্য এমনভাবে রাখতে চাই যাতে প্রতিবার অডিটের আগে হন্তদন্ত না হতে হয়</q>
+        <span class="qn">রফিক · কমপ্লায়েন্স · ঢাকা</span></div>
+    </div>
+    <p class="pie" data-t="casosP"></p>
   </section>
 
   <section class="cont rev">
