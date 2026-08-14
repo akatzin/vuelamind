@@ -11,7 +11,7 @@ origen: destilado de un dominio real, 2026-08-03 — las historias conservan el 
 
 **Qué es esto.** Un marco para auditar y documentar un dominio complejo con un asistente, sin que la documentación se despegue de la realidad. Nació auditando un dominio técnico real, pero nada de su núcleo es de infraestructura: sirve para un área de trabajo, un producto, un proceso, una migración o una operación.
 
-**Cómo se usa.** Pega este archivo completo en un contexto nuevo del asistente y di: *"inicializa este marco"*. **Lo segundo que te va a preguntar es si el dominio nace aquí o si esta máquina se suma a uno que ya vive** — y de ahí salen dos caminos distintos. Si nace: la entrevista de la Fase 0, el vault en la Fase 1 y las reglas de la Fase 2. Si se suma: no hay entrevista ni se genera nada, se conecta esta máquina a lo que ya existe.
+**Cómo se usa.** Clona el repositorio, abre tu asistente **en esa carpeta** y dile: *"Inicializa `MARCO_Inicial.md`"*. No hace falta pegar nada — el archivo ya está en disco y el asistente lo lee. *(Si llegaste aquí con el archivo pegado en un contexto, también funciona: es el mismo texto.)* **Lo segundo que te va a preguntar es si el dominio nace aquí o si esta máquina se suma a uno que ya vive** — y de ahí salen dos caminos distintos. Si nace: la entrevista de la Fase 0, el vault en la Fase 1 y las reglas de la Fase 2. Si se suma: no hay entrevista ni se genera nada, se conecta esta máquina a lo que ya existe.
 
 **Y también es así como llegan los comandos.** Pegar este archivo es lo que instala el ciclo, incluido `vuelamind-join`. Por eso una máquina nueva que quiere sumarse empieza aquí igual: no por el comando —que todavía no tiene— sino por este archivo, que se lo trae.
 
@@ -234,7 +234,9 @@ En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —ident
 >
 > **La vía conocida es un contenedor Linux**: correr el asistente dentro de uno —por ejemplo con Docker— y trabajar ahí, montando las carpetas del dominio. Todo lo que el marco necesita existe dentro del contenedor y el sistema anfitrión deja de importar.
 >
-> **Y eso está declarado como inferido, no como medido:** es razonable y no debería dar problema, pero **nadie lo ha probado todavía**. Si alguien lo hace, ése es un hallazgo que vale un parche — con lo que funcionó y con lo que hubo que ajustar.
+> **Y eso está MEDIDO desde el 2026-08-13**, no inferido: se construyó la imagen y se corrió. La carpeta `docker/` del repositorio la trae, con el método ya horneado dentro. Ahí se ejercitaron de punta a punta los cuatro cuadrantes de la Pregunta 1 —nacer y sumarse, cruzados con carpeta vacía y con contenido— y el asistente se detuvo donde debía detenerse.
+>
+> **Lo que esa prueba NO cubrió:** alcanzar sistemas vivos desde dentro del contenedor. Una máquina que lee el vault pero no alcanza lo que documenta sigue siendo una instancia legítima — solo tiene que decirlo.
 >
 > **Lo que sí funciona en cualquier sistema, Windows incluido, es el núcleo**: la entrevista, las plantillas, las reglas, el libro de errores y el ciclo completo son **texto plano**. Se puede trabajar así, renunciando a la maquinaria y haciendo a mano lo que ella haría — menos cómodo, igual de válido.
 >

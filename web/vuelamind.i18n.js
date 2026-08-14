@@ -94,12 +94,13 @@ es: {
   g1n:'1',
   g1:'Crea una carpeta para tu dominio y clona ahí el método:<code>git clone https://github.com/akatzin/vuelamind.git</code>',
   g2n:'2',
-  g2:'Abre tu asistente en esa carpeta y pégale <b>MARCO_Inicial.md</b> completo. Di: «inicializa este marco»',
+  g2:'Abre tu asistente <b>en esa carpeta</b> y dile: <b>«Inicializa MARCO_Inicial.md»</b>',
   g3n:'3',
   g3:'Elige: ¿este dominio nace aquí, o esta máquina se suma a uno que ya vive?',
   g4n:'4',
   g4:'Si nace, la entrevista — unos veinte minutos, y puedes pausar. Si se suma, ni entrevista ni nada generado: se conecta a lo que ya existe.',
-  gpie:'Sin servidor, sin herramientas, sin cuenta. La pregunta cero es tu idioma, y el archivo trae los comandos consigo.'
+  gnec:'<b>Lo que necesitas:</b> un asistente que pueda leer tus archivos y correr comandos. Cualquiera sirve — el método es texto plano. Si no tienes uno, éste es un camino conocido:<code>npm install -g @anthropic-ai/claude-code</code>',
+  gpie:'El marco no te pide servidor propio, ni servicio, ni cuenta suya: solo eso y dos carpetas locales. La pregunta cero es tu idioma, y el archivo trae los comandos consigo.'
 },
 
 en: {
@@ -195,12 +196,13 @@ en: {
   g1n:'1',
   g1:'Make a folder for your domain and clone the method into it:<code>git clone https://github.com/akatzin/vuelamind.git</code>',
   g2n:'2',
-  g2:'Open your assistant in that folder and paste all of <b>MARCO_Inicial.md</b>. Say: “initialize this framework”',
+  g2:'Open your assistant <b>in that folder</b> and tell it: <b>“Initialize MARCO_Inicial.md”</b>',
   g3n:'3',
   g3:'Choose: is this domain being born here, or is this machine joining one that already lives?',
   g4n:'4',
   g4:'Born: the interview — about twenty minutes, and you can pause. Joining: no interview, nothing generated — it connects to what already exists.',
-  gpie:'No server, no tooling, no account. Question zero is your language, and the file brings the commands with it.'
+  gnec:'<b>What you need:</b> an assistant that can read your files and run commands. Any of them works — the method is plain text. If you don’t have one, here is a known path:<code>npm install -g @anthropic-ai/claude-code</code>',
+  gpie:'The framework asks for no server of its own, no service, no account with it: just that and two local folders. Question zero is your language, and the file brings the commands with it.'
 },
 
 fr: {
@@ -296,12 +298,13 @@ fr: {
   g1n:'1',
   g1:'Créez un dossier pour votre domaine et clonez-y la méthode :<code>git clone https://github.com/akatzin/vuelamind.git</code>',
   g2n:'2',
-  g2:'Ouvrez votre assistant dans ce dossier et collez-y tout <b>MARCO_Inicial.md</b>. Dites : « initialise ce cadre »',
+  g2:'Ouvrez votre assistant <b>dans ce dossier</b> et dites-lui : <b>« Initialise MARCO_Inicial.md »</b>',
   g3n:'3',
   g3:'Choisissez : ce domaine naît-il ici, ou cette machine rejoint-elle un domaine qui vit déjà ?',
   g4n:'4',
   g4:'Naître : l’entretien — une vingtaine de minutes, avec pauses. Rejoindre : pas d’entretien, rien de généré — il se connecte à ce qui existe déjà.',
-  gpie:'Ni serveur, ni outils, ni compte. La question zéro porte sur votre langue, et le fichier apporte les commandes avec lui.'
+  gnec:'<b>Ce qu’il vous faut :</b> un assistant capable de lire vos fichiers et d’exécuter des commandes. N’importe lequel convient — la méthode est du texte brut. Si vous n’en avez pas, voici une voie connue :<code>npm install -g @anthropic-ai/claude-code</code>',
+  gpie:'Le cadre n’exige ni serveur propre, ni service, ni compte chez lui : juste cela et deux dossiers locaux. La question zéro porte sur votre langue, et le fichier apporte les commandes avec lui.'
 },
 
 ru: {
@@ -397,12 +400,13 @@ ru: {
   g1n:'1',
   g1:'Создайте папку для своей области и клонируйте в неё метод:<code>git clone https://github.com/akatzin/vuelamind.git</code>',
   g2n:'2',
-  g2:'Откройте ассистента в этой папке и вставьте <b>MARCO_Inicial.md</b> целиком. Скажите: «инициализируй этот метод»',
+  g2:'Откройте ассистента <b>в этой папке</b> и скажите: <b>«Инициализируй MARCO_Inicial.md»</b>',
   g3n:'3',
   g3:'Выберите: эта область рождается здесь — или эта машина присоединяется к той, что уже живёт?',
   g4n:'4',
   g4:'Рождается: интервью — около двадцати минут, можно прерваться. Присоединяется: без интервью, ничего не создаётся — подключается к тому, что уже есть.',
-  gpie:'Без сервера, инструментов и аккаунта. Нулевой вопрос — ваш язык, а файл приносит команды с собой.'
+  gnec:'<b>Что нужно:</b> ассистент, который умеет читать ваши файлы и выполнять команды. Подойдёт любой — метод это простой текст. Если его нет, вот известный путь:<code>npm install -g @anthropic-ai/claude-code</code>',
+  gpie:'Метод не требует ни своего сервера, ни сервиса, ни учётной записи у него: только это и две локальные папки. Нулевой вопрос — ваш язык, а файл приносит команды с собой.'
 },
 
 zh: {
@@ -498,12 +502,13 @@ zh: {
   g1n:'1',
   g1:'为你的领域建一个目录，把方法克隆进去：<code>git clone https://github.com/akatzin/vuelamind.git</code>',
   g2n:'2',
-  g2:'在该目录中打开助手，粘贴完整的 <b>MARCO_Inicial.md</b>。说：「初始化这个框架」',
+  g2:'<b>在该目录中</b>打开助手，对它说：<b>「初始化 MARCO_Inicial.md」</b>',
   g3n:'3',
   g3:'选择：这个领域是在这里诞生，还是这台机器要加入一个已经在活的领域？',
   g4n:'4',
   g4:'诞生：访谈——约二十分钟，可以暂停。加入：没有访谈，也不生成任何东西——直接连上已经存在的一切。',
-  gpie:'无需服务器、工具或账号。第零个问题是你的语言，而文件会把命令一并带来。'
+  gnec:'<b>你需要什么：</b>一个能读取你的文件、执行命令的助手。哪一个都行——方法本身只是纯文本。如果你还没有，这是一条已知的路：<code>npm install -g @anthropic-ai/claude-code</code>',
+  gpie:'框架本身不要求你自建服务器、不要求任何服务、也不要求在它这里注册账号：只要这些，加上两个本地文件夹。第零个问题是你的语言，而文件会把命令一并带来。'
 },
 
 ar: {
@@ -599,12 +604,13 @@ ar: {
   g1n:'١',
   g1:'أنشئ مجلدًا لمجالك واستنسخ فيه المنهج:<code>git clone https://github.com/akatzin/vuelamind.git</code>',
   g2n:'٢',
-  g2:'افتح مساعدك داخل ذلك المجلد والصق <b>MARCO_Inicial.md</b> كاملًا. قل: «هيّئ هذا الإطار»',
+  g2:'افتح مساعدك <b>داخل ذلك المجلد</b> وقل له: <b>«هيّئ MARCO_Inicial.md»</b>',
   g3n:'٣',
   g3:'اختر: هل يولد هذا المجال هنا، أم أن هذه الآلة تنضم إلى مجال يحيا بالفعل؟',
   g4n:'٤',
   g4:'يولد: المقابلة — نحو عشرين دقيقة، ويمكنك التوقف. ينضم: بلا مقابلة ودون توليد شيء — يتصل بما هو قائم بالفعل.',
-  gpie:'بلا خادم ولا أدوات ولا حساب. السؤال صفر هو لغتك، والملف يحمل الأوامر معه.'
+  gnec:'<b>ما تحتاجه:</b> مساعد يستطيع قراءة ملفاتك وتنفيذ الأوامر. أيّ مساعد يفي بالغرض — فالمنهج نصّ صِرف. وإن لم يكن لديك واحد، فهذا طريق معروف:<code>npm install -g @anthropic-ai/claude-code</code>',
+  gpie:'الإطار لا يطلب خادمًا خاصًا به، ولا خدمة، ولا حسابًا لديه: فقط ذلك ومجلدان محليان. السؤال صفر هو لغتك، والملف يحمل الأوامر معه.'
 },
 
 hi: {
@@ -700,12 +706,13 @@ hi: {
   g1n:'१',
   g1:'अपने क्षेत्र के लिए एक फ़ोल्डर बनाएँ और उसमें विधि क्लोन करें:<code>git clone https://github.com/akatzin/vuelamind.git</code>',
   g2n:'२',
-  g2:'उसी फ़ोल्डर में अपना सहायक खोलें और पूरा <b>MARCO_Inicial.md</b> चिपकाएँ। कहें: «इस ढाँचे को आरंभ करो»',
+  g2:'<b>उसी फ़ोल्डर में</b> अपना सहायक खोलें और कहें: <b>«MARCO_Inicial.md को आरंभ करो»</b>',
   g3n:'३',
   g3:'चुनें: यह क्षेत्र यहीं जन्म ले रहा है, या यह मशीन किसी ऐसे क्षेत्र से जुड़ रही है जो पहले से जीवित है?',
   g4n:'४',
   g4:'जन्म: साक्षात्कार — लगभग बीस मिनट, बीच में रोक सकते हैं। जुड़ना: न साक्षात्कार, न कुछ बनाया जाता — जो पहले से है, उसी से जुड़ जाता है।',
-  gpie:'न सर्वर, न औज़ार, न खाता। शून्यवाँ प्रश्न आपकी भाषा है, और फ़ाइल कमांड अपने साथ लाती है।'
+  gnec:'<b>क्या चाहिए:</b> एक सहायक जो आपकी फ़ाइलें पढ़ सके और कमांड चला सके। कोई भी चलेगा — विधि सादा पाठ है। यदि आपके पास कोई नहीं है, तो यह एक जाना-पहचाना रास्ता है:<code>npm install -g @anthropic-ai/claude-code</code>',
+  gpie:'ढाँचा न अपना सर्वर माँगता है, न कोई सेवा, न उसके यहाँ कोई खाता: बस इतना और दो स्थानीय फ़ोल्डर। शून्यवाँ प्रश्न आपकी भाषा है, और फ़ाइल कमांड अपने साथ लाती है।'
 },
 
 bn: {
@@ -801,12 +808,13 @@ bn: {
   g1n:'১',
   g1:'আপনার ক্ষেত্রের জন্য একটি ফোল্ডার বানান আর সেখানে পদ্ধতিটি ক্লোন করুন:<code>git clone https://github.com/akatzin/vuelamind.git</code>',
   g2n:'২',
-  g2:'ওই ফোল্ডারেই আপনার সহকারী খুলুন আর পুরো <b>MARCO_Inicial.md</b> পেস্ট করুন। বলুন: «এই কাঠামোটি চালু করো»',
+  g2:'<b>ওই ফোল্ডারেই</b> আপনার সহকারী খুলুন আর বলুন: <b>«MARCO_Inicial.md চালু করো»</b>',
   g3n:'৩',
   g3:'বেছে নিন: এই ক্ষেত্রটি কি এখানে জন্ম নিচ্ছে, নাকি এই মেশিন এমন একটিতে যোগ দিচ্ছে যা আগে থেকেই বেঁচে আছে?',
   g4n:'৪',
   g4:'জন্ম: সাক্ষাৎকার — প্রায় বিশ মিনিট, মাঝপথে থামা যায়। যোগ দেওয়া: কোনো সাক্ষাৎকার নেই, কিছুই তৈরি হয় না — যা আগে থেকে আছে তার সঙ্গেই যুক্ত হয়।',
-  gpie:'সার্ভার নেই, সরঞ্জাম নেই, অ্যাকাউন্ট নেই। শূন্যতম প্রশ্ন আপনার ভাষা, আর ফাইলটি কমান্ডগুলো সঙ্গে করে নিয়ে আসে।'
+  gnec:'<b>যা দরকার:</b> এমন একজন সহকারী যে আপনার ফাইল পড়তে আর কমান্ড চালাতে পারে। যে কোনোটিই চলবে — পদ্ধতিটি নিছক সাদা লেখা। আপনার কাছে না থাকলে, এটি একটি পরিচিত পথ:<code>npm install -g @anthropic-ai/claude-code</code>',
+  gpie:'কাঠামো নিজের কোনো সার্ভার চায় না, কোনো সেবা নয়, তার কাছে কোনো অ্যাকাউন্টও নয়: শুধু এটুকু আর দুটি স্থানীয় ফোল্ডার। শূন্যতম প্রশ্ন আপনার ভাষা, আর ফাইলটি কমান্ডগুলো সঙ্গে করে নিয়ে আসে।'
 },
 
 de: {
@@ -902,12 +910,13 @@ de: {
   g1n:'1',
   g1:'Lege einen Ordner für deine Domäne an und klone die Methode hinein:<code>git clone https://github.com/akatzin/vuelamind.git</code>',
   g2n:'2',
-  g2:'Öffne deinen Assistenten in diesem Ordner und füge <b>MARCO_Inicial.md</b> vollständig ein. Sag: «initialisiere dieses Rahmenwerk»',
+  g2:'Öffne deinen Assistenten <b>in diesem Ordner</b> und sag ihm: <b>«Initialisiere MARCO_Inicial.md»</b>',
   g3n:'3',
   g3:'Wähle: wird diese Domäne hier geboren, oder schließt sich diese Maschine einer an, die bereits lebt?',
   g4n:'4',
   g4:'Geboren: das Interview — etwa zwanzig Minuten, mit Pausen. Anschließen: kein Interview, nichts wird erzeugt — es verbindet sich mit dem, was schon da ist.',
-  gpie:'Kein Server, keine Werkzeuge, kein Konto. Die nullte Frage ist deine Sprache, und die Datei bringt die Befehle mit.'
+  gnec:'<b>Was du brauchst:</b> einen Assistenten, der deine Dateien lesen und Befehle ausführen kann. Jeder taugt — die Methode ist reiner Text. Falls du keinen hast, hier ein bekannter Weg:<code>npm install -g @anthropic-ai/claude-code</code>',
+  gpie:'Das Rahmenwerk verlangt keinen eigenen Server, keinen Dienst, kein Konto bei ihm: nur das und zwei lokale Ordner. Die nullte Frage ist deine Sprache, und die Datei bringt die Befehle mit.'
 }
 
 };

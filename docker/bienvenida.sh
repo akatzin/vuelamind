@@ -35,8 +35,9 @@ echo
 echo "  Para empezar:"
 echo
 printf '    %s\n' "$(c 'claude')"
-printf '    %s\n' "$(d "y pegale $C/MARCO_Inicial.md completo,")"
-printf '    %s\n' "$(d 'diciendo: «inicializa este marco»')"
+printf '    %s\n' "$(d "y dile: «Inicializa $C/MARCO_Inicial.md»")"
+echo
+printf '  %s\n' "$(d 'No hace falta pegar nada: el archivo ya esta en disco.')"
 echo
 printf '  %s\n' "$(d 'La segunda pregunta decide todo lo que sigue: si el dominio nace')"
 printf '  %s\n' "$(d 'aqui, o si esta maquina se suma a uno que ya vive.')"

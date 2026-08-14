@@ -28,8 +28,9 @@ Les deux chemins commencent pareil — par le fichier, pas par une commande :
    git clone https://github.com/akatzin/vuelamind.git
    ```
 
-2. Ouvrez votre assistant **dans ce dossier**, collez-y tout `MARCO_Inicial.md` et dites :
-   **« initialise ce cadre »**.
+2. Ouvrez votre assistant **dans ce dossier** et dites-lui : **« Initialise MARCO_Inicial.md »**.
+
+   Rien à coller : l’étape 1 a déjà mis le fichier sur le disque, l’assistant le lit.
 
 La première question est votre langue. **La deuxième décide de tout le reste :** ce domaine naît-il ici, ou cette machine rejoint-elle un domaine qui vit déjà ?
 
@@ -38,7 +39,9 @@ La première question est votre langue. **La deuxième décide de tout le reste 
 
 L'assistant ne s'en tient pas à votre parole : il regarde le dossier de destination et **s'arrête** si vous avez dit *naître* et qu'il y trouve des mois de travail — ou si vous avez dit *rejoindre* et qu'il n'y trouve rien.
 
-Pas de serveur, pas d'outillage, pas de compte. Un assistant et deux dossiers locaux.
+**Ce qu'il vous faut :** un assistant capable de lire vos fichiers et d'exécuter des commandes. N'importe lequel convient —la méthode est du texte brut—. Si vous n'en avez aucun, `npm install -g @anthropic-ai/claude-code` est une voie connue.
+
+Au-delà, le cadre n'exige ni serveur propre, ni service, ni compte chez lui : seulement deux dossiers locaux.
 
 ## Une machine, ou plusieurs
 
@@ -48,7 +51,7 @@ Tout ce qui précède en suppose une : un assistant et deux dossiers locaux. **C
 
 `/vuelamind-join` parcourt ce chemin, et ses vérifications sont l'essentiel : il confirme que le vault est arrivé **entier** —à moitié synchronisé est pire que vide, car l'assistant mesure sur un trou et conclut avec assurance—, installe le cycle depuis le canon et **exécute votre validateur comme preuve d'être dedans**. Que les fichiers soient là ne veut pas dire qu'on peut mesurer.
 
-**Et cette commande n'est pas encore sur la nouvelle machine** — elle voyage avec la naissance. Une machine qui n'est jamais née commence donc là où tout le monde commence : cloner ce dépôt, coller `MARCO_Inicial.md`, répondre *rejoindre*. Le fichier apporte les commandes avec lui ; ensuite c'est la commande qui mène.
+**Et cette commande n'est pas encore sur la nouvelle machine** — elle voyage avec la naissance. Une machine qui n'est jamais née commence donc là où tout le monde commence : cloner ce dépôt, initialiser `MARCO_Inicial.md`, répondre *rejoindre*. Le fichier apporte les commandes avec lui ; ensuite c'est la commande qui mène.
 
 Une machine qui lit le vault sans atteindre les systèmes reste une instance légitime — elle doit seulement **le dire** en se déclarant.
 

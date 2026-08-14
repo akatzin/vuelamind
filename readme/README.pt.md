@@ -28,8 +28,9 @@ Os dois caminhos começam igual — pelo arquivo, não por um comando:
    git clone https://github.com/akatzin/vuelamind.git
    ```
 
-2. Abra o seu assistente **nessa pasta**, cole `MARCO_Inicial.md` inteiro e diga:
-   **«inicialize este framework»**.
+2. Abra o seu assistente **nessa pasta** e diga: **«Inicialize MARCO_Inicial.md»**.
+
+   Não precisa colar nada: o passo 1 já deixou o arquivo em disco, então o assistente o lê.
 
 A primeira pergunta é o seu idioma. **A segunda decide tudo o que vem depois:** este domínio nasce aqui, ou esta máquina se soma a um que já vive?
 
@@ -38,7 +39,9 @@ A primeira pergunta é o seu idioma. **A segunda decide tudo o que vem depois:**
 
 O assistente não fica só na sua palavra: olha a pasta de destino e **para** se você disse *nasce* e encontrou meses de trabalho lá dentro — ou se disse *soma-se* e não encontrou nada.
 
-Sem servidor, sem ferramentas, sem conta. Um assistente e duas pastas locais.
+**O que você precisa:** um assistente que consiga ler seus arquivos e rodar comandos. Qualquer um serve —o método é texto puro—. Se não tiver nenhum, `npm install -g @anthropic-ai/claude-code` é um caminho conhecido.
+
+Fora isso, o framework não pede servidor próprio, nem serviço, nem conta com ele: só duas pastas locais.
 
 ## Uma máquina, ou várias
 
@@ -48,7 +51,7 @@ Tudo acima supõe uma: um assistente e duas pastas locais. **Essa promessa vale 
 
 `/vuelamind-join` percorre esse caminho, e suas verificações são o ponto: confirma que o vault chegou **inteiro** —pela metade é pior que vazio, porque o assistente mede sobre um buraco e conclui com confiança—, instala o ciclo a partir do cânone e **roda o seu validador como prova de estar dentro**. Os arquivos estarem lá não é o mesmo que poder medir.
 
-**E esse comando ainda não está na máquina nova** — ele viaja com o nascimento. Então uma máquina que nunca nasceu começa onde todo mundo começa: clone este repositório, cole `MARCO_Inicial.md`, responda *soma-se*. O arquivo traz os comandos consigo; daí em diante quem manda é o comando.
+**E esse comando ainda não está na máquina nova** — ele viaja com o nascimento. Então uma máquina que nunca nasceu começa onde todo mundo começa: clone este repositório e inicialize `MARCO_Inicial.md`, respondendo *soma-se*. O arquivo traz os comandos consigo; daí em diante quem manda é o comando.
 
 Uma máquina que lê o vault mas não alcança os sistemas ainda é uma instância legítima — só precisa **dizê-lo** ao se declarar.
 

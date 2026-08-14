@@ -28,8 +28,9 @@ Beide Wege beginnen gleich — mit der Datei, nicht mit einem Befehl:
    git clone https://github.com/akatzin/vuelamind.git
    ```
 
-2. Öffne deinen Assistenten **in diesem Ordner**, füge `MARCO_Inicial.md` vollständig ein und sag:
-   **«initialisiere dieses Rahmenwerk»**.
+2. Öffne deinen Assistenten **in diesem Ordner** und sag ihm: **«Initialisiere MARCO_Inicial.md»**.
+
+   Nichts einzufügen — Schritt 1 hat die Datei schon auf die Platte gelegt, der Assistent liest sie.
 
 Die erste Frage ist deine Sprache. **Die zweite entscheidet alles Weitere:** wird diese Domäne hier geboren, oder schließt sich diese Maschine einer an, die bereits lebt?
 
@@ -38,7 +39,9 @@ Die erste Frage ist deine Sprache. **Die zweite entscheidet alles Weitere:** wir
 
 Der Assistent verlässt sich nicht auf dein Wort: er schaut in den Zielordner und **hält an**, wenn du *geboren* gesagt hast und dort Monate an Arbeit liegen — oder wenn du *anschließen* gesagt hast und nichts da ist.
 
-Kein Server, keine Werkzeuge, kein Konto. Ein Assistent und zwei lokale Ordner.
+**Was du brauchst:** einen Assistenten, der deine Dateien lesen und Befehle ausführen kann. Jeder taugt —die Methode ist reiner Text—. Hast du keinen, ist `npm install -g @anthropic-ai/claude-code` ein bekannter Weg.
+
+Darüber hinaus verlangt das Rahmenwerk keinen eigenen Server, keinen Dienst und kein Konto bei ihm: nur zwei lokale Ordner.
 
 ## Eine Maschine oder mehrere
 
@@ -48,7 +51,7 @@ Alles Obige setzt eine voraus: ein Assistent und zwei lokale Ordner. **Dieses Ve
 
 `/vuelamind-join` geht diesen Weg, und seine Prüfungen sind der Punkt: es bestätigt, dass der Vault **vollständig** ankam —halb synchronisiert ist schlimmer als leer, denn der Assistent misst über ein Loch und schließt daraus mit Überzeugung—, installiert den Zyklus aus dem Kanon und **führt deinen Validator als Beweis des Drinseins aus**. Dass Dateien da sind, heißt nicht, dass man messen kann.
 
-**Und dieser Befehl liegt auf der neuen Maschine noch nicht** — er kommt mit der Geburt. Eine Maschine, die nie geboren wurde, beginnt also dort, wo alle beginnen: dieses Repository klonen, `MARCO_Inicial.md` einfügen, *anschließen* antworten. Die Datei bringt die Befehle mit; ab da übernimmt der Befehl.
+**Und dieser Befehl liegt auf der neuen Maschine noch nicht** — er kommt mit der Geburt. Eine Maschine, die nie geboren wurde, beginnt also dort, wo alle beginnen: dieses Repository klonen, `MARCO_Inicial.md` initialisieren, *anschließen* antworten. Die Datei bringt die Befehle mit; ab da übernimmt der Befehl.
 
 Eine Maschine, die den Vault liest, aber die Systeme nicht erreicht, ist trotzdem eine legitime Instanz — sie muss es nur **sagen**, wenn sie sich anmeldet.
 

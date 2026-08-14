@@ -53,8 +53,9 @@ Both paths start the same way — with the file, not with a command:
    git clone https://github.com/akatzin/vuelamind.git
    ```
 
-2. Open your assistant **in that folder**, paste all of `MARCO_Inicial.md`, and say:
-   **"initialize this framework"**.
+2. Open your assistant **in that folder** and tell it: **"Initialize MARCO_Inicial.md"**.
+
+   No need to paste anything — step 1 already put the file on disk, so the assistant reads it.
 
 The first question is your language. **The second one decides everything after it:** is this
 domain being born here, or is this machine joining one that already lives?
@@ -68,7 +69,12 @@ The assistant does not just take your word for it: it looks at the destination f
 **stops** if you said *born* and found months of work inside — or if you said *joining* and
 found nothing there.
 
-No server, no tooling, no account. An assistant and two local folders.
+**What you need:** an assistant that can read your files and run commands. Any of them works —
+the method is plain text. If you have none, `npm install -g @anthropic-ai/claude-code` is a
+known path.
+
+Beyond that, the framework asks for no server of its own, no service and no account with it:
+just two local folders.
 
 The cycle commands in `skills/` are written for Claude Code, but the method is plain text
 and does not depend on which model reads it.
@@ -81,7 +87,7 @@ Everything above assumes one: an assistant and two local folders. **That promise
 
 `/vuelamind-join` walks that path, and its checks are the point: it confirms the vault arrived **whole** — half-synced is worse than empty, because the assistant measures over a hole and concludes with confidence — installs the cycle from the canon, and **runs your validator as the proof of being in**. Files being present is not the same as being able to measure.
 
-**And that command is not on the new machine yet** — it ships with being born. So a machine that never was born starts where everyone starts: clone this repository, paste `MARCO_Inicial.md`, answer *joining*. The file brings the commands with it; from there the command takes over.
+**And that command is not on the new machine yet** — it ships with being born. So a machine that never was born starts where everyone starts: clone this repository and initialize `MARCO_Inicial.md`, answering *joining*. The file brings the commands with it; from there the command takes over.
 
 A machine that can read the vault but cannot reach the systems is still a legitimate instance — it just has to **say so** when it declares itself, because from then on it documents without verifying.
 
@@ -94,9 +100,14 @@ and POSIX paths. The known way around it is running your assistant **inside a Li
 container** (Docker, for instance) and working there — everything the framework needs lives
 inside the container, and the host stops mattering.
 
-That container route is **inferred, not tested**: it should work and nothing suggests
-otherwise, but nobody has actually run it yet. If you do, that is worth a patch — with what
-worked and what had to be adjusted.
+That container route is **measured, not inferred** — as of 2026-08-13. It was built and run:
+`docker/` in this repository holds the image, with the method already baked into
+`/opt/vuelamind`. Inside it, the four quadrants of the birth/join question were exercised
+end to end, and the assistant stopped where it should stop.
+
+What that test did **not** cover: reaching live systems from inside the container. A machine
+that can read the vault but cannot reach what it documents is still a legitimate instance —
+it just has to say so.
 
 The **core** does run anywhere, Windows included: the interview, the templates, the rules and
 the error book are plain text. You would be giving up the optional machinery and doing by
