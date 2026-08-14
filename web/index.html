@@ -107,6 +107,19 @@
   .decl table{width:100%; border-collapse:collapse; font-size:.92rem}
   .decl td{padding:.7rem 1.1rem; border-top:1px solid var(--linea); color:#cfd8e0; vertical-align:top; text-align:start}
   .decl tr:first-child td{border-top:0}
+  /* Comparativa a tres columnas: la pregunta, el asistente solo, el asistente
+     con el metodo. En pantalla angosta se desapila por columnas, no se aplasta. */
+  .decl.comp th{padding:.6rem 1.1rem; text-align:start; font-size:.74rem; font-weight:600;
+    letter-spacing:.09em; text-transform:uppercase; color:#7d8f99; border-bottom:1px solid var(--linea)}
+  .decl.comp th:nth-child(3){color:var(--cianv)}
+  .decl.comp td{font-size:.89rem}
+  .decl.comp td:first-child{color:#9fb0b8}
+  @media (max-width:640px){
+    .decl.comp table,.decl.comp tbody,.decl.comp tr,.decl.comp td,.decl.comp th{display:block; width:100%}
+    .decl.comp th{display:none}
+    .decl.comp tr{border-top:1px solid var(--linea); padding:.4rem 0}
+    .decl.comp td{border-top:0; padding:.35rem 1.1rem}
+  }
   .decl td:first-child{width:52%}
   .no{color:var(--ambar)} .si{color:var(--cian)}
 
@@ -290,6 +303,19 @@
       <p class="grande" data-t="ab1"></p>
       <p data-t="ab2"></p>
     </div>
+  </section>
+
+  <section class="cont rev">
+    <h3 data-t="chatT"></h3>
+    <p class="grande" data-t="chatS"></p>
+    <div class="decl comp"><table>
+      <tr><th data-t="chat_h0"></th><th data-t="chat_h1"></th><th data-t="chat_h2"></th></tr>
+      <tr><td data-t="chat_f1a"></td><td class="no" data-t="chat_f1b"></td><td class="si" data-t="chat_f1c"></td></tr>
+      <tr><td data-t="chat_f2a"></td><td class="no" data-t="chat_f2b"></td><td class="si" data-t="chat_f2c"></td></tr>
+      <tr><td data-t="chat_f3a"></td><td class="no" data-t="chat_f3b"></td><td class="si" data-t="chat_f3c"></td></tr>
+      <tr><td data-t="chat_f4a"></td><td class="no" data-t="chat_f4b"></td><td class="si" data-t="chat_f4c"></td></tr>
+    </table></div>
+    <p style="margin-top:1.6rem" data-t="chatP"></p>
   </section>
 
   <section class="cont rev">
