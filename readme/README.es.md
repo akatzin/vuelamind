@@ -22,8 +22,14 @@ Dentro: una cola de trabajo ordenada por gravedad real, un registro de decisione
 
 Los dos caminos empiezan igual — por el archivo, no por un comando:
 
-1. Pega `MARCO_Inicial.md` completo en un contexto nuevo de tu asistente.
-2. Di: **«inicializa este marco»**.
+1. Crea una carpeta para tu dominio y clona ahí el método:
+
+   ```
+   git clone https://github.com/akatzin/vuelamind.git
+   ```
+
+2. Abre tu asistente **en esa carpeta**, pégale `MARCO_Inicial.md` completo y di:
+   **«inicializa este marco»**.
 
 La primera pregunta es tu idioma. **La segunda decide todo lo que sigue:** ¿este dominio nace aquí, o esta máquina se suma a uno que ya vive?
 

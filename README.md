@@ -47,8 +47,14 @@ scars you could not.
 
 Both paths start the same way — with the file, not with a command:
 
-1. Paste the whole of `MARCO_Inicial.md` into a fresh assistant context.
-2. Say: **"initialize this framework"**.
+1. Make a folder for your domain and clone the method into it:
+
+   ```
+   git clone https://github.com/akatzin/vuelamind.git
+   ```
+
+2. Open your assistant **in that folder**, paste all of `MARCO_Inicial.md`, and say:
+   **"initialize this framework"**.
 
 The first question is your language. **The second one decides everything after it:** is this
 domain being born here, or is this machine joining one that already lives?

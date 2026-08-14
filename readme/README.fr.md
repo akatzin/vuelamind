@@ -22,8 +22,14 @@ Dedans : une file de travail classée par gravité réelle, un registre de déci
 
 Les deux chemins commencent pareil — par le fichier, pas par une commande :
 
-1. Collez `MARCO_Inicial.md` en entier dans un contexte neuf de votre assistant.
-2. Dites : **« initialise ce cadre »**.
+1. Créez un dossier pour votre domaine et clonez-y la méthode :
+
+   ```
+   git clone https://github.com/akatzin/vuelamind.git
+   ```
+
+2. Ouvrez votre assistant **dans ce dossier**, collez-y tout `MARCO_Inicial.md` et dites :
+   **« initialise ce cadre »**.
 
 La première question est votre langue. **La deuxième décide de tout le reste :** ce domaine naît-il ici, ou cette machine rejoint-elle un domaine qui vit déjà ?
 

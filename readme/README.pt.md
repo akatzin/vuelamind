@@ -22,8 +22,14 @@ Dentro: uma fila de trabalho ordenada por gravidade real, um registro de decisõ
 
 Os dois caminhos começam igual — pelo arquivo, não por um comando:
 
-1. Cole `MARCO_Inicial.md` inteiro num contexto novo do seu assistente.
-2. Diga: **«inicialize este framework»**.
+1. Crie uma pasta para o seu domínio e clone o método nela:
+
+   ```
+   git clone https://github.com/akatzin/vuelamind.git
+   ```
+
+2. Abra o seu assistente **nessa pasta**, cole `MARCO_Inicial.md` inteiro e diga:
+   **«inicialize este framework»**.
 
 A primeira pergunta é o seu idioma. **A segunda decide tudo o que vem depois:** este domínio nasce aqui, ou esta máquina se soma a um que já vive?
 

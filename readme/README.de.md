@@ -22,8 +22,14 @@ Darin: eine nach echter Schwere geordnete Arbeitswarteschlange, ein Entscheidung
 
 Beide Wege beginnen gleich — mit der Datei, nicht mit einem Befehl:
 
-1. Füge `MARCO_Inicial.md` vollständig in einen frischen Kontext deines Assistenten ein.
-2. Sag: **«initialisiere dieses Rahmenwerk»**.
+1. Lege einen Ordner für deine Domäne an und klone die Methode hinein:
+
+   ```
+   git clone https://github.com/akatzin/vuelamind.git
+   ```
+
+2. Öffne deinen Assistenten **in diesem Ordner**, füge `MARCO_Inicial.md` vollständig ein und sag:
+   **«initialisiere dieses Rahmenwerk»**.
 
 Die erste Frage ist deine Sprache. **Die zweite entscheidet alles Weitere:** wird diese Domäne hier geboren, oder schließt sich diese Maschine einer an, die bereits lebt?
 
