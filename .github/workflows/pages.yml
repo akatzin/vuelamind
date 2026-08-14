@@ -40,6 +40,17 @@ jobs:
           [ "$idiomas" -ge 9 ] || { echo "esperaba 9 idiomas o mas"; exit 1; }
           grep -q 'data-t="g4"' web/index.html || { echo "falta el cuarto paso de la guia"; exit 1; }
 
+      # El navegador cachea vuelamind.i18n.js, y ahi vive TODO el texto de la
+      # pagina: el HTML se recarga y el usuario sigue leyendo la version vieja
+      # sin ninguna senal de que algo cambio. Se le pega el sha del commit a la
+      # referencia para que cada despliegue sea un archivo distinto.
+      # Automatico a proposito: hacerlo a mano se olvida justo cuando importa.
+      - name: Versionar la referencia al i18n
+        run: |
+          sed -i "s|vuelamind.i18n.js\"|vuelamind.i18n.js?v=${GITHUB_SHA::12}\"|" web/index.html
+          grep -o 'vuelamind\.i18n\.js[^"]*' web/index.html
+          grep -q "i18n.js?v=" web/index.html || { echo "la referencia no quedo versionada"; exit 1; }
+
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
