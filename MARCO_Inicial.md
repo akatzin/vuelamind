@@ -816,7 +816,9 @@ El motor, ante un manifiesto ausente, **se detiene y ofrece generarlo** — nunc
 
 ### 1.5 — Instalar los comandos genéricos del ciclo, desde el canon
 
-Los comandos del ciclo —**sumarse**, **retomar**, **cerrar** (el motor)— no se escriben ni se copian de otro dominio: **se instalan desde `skills/`, la carpeta canon junto al master**, que trae cada uno con su huella en `MD5SUM.txt`. *(Nacer no está entre ellos: nacer es pegar este archivo.)*
+Los comandos del ciclo no se escriben ni se copian de otro dominio: **se instalan desde `skills/`, la carpeta canon junto al master**, que trae cada uno con su huella en `MD5SUM.txt`. *(Nacer no está entre ellos: nacer es pegar este archivo.)*
+
+> [!warning] **La lista es la carpeta, y no se enumera aquí.** Instala lo que `skills/` contenga y **cuenta contra su `MD5SUM.txt`** — no contra lo que este párrafo diga. Una enumeración escrita aquí envejecería cada vez que el canon crece, y el fallo tiene una forma concreta y medida: un asistente que lee una lista incompleta **rellena el resto con nombres verosímiles** y los reporta como si existieran. *(Ocurrió en una prueba del 2026-08-13: la lista decía tres, en disco había nueve, y el asistente inventó un décimo que nunca existió.)*
 
 **Y con ellos se copia `ALMA.md`**, el texto canónico del alma, a la nota que el manifiesto declare en su clave `alma`. Se **copia**, no se genera: su contenido es igual en todos los dominios y solo crece por abajo, en las atestiguaciones locales. Un dominio que la reescriba a su manera se queda con una definición propia de qué es el marco.
 
