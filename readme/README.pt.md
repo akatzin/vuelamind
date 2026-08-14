@@ -20,13 +20,19 @@ Dentro: uma fila de trabalho ordenada por gravidade real, um registro de decisõ
 
 ## Como começar
 
-1. Cole o `MARCO_Inicial.md` inteiro num contexto novo do seu assistente.
+Os dois caminhos começam igual — pelo arquivo, não por um comando:
+
+1. Cole `MARCO_Inicial.md` inteiro num contexto novo do seu assistente.
 2. Diga: **«inicialize este framework»**.
-3. Responda à entrevista — cerca de vinte minutos, e dá para pausar.
+
+A primeira pergunta é o seu idioma. **A segunda decide tudo o que vem depois:** este domínio nasce aqui, ou esta máquina se soma a um que já vive?
+
+- **Nasce** — você responde à entrevista. Cerca de vinte minutos, e dá para pausar. Gera o vault, o andaime e os comandos do ciclo.
+- **Soma-se** — sem entrevista e sem gerar nada. Chega ao vault existente, confirma que chegou inteiro, instala o ciclo a partir do cânone e passa o bastão para `/vuelamind-join`.
+
+O assistente não fica só na sua palavra: olha a pasta de destino e **para** se você disse *nasce* e encontrou meses de trabalho lá dentro — ou se disse *soma-se* e não encontrou nada.
 
 Sem servidor, sem ferramentas, sem conta. Um assistente e duas pastas locais.
-
-**A pergunta zero é em que idioma você quer trabalhar**, e a partir daí tudo sai no seu.
 
 ## Uma máquina, ou várias
 
@@ -35,6 +41,8 @@ Tudo acima supõe uma: um assistente e duas pastas locais. **Essa promessa vale 
 **Uma segunda máquina precisa alcançar o que a primeira tem**: o vault, o andaime —seu manifesto, seu validador, sua memória— e, se o seu domínio verifica contra sistemas vivos, as credenciais para isso. *Como* os alcança é escolha sua: pasta compartilhada, montagem, clone, réplica automática. O framework não decide o transporte.
 
 `/vuelamind-join` percorre esse caminho, e suas verificações são o ponto: confirma que o vault chegou **inteiro** —pela metade é pior que vazio, porque o assistente mede sobre um buraco e conclui com confiança—, instala o ciclo a partir do cânone e **roda o seu validador como prova de estar dentro**. Os arquivos estarem lá não é o mesmo que poder medir.
+
+**E esse comando ainda não está na máquina nova** — ele viaja com o nascimento. Então uma máquina que nunca nasceu começa onde todo mundo começa: clone este repositório, cole `MARCO_Inicial.md`, responda *soma-se*. O arquivo traz os comandos consigo; daí em diante quem manda é o comando.
 
 Uma máquina que lê o vault mas não alcança os sistemas ainda é uma instância legítima — só precisa **dizê-lo** ao se declarar.
 

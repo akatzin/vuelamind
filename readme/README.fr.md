@@ -20,13 +20,19 @@ Dedans : une file de travail classée par gravité réelle, un registre de déci
 
 ## Pour commencer
 
-1. Collez l'intégralité de `MARCO_Inicial.md` dans un contexte neuf de votre assistant.
+Les deux chemins commencent pareil — par le fichier, pas par une commande :
+
+1. Collez `MARCO_Inicial.md` en entier dans un contexte neuf de votre assistant.
 2. Dites : **« initialise ce cadre »**.
-3. Répondez à l'entretien — une vingtaine de minutes, avec pauses possibles.
 
-Ni serveur, ni outils, ni compte. Un assistant et deux dossiers locaux.
+La première question est votre langue. **La deuxième décide de tout le reste :** ce domaine naît-il ici, ou cette machine rejoint-elle un domaine qui vit déjà ?
 
-**La question zéro porte sur la langue de travail**, et tout le reste sort dans la vôtre.
+- **Naître** — vous répondez à l'entretien. Une vingtaine de minutes, avec pauses possibles. Il génère le vault, l'échafaudage et les commandes du cycle.
+- **Rejoindre** — pas d'entretien, rien de généré. Il atteint le vault existant, vérifie qu'il est arrivé entier, installe le cycle depuis le canon et passe la main à `/vuelamind-join`.
+
+L'assistant ne s'en tient pas à votre parole : il regarde le dossier de destination et **s'arrête** si vous avez dit *naître* et qu'il y trouve des mois de travail — ou si vous avez dit *rejoindre* et qu'il n'y trouve rien.
+
+Pas de serveur, pas d'outillage, pas de compte. Un assistant et deux dossiers locaux.
 
 ## Une machine, ou plusieurs
 
@@ -35,6 +41,8 @@ Tout ce qui précède en suppose une : un assistant et deux dossiers locaux. **C
 **Une deuxième machine doit atteindre ce que possède la première** : le vault, l'échafaudage —son manifeste, son validateur, sa mémoire— et, si votre domaine vérifie contre des systèmes vivants, les accès pour le faire. *Comment* elle les atteint, c'est vous qui le choisissez : dossier partagé, montage, clone, réplique automatique. Le cadre ne décide pas du transport.
 
 `/vuelamind-join` parcourt ce chemin, et ses vérifications sont l'essentiel : il confirme que le vault est arrivé **entier** —à moitié synchronisé est pire que vide, car l'assistant mesure sur un trou et conclut avec assurance—, installe le cycle depuis le canon et **exécute votre validateur comme preuve d'être dedans**. Que les fichiers soient là ne veut pas dire qu'on peut mesurer.
+
+**Et cette commande n'est pas encore sur la nouvelle machine** — elle voyage avec la naissance. Une machine qui n'est jamais née commence donc là où tout le monde commence : cloner ce dépôt, coller `MARCO_Inicial.md`, répondre *rejoindre*. Le fichier apporte les commandes avec lui ; ensuite c'est la commande qui mène.
 
 Une machine qui lit le vault sans atteindre les systèmes reste une instance légitime — elle doit seulement **le dire** en se déclarant.
 

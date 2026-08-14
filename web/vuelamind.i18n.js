@@ -96,8 +96,10 @@ es: {
   g2n:'2',
   g2:'Di: «inicializa este marco»',
   g3n:'3',
-  g3:'Contesta la entrevista — unos veinte minutos, y puedes pausar',
-  gpie:'Sin servidor, sin herramientas, sin cuenta. La pregunta cero es en qué idioma quieres trabajar.'
+  g3:'Elige: ¿este dominio nace aquí, o esta máquina se suma a uno que ya vive?',
+  g4n:'4',
+  g4:'Si nace, la entrevista — unos veinte minutos, y puedes pausar. Si se suma, ni entrevista ni nada generado: se conecta a lo que ya existe.',
+  gpie:'Sin servidor, sin herramientas, sin cuenta. La pregunta cero es tu idioma, y el archivo trae los comandos consigo.'
 },
 
 en: {
@@ -195,8 +197,10 @@ en: {
   g2n:'2',
   g2:'Say: “initialize this framework”',
   g3n:'3',
-  g3:'Answer the interview — about twenty minutes, and you can pause',
-  gpie:'No server, no tooling, no account. Question zero is which language you want to work in.'
+  g3:'Choose: is this domain being born here, or is this machine joining one that already lives?',
+  g4n:'4',
+  g4:'Born: the interview — about twenty minutes, and you can pause. Joining: no interview, nothing generated — it connects to what already exists.',
+  gpie:'No server, no tooling, no account. Question zero is your language, and the file brings the commands with it.'
 },
 
 fr: {
@@ -294,8 +298,10 @@ fr: {
   g2n:'2',
   g2:'Dites : « initialise ce cadre »',
   g3n:'3',
-  g3:'Répondez à l’entretien — une vingtaine de minutes, avec pauses possibles',
-  gpie:'Ni serveur, ni outils, ni compte. La question zéro porte sur votre langue de travail.'
+  g3:'Choisissez : ce domaine naît-il ici, ou cette machine rejoint-elle un domaine qui vit déjà ?',
+  g4n:'4',
+  g4:'Naître : l’entretien — une vingtaine de minutes, avec pauses. Rejoindre : pas d’entretien, rien de généré — il se connecte à ce qui existe déjà.',
+  gpie:'Ni serveur, ni outils, ni compte. La question zéro porte sur votre langue, et le fichier apporte les commandes avec lui.'
 },
 
 ru: {
@@ -393,8 +399,10 @@ ru: {
   g2n:'2',
   g2:'Скажите: «инициализируй этот фреймворк»',
   g3n:'3',
-  g3:'Ответьте на интервью — около двадцати минут, можно прерваться',
-  gpie:'Без сервера, инструментов и аккаунта. Нулевой вопрос — язык вашей работы.'
+  g3:'Выберите: эта область рождается здесь — или эта машина присоединяется к той, что уже живёт?',
+  g4n:'4',
+  g4:'Рождается: интервью — около двадцати минут, можно прерваться. Присоединяется: без интервью, ничего не создаётся — подключается к тому, что уже есть.',
+  gpie:'Без сервера, инструментов и аккаунта. Нулевой вопрос — ваш язык, а файл приносит команды с собой.'
 },
 
 zh: {
@@ -492,8 +500,10 @@ zh: {
   g2n:'2',
   g2:'说：「初始化这个框架」',
   g3n:'3',
-  g3:'回答访谈——约二十分钟，可以暂停',
-  gpie:'无需服务器、工具或账号。第零个问题是你想用哪种语言工作。'
+  g3:'选择：这个领域是在这里诞生，还是这台机器要加入一个已经在活的领域？',
+  g4n:'4',
+  g4:'诞生：访谈——约二十分钟，可以暂停。加入：没有访谈，也不生成任何东西——直接连上已经存在的一切。',
+  gpie:'无需服务器、工具或账号。第零个问题是你的语言，而文件会把命令一并带来。'
 },
 
 ar: {
@@ -591,8 +601,10 @@ ar: {
   g2n:'٢',
   g2:'قل: «هيّئ هذا الإطار»',
   g3n:'٣',
-  g3:'أجب عن المقابلة — نحو عشرين دقيقة، ويمكنك التوقف',
-  gpie:'بلا خادم ولا أدوات ولا حساب. السؤال صفر هو لغة عملك.'
+  g3:'اختر: هل يولد هذا المجال هنا، أم أن هذه الآلة تنضم إلى مجال يحيا بالفعل؟',
+  g4n:'٤',
+  g4:'يولد: المقابلة — نحو عشرين دقيقة، ويمكنك التوقف. ينضم: بلا مقابلة ودون توليد شيء — يتصل بما هو قائم بالفعل.',
+  gpie:'بلا خادم ولا أدوات ولا حساب. السؤال صفر هو لغتك، والملف يحمل الأوامر معه.'
 },
 
 hi: {
@@ -690,8 +702,10 @@ hi: {
   g2n:'२',
   g2:'कहें: «इस ढाँचे को आरंभ करो»',
   g3n:'३',
-  g3:'साक्षात्कार का उत्तर दें — लगभग बीस मिनट, बीच में रोक सकते हैं',
-  gpie:'न सर्वर, न औज़ार, न खाता। शून्यवाँ प्रश्न आपकी कार्य-भाषा है।'
+  g3:'चुनें: यह क्षेत्र यहीं जन्म ले रहा है, या यह मशीन किसी ऐसे क्षेत्र से जुड़ रही है जो पहले से जीवित है?',
+  g4n:'४',
+  g4:'जन्म: साक्षात्कार — लगभग बीस मिनट, बीच में रोक सकते हैं। जुड़ना: न साक्षात्कार, न कुछ बनाया जाता — जो पहले से है, उसी से जुड़ जाता है।',
+  gpie:'न सर्वर, न औज़ार, न खाता। शून्यवाँ प्रश्न आपकी भाषा है, और फ़ाइल कमांड अपने साथ लाती है।'
 },
 
 bn: {
@@ -789,8 +803,10 @@ bn: {
   g2n:'২',
   g2:'বলুন: «এই কাঠামোটি চালু করো»',
   g3n:'৩',
-  g3:'সাক্ষাৎকারের উত্তর দিন — প্রায় বিশ মিনিট, মাঝপথে থামা যায়',
-  gpie:'সার্ভার নেই, সরঞ্জাম নেই, অ্যাকাউন্ট নেই। শূন্যতম প্রশ্ন আপনার কাজের ভাষা।'
+  g3:'বেছে নিন: এই ক্ষেত্রটি কি এখানে জন্ম নিচ্ছে, নাকি এই মেশিন এমন একটিতে যোগ দিচ্ছে যা আগে থেকেই বেঁচে আছে?',
+  g4n:'৪',
+  g4:'জন্ম: সাক্ষাৎকার — প্রায় বিশ মিনিট, মাঝপথে থামা যায়। যোগ দেওয়া: কোনো সাক্ষাৎকার নেই, কিছুই তৈরি হয় না — যা আগে থেকে আছে তার সঙ্গেই যুক্ত হয়।',
+  gpie:'সার্ভার নেই, সরঞ্জাম নেই, অ্যাকাউন্ট নেই। শূন্যতম প্রশ্ন আপনার ভাষা, আর ফাইলটি কমান্ডগুলো সঙ্গে করে নিয়ে আসে।'
 },
 
 de: {
@@ -888,8 +904,10 @@ de: {
   g2n:'2',
   g2:'Sag: „initialisiere dieses Rahmenwerk“',
   g3n:'3',
-  g3:'Beantworte das Interview — etwa zwanzig Minuten, Pausen möglich',
-  gpie:'Kein Server, keine Werkzeuge, kein Konto. Die nullte Frage ist deine Arbeitssprache.'
+  g3:'Wähle: wird diese Domäne hier geboren, oder schließt sich diese Maschine einer an, die bereits lebt?',
+  g4n:'4',
+  g4:'Geboren: das Interview — etwa zwanzig Minuten, mit Pausen. Anschließen: kein Interview, nichts wird erzeugt — es verbindet sich mit dem, was schon da ist.',
+  gpie:'Kein Server, keine Werkzeuge, kein Konto. Die nullte Frage ist deine Sprache, und die Datei bringt die Befehle mit.'
 }
 
 };

@@ -11,7 +11,9 @@ origen: destilado de un dominio real, 2026-08-03 — las historias conservan el 
 
 **Qué es esto.** Un marco para auditar y documentar un dominio complejo con un asistente, sin que la documentación se despegue de la realidad. Nació auditando un dominio técnico real, pero nada de su núcleo es de infraestructura: sirve para un área de trabajo, un producto, un proceso, una migración o una operación.
 
-**Cómo se usa.** Pega este archivo completo en un contexto nuevo del asistente y di: *"inicializa este marco"*. El asistente conduce la entrevista de la Fase 0, genera el vault en la Fase 1 y a partir de ahí opera bajo las reglas de la Fase 2.
+**Cómo se usa.** Pega este archivo completo en un contexto nuevo del asistente y di: *"inicializa este marco"*. **Lo segundo que te va a preguntar es si el dominio nace aquí o si esta máquina se suma a uno que ya vive** — y de ahí salen dos caminos distintos. Si nace: la entrevista de la Fase 0, el vault en la Fase 1 y las reglas de la Fase 2. Si se suma: no hay entrevista ni se genera nada, se conecta esta máquina a lo que ya existe.
+
+**Y también es así como llegan los comandos.** Pegar este archivo es lo que instala el ciclo, incluido `vuelamind-join`. Por eso una máquina nueva que quiere sumarse empieza aquí igual: no por el comando —que todavía no tiene— sino por este archivo, que se lo trae.
 
 Después, el dominio vive en un ciclo de cuatro actos: **nacer** una vez, **sumarse** cuando otra máquina se une, **retomarse** al abrir cada sesión y **reconciliarse** al cerrarla. Los tres últimos son comandos, no buenas intenciones — la Fase 3 y la sección *El ciclo completo*.
 
@@ -32,6 +34,38 @@ Antes de crear un solo archivo, el asistente hace estas preguntas. No las hace t
 **Antes que nada: «¿en qué idioma quieres trabajar?»** Se pregunta en el idioma en que llegó el usuario, y a partir de la respuesta **todo** va en ese idioma: la entrevista, el vault, las notas, los reportes. Este archivo está escrito en uno solo porque tiene que estarlo; el dominio que genera, no.
 
 No es una preferencia de cortesía: **la persona va a escribir aquí durante meses, y va a leerlo cansada.** Un vault en un idioma que no es el propio se abandona.
+
+### Pregunta 1 — ¿este dominio **nace** aquí, o esta máquina **se suma** a uno que ya vive?
+
+**La segunda pregunta, y la que más cambia lo que sigue.** Todo lo que viene después —la
+presentación, los seis bloques, las tres fases— es el camino de **nacer**. Quien llega a sumarse
+a un dominio existente y no encuentra este desvío **contesta una entrevista que va a generar un
+vault que ya existe**, y eso no se nota hasta que ya se escribió encima de algo.
+
+Se pregunta en llano: *«¿empezamos un dominio desde cero, o esta máquina se conecta a uno que ya
+tiene vault, historia y decisiones tomadas?»*
+
+> [!danger] Y no basta con preguntarlo: hay que MEDIRLO
+> La respuesta puede ser sincera y estar equivocada — alguien apunta sin saberlo a una carpeta
+> con meses dentro, o cree que hay un vault donde solo hay una carpeta vacía. **Antes de escribir
+> un solo archivo, mira la carpeta destino** y cruza lo dicho con lo medido:
+>
+> | Contesta | Y la carpeta está | Qué se hace |
+> |---|---|---|
+> | **nace** | vacía | **Vía A.** Adelante, sin más |
+> | **nace** | **con contenido** | **Detenerse.** Decir qué se encontró —cuántas notas, de qué fecha— y ofrecer la Vía B. Reinicializar sobre un dominio vivo no es un error recuperable |
+> | **se suma** | con contenido | **Vía B.** Adelante |
+> | **se suma** | vacía | No es un dominio que ya vive: es uno que no ha nacido. **Decirlo y ofrecer la Vía A** en vez de conectar una máquina a una carpeta sin nada que retomar |
+>
+> Las dos filas del medio son las que importan, y son **simétricas a propósito**: cada vía se
+> niega a correr cuando el terreno dice lo contrario. Un desvío que solo cree lo que le
+> contestan no es una comprobación, es una cortesía.
+
+**Vía A — nace.** Sigue leyendo: la presentación, los bloques A–F, y después las Fases 1 y 2.
+
+**Vía B — se suma.** Salta a *Sumarse a un dominio que ya vive*, más abajo en esta misma fase.
+**No hagas la entrevista**: sus respuestas ya están en el acta de ese dominio, y volver a
+preguntarlas produce una segunda versión de la verdad.
 
 ### Antes de empezar — lo que hay que decirle a quien va a contestar
 
@@ -206,7 +240,70 @@ En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —ident
 >
 > **Lo que no se vale es generar en silencio scripts que no van a correr.** Si el asistente detecta que el sistema no puede ejecutarlos, lo dice **antes** de escribirlos: un script que no corre es peor que no tenerlo, porque parece cubierto y no lo está.
 
+---
+
+### Vía B — Sumarse a un dominio que ya vive
+
+Aquí llega quien contestó *«esta máquina se suma»* en la Pregunta 1. **No hay entrevista, no hay
+Fase 1 y no se genera nada**: el dominio ya tiene vault, acta, decisiones y errores pagados. Lo
+que falta es conectar **esta máquina**, y eso es un acto propio con su comando —
+`vuelamind-join`, el cuarto del ciclo.
+
+> [!danger] El problema del huevo y la gallina, y por eso esta sección existe
+> **Ese comando se instala al nacer** (Fase 1.5). Una máquina que nunca nació **no lo tiene**, así
+> que decirle *"corre `vuelamind-join`"* la manda a un comando que no está.
+>
+> Esta sección cubre **exactamente el tramo donde el comando todavía no existe** —llegar al
+> conocimiento y traer el ciclo— y ahí se detiene. **No repite los pasos del comando**: dos
+> descripciones del mismo acto divergen en silencio, y la Fase 2 §6 de este mismo archivo dice
+> por qué eso es peor que un rodeo.
+
+**1 · Llegar al vault, y comprobar que llegó ENTERO.** El transporte lo decide el dominio —una
+carpeta compartida, un montaje, un clon, una réplica—; este archivo no lo elige. Lo que sí exige
+es la comprobación: **contar las notas de los dos lados** y, si el transporte permite huellas,
+comparar la de un archivo grande.
+
+> [!warning] Un vault a medio llegar es peor que uno vacío
+> Con la carpeta vacía el asistente dice que no puede trabajar. **A medio sincronizar mide sobre
+> un hueco y concluye con confianza** — y esa conclusión entra al vault como hecho. Si los
+> conteos no cuadran, **detenerse aquí**: esperar a que termine, o averiguar por qué no llega.
+
+**2 · Traer el ciclo desde el canon.** Los comandos se instalan desde `skills/`, la carpeta que
+viaja junto a este archivo, **verificados por huella** — el mismo procedimiento de la Fase 1.5,
+que se lee allí y no se copia aquí. **Nunca se copian de la otra máquina**: llegarían con sus
+ediciones locales y sin forma de saber cuáles.
+
+Y con ellos, `ALMA.md` **solo si el dominio no la tiene ya**. Si la tiene, se deja: sus
+atestiguaciones son de esta casa.
+
+**3 · Y desde aquí manda `vuelamind-join`, que ya existe. Córrelo.**
+
+Vuelve a comprobar lo de los pasos 1 y 2 —es idempotente, y volver a medir no cuesta nada— y
+sigue con lo que este archivo no cubre: **los accesos** (lo único irreductiblemente manual),
+**el validador como prueba de estar dentro**, **declararse ante el dominio** y **la primera
+sesión, de lectura**.
+
+> [!important] El nombre NO se vuelve a preguntar
+> La presentación de la Vía A ofrece un nombre porque ahí se está fundando la relación. **Aquí ya
+> hay una**: el dominio nombró a su asistente el día que nació, y preguntarlo otra vez produce
+> dos nombres para la misma mente — que en el libro de errores y en la bitácora se lee como dos
+> participantes distintos.
+>
+> **Se lee del vault** —del acta, de la nota del alma o del documento de arranque— y la
+> presentación es otra: *«en este dominio me llamo `<nombre>`. Me sumo desde esta máquina.»*
+>
+> Si no aparece por ningún lado, **se dice que no se encontró** y se pregunta, anotándolo como
+> hueco. Lo que no se hace es elegir uno nuevo en silencio.
+
+**Lo que esta vía nunca hace:** reescribir el manifiesto, el arranque o las decisiones. Es una
+máquina que se suma, no una que reforma.
+
 ## Fase 1 — Generar la estructura
+
+> [!note] Esta fase y la siguiente son de la **Vía A**
+> Un dominio que ya vive tiene su estructura hecha y sus reglas escritas: quien se suma **no las
+> genera de nuevo, las hereda**. La Vía B pasa de largo por aquí — salvo por la Fase 1.5, que se
+> lee para traer los comandos, y por la Fase 3, que rige igual en todas las máquinas.
 
 ### 1.0 — Primero la topología, luego los archivos
 
@@ -252,11 +349,12 @@ La forma que menos se degrada al agregar dominios: **dos carpetas sincronizadas 
    > al proyecto. *(Y en cualquier otra herramienta: mide la dirección, no la
    > supongas. Esta suposición se dio por obvia y salió falsa.)*
 
-   **Vacío de comandos de dominio, no vacío del todo.** Arriba viven exactamente
-   dos cosas —los comandos de **crear** y **retomar** un dominio, ver *El ciclo
-   completo*— y viven ahí justamente porque **no nombran ningún dominio**. La
-   prueba de que uno pertenece arriba es que se pueda leer entero sin encontrar
-   una sola ruta o nombre de archivo particular; el día que la necesite, baja.
+   **Vacío de comandos de dominio, no vacío del todo.** Arriba vive la familia del
+   método —los comandos con su prefijo, ver *El ciclo completo*— y vive ahí
+   justamente porque **ninguno nombra un dominio**. *(Nacer no está entre ellos:
+   nacer es pegar este archivo.)* La prueba de que uno pertenece arriba es que se
+   pueda leer entero sin encontrar una sola ruta o nombre de archivo particular;
+   el día que la necesite, baja.
 2. **Si la herramienta exige que la memoria esté en una ruta suya, apúntala hacia acá**, no muevas la carpeta sincronizada allá. Un enlace simbólico desde la ruta que la herramienta espera hacia `memory/` deja el archivo real en territorio que tú controlas. *(Verifica que la herramienta siga el enlace: es una suposición hasta que lo pruebes — ver la lección 4.)*
 3. **Nada se comparte entre dominios por default.** Si algo debe compartirse —una convención, una plantilla— se copia a propósito y se anota en `Decisiones.md` que ahora existe en dos lados y hay que mantener los dos.
 
@@ -1197,7 +1295,7 @@ nueva arranca con el estado de la anterior** — que puede tener días.
 >
 > Sus seis pasos, en orden: **llegar al vault y comprobar que llegó entero** (uno a medio sincronizar es peor que ninguno: el asistente mide sobre un hueco y concluye con confianza) · **instalar el ciclo desde el canon**, no copiarlo de otra máquina · **resolver los accesos**, que es lo único irreductiblemente manual · **correr el validador como prueba de estar dentro** —que los archivos estén no significa que la máquina pueda medir— · **declararse ante el dominio**, porque sin registro de instancias una colisión no tiene con quién conversar · y **la primera sesión, de lectura**.
 >
-> **Lo que nunca se hace es reinicializar sobre un dominio vivo.** El comando de nacer se detiene solo al encontrar contenido, y hace bien: ahí es donde empieza éste.
+> **Lo que nunca se hace es reinicializar sobre un dominio vivo**, y eso no se sostiene con buena voluntad: la **Pregunta 1** de la Fase 0 cruza lo que la persona contesta con lo que hay en la carpeta, y se detiene cuando alguien dice *"nace"* apuntando a un vault con contenido. Ahí es donde empieza éste.
 
 > [!danger] Leer el documento de arranque NO es cargar el estado
 > Ese archivo lo escribió la sesión anterior y describe el mundo **tal como
@@ -1213,14 +1311,14 @@ archivo: un párrafo se lee cuando alguien se acuerda; un comando está en el
 camino de todos los días. Es el mismo argumento de la Fase 1.2 sobre por qué el
 arranque **lanza** además de comprobar.
 
-### Los dos comandos, y dónde vive cada uno
+### Los comandos del ciclo, y dónde vive cada uno
 
 Son **universales por escritura**: no llevan dentro ninguna ruta ni nombre de nota
 de un dominio concreto. Eso es lo que los distingue del comando de reconciliación,
 que se genera dentro del dominio (Fase 1.4).
 
 > [!important] Universal no significa automáticamente "arriba" — corregido el 2026-08-11
-> La versión anterior de esta sección concluía que los dos viven en el nivel
+> La versión anterior de esta sección concluía que viven en el nivel
 > personal *porque son universales*, y eso mezcla dos cosas. Ser universal es
 > condición **necesaria** para vivir arriba, no suficiente: lo que decide es si
 > **estorbaría** a una versión propia del dominio, porque el nivel personal
@@ -1370,7 +1468,7 @@ Cuando el asistente termine, debe entregar:
 - [ ] **Un primer paso concreto para la siguiente sesión**
 - [ ] `initPrompt.md` apuntando al primer trabajo real
 - [ ] El registro de parches del método, aunque sea vacío — con la columna de **versión**, no solo la fecha
-- [ ] Los dos comandos universales —**crear** y **retomar**— presentes en el nivel personal de esta máquina, o dicho explícitamente que no están
+- [ ] Los comandos del ciclo **instalados desde el canon** (Fase 1.5) y contados contra `skills/`, o dicho explícitamente cuáles no se pudieron instalar y por qué
 - [ ] **Una lista explícita de lo que NO se pudo verificar en esta sesión**
 
 Ese último punto es el que arranca el marco con el pie derecho: el primer acto del vault es admitir lo que todavía no sabe.

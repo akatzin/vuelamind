@@ -27,10 +27,15 @@ Presenta **la familia `vuelamind-*` que de verdad existe en esta máquina**, con
 | **Al abrir sesión** | El que pone al día: lee el arranque del dominio, mide su estado y dice por dónde seguir |
 | **Durante el trabajo** | Los de consulta — el estado de la cola, quién es este dominio, qué es el marco, el censo de comandos |
 | **Al cerrar** | El de reconciliación: mide, confirma, escribe, verifica |
-| **De vez en cuando** | Nacer un dominio nuevo, escalar de versión |
+| **De vez en cuando** | Escalar de versión, sumar esta máquina a un dominio que ya vive |
 | **Cuando algo sale mal** | Los de rescate |
 
 Para cada uno: **el nombre exacto que se teclea**, una línea de qué hace, y —si aporta— *cuándo* conviene. Nada de opciones ni banderas: eso vive en cada comando.
+
+> [!important] Los dos actos que NO empiezan por un comando
+> **Nacer un dominio** y **sumar una máquina que nunca nació** arrancan igual: pegando `MARCO_Inicial.md` en un contexto nuevo. Ese archivo pregunta cuál de los dos es y, en el segundo caso, **instala el ciclo y le pasa el mando al comando de sumarse**.
+>
+> Decirlo aquí importa porque es la pregunta que llega justo después de ver esta lista: *"¿y para empezar otro dominio, cuál corro?"*. La respuesta honesta es **ninguno** — y quien la ignora acaba buscando un comando que no existe, o peor, corriendo el de sumarse en una máquina que todavía no lo tiene.
 
 **Cierra con lo mínimo que hay que recordar.** Si alguien solo se va a quedar con dos, que sean el de abrir y el de cerrar: el resto se descubre solo.
 

@@ -20,13 +20,19 @@ Darin: eine nach echter Schwere geordnete Arbeitswarteschlange, ein Entscheidung
 
 ## Loslegen
 
+Beide Wege beginnen gleich — mit der Datei, nicht mit einem Befehl:
+
 1. Füge `MARCO_Inicial.md` vollständig in einen frischen Kontext deines Assistenten ein.
-2. Sag: **„initialisiere dieses Rahmenwerk“**.
-3. Beantworte das Interview — etwa zwanzig Minuten, Pausen möglich.
+2. Sag: **«initialisiere dieses Rahmenwerk»**.
+
+Die erste Frage ist deine Sprache. **Die zweite entscheidet alles Weitere:** wird diese Domäne hier geboren, oder schließt sich diese Maschine einer an, die bereits lebt?
+
+- **Geboren** — du beantwortest das Interview. Etwa zwanzig Minuten, mit Pausen. Es erzeugt den Vault, das Gerüst und die Zyklus-Befehle.
+- **Anschließen** — kein Interview, nichts wird erzeugt. Es erreicht den vorhandenen Vault, prüft, dass er vollständig ankam, installiert den Zyklus aus dem Kanon und übergibt an `/vuelamind-join`.
+
+Der Assistent verlässt sich nicht auf dein Wort: er schaut in den Zielordner und **hält an**, wenn du *geboren* gesagt hast und dort Monate an Arbeit liegen — oder wenn du *anschließen* gesagt hast und nichts da ist.
 
 Kein Server, keine Werkzeuge, kein Konto. Ein Assistent und zwei lokale Ordner.
-
-**Die nullte Frage lautet, in welcher Sprache du arbeiten willst** — alles Weitere entsteht in deiner.
 
 ## Eine Maschine oder mehrere
 
@@ -35,6 +41,8 @@ Alles Obige setzt eine voraus: ein Assistent und zwei lokale Ordner. **Dieses Ve
 **Eine zweite Maschine muss erreichen, was die erste hat**: den Vault, das Gerüst —Manifest, Validator, Gedächtnis— und, falls deine Domäne gegen laufende Systeme prüft, die Zugänge dafür. *Wie* sie das erreicht, entscheidest du: geteilter Ordner, Mount, Klon, automatische Replik. Das Rahmenwerk legt den Transport nicht fest.
 
 `/vuelamind-join` geht diesen Weg, und seine Prüfungen sind der Punkt: es bestätigt, dass der Vault **vollständig** ankam —halb synchronisiert ist schlimmer als leer, denn der Assistent misst über ein Loch und schließt daraus mit Überzeugung—, installiert den Zyklus aus dem Kanon und **führt deinen Validator als Beweis des Drinseins aus**. Dass Dateien da sind, heißt nicht, dass man messen kann.
+
+**Und dieser Befehl liegt auf der neuen Maschine noch nicht** — er kommt mit der Geburt. Eine Maschine, die nie geboren wurde, beginnt also dort, wo alle beginnen: dieses Repository klonen, `MARCO_Inicial.md` einfügen, *anschließen* antworten. Die Datei bringt die Befehle mit; ab da übernimmt der Befehl.
 
 Eine Maschine, die den Vault liest, aber die Systeme nicht erreicht, ist trotzdem eine legitime Instanz — sie muss es nur **sagen**, wenn sie sich anmeldet.
 

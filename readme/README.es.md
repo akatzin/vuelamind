@@ -20,13 +20,19 @@ Dentro: una cola de trabajo ordenada por gravedad real, un registro de decisione
 
 ## Cómo se empieza
 
+Los dos caminos empiezan igual — por el archivo, no por un comando:
+
 1. Pega `MARCO_Inicial.md` completo en un contexto nuevo de tu asistente.
 2. Di: **«inicializa este marco»**.
-3. Contesta la entrevista — unos veinte minutos, y puedes pausar.
+
+La primera pregunta es tu idioma. **La segunda decide todo lo que sigue:** ¿este dominio nace aquí, o esta máquina se suma a uno que ya vive?
+
+- **Nace** — contestas la entrevista. Unos veinte minutos, y puedes pausar. Genera el vault, el andamiaje y los comandos del ciclo.
+- **Se suma** — sin entrevista y sin generar nada. Llega al vault que ya existe, comprueba que llegó entero, instala el ciclo desde el canon y le pasa el mando a `/vuelamind-join`.
+
+El asistente no se queda con tu palabra: mira la carpeta destino y **se detiene** si dijiste *nace* y encontró meses de trabajo dentro — o si dijiste *me sumo* y no encontró nada.
 
 Sin servidor, sin herramientas, sin cuenta. Un asistente y dos carpetas locales.
-
-**La pregunta cero es en qué idioma quieres trabajar**, y a partir de ahí todo sale en el tuyo.
 
 ## Una máquina, o varias
 
@@ -35,6 +41,8 @@ Todo lo anterior supone una: un asistente y dos carpetas locales. **Esa promesa 
 **Una segunda máquina necesita alcanzar lo que tiene la primera**: el vault, el andamiaje —su manifiesto, su validador, su memoria— y, si tu dominio verifica contra sistemas vivos, las credenciales para hacerlo. *Cómo* los alcanza lo eliges tú: una carpeta compartida, un montaje, un clon, una réplica automática. El marco no decide el transporte.
 
 `/vuelamind-join` recorre ese camino, y sus comprobaciones son lo valioso: confirma que el vault llegó **entero** —a medio sincronizar es peor que vacío, porque el asistente mide sobre un hueco y concluye con confianza—, instala el ciclo desde el canon y **corre tu validador como prueba de estar dentro**. Que los archivos estén no es lo mismo que poder medir.
+
+**Y ese comando todavía no está en la máquina nueva** — viaja con el nacimiento. Así que una máquina que nunca nació empieza donde empieza todo el mundo: clona este repositorio, pega `MARCO_Inicial.md`, contesta *me sumo*. El archivo trae los comandos consigo; de ahí en adelante manda el comando.
 
 Una máquina que lee el vault pero no alcanza los sistemas sigue siendo una instancia legítima — solo tiene que **decirlo** al declararse, porque a partir de ahí documenta sin verificar.
 

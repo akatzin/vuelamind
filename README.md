@@ -45,9 +45,22 @@ scars you could not.
 
 ## Getting started
 
+Both paths start the same way — with the file, not with a command:
+
 1. Paste the whole of `MARCO_Inicial.md` into a fresh assistant context.
 2. Say: **"initialize this framework"**.
-3. Answer the interview. It takes about twenty minutes, and you can pause.
+
+The first question is your language. **The second one decides everything after it:** is this
+domain being born here, or is this machine joining one that already lives?
+
+- **Being born** — answer the interview. About twenty minutes, and you can pause. It generates
+  the vault, the scaffolding and the cycle commands.
+- **Joining** — no interview and nothing generated. It reaches the existing vault, checks it
+  arrived whole, installs the cycle from the canon, and hands over to `/vuelamind-join`.
+
+The assistant does not just take your word for it: it looks at the destination folder and
+**stops** if you said *born* and found months of work inside — or if you said *joining* and
+found nothing there.
 
 No server, no tooling, no account. An assistant and two local folders.
 
@@ -61,6 +74,8 @@ Everything above assumes one: an assistant and two local folders. **That promise
 **A second machine needs to reach what the first one has**: the vault, the scaffolding — its manifest, its validator, its memory — and, if your domain verifies against live systems, the credentials to do that. *How* it reaches them is yours to pick: a shared folder, a mount, a clone, an automatic replica. The framework does not decide the transport.
 
 `/vuelamind-join` walks that path, and its checks are the point: it confirms the vault arrived **whole** — half-synced is worse than empty, because the assistant measures over a hole and concludes with confidence — installs the cycle from the canon, and **runs your validator as the proof of being in**. Files being present is not the same as being able to measure.
+
+**And that command is not on the new machine yet** — it ships with being born. So a machine that never was born starts where everyone starts: clone this repository, paste `MARCO_Inicial.md`, answer *joining*. The file brings the commands with it; from there the command takes over.
 
 A machine that can read the vault but cannot reach the systems is still a legitimate instance — it just has to **say so** when it declares itself, because from then on it documents without verifying.
 
