@@ -1,0 +1,48 @@
+name: Publicar el micrositio
+
+# Publica web/ en GitHub Pages. No hay build ni dependencias: la página es
+# HTML y un archivo de traducciones, autocontenidos a proposito.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Un despliegue a la vez; si llegan dos empujes seguidos, gana el ultimo.
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  publicar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.despliegue.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Falla temprano si el micrositio no esta entero, en vez de publicar
+      # una pagina rota: es la disciplina del marco aplicada al propio marco.
+      - name: Comprobar que la pagina esta completa
+        run: |
+          test -f web/index.html || { echo "falta web/index.html"; exit 1; }
+          test -f web/vuelamind.i18n.js || { echo "falta web/vuelamind.i18n.js"; exit 1; }
+          idiomas=$(grep -cE "^[a-z]{2}: \{" web/vuelamind.i18n.js)
+          echo "idiomas en el i18n: $idiomas"
+          [ "$idiomas" -ge 9 ] || { echo "esperaba 9 idiomas o mas"; exit 1; }
+          grep -q 'data-t="g4"' web/index.html || { echo "falta el cuarto paso de la guia"; exit 1; }
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: web
+      - id: despliegue
+        uses: actions/deploy-pages@v4
