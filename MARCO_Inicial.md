@@ -35,6 +35,24 @@ Antes de crear un solo archivo, el asistente hace estas preguntas. No las hace t
 
 No es una preferencia de cortesía: **la persona va a escribir aquí durante meses, y va a leerlo cansada.** Un vault en un idioma que no es el propio se abandona.
 
+> [!danger] Las dos palabras del método que hay que presentar, y solo una vez
+> Este archivo usa **«vault»** y **«dominio»** decenas de veces porque necesita un vocabulario
+> fijo. **Quien contesta la entrevista no lo tiene**, y ninguna de las dos se explica sola.
+>
+> | Palabra | Qué se dice, una vez, al usarla por primera vez |
+> |---|---|
+> | **vault** | *"una carpeta con archivos de texto que puedes abrir con cualquier editor — nada propietario, nada que se pueda quedar encerrado"* |
+> | **dominio** | *"la cosa que vamos a documentar: tu tlapalería, tu tesis, la restauración de la casa"* — y se dice **con el ejemplo de esa persona**, no en abstracto |
+>
+> **Y a partir de ahí se usa la palabra del idioma de trabajo.** La pregunta cero ya decidió el
+> idioma; si en el suyo lo natural es *bóveda*, *archivo* o *carpeta del conocimiento*, ésa es
+> la palabra —se elige con la persona y **se anota en el acta**, para que todas las sesiones y
+> todas las notas usen la misma. Un vocabulario que cambia entre sesiones envejece igual que un
+> hecho falso, y es más difícil de detectar.
+>
+> Lo que **no** se vale es soltarlas sin presentar. *(Medido: `vault` aparece más de setenta
+> veces en este archivo y no se definía en ninguna — un tlapalero lo señaló el 2026-08-13.)*
+
 ### Pregunta 1 — ¿este dominio **nace** aquí, o esta máquina **se suma** a uno que ya vive?
 
 **La segunda pregunta, y la que más cambia lo que sigue.** Todo lo que viene después —la
@@ -81,11 +99,27 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 > [!important] Aquí se está escribiendo el acta de nacimiento
 > Lo que se conteste queda como la identidad del dominio, con las palabras de quien lo funda. Por eso el asistente **no parafrasea al escribirla**, y por eso conviene contestar en corto y en llano en vez de bonito.
 
-### Bloque A — El dominio y su frontera
+### Bloque A — De qué se trata, y hasta dónde llega
 
-1. **¿Qué dominio se va a documentar, y cómo se llama?** El nombre da el título de la nota panorama (`0_<Dominio>.md`) y el del vault.
+> [!danger] La primera pregunta se lee en voz alta, y por eso NO lleva jerga
+> Quien contesta acaba de llegar: no sabe qué es un *dominio*, ni un *vault*, ni por qué un
+> archivo se llamaría `0_<algo>.md`. **Ninguna de esas palabras entra en el texto de la
+> pregunta.** Las consecuencias técnicas de la respuesta son asunto del asistente; decirlas en
+> voz alta no ayuda a contestar y sí hace sentir que uno llegó al sitio equivocado.
+>
+> **Se midió por qué importa:** la versión anterior preguntaba *"¿qué dominio se va a
+> documentar, y cómo se llama?"* explicando que el nombre daba el título de la nota panorama.
+> Un tlapalero contestó *«mi tlapalería, quiero llevar el control del inventario y de quién me
+> debe dinero»* —el propósito, no el nombre— y el nombre llegó **solo, dos turnos después**,
+> cuando ya sabía qué estaba nombrando. La pregunta pedía las dos cosas en el orden inverso al
+> natural. *(Prueba con usuario, 2026-08-13.)*
 
-> [!note] Si la persona duda de si su caso «califica», ofrécele ejemplos — pero **genéralos tú**
+1. **¿Qué quieres poder hacer con esto que hoy no puedes?** En llano, como se lo contarías a
+   alguien en la calle. **Ofrece dos o tres ejemplos de entrada**, sin esperar a que la persona
+   dude — ver la nota de abajo. De esta respuesta salen el primer párrafo del panorama y el
+   criterio para priorizar, así que se anota **con las palabras de quien contesta**.
+
+> [!note] Los ejemplos se ofrecen SIEMPRE, y los generas tú
 > Aquí **no hay lista escrita a propósito**: una lista envejece y, peor, **encajona** — quien no ve el suyo entre los ejemplos se va creyendo que esto no es para él.
 >
 > **Genera tres o cuatro ejemplos cercanos al mundo de esa persona**, con lo que ya sepas de ella. Y para saber si algo califica, la prueba son tres preguntas — **con dos que respondan sí, basta**:
@@ -95,9 +129,12 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 > 3. ¿Hay **errores que se repiten**? Algo que ya salió mal y volverá a salir mal.
 >
 > Sirve para mucho más que infraestructura: donde la **procedencia** es la sustancia (un caso legal, una enfermedad crónica, una genealogía, una investigación), donde hay **una cosa física con historia** (una restauración, una colección, un barco habitado), donde **varias personas acuerdan y olvidan** (cuidar a un mayor entre hermanos, una asociación, una obra), o donde alguien **se forma sin ver su progreso** (una tesis, un instrumento, una oposición). Que los ejemplos sean **variados de propósito**: si todos son técnicos, la persona con una tesis entre manos concluye que esto no es para ella.
-2. **¿Qué queda dentro y qué queda fuera?** La frontera importa más que el contenido: sin ella, el vault crece hasta volverse inútil. Pide dos o tres ejemplos de cosas que quedan **fuera** a propósito.
-3. **¿Para qué existe este dominio?** Una o dos frases, en lenguaje llano, sin jerga. Es el primer párrafo del panorama y lo que da criterio para priorizar.
-4. **¿Qué pasa si esto se hace mal?** Define el eje de severidad. Si la peor consecuencia es perder datos, la severidad se mide en irreversibilidad; si es perder dinero, en pesos; si es incumplimiento, en exposición.
+2. **¿Qué queda dentro y qué queda fuera?** La frontera importa más que el contenido: sin ella, esto crece hasta volverse inútil. Pide dos o tres ejemplos de cosas que quedan **fuera** a propósito.
+3. **¿Qué pasa si esto se lleva mal?** Define el eje de severidad. Si la peor consecuencia es perder datos, la severidad se mide en irreversibilidad; si es perder dinero, en pesos; si es incumplimiento, en exposición.
+4. **Y por último, el nombre — que a estas alturas se PROPONE, no se pregunta.** Con lo contestado arriba ya lo tienes: *«entonces esto se llama Tlapalería Susy, ¿lo dejo así?»*. Confirmar es más fácil que inventar, y quien acaba de explicar su caso ya sabe cómo se llama.
+
+> [!note] Para el asistente, no para leer en voz alta
+> El nombre da el título de la nota panorama (`0_<Dominio>.md`) y el de la carpeta del conocimiento. Si trae acentos, espacios o caracteres que compliquen las rutas, **resuélvelo tú** —un nombre corto para el archivo, el de verdad dentro de la nota— y dilo en una línea, sin convertirlo en una pregunta.
 
 > [!important] La presentación, y es lo PRIMERO que ocurre — antes del Bloque A
 > Antes de la primera pregunta del dominio, el asistente se presenta y **ofrece
@@ -195,19 +232,40 @@ Hay **dos planos** que se sincronizan, y confundirlos es el error de arquitectur
 18. **¿Alguna carpeta sincronizada vive dentro de un directorio que administre otro programa?** Si la herramienta hace limpieza automática ahí, tu configuración de sincronización está a merced de una decisión ajena. Preferible: la carpeta sincronizada es tuya y la herramienta apunta a ella, no al revés.
 19. **¿La ruta del proyecto forma parte de algún identificador?** Muchas herramientas derivan un identificador interno del directorio de trabajo. Si es el caso, mover o renombrar el proyecto rompe la sincronización en silencio — y cada dominio nuevo genera un identificador nuevo.
 
-**¿De qué canon se alimenta este dominio, y a dónde devuelve lo que aprenda?** Dos decisiones, y son distintas:
+20. **¿De dónde se trae el método?** El repositorio oficial, un derivado de alguien más, o ninguno — un dominio puede vivir aislado con la copia que tenga, y es una elección legítima: nada obliga a estar conectado.
+21. **¿Y a dónde se manda lo que este dominio aprenda?** Al mismo del que se trae, a otro distinto —un derivado propio, el de una organización—, o **a ninguno**: lo aprendido se queda en casa.
 
-- **De dónde se jala el método.** El repositorio oficial, un derivado de alguien más, o ninguno — un dominio puede vivir aislado con la copia que tenga, y es una elección legítima: nada obliga a estar conectado.
-- **A dónde se proponen los parches.** Puede ser el mismo del que se jala, otro distinto —un derivado propio, el de una organización—, o **ninguno**: lo aprendido se queda en casa. Un dominio con material sensible puede querer exactamente eso.
+> [!danger] Esta pregunta se saltaba, y estaba escrita
+> Iba aquí mismo, sin número, como párrafo de cierre del bloque — con un **«no se asume»** en
+> negrita y ningún mecanismo detrás. En la primera prueba con un usuario real **nunca se le
+> preguntó**, y él lo notó: *«jamás me preguntó si quería publicar parches»*. El texto era
+> enfático y el mecanismo no existía: **el ítem 39 de este mismo libro**, cometido por el libro.
+>
+> Por eso ahora **están numeradas** y por eso el cierre de la Fase 1 **exige las dos
+> respuestas**. Que se pueda contestar `ninguno` no vuelve la pregunta opcional: lo que no se
+> vale es no hacerla.
 
-**No se asume.** Que el método venga de un sitio no obliga a devolverle nada, y aportar a un canon distinto del que se consume es perfectamente válido — es como funciona cualquier derivado. Si quien funda no lo tiene claro todavía, se anota como hueco y se decide después: mientras tanto, `ninguno`.
+> [!important] Y hay que decir qué implica, porque es una decisión sobre datos
+> **Mandar un parche significa mandar una lección a un repositorio de alguien más — y una
+> lección lleva su caso.** El método exige que cada regla venga con el error concreto que la
+> pagó, porque sin el caso la regla se revierte; eso significa que el parche cuenta algo de tu
+> dominio.
+>
+> Se anonimiza al escribirlo —nombres propios fuera, la situación dentro—, pero **quien decide
+> tiene que saber que eso viaja**, no enterarse después. Un dominio con material sensible
+> puede querer `ninguno` y tiene toda la razón.
+>
+> **No se asume en ninguna dirección.** Que el método venga de un sitio no obliga a devolverle
+> nada, y aportar a un canon distinto del que se consume es perfectamente válido — así funciona
+> cualquier derivado. Si quien funda no lo tiene claro todavía, se anota como **hueco declarado
+> con su fecha** y se decide después: mientras tanto, `ninguno`.
 
 ### Bloque F — Operación
 
-20. **¿Quién más lo lee?** Cambia el tono. Un vault personal puede nombrar los errores propios con fecha; uno compartido necesita decidir antes cuánto de eso se escribe.
-21. **¿Con qué ritmo se trabaja?** Cuándo se corre la reconciliación (ver Fase 3), cada cuánto se re-audita.
-22. **¿Qué puede hacer el asistente por su cuenta y qué requiere autorización explícita?** Traza la línea entre leer, proponer y aplicar. Escríbela: es la regla que más fricción evita después.
-23. **Antes de decir "encontré", búscalo.** El método tiene reglas para escribir bien y **ninguna para leer antes de hablar**. La regla de *consultar el registro antes de escalar una decisión* cubre el caso de pedir permiso; falta el más frecuente: **presentar un hecho**. Antes de reportar un hallazgo, búscalo en los tres sitios —el registro de decisiones, la nota del componente y **el archivo de lo cerrado**, que es el que nadie abre—. Un hallazgo redundante **no falla**: es cierto, y por eso pasa sin fricción; lo que cuesta es que, dicho con tono de descubrimiento, **hace dudar de documentación que estaba correcta**, y pierde el contexto ya escrito —como que una ausencia fuera deliberada y no un defecto—. La forma correcta cuando sí estaba escrito: *"el registro ya lo dice desde `<fecha>`; lo re-medí y sigue siendo cierto"*. *(En el dominio de origen ocurrió tres veces en un solo día; en uno de los casos la lección estaba promovida en los tres sitios que el método exige, lo que prueba que ninguna mejora del lado de la escritura lo habría evitado.)*
+22. **¿Quién más lo lee?** Cambia el tono. Un vault personal puede nombrar los errores propios con fecha; uno compartido necesita decidir antes cuánto de eso se escribe.
+23. **¿Con qué ritmo se trabaja?** Cuándo se corre la reconciliación (ver Fase 3), cada cuánto se re-audita.
+24. **¿Qué puede hacer el asistente por su cuenta y qué requiere autorización explícita?** Traza la línea entre leer, proponer y aplicar. Escríbela: es la regla que más fricción evita después.
+25. **Antes de decir "encontré", búscalo.** El método tiene reglas para escribir bien y **ninguna para leer antes de hablar**. La regla de *consultar el registro antes de escalar una decisión* cubre el caso de pedir permiso; falta el más frecuente: **presentar un hecho**. Antes de reportar un hallazgo, búscalo en los tres sitios —el registro de decisiones, la nota del componente y **el archivo de lo cerrado**, que es el que nadie abre—. Un hallazgo redundante **no falla**: es cierto, y por eso pasa sin fricción; lo que cuesta es que, dicho con tono de descubrimiento, **hace dudar de documentación que estaba correcta**, y pierde el contexto ya escrito —como que una ausencia fuera deliberada y no un defecto—. La forma correcta cuando sí estaba escrito: *"el registro ya lo dice desde `<fecha>`; lo re-medí y sigue siendo cierto"*. *(En el dominio de origen ocurrió tres veces en un solo día; en uno de los casos la lección estaba promovida en los tres sitios que el método exige, lo que prueba que ninguna mejora del lado de la escritura lo habría evitado.)*
 
 ---
 
@@ -1450,9 +1508,34 @@ Con lo que salió de la entrevista, **ofrece tres o cuatro entregables concretos
 
 Tres o cuatro. Diez es un catálogo, y un catálogo no se elige: se hojea.
 
-### 3 · Una sola cosa para mañana
+### 3 · El traspaso: cerrar la sesión y volver a entrar
 
-Cierra con **un primer paso concreto y pequeño**: abrir la sesión con el comando de retomar, **medir una sola cosa** del dominio y escribirla con su evidencia. Una. El vault vacío intimida, y el primer hecho medido lo rompe — a partir de ahí el método se sostiene solo.
+> [!danger] Los comandos todavía no existen en ESTA sesión, y hay que decirlo
+> **La sesión que instala los comandos no puede usarlos.** Se resuelven al arrancar, así que
+> los que acaba de escribir la Fase 1.5 están en disco y **esta sesión no los ve**. Quien
+> teclee el de ayuda ahora mismo recibe *«no es un comando reconocido»* después de haber
+> contestado veinte minutos de entrevista, y no tiene modo de saber que eso es normal.
+>
+> *(Pasó en la primera prueba con un usuario real, 2026-08-13. El aviso ya existía en la Fase
+> 1.4 — escrito **para el asistente**. Nadie se lo dijo a él.)*
+
+**El cierre es un traspaso de tres movimientos, con los nombres exactos que va a teclear:**
+
+1. **Cierra esta sesión.** Se dice tal cual, y se dice **por qué**: los comandos ya están
+   escritos, pero se cargan al abrir.
+2. **Vuelve a entrar y corre el comando de retomar.** Es como van a empezar todas las sesiones
+   a partir de ahora — se aprende usándolo, no leyéndolo.
+3. **Y entonces el de ayuda**, que ahora sí puede listarlos porque los lee del disco.
+
+> [!warning] Si el entorno no soporta comandos, se dice ANTES
+> Una interfaz web sin sistema de archivos, un asistente sin extensiones: ahí no van a existir
+> nunca. Se advierte **antes** de prometerlos, y lo que aquí es un comando allá es una
+> instrucción escrita que se pega. Ofrecer un atajo que ese entorno no puede dar es peor que no
+> ofrecerlo — la persona lo teclea, falla, y concluye que el método está roto.
+
+### 4 · Una sola cosa para mañana
+
+Y ya en esa segunda sesión, **un primer paso concreto y pequeño**: **medir una sola cosa** del dominio y escribirla con su evidencia. Una. El vault vacío intimida, y el primer hecho medido lo rompe — a partir de ahí el método se sostiene solo.
 
 ## Resumen de la inicialización
 
@@ -1469,6 +1552,8 @@ Cuando el asistente termine, debe entregar:
 - [ ] `rsync_project.sh` **generado y probado**, si el transporte lo requiere (Fase 1.3)
 - [ ] **El ciclo enseñado con un caso del propio dominio**, y los comandos que existen en esta máquina, mostrados con su nombre exacto
 - [ ] **Tres o cuatro entregables propuestos como preguntas**, y anotado cuál eligió
+- [ ] **Las dos decisiones de canon**: de dónde se trae el método y **a dónde se manda lo que aprenda** — con su respuesta escrita, `ninguno` incluido, o marcada como hueco con fecha. *(Sin esta línea el reporte está incompleto: la pregunta existía y se saltaba.)*
+- [ ] **El traspaso dicho**: cerrar la sesión, volver a entrar, correr el de retomar y luego el de ayuda — o, si el entorno no soporta comandos, dicho que no van a existir
 - [ ] **Un primer paso concreto para la siguiente sesión**
 - [ ] `initPrompt.md` apuntando al primer trabajo real
 - [ ] El registro de parches del método, aunque sea vacío — con la columna de **versión**, no solo la fecha
