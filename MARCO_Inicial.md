@@ -247,8 +247,8 @@ Hay **dos planos** que se sincronizan, y confundirlos es el error de arquitectur
 18. **¿Alguna carpeta sincronizada vive dentro de un directorio que administre otro programa?** Si la herramienta hace limpieza automática ahí, tu configuración de sincronización está a merced de una decisión ajena. Preferible: la carpeta sincronizada es tuya y la herramienta apunta a ella, no al revés.
 19. **¿La ruta del proyecto forma parte de algún identificador?** Muchas herramientas derivan un identificador interno del directorio de trabajo. Si es el caso, mover o renombrar el proyecto rompe la sincronización en silencio — y cada dominio nuevo genera un identificador nuevo.
 
-20. **¿De dónde se trae el método?** El repositorio oficial, un derivado de alguien más, o ninguno — un dominio puede vivir aislado con la copia que tenga, y es una elección legítima: nada obliga a estar conectado.
-21. **¿Y a dónde se manda lo que este dominio aprenda?** Al mismo del que se trae, a otro distinto —un derivado propio, el de una organización—, o **a ninguno**: lo aprendido se queda en casa.
+20. **¿De dónde se trae el método?** El repositorio oficial, un derivado de alguien más, o ninguno. **El default es el oficial** — de ahí acaba de llegar este archivo, y traerse los parches es un acto de solo lectura: adoptar mejoras no expone nada del dominio. Quien quiera un derivado lo nombra; quien quiera vivir aislado con su copia lo dice, y es legítimo — pero el aislamiento se **elige**, no se cae en él por no contestar.
+21. **¿Quieres proponer lo que este dominio aprenda, y a dónde?** Son dos decisiones anidadas. **Proponer es opt-in**: nadie manda nada sin haber dicho que sí, porque un parche lleva su caso y el caso cuenta algo del dominio. Pero **si la respuesta es sí, el destino por default es el repositorio oficial** — otro destino (un derivado propio, el de una organización) se nombra explícito. Y *ninguno* —lo aprendido se queda en casa— sigue siendo respuesta completa.
 
 > [!danger] Esta pregunta se saltaba, y estaba escrita
 > Iba aquí mismo, sin número, como párrafo de cierre del bloque — con un **«no se asume»** en
@@ -270,10 +270,13 @@ Hay **dos planos** que se sincronizan, y confundirlos es el error de arquitectur
 > tiene que saber que eso viaja**, no enterarse después. Un dominio con material sensible
 > puede querer `ninguno` y tiene toda la razón.
 >
-> **No se asume en ninguna dirección.** Que el método venga de un sitio no obliga a devolverle
-> nada, y aportar a un canon distinto del que se consume es perfectamente válido — así funciona
-> cualquier derivado. Si quien funda no lo tiene claro todavía, se anota como **hueco declarado
-> con su fecha** y se decide después: mientras tanto, `ninguno`.
+> **No se asume en ninguna dirección, y los fallbacks son asimétricos a propósito.** Aportar a
+> un canon distinto del que se consume es perfectamente válido — así funciona cualquier
+> derivado. Si quien funda no lo tiene claro todavía, se anota como **hueco declarado con su
+> fecha** y se decide después — y mientras tanto: **la adopción queda apuntada al oficial**
+> (solo lectura, no expone nada) y **la proposición queda en `ninguno`** (mandar sí expone, y
+> lo que expone no se puede des-mandar). El hueco barato se rellena con el default seguro de
+> cada dirección, no con el mismo para las dos.
 
 ### Bloque F — Operación
 
@@ -876,8 +879,8 @@ Y dos corolarios que ya se cobraron caro:
 | `acceso_vivo` | cómo se llega a los sistemas que hay que verificar |
 | `notas:` `cola` · `archivo` · `panorama` · `decisiones` · `bitacora` · `arranque` | los nombres reales de las seis notas del ciclo |
 | `marco` | dónde vive la copia local del método y en qué nota registra esta instancia lo aplicado |
-| `canon` | **de qué repositorio se jala el método** — el oficial, un derivado, o `—` si este dominio vive aislado |
-| `aportar_a` | **a dónde se proponen los parches**: el mismo canon, otro repositorio, o `ninguno` si lo aprendido se queda en casa |
+| `canon` | **de qué repositorio se jala el método**. Default: el oficial. Un derivado se nombra; `—` solo si el aislamiento se eligió en la entrevista |
+| `aportar_a` | **a dónde se proponen los parches** — solo si el dominio dijo que sí. Default cuando se quiere: el mismo canon. `ninguno` si lo aprendido se queda en casa, y es el fallback mientras no se decida |
 | `replica` | contra qué se compara al confirmar la sincronización, y cómo |
 | `antes_de_medir` | enganche opcional: qué correr antes de medir (desbloquear una llave, montar algo) |
 | `despues_de_escribir` | enganche opcional: qué correr tras escribir (el empuje manual, si el transporte lo pide — ver 1.3) |
