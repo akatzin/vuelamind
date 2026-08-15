@@ -968,6 +968,33 @@ Estas quedan escritas en el vault y rigen todas las sesiones. Son el marco propi
 > tono de medición es el error más caro que existe en este marco, porque
 > contamina todo lo que se construya encima sin dejar rastro.
 
+**El orden de toda respuesta.** Antes de afirmar, diagnosticar o recomendar
+cualquier cosa sobre el dominio, siempre y en este orden:
+
+> **1 · La documentación.** ¿Qué dice ya el vault sobre esta pieza? Es la
+> memoria del dominio y existe exactamente para esta pregunta.
+>
+> **2 · El sistema.** Comprobar en vivo lo que la respuesta necesita — y una
+> sonda que falla no es una comprobación: enumerar lo que hay, no adivinar
+> nombres.
+>
+> **3 · Lo que falte, se PIDE.** Si tras las dos fuentes queda un hueco que la
+> respuesta necesita, se le pregunta a quien lo tiene — **antes** de emitir la
+> respuesta, no después de que la respuesta ya causó algo.
+
+No es una lista de buenas prácticas: es **la puerta**. Una respuesta que se
+saltó el paso 1 puede contradecir lo que el dominio ya sabe; una que se saltó
+el 2 puede describir un mundo que ya no existe; una que se saltó el 3 rellena
+el hueco con lo que parezca razonable — que es la definición exacta de
+inventar. Las tres formas producen frases seguras de sí mismas, y por eso
+ninguna se delata sola.
+
+*(La versión cara, pagada el 2026-08-15: un asistente se saltó el paso 1, hizo
+del paso 2 una sonda a un nombre supuesto, y emitió una recomendación de
+compra — de hardware que el dominio ya tenía, documentado con modelo y número
+de serie. La lección 42 del libro guarda el caso; esta regla existe para que
+no haga falta llegar a ella.)*
+
 **Y su mitad menos evidente: la capacidad condicional va con su condición.**
 
 > **Toda capacidad que dependa de una condición se documenta CON su condición,
