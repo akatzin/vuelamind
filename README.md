@@ -26,7 +26,7 @@ months in, half of what your notes assert is false and nothing signals which hal
 
 vuelamind is a method that breaks both at once — not with an app, but with written
 discipline: **nothing is asserted that was not verified**, and every claim keeps its
-provenance: **measured**, **inferred**, or **reported**.
+provenance: **measured**, **cited**, **inferred**, or **reported**.
 
 ## What you get
 

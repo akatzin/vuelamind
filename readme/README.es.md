@@ -10,7 +10,7 @@ Un asistente de IA olvida: su ventana de contexto se llena y el principio se dis
 
 Y la documentación que no se reconcilia con la realidad **miente con confianza**. A los seis meses, la mitad de lo que afirman tus notas es falso y nada señala cuál mitad.
 
-vuelamind rompe las dos cosas a la vez — no con una app, sino con disciplina escrita: **no se afirma nada que no se haya comprobado**, y toda afirmación conserva su procedencia: **medido**, **inferido** o **aportado**.
+vuelamind rompe las dos cosas a la vez — no con una app, sino con disciplina escrita: **no se afirma nada que no se haya comprobado**, y toda afirmación conserva su procedencia: **medido**, **citado**, **inferido** o **aportado**.
 
 ## Qué obtienes
 

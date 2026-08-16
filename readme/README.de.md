@@ -10,7 +10,7 @@ Ein KI-Assistent vergisst: Sein Kontextfenster füllt sich und der Anfang löst 
 
 Und Dokumentation, die nie mit der Wirklichkeit abgeglichen wird, **lügt selbstbewusst**. Nach einem halben Jahr ist die Hälfte dessen, was deine Notizen behaupten, falsch — und nichts zeigt an, welche Hälfte.
 
-vuelamind bricht beides zugleich — nicht mit einer App, sondern mit geschriebener Disziplin: **nichts wird behauptet, was nicht geprüft wurde**, und jede Aussage behält ihre Herkunft: **gemessen**, **erschlossen** oder **berichtet**.
+vuelamind bricht beides zugleich — nicht mit einer App, sondern mit geschriebener Disziplin: **nichts wird behauptet, was nicht geprüft wurde**, und jede Aussage behält ihre Herkunft: **gemessen**, **zitiert**, **erschlossen** oder **berichtet**.
 
 ## Was du bekommst
 

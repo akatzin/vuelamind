@@ -218,6 +218,52 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
     - **Acceso a sistemas reales** — el asistente comprueba por su cuenta. Exige resolver el Bloque D antes de empezar.
     - **Lectura de archivos locales** — verifica contra documentos y exports, no contra el sistema.
     - **Solo lo que le peguen** — no puede verificar nada. La regla se convierte en: *pedir la fuente primaria antes de escribir, y marcar como INFERIDO todo lo que no se haya podido comprobar.*
+    > **Contesta con la capacidad, no con la plomería.** La respuesta natural es el
+    > mecanismo —el usuario, el host, la ruta, el comando de transporte, la condición
+    > del agente de llaves— y todo eso es **plomería de otro dominio**: el que hospeda
+    > la copia o el servicio. Anotarla en el acta hace dos daños que no hacen ruido:
+    > **caduca en silencio** —la llave rota, la ruta se muda, el host se renombra, y el
+    > acta sigue describiéndolo con tono de vigencia— y **confunde de quién es el
+    > pendiente**, invitando a arreglar desde donde no se posee.
+    >
+    > La forma correcta es una **tabla de capacidades con dueño**: *puedo medir X,
+    > condicionado a Y, y que se pueda es responsabilidad de Z*. Si una copia se vuelve
+    > inalcanzable **no es un defecto de esta casa**: es un pendiente de quien la
+    > hospeda, y lo de aquí es registrar *"no pude medir, y por qué"* — que dicho así
+    > es un **dato completo**, no un hueco. Y su corolario: una copia ilegible **por
+    > diseño** —cifrada para su tránsito, por ejemplo— no es una excepción incómoda:
+    > es una fila cuya condición es **permanente y sana**, y el defecto sería
+    > registrarla como avería.
+    >
+    > *(Parche `2026-08-16-la-capacidad-se-declara-con-su-dueno-no-con-su-plomeria`.)*
+
+    **Y el tercer eje de la misma pregunta: ¿como quién actúo hacia afuera?** Es el
+    que más caro sale por faltar: los otros dos preguntan **qué alcanzas** y **qué
+    requiere palabra**, y ninguno pregunta **con qué identidad firmas** cuando tocas
+    algo fuera de casa.
+    No es comodidad, es **delegación de identidad** — y hoy se hereda por accidente en
+    vez de concederse a propósito, porque la identidad viaja pegada a los artefactos:
+    un clon cuyo remoto puede publicar, una llave cargada en un agente, una sesión
+    autenticada. Quien trabaja sobre ellos hereda la firma de su dueño por el solo
+    hecho de que el artefacto existe en su árbol. **Nadie lo decidió, así que nadie lo
+    revisa.**
+
+    Por cada superficie externa que el dominio toque —un repositorio, un servidor, un
+    servicio— se registra: **(1)** qué identidad firma los actos que salen, **(2)**
+    quién la concedió y dónde quedó escrito, **(3)** qué actos puede preparar la
+    instancia **sin** esa identidad. Preparar y publicar son actos distintos.
+
+    > **La respuesta fuerte es estructural, no una promesa:** que la copia de trabajo
+    > diaria **no pueda** firmar hacia afuera. Cuando eso no es posible o no conviene,
+    > la alternativa legítima no es la buena voluntad: es una **identidad propia,
+    > concedida a propósito y declarada con su dueño y su condición** — distinta de la
+    > del responsable, para que lo que firme la instancia no parezca firmado por él. Y
+    > la regla para el acta: **una identidad de escritura no se hereda por omisión.**
+    > Si un artefacto con firma delegada vive en el árbol del dominio, se declara con
+    > dueño y condición, o se sustituye por su versión de solo lectura.
+    >
+    > *(Parche `2026-08-16-la-entrevista-no-pregunta-como-quien-actuas-hacia-afuera`.)*
+
 11. **¿Qué tan caro es equivocarse aquí?** Si una afirmación falsa en el vault puede provocar una decisión costosa, el umbral de "esto ya está verificado" sube y conviene marcar la fuente de cada afirmación importante, no solo las dudosas.
 
 ### Bloque D — Confidencialidad
@@ -967,6 +1013,35 @@ Estas quedan escritas en el vault y rigen todas las sesiones. Son el marco propi
 > y no la comprobaste, dilo en el mismo renglón. Escribir inferencias con
 > tono de medición es el error más caro que existe en este marco, porque
 > contamina todo lo que se construya encima sin dejar rastro.
+
+**La escala de procedencia: cuatro marcas, todas con fecha.** Distinguir dos no
+alcanza, porque hay material que no es ninguna de las dos y acaba escrito con la
+marca equivocada:
+
+> - **medido** — lo corriste y viste la salida.
+> - **citado** — lo dice una fuente identificable y fechada que no es primaria:
+>   el registro de otro dominio, un acta vieja, la nota de un tercero. **La marca
+>   incluye la fuente**: citado sin cita es inferido con mejor ropa.
+> - **inferido** — lo dedujiste; no hay observación detrás.
+> - **aportado** — te lo dijo quien funda. Se nombra aparte porque el fundador
+>   **también es una fuente falible**, y separarlo permite volver a preguntarle.
+
+Sin `citado`, lo que dice una fuente fechada y no primaria solo puede escribirse
+mintiendo: como *medido* fabrica una medición que nadie hizo; como *inferido*
+esconde que hay una fuente concreta que se puede ir a leer; como *aportado* le
+atribuye a una persona lo que dijo un documento. La distinción que se pierde es
+justo la que importa: **"me consta" contra "consta en algún lado"**.
+
+**Y la regla de tránsito, que es donde la marca gana su sueldo:** un citado
+**asciende a medido** ejecutando la comprobación uno mismo — y si la fuente es
+alcanzable y la afirmación importa, ascenderlo es obligación, no cortesía. Un
+citado que lleva meses sin ascender en un punto crítico es una deuda visible, que
+es exactamente lo que la marca existe para mostrar.
+
+*(Parche `2026-08-16-citado-la-marca-entre-lo-medido-y-lo-aportado`. Un dominio
+que ya distinga con otra marca **quién** hizo la observación —haber estado
+presente frente a repetir lo que otro cuenta— conserva la suya: `citado` no
+sustituye ninguna marca existente, se separa por quién vio.)*
 
 **El orden de toda respuesta.** Antes de afirmar, diagnosticar o recomendar
 cualquier cosa sobre el dominio, siempre y en este orden:
