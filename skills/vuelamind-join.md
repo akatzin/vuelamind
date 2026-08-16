@@ -57,7 +57,15 @@ El único paso irreductiblemente manual, y el que de verdad cuesta: llaves, cred
 
 ## 5 · Declararse ante el dominio
 
-Escribir que hay una instancia más: **dónde corre, desde cuándo, y qué puede medir desde ahí** — porque casi nunca es lo mismo que las otras. El sitio lo dice el dominio; si no tiene uno, la nota de la instancia o el panorama.
+Escribir que hay una instancia más: **dónde corre, desde cuándo, qué puede medir desde ahí** — y su **`acceso: escribe | lee`**, porque casi nunca es lo mismo que las otras. El sitio lo dice el dominio; si no tiene uno, la nota de la instancia o el panorama.
+
+> [!important] Si esta instancia solo LEE, este paso no lo hace ella
+> **Quien no escribe no se declara: se le declara.** Una instancia que sí escribe —o el
+> responsable— registra al lector antes de que llegue, o al saberse de él. El registro queda
+> completo y el lector conserva lo que lo define: cerrar cada sesión sin haber escrito una
+> letra. *(Nacido de una prueba real con el dominio montado en solo lectura, 2026-08-15: el
+> asistente se detuvo solo en este paso y lo dijo — este aviso existe para que no haga falta
+> el juicio.)* Y el rol nunca se llama «testigo»: esa palabra ya es marca de procedencia.
 
 > [!important] Sin esto, la colmena existe pero nadie la ve
 > Y el día que dos se pisen, **nadie sabrá quién era el otro**. Un registro de instancias no es burocracia: es lo que convierte una colisión en una conversación.

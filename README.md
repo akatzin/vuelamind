@@ -91,6 +91,8 @@ Everything above assumes one: an assistant and two local folders. **That promise
 
 A machine that can read the vault but cannot reach the systems is still a legitimate instance — it just has to **say so** when it declares itself, because from then on it documents without verifying.
 
+And there is a legitimate instance that never writes at all — a board subscribed to the engineering memory, an auditor. Its registry row carries `access: writes | reads`, and **it does not declare itself: a writing instance declares it**, before it arrives. Whoever only reads keeps the thing that defines the role: closing every session without having written a letter.
+
 ## Requirements
 
 An assistant, two local folders, and **a Unix-like shell** — macOS or Linux.
