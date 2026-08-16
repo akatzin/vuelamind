@@ -176,6 +176,11 @@ cannot; it happened in your domain). Each instance that adopts a patch judges it
 its own evidence, with three possible verdicts — and **discarding with a reason is worth
 more than adopting out of courtesy**.
 
+Someone has to judge what arrives. That role has a name and a definition of its own —
+what it watches, what it measures, how it judges, and what is none of its business — in
+`WATCHER.md`. It watches **what enters the canon, never who uses it**: there is no
+registry of installations, and there will not be one.
+
 ## License
 
 Personal, educational, community and research use: **free**. Enterprise use: **paid
