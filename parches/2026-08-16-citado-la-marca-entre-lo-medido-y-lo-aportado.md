@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto
+estado: fusionado al canon el 2026-08-16 · armonizado al master y a los diez README el 2026-08-16
 ---
 
 # 2026-08-16 · «Citado» — la marca que falta entre lo medido y lo aportado

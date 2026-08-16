@@ -1,6 +1,7 @@
 ---
 version: 1
 origen: anonimo
+estado: armonizado al master el 2026-08-16 (ya vivía en Fase 0: «La regla de corte: dos veces sin respuesta, y se construye»; solo faltaba declararlo)
 ---
 
 # La entrevista necesita una regla de corte

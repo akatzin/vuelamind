@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: dominio de origen
-estado: propuesto — caso de ejecución pendiente (un dominio v2 lo pagará al adherirse)
+estado: armonizado al master el 2026-08-16 · caso de ejecucion pendiente: el primer dominio que se adhiera lo pagara
 ---
 
 # 2026-08-16 · Con canon versionado, el upgrade es adhesión — los upgraders solo migran contenido

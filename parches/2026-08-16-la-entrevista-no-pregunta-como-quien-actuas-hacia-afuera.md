@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto
+estado: fusionado al canon el 2026-08-16 · armonizado el 2026-08-16, con la alternativa de identidad propia declarada junto a la forma estructural
 ---
 
 # 2026-08-16 · La entrevista no pregunta como quién actúas hacia afuera

@@ -1070,6 +1070,23 @@ compra — de hardware que el dominio ya tenía, documentado con modelo y númer
 de serie. La lección 42 del libro guarda el caso; esta regla existe para que
 no haga falta llegar a ella.)*
 
+**Y un caso donde el paso 2 tiene una trampa: la intención en curso también es estado.**
+
+> **Un servicio abajo no es un hecho: es una pregunta.** Antes de levantarlo,
+> responder **dos** cosas con fuentes y no con reflejos: **¿el estado del orquestador
+> dice que hay una transición en curso?** —el gestor del sistema, no el servicio— y
+> **¿alguien está maniobrando?**, que se pregunta, no se adivina. Si cualquiera de las
+> dos dice maniobra: **las manos quietas**, y estorbar menos.
+
+Lo que hace falta nombrarlo aparte es que el reflejo de arreglar **se siente como
+diligencia**: encontrar algo caído y levantarlo parece exactamente el trabajo. Pero la
+recuperación automática y la maniobra de un operador **compiten por el mismo recurso**, y
+quien llega tarde deshace lo que el otro estaba haciendo. Es pariente de *el orden de toda
+respuesta*, un paso más adentro: ahí el paso 2 mide el sistema; aquí mide también **lo que
+alguien está haciéndole ahora mismo**.
+
+*(Parche `2026-08-15-la-recuperacion-pelea-contra-la-maniobra`.)*
+
 **Y su mitad menos evidente: la capacidad condicional va con su condición.**
 
 > **Toda capacidad que dependa de una condición se documenta CON su condición,
@@ -1309,6 +1326,24 @@ Qué hace, en orden:
    > alfabetos que ese dominio no usa—, **no una falla del validador**: un
    > dominio que cite nombres propios en otro alfabeto los tendría
    > legítimamente, y un chequeo que grita por algo legítimo enseña a ignorarlo.
+
+   > [!warning] Un texto didáctico dentro del vault produce colgantes legítimos
+   > Este chequeo **no puede distinguir un enlace exhibido de uno pretendido: son el
+   > mismo texto.** Cualquier nota que enseñe la sintaxis usándola —y la semilla del
+   > libro de errores lo hacía— genera un colgante que el validador reporta en rojo,
+   > y su primera manifestación es la peor posible: **el primer validador que alguien
+   > corre en su vida sale en rojo por un defecto heredado**, justo cuando está
+   > decidiendo si esta herramienta merece confianza. Quien no sepa de dónde viene
+   > concluirá que su vault está mal o que el validador miente — las dos falsas, y las
+   > dos enseñan a ignorar el rojo.
+   >
+   > La regla general, que aplica también a marcadores de plantilla y comodines: **no
+   > enseñes una sintaxis usándola si algún chequeo va a recorrer ese mismo texto.**
+   > Nómbrala o descríbela — *"los wikilinks salientes"* dice lo mismo sin ser uno. Si
+   > aun así se exhibe, la excepción se escribe **donde vive el chequeo**, no en la
+   > cabeza de quien lo mantiene.
+   >
+   > *(Parche `2026-08-14-un-ejemplo-de-enlace-no-se-distingue-de-uno-real`.)*
 4. **El radio del cambio — el grafo de enlaces, ANTES de cerrar la lista.** La lista de notas a tocar no sale solo de lo que la sesión tuvo abierto: por cada nota candidata, dos barridos. **Hacia afuera** — sus enlaces salientes, los de doble corchete: ¿alguna vecina habla del mismo tema y quedaría desactualizada, o tiene un *"por confirmar"* que este cambio responde? **Hacia adentro** — quién la enlaza: ¿alguien cita como hecho lo que este cambio vuelve falso? Lo encontrado entra a la lista como fila propia con su porqué. La estructura de carpetas no delata la relación temática; el grafo sí. Y si el tema no tiene nota de la que salir, eso también es hallazgo (lección 30: un track sin nodo no aparece en ningún censo).
 
    > *En el dominio de origen: una auditoría de un aparato de red se iba a escribir solo en el panorama, con dos notas vecinas cargando semanas un "por confirmar" que la auditoría acababa de resolver — los wikilinks de la nota ya leída las delataban, y nadie los siguió (lección 27). Semanas después, un permiso de acceso se concedió sobre una premisa que otra nota marcaba como no verificada: el grafo las conectaba, la sesión no.*
@@ -1437,6 +1472,23 @@ Desde el corte 3.0 el canon vive en un repositorio git, y un parche nuevo **se p
 `version` sube en uno cada vez que se corrige el **texto** del parche. Los cambios de **metadatos** —añadir `incorporado:`, normalizar `origen:`, retirar un campo podrido— **no la suben**: la versión habla del contenido, y un bump cosmético haría gritar "corregido después" a los validadores de todos los dominios a la vez.
 
 **Las versiones mayores de la plantilla son líneas base.** `version: 2.0` significa: *esta plantilla ya contiene el corpus completo de parches hasta su fecha de corte* (el frontmatter lo declara con `corpus_incorporado:`). Cada parche del corpus lleva `incorporado: <versión>` en su frontmatter, y la matriz de incorporación del corte registra en qué sección vive cada uno, con una frase ancla verificable. Después del corte, los parches siguen exactamente igual que siempre — la mecánica no cambia; lo que se resetea es la deuda.
+
+> [!important] Qué es un upgrade, y por qué son dos cosas distintas
+> **El upgrade de MÁQUINA es re-instalar el ciclo desde el canon** — el paso de huella
+> del acto de sumarse, sin ceremonia: la instancia fundadora no se re-declara ni hace
+> primera sesión de lectura.
+>
+> **El upgrade de DOMINIO es adherirse al canon**, y su delta es enumerable y chico: el
+> manifiesto gana las claves que le falten (`canon`, `aportar_a`), la semilla del libro
+> se refresca a la vigente, entra una fila en el registro —*"vN por adhesión al canon"*—
+> y **las copias locales del master se archivan con fecha**: no se migran y no se quedan
+> como trampas, porque una copia vieja junto a la nueva solo puede divergir.
+>
+> Lo que queda para un upgrader de verdad es **lo único que de verdad migra: contenido**
+> — vaults cuya estructura cambió entre líneas base, no plantillas que el canon ya carga.
+>
+> *(Parche `2026-08-16-el-upgrade-es-adhesion-al-canon`. Su caso de ejecución sigue
+> pendiente: la regla está escrita, y el primer dominio que se adhiera la pagará.)*
 
 **Un dominio que NACE de una línea base la hereda saldada:** al generar su registro, siembra una fila `✅ incorporado en plantilla vX.0 · vN` por cada parche cuyo `incorporado:` sea menor o igual a su versión. Sin esa siembra, su arranque le ofrecería como "sin mirar" decenas de parches que su plantilla ya trae dentro. **Un dominio que hace UPGRADE los hereda en bloque** con lista visible — el humano aparta los que quiera revisar; posponer o descartar previos no se pisa en silencio.
 

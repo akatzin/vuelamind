@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto
+estado: fusionado al canon el 2026-08-16 · armonizado a la pregunta de acceso de la entrevista el 2026-08-16
 ---
 
 # 2026-08-16 · La capacidad se declara con su dueño, no con su plomería
