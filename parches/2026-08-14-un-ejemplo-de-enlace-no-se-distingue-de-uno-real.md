@@ -1,6 +1,7 @@
 ---
 version: 1
 origen: anonimo
+estado: armonizado al master el 2026-08-16 (la leccion 27 ya describia los enlaces en vez de usarlos; se anadio la advertencia de colgantes legitimos en Fase 3)
 ---
 
 # Un ejemplo de enlace no se distingue de uno real

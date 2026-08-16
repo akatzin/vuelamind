@@ -1,6 +1,7 @@
 ---
 version: 1
 origen: akatzin
+estado: fusionado al canon el 2026-08-16 · armonizado en su propio PR: las dos superficies en el mismo acto
 ---
 
 # 2026-08-16 · El método exige un MOMENTO para presentar lo que no publica solo, y no da dónde cumplirlo

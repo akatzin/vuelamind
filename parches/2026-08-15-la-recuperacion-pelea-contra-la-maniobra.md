@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: anonimo
-estado: propuesto — sin armonizar al libro todavía
+estado: armonizado al master el 2026-08-16, en el nucleo epistemico
 ---
 
 # 2026-08-15 · Antes de «recuperar», pregunta qué maniobra está en curso
