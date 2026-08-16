@@ -188,6 +188,32 @@ Que el vault local y su réplica coincidan — **por huella, no por fe**. El có
 
 Si no había nada que corregir, decir eso: es un resultado válido y significa que el marco se está manteniendo solo.
 
+## 7. Presentar los parches por proponer
+
+**El último acto, después de reportar.** Un dominio que delegó la publicación en su responsable necesita un **momento** en que la decisión se le ponga enfrente; sin él, la decisión no se rechaza — **no se toma nunca**, y los borradores se acumulan sin que nada falle ni nadie los vea. Ese momento es éste, y por eso vive en el orden y no en una clave del manifiesto: si fuera declarable, el dominio que no lo declarara volvería a quedarse sin ninguno.
+
+Lo gobierna la clave que ya existe:
+
+| `aportar_a` | Qué se hace al final |
+|---|---|
+| Un repositorio (con cuenta o sin ella) | **Presentar uno a uno los parches pendientes de proponer** —qué corrige cada uno y qué costaría publicarlo— y **pedir confirmación de publicarlos**. Sin cuenta la confirmación sigue teniendo sentido: decide el responsable, y el transporte puede ser otra máquina u otro día |
+| `ninguno` | **No se presenta nada.** No hay decisión que pedir: el parche se queda en casa por diseño, y preguntarlo cada cierre es ruido que enseña a contestar que no sin mirar |
+| Sin declarar | Se pregunta **una vez** por el destino — no se asume ni que sí ni que no |
+
+**Dos estados, porque en un listado se ven idénticos:**
+
+> **`nunca presentado`** — se re-ofrece en **cada** cierre hasta que haya decisión.
+> **`decidido no publicar`** — con su motivo escrito; **no vuelve a ofrecerse**.
+
+> [!danger] Confirmar el checkpoint no es confirmar una publicación
+> El visto bueno del paso 3 autoriza **escribir en el vault**. Publicar cruza el
+> borde de salida del dominio y es irreversible, así que se pide **aparte y
+> explícito**, con la misma ceremonia: `AskUserQuestion`, y **nada sale de la
+> máquina hasta el sí**. Un parche que espera no pierde validez — lleva fecha,
+> caso y forma de verificarse desde el día que se escribió.
+
+*(Parche `los-parches-por-proponer-se-quedan-sin-presentar`.)*
+
 ---
 
 > [!note] De dónde salió este motor

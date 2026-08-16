@@ -1315,7 +1315,9 @@ Qué hace, en orden:
 
 #### Si el asistente no publica por su cuenta, la política necesita un MOMENTO
 
-La regla por defecto de este método es que **publicar al master es parte del mismo acto de aplicar** — no se escala. Un dominio puede decidir lo contrario (que toda publicación pase por el responsable), y esa política es legítima; lo que no puede es quedarse a medias: **una decisión delegada sin momento definido de presentarla no se rechaza — no se toma nunca.** Los borradores se acumulan sin que nada falle ni nadie los vea. Si tu dominio elige esa política, define en el mismo acto **cuándo** se presentan los borradores pendientes (en el cierre de sesión, en el arranque, en una revisión fija), y que ese momento viva en un comando, no en una intención.
+La regla por defecto de este método es que **publicar al master es parte del mismo acto de aplicar** — no se escala. Un dominio puede decidir lo contrario (que toda publicación pase por el responsable), y esa política es legítima; lo que no puede es quedarse a medias: **una decisión delegada sin momento definido de presentarla no se rechaza — no se toma nunca.** Los borradores se acumulan sin que nada falle ni nadie los vea.
+
+**El momento ya no lo inventa cada dominio: lo da el orden.** El cierre termina presentando los parches pendientes y pidiendo la decisión — el punto 9 de esta fase, y el paso homónimo del motor. Por eso **no hay clave de manifiesto para esto**: si el momento fuera declarable, el dominio que no lo declarara volvería a quedarse sin ninguno, que es exactamente el defecto que esta sección nombra. Un dominio con `aportar_a: ninguno` no recibe la pregunta, porque no delegó nada: sus parches se quedan en casa por diseño.
 
 > *En el dominio de origen: la instancia que eligió esa política acumuló borradores sin momento de revisión hasta que un parche lo señaló; la instancia con la política contraria lo descartó con razón — su regla hace que los borradores no lleguen a existir.*
 
@@ -1391,6 +1393,7 @@ Desde el corte 3.0 el canon vive en un repositorio git, y un parche nuevo **se p
 > diría *"en ningún otro dominio"* para todo, que es el mismo falso negativo con
 > forma de dato.
 8. **`initPrompt.md`.** Reescribirlo con el estado real: por dónde seguir, qué se cerró, qué se descubrió, y **qué supuestos resultaron falsos** — esa última parte es la que evita repetir el error en la sesión siguiente.
+9. **Presentar los parches por proponer, y pedir la decisión.** El último acto, después de reportar. Si `aportar_a` nombra un repositorio, **se presentan uno a uno los parches pendientes de proponer** —qué corrige cada uno y qué costaría publicarlo— y se pide confirmación de publicarlos. Con `aportar_a: ninguno` no se presenta nada: no hay decisión que pedir, y preguntarlo cada cierre es ruido que enseña a contestar que no sin mirar. **Dos estados, porque en un listado se ven idénticos:** `nunca presentado` se re-ofrece en **cada** cierre hasta que haya decisión; `decidido no publicar` lleva su motivo escrito y **no vuelve a ofrecerse**. Confirmar el checkpoint y confirmar una publicación son **actos distintos**: el segundo cruza el borde de salida del dominio y por eso se pide aparte. *(Parche `los-parches-por-proponer-se-quedan-sin-presentar`.)*
 
 **Conviene tener un validador mecánico** para los puntos 1 a 3, que son puramente estructurales. Tres advertencias ganadas en el original:
 
