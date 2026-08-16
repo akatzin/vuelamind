@@ -1,0 +1,81 @@
+name: Coherencia del canon
+
+# config.yml declara donde vive el canon. Los archivos estaticos no pueden
+# leerlo al vuelo, asi que las copias de esa URL siguen existiendo en el README,
+# sus nueve traducciones y el i18n del micrositio.
+#
+# Este chequeo es lo que impide que esas copias se aparten en silencio. Es la
+# misma disciplina que el marco predica: no puedes evitar que haya copias, pero
+# si puedes evitar que diverjan sin que nadie lo note.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  coherencia:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Leer config.yml
+        id: cfg
+        run: |
+          test -f config.yml || { echo "no existe config.yml"; exit 1; }
+          repo=$(grep -m1 -E '^  repo:'   config.yml | sed 's/^  repo: *//')
+          sitio=$(grep -m1 -E '^  sitio:' config.yml | sed 's/^  sitio: *//')
+          clonar=$(grep -m1 -E '^  clonar:' config.yml | sed 's/^  clonar: *//')
+          for v in repo sitio clonar; do
+            eval "val=\$$v"
+            [ -n "$val" ] || { echo "config.yml: falta '$v' — un campo vacio significa 'todavia no se contesto', y aqui hay que contestarlo"; exit 1; }
+          done
+          echo "repo=$repo"     >> "$GITHUB_OUTPUT"
+          echo "sitio=$sitio"   >> "$GITHUB_OUTPUT"
+          echo "clonar=$clonar" >> "$GITHUB_OUTPUT"
+          echo "declarado: $repo · $sitio"
+
+      # Toda mencion a un repositorio de vuelamind tiene que apuntar al
+      # declarado. Cubre las dos direcciones: si cambia config.yml y no los
+      # readmes, falla; si alguien edita un readme a mano, tambien.
+      - name: Las menciones al repo coinciden con el declarado
+        run: |
+          # Sin sed: `\?` no es portable entre BSD y GNU, y al probarlo en un Mac
+          # dejo el esquema pegado y marco como malas las 19 menciones buenas.
+          # Un resultado absurdo acusa al extractor antes que a los datos.
+          repo="${{ steps.cfg.outputs.repo }}"
+          declarado="${repo#*//}"
+          malas=$(grep -rnoE 'github\.com/[A-Za-z0-9._-]+/vuelamind' \
+                    --include='*.md' --include='*.js' --include='*.html' . \
+                  | grep -v ":${declarado}$" || true)
+          if [ -n "$malas" ]; then
+            echo "Estas menciones no apuntan al canon declarado ($declarado):"
+            echo "$malas"
+            exit 1
+          fi
+          n=$(grep -rloE 'github\.com/[A-Za-z0-9._-]+/vuelamind' \
+                --include='*.md' --include='*.js' --include='*.html' . | wc -l)
+          echo "archivos que citan el canon, todos coherentes: $n"
+
+      # Un valor que sale igual en todas las filas puede acusar al extractor y
+      # no a los datos. Si el patron deja de encontrar nada, el chequeo pasaria
+      # en verde sin haber mirado — que es el modo de fallo que mas engana.
+      - name: El chequeo anterior de verdad miro algo
+        run: |
+          n=$(grep -rloE 'github\.com/[A-Za-z0-9._-]+/vuelamind' \
+                --include='*.md' --include='*.js' --include='*.html' . | wc -l)
+          [ "$n" -ge 10 ] || { echo "esperaba 10 archivos o mas citando el canon, encontre $n — sospecha del patron antes que del repo"; exit 1; }
+
+      - name: El dominio del sitio coincide con el CNAME
+        run: |
+          sitio="${{ steps.cfg.outputs.sitio }}"
+          esperado="${sitio#*//}"; esperado="${esperado%/}"
+          real=$(tr -d '[:space:]' < web/CNAME)
+          [ "$esperado" = "$real" ] || { echo "config.yml dice '$esperado' y web/CNAME dice '$real'"; exit 1; }
+          echo "sitio coherente: $real"
+
+      - name: La plantilla remite a config.yml en vez de repetir la URL
+        run: |
+          grep -q 'config\.yml' MARCO_Inicial.md || { echo "MARCO_Inicial.md no remite a config.yml"; exit 1; }
+          echo "la plantilla remite al declarante"

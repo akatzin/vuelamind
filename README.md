@@ -61,6 +61,11 @@ Both paths start the same way — with the file, not with a command:
 The first question is your language. **The second one decides everything after it:** is this
 domain being born here, or is this machine joining one that already lives?
 
+> Where the canon lives — repository, branch, site — is declared once in
+> [`config.yml`](config.yml), along with the defaults for where patches are consumed from and
+> published to. Everything else references that file instead of repeating it, and a check
+> fails the build if any copy drifts away from it.
+
 - **Being born** — answer the interview. About twenty minutes, and you can pause. It generates
   the vault, the scaffolding and the cycle commands.
 - **Joining** — no interview and nothing generated. It reaches the existing vault, checks it

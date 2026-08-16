@@ -3,7 +3,7 @@ title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
 version: 3.0
 corpus_incorporado: 64 parches · corte 2026-08-13 · anonimizado para publicación en el corte 3.0
-canon: el repositorio git de vuelamind — los parches se proponen ahí, como pull requests
+canon: declarado en config.yml — de ahí sale el repositorio, la rama y el sitio, y ahí se proponen los parches como pull requests
 origen: destilado de un dominio real, 2026-08-03 — las historias conservan el caso y omiten los nombres
 ---
 

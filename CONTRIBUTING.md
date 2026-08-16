@@ -6,6 +6,13 @@ The method improves through **patches**: corrections discovered by using it, wit
 case and a way to verify them. This repository is the canon; patches are proposed here as
 pull requests.
 
+**Where "here" is, exactly, is declared in [`config.yml`](config.yml)** — repository, branch
+and site, written once so nothing else has to repeat them. That file also holds the two
+defaults: a domain **consumes** patches from the canon by default (read-only, it exposes
+nothing about the domain), and when a domain chooses to **publish**, the canon is the default
+destination. Publishing itself stays opt-in — a patch carries its case, and the case says
+something about the domain that wrote it. What you send cannot be un-sent.
+
 ## What a patch is
 
 A file in `parches/` named `YYYY-MM-DD-short-description.md` — the date is the date of

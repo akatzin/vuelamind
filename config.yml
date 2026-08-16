@@ -1,0 +1,63 @@
+# Configuración del canon — vuelamind
+#
+# Este archivo declara UNA VEZ dónde vive el canon y por dónde entran los
+# parches. Todo lo demás lo referencia en vez de repetirlo.
+#
+# Por qué existe: la URL del repositorio estaba escrita a mano en once lugares
+# —el README, sus nueve traducciones y el archivo de textos del micrositio— y
+# nada las comparaba. Once copias de un dato que nadie mide es exactamente el
+# modo de fallo que este método existe para no repetir.
+#
+# Qué NO hace: no elimina las copias. Los archivos estáticos —markdown, la
+# página— no pueden leer un yml al vuelo, así que las copias siguen ahí. Lo que
+# cambia es que ahora tienen DUEÑO y MEDIDOR: este archivo manda, y el chequeo
+# de `.github/workflows/canon.yml` falla si alguna copia se aparta.
+#
+# Un campo vacío significa una sola cosa: TODAVÍA NO SE CONTESTÓ. No se usa el
+# vacío para decir algo — si un dominio es su propio canon, se declara con
+# `sí mismo`, no dejándolo en blanco.
+
+canon:
+  # De dónde se trae el método, y contra qué se compara una copia local.
+  repo: https://github.com/akatzin/vuelamind
+  rama: main
+  sitio: https://vuelamind.ai
+
+  # La línea exacta que aparece en los readmes y en la guía del micrositio.
+  # Si cambia aquí, tiene que cambiar allá — y el chequeo lo obliga.
+  clonar: git clone https://github.com/akatzin/vuelamind.git
+
+parches:
+  # DESTINO por omisión de las dos direcciones. `canon` significa: el
+  # repositorio declarado arriba. Esto responde "¿a cuál?", no "¿lo hago?".
+  consumir_de: canon
+  publicar_en: canon
+  via: pull request
+
+  # La diferencia entre las dos direcciones NO es cosmética, y este archivo no
+  # la deroga: consumir es de solo lectura y no expone nada del dominio, así
+  # que se adopta por omisión. PUBLICAR SIGUE SIENDO OPT-IN — un parche lleva
+  # su caso, y el caso cuenta algo del dominio que lo escribió. Lo que se manda
+  # no se puede des-mandar.
+  #
+  # O sea: `publicar_en: canon` dice A DÓNDE va si el dominio dijo que sí. No
+  # dice que haya dicho que sí. Esa respuesta vive en el manifiesto de cada
+  # dominio, y mientras no exista, el valor es `ninguno`.
+  publicar_es_opt_in: true
+
+  # Un dominio puede apartarse de los valores por omisión —una bifurcación
+  # privada, una organización con su propio canon interno— y entonces lo
+  # declara en SU manifiesto, no aquí. Este archivo describe el canon público;
+  # cada dominio registra a cuál se adhirió.
+  #
+  # Y una asimetría que conviene tener escrita: consumir y publicar son
+  # decisiones SEPARADAS. Un dominio puede consumir del canon público y
+  # publicar sólo hacia adentro; lo que no puede es publicar hacia afuera sin
+  # decirlo, porque un parche que sale lleva el caso de quien lo escribió.
+
+licencia:
+  # Se nombra aquí porque viaja con cada copia y con cada derivado.
+  archivo: LICENSE.md
+  nombre: Vuelamind 1.0
+  # La condición que no se negocia. Está completa en LICENSE.md, cláusula 3.
+  condicion_irrenunciable: las personas no se sustituyen
