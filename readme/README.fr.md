@@ -55,6 +55,8 @@ Tout ce qui précède en suppose une : un assistant et deux dossiers locaux. **C
 
 Une machine qui lit le vault sans atteindre les systèmes reste une instance légitime — elle doit seulement **le dire** en se déclarant.
 
+Et il existe une instance légitime qui n'écrit jamais — un conseil abonné à la mémoire de l'ingénierie, un auditeur. Sa ligne au registre porte `accès : écrit | lit`, et **elle ne se déclare pas elle-même : une instance qui écrit la déclare**, avant son arrivée. Qui ne fait que lire garde ce qui définit le rôle : fermer chaque session sans avoir écrit une lettre.
+
 ## Prérequis
 
 Un assistant, deux dossiers locaux et **un shell de type Unix** — macOS ou Linux.

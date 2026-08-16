@@ -55,6 +55,8 @@ Alles Obige setzt eine voraus: ein Assistent und zwei lokale Ordner. **Dieses Ve
 
 Eine Maschine, die den Vault liest, aber die Systeme nicht erreicht, ist trotzdem eine legitime Instanz — sie muss es nur **sagen**, wenn sie sich anmeldet.
 
+Und es gibt eine legitime Instanz, die nie schreibt — ein Vorstand, der das Engineering-Gedächtnis abonniert, ein Auditor. Ihre Zeile im Register trägt `Zugriff: schreibt | liest`, und **sie meldet sich nicht selbst an: eine schreibende Instanz trägt sie ein**, bevor sie kommt. Wer nur liest, behält, was die Rolle ausmacht: jede Sitzung zu schließen, ohne einen Buchstaben geschrieben zu haben.
+
 ## Voraussetzungen
 
 Ein Assistent, zwei lokale Ordner und **eine Unix-artige Shell** — macOS oder Linux.

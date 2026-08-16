@@ -55,6 +55,8 @@ Tudo acima supõe uma: um assistente e duas pastas locais. **Essa promessa vale 
 
 Uma máquina que lê o vault mas não alcança os sistemas ainda é uma instância legítima — só precisa **dizê-lo** ao se declarar.
 
+E existe uma instância legítima que nunca escreve — um conselho assinante da memória de engenharia, um auditor. Sua linha no registro leva `acesso: escreve | lê`, e **ela não se declara: uma instância que escreve a declara**, antes de chegar. Quem só lê conserva o que define o papel: fechar cada sessão sem ter escrito uma letra.
+
 ## Requisitos
 
 Um assistente, duas pastas locais e **um shell tipo Unix** — macOS ou Linux.

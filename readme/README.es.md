@@ -55,6 +55,8 @@ Todo lo anterior supone una: un asistente y dos carpetas locales. **Esa promesa 
 
 Una máquina que lee el vault pero no alcanza los sistemas sigue siendo una instancia legítima — solo tiene que **decirlo** al declararse, porque a partir de ahí documenta sin verificar.
 
+Y hay una instancia legítima que no escribe jamás — un consejo suscrito a la memoria de ingeniería, un auditor. Su fila en el registro lleva `acceso: escribe | lee`, y **no se declara ella: la declara una instancia que escribe**, antes de que llegue. Quien solo lee conserva lo que define al rol: cerrar cada sesión sin haber escrito una letra.
+
 ## Requisitos
 
 Un asistente, dos carpetas locales y **un shell tipo Unix** — macOS o Linux.
