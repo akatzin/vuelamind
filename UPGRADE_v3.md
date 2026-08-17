@@ -145,6 +145,22 @@ primer paso sin línea en el registro, o rollback y reinicio limpio.
    > referencia exige que NO haya copia local y que el clon esté al día contra HEAD;
    > copia propia exige la copia y su huella.
    >
+   > **La forma legible por máquina del modo** (pagada en la segunda corrida): dentro de
+   > la sección `marco` del manifiesto, una línea `modo_marco: referencia | copia_propia`,
+   > documentada ahí mismo como *la forma legible de la clave `marco`, no una segunda
+   > clave*. Y el candado que impide que se vuelva una segunda verdad: **el validador
+   > falla si `modo_marco` contradice lo que la prosa de `marco` declara** — dos formas
+   > de la misma clave que divergen son exactamente el defecto que la regla de las
+   > claves únicas quiere impedir.
+   >
+   > **Y al tocar el chequeo, la prueba en ROJO es parte del paso, no cortesía aparte:**
+   > se fuerza el caso que debe fallar —la copia resucitada en modo referencia— y se
+   > comprueba que falla DE VERDAD, con su código de salida. Estás tocando al que vigila:
+   > es el momento de máximo riesgo, y un chequeo probado solo en verde no está probado.
+   > *(Pagado en la segunda corrida: el chequeo reescrito salió verde y correcto, y al
+   > forzar el rojo imprimió `command not found` con exit 0 — un typo en el nombre de la
+   > función lo había vuelto incapaz de fallar, dentro del propio acto de arreglarlo.)*
+   >
    > *(Descubierto en la primera ejecución real: el ejecutor cumplió el paso al pie de
    > la letra y su validador se puso en rojo por ausencia — un chequeo suyo, correcto en
    > v2, midiendo la adhesión como defecto.)*
@@ -162,6 +178,11 @@ primer paso sin línea en el registro, o rollback y reinicio limpio.
 
    **5b · Los genéricos del ciclo, desde el canon** (`skills/`, hoy nueve comandos con su
    `MD5SUM.txt`): verificar por huella recalculada; instalar del canon lo que falte.
+   **El formato de instalación varía por máquina** —hay instalaciones de archivo plano y
+   de directorio-por-skill— y el canon aún no declara los formatos: la verificación es
+   por huella del **contenido**, y la traducción de formato que cada máquina haga queda
+   anotada en su manifiesto. *(Deuda declarada del canon: publicar los formatos, para que
+   la traducción no se invente en cada casa.)*
 
 6. **La semilla del libro se refresca a la vigente.** Si el canon queda clonado al lado,
    por referencia (una copia junto a su original solo puede divergir); si el dominio vive
