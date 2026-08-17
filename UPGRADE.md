@@ -62,4 +62,4 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 
 | Salto | Documento | Estado |
 |---|---|---|
-| v2 → v3 | `UPGRADE_v3.md` | **Pendiente de publicación** — el material existe fuera del repo y está en camino. Hasta que esté junto al master, v3 está liberada para nacer, no para saltar |
+| v2 → v3 | `UPGRADE_v3.md` | **Liberado y EJECUTADO** (2026-08-16). El primer salto real lo corrió el caso duro —huella huérfana derivada de un borrador nunca liberado— y pagó su deuda en la moneda prometida: tres defectos de instrumento encontrados corriéndolo, ninguno leyéndolo, los tres corregidos en la misma jornada. El preflight abortó dos veces y las dos tuvo razón |
