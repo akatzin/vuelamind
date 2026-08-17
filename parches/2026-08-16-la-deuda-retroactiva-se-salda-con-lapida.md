@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto
+estado: armonizado al master el 2026-08-16 (lección 50 del libro heredado)
 ---
 
 # 2026-08-16 · La deuda retroactiva de una regla nueva se salda con lápida, no con reconstrucción
