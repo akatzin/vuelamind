@@ -153,6 +153,16 @@ primer paso sin línea en el registro, o rollback y reinicio limpio.
    > de la misma clave que divergen son exactamente el defecto que la regla de las
    > claves únicas quiere impedir.
    >
+   > **Lo que el candado NO cubre, y hay que saberlo al instalarlo:** es un chequeo de
+   > **presencia**, no de coherencia — detecta que la declaración falte o esté negada,
+   > no que la sección se contradiga a sí misma. Caso medido el día que se diseñó: la
+   > prosa afirmaba «por referencia» y a la vez conservaba una fila con la ruta de la
+   > copia local recién archivada — y el candado dio verde, porque encontró la frase que
+   > buscaba. **La coherencia interna de la sección es del PASO, no del chequeo**: al
+   > declarar el modo, se actualizan TODAS las filas de la sección `marco` —copia,
+   > parches, skills, conteos—, porque una fila vieja junto a la declaración nueva es
+   > prosa que se desmiente y ningún candado barato la ve.
+   >
    > **Y al tocar el chequeo, la prueba en ROJO es parte del paso, no cortesía aparte:**
    > se fuerza el caso que debe fallar —la copia resucitada en modo referencia— y se
    > comprueba que falla DE VERDAD, con su código de salida. Estás tocando al que vigila:
