@@ -128,14 +128,33 @@ primer paso sin línea en el registro, o rollback y reinicio limpio.
    > prosa: la fila lleva literalmente `aplicado`, `pospuesto` o `descartado` — una fila
    > que diga solo «incorporado» no casa con nada y el parche se re-ofrece para siempre.
 
-3. **La copia vieja se ARCHIVA, el clon manda.** `MARCO_Inicial.md` local →
-   `MARCO_Inicial.md.pre-v3-<fecha>` (o al archivo histórico del dominio). El dominio
-   pasa a leer el master **desde el clon del canon**. Si su operación exige copia propia,
-   se toma de HEAD y se anota con la huella recalculada en ese momento.
+3. **La copia vieja se ARCHIVA, el clon manda — y el modo queda DECLARADO.**
+   `MARCO_Inicial.md` local → `MARCO_Inicial.md.pre-v3-<fecha>` (o al archivo histórico
+   del dominio). El dominio pasa a leer el master **desde el clon del canon**; si su
+   operación exige copia propia, se toma de HEAD y se anota con la huella recalculada.
+
+   > [!important] El modo no se infiere de una ausencia: se declara
+   > «Sin copia porque adherido al clon» y «sin copia porque alguien la borró» son
+   > **estados opuestos con la misma cara**, y ningún instrumento puede distinguirlos
+   > mirando el disco. El modo queda declarado donde ya vive esa respuesta: **la clave
+   > `marco` del manifiesto** apunta al clon del canon (por referencia) o a la ruta de
+   > la copia propia — y esa clave, no la ausencia, es lo que consultan la verificación
+   > final y el validador del dominio. Un chequeo escrito en la era de la copia propia
+   > («sin copia no vigilo nada») queda midiendo con el criterio de la era anterior:
+   > parte de este paso es **actualizarlo para que consulte el modo declarado** — por
+   > referencia exige que NO haya copia local y que el clon esté al día contra HEAD;
+   > copia propia exige la copia y su huella.
+   >
+   > *(Descubierto en la primera ejecución real: el ejecutor cumplió el paso al pie de
+   > la letra y su validador se puso en rojo por ausencia — un chequeo suyo, correcto en
+   > v2, midiendo la adhesión como defecto.)*
 
 4. **Manifiesto.** Gana `canon` (default: el oficial) y `aportar_a` (**solo si el dominio
-   dijo que sí** — `ninguno` es el fallback mientras no se decida). Si no hay manifiesto,
-   se genera del contrato de la plantilla preguntando solo lo no deducible.
+   dijo que sí** — `ninguno` es el fallback mientras no se decida), y **su clave `marco`
+   se actualiza al modo elegido en el paso 3** — el clon, o la ruta de la copia propia.
+   Si no hay manifiesto, se genera del contrato de la plantilla preguntando solo lo no
+   deducible. *(No se añade clave nueva al contrato: `marco` ya responde «dónde vive el
+   master», y una segunda clave para lo mismo sería una segunda verdad.)*
 
 5. **El cierre migra al motor — donde lo haya.** Igual que v2: con motor en la máquina,
    el comando propio se vuelve alias fino; sin motor posible, copia declarada con
@@ -157,8 +176,9 @@ primer paso sin línea en el registro, o rollback y reinicio limpio.
 
 ## Verificación final
 
-1. La copia local (si existe) casa con HEAD por huella recalculada; la vieja está
-   archivada con fecha ✅
+1. **Según el modo que declare `marco`:** por referencia → NO hay copia local y el clon
+   está al día contra HEAD; copia propia → la copia casa con HEAD por huella
+   recalculada. En ambos: la vieja está archivada con fecha ✅
 2. El registro tiene la fila de adhesión, y las históricas anotadas sin reescribir ✅
 3. El arranque del dominio ya no ofrece parches del corpus como «sin mirar» ✅
 4. El manifiesto existe y sus claves obligatorias tienen valor — `canon` y `aportar_a`
