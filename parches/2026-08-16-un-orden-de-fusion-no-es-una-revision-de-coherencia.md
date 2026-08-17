@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: anonimo
-estado: propuesto
+estado: armonizado al master el 2026-08-16 (lección 43 del libro heredado)
 ---
 
 # 2026-08-16 · Un orden de fusión no es una revisión de coherencia

@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: anonimo
-estado: propuesto
+estado: armonizado al master el 2026-08-16 (lección 45 del libro heredado)
 ---
 
 # 2026-08-16 · El apéndice ejecutable va después de decidir, y va aparte
