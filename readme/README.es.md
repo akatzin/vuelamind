@@ -16,7 +16,7 @@ vuelamind rompe las dos cosas a la vez — no con una app, sino con disciplina e
 
 Un vault de texto plano y un ciclo de cuatro actos: **nacer** una vez, **retomarse** al abrir cada sesión —midiendo el estado actual en vez de confiar en lo que se recuerda— y **reconciliarse** al cerrarla.
 
-Dentro: una cola de trabajo ordenada por gravedad real, un registro de decisiones que anota *qué me haría cambiar de opinión*, y **un libro de errores con 47 lecciones, cada una pagada con una equivocación real**.
+Dentro: una cola de trabajo ordenada por gravedad real, un registro de decisiones que anota *qué me haría cambiar de opinión*, y **un libro de errores con 49 lecciones, cada una pagada con una equivocación real**.
 Y el método no solo dice funcionar: **diez corridas completas guionizadas, todas limpias** — ver [PRUEBAS.md](../PRUEBAS.md). Esa última parte es la valiosa: la estructura se reconstruye en una tarde; las cicatrices no.
 
 ## Cómo se empieza

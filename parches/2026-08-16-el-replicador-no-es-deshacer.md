@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto
+estado: armonizado al master el 2026-08-16 (lección 49 del libro heredado)
 ---
 
 # 2026-08-16 · El replicador no es deshacer

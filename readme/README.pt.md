@@ -16,7 +16,7 @@ vuelamind quebra as duas coisas ao mesmo tempo — não com um aplicativo, mas c
 
 Um vault de texto puro e um ciclo de três atos: **nascer** uma vez; **retomar** no início de cada sessão — medindo o estado atual em vez de confiar na memória; e **reconciliar** ao encerrar.
 
-Dentro: uma fila de trabalho ordenada por gravidade real, um registro de decisões que anota *o que me faria mudar de ideia*, e **um livro de erros com 47 lições, cada uma paga com um engano real**. Essa última parte é a valiosa: a estrutura se reconstrói numa tarde; as cicatrizes não.
+Dentro: uma fila de trabalho ordenada por gravidade real, um registro de decisões que anota *o que me faria mudar de ideia*, e **um livro de erros com 49 lições, cada uma paga com um engano real**. Essa última parte é a valiosa: a estrutura se reconstrói numa tarde; as cicatrizes não.
 
 ## Como começar
 
