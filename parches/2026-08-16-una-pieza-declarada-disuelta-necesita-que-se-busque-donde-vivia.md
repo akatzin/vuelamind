@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto
+estado: armonizado al master el 2026-08-16 (lección 51 del libro heredado)
 ---
 
 # 2026-08-16 · Una pieza que se declara disuelta necesita que se busque dónde vivía
