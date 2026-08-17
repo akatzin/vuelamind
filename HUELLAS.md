@@ -12,6 +12,14 @@ versión de la que nadie guardó huella — y eso se resuelve **antes** de hacer
 > recalculando ambos lados en el momento** — nunca contra una copia local o una réplica
 > de red, que pueden estar divergidas y darse la razón entre sí.
 
+> [!warning] El linaje mapea huella→versión — NUNCA dominio→versión
+> La versión VIGENTE de un dominio se lee de la **fila de cierre de su último upgrade**,
+> nunca de campos de nacimiento (`origen_plantilla:`) ni de frontmatters declarados: un
+> campo de nacimiento **no cambia por diseño**, y leerlo como estado hace ver viejo a un
+> dominio al día. Caso medido el 2026-08-16: un dominio en v2.0 verificada por artefacto
+> fue leído como v1.3 porque el lector tomó su línea de nacimiento por su estado. Por lo
+> mismo, cada fila de abajo que dependa de un registro **dice de qué campo salió**.
+
 ## El linaje
 
 | md5 | versión | atestada por |
@@ -33,8 +41,8 @@ versión de la que nadie guardó huella — y eso se resuelve **antes** de hacer
 | `ec18b0566f0a678c63aab425ac428cad` | v1.26 | respaldo del master |
 | `10c745a8cf6b7eabb5c9368832e063ab` | v1.27 | respaldo del master |
 | `076e32607308a267cadaeffa1cd812fd` | v1.28 | el master vivo al momento del corte |
-| `c23a724500f963aeb5ef95ee5e3d6832` | v1.3 | **solo el registro de una instancia** (`origen_plantilla:` anotado al inicializar). No hay respaldo del master que la ateste; la palabra del dominio en su nacimiento es la fuente |
-| `02d578cf9c91345869be7efde037c180` | v1.18 | **solo una copia local**. Los respaldos del master saltan de v1.17 a v1.19 — el preflight debe tratarla con la opción de diff |
+| `c23a724500f963aeb5ef95ee5e3d6832` | v1.3 | el campo `origen_plantilla:` del registro de una instancia — **campo de NACIMIENTO, no de estado**: dice qué plantilla la parió, nunca su versión vigente. Y desde el 2026-08-16, **también un artefacto medido**: el respaldo `pre-v2` de esa instancia casa con esta huella y es el **único ejemplar conocido de la v1.3** (ningún respaldo del master anterior al 2026-08-05 existe). No es «sin respaldo»: es «cuídalo — no hay otro» |
+| `02d578cf9c91345869be7efde037c180` | v1.18 | **solo una copia local, y por campo DECLARADO** (su frontmatter dice v1.18 — sin artefacto independiente que lo confirme). Los respaldos del master saltan de v1.17 a v1.19 — el preflight debe tratarla con la opción de diff |
 | `b7c51925e63af917c805dcafb1c19b6a` | v2.0 | respaldo del master |
 | `f132843ae45aacf6ffb0e28e2620dd2a` | v2.1 | respaldo del master |
 | `2c9f8a2e77269d257befcab2fb80d049` | v2.2 | respaldo del master |
