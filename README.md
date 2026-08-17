@@ -39,7 +39,7 @@ A vault of plain text files and a cycle of four acts:
 - **Joined**, when another machine comes in — the first step of a hive.
 
 Inside: a work queue ordered by real severity, a decision log that records *what would
-change my mind*, and **an error book — 47 lessons, each one paid for by a real mistake**.
+change my mind*, and **an error book — 49 lessons, each one paid for by a real mistake**.
 And the method does not just claim to work: **ten scripted end-to-end runs, all clean** — see [PRUEBAS.md](PRUEBAS.md).
 That last part is the valuable one. The structure you could rebuild in an afternoon; the
 scars you could not.
