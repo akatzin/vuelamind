@@ -1,0 +1,154 @@
+---
+title: Salto a la línea base v3 — adhesión al canon
+tipo: plantilla ejecutable
+para: dominios en v1.x o v2.x — y copias que declaran v3 con huella fuera del linaje (adhesión correctiva)
+---
+
+# UPGRADE a v3 — adhesión al canon
+
+Sube un dominio existente a la línea base v3. **Se ejecuta DENTRO del dominio** — en una
+sesión abierta en su proyecto, nunca desde otro dominio hacia él: el registro y las
+memorias tienen que aterrizar en su casa.
+
+**Qué es v3:** el canon vive en un repositorio git y el método cambia por parche. Subir
+es **adherirse**: el manifiesto gana las claves que le falten (`canon`, `aportar_a`), la
+semilla del libro se refresca a la vigente, entra la fila de adhesión al registro, y las
+copias locales viejas del master **se archivan con fecha — no se migran, no se quedan
+como trampas**. El contenido del dominio (folios, decisiones, bitácora, acta) **no se
+toca**.
+
+> [!important] Este documento no trae huella fija del master — a propósito
+> El upgrader v2 sellaba `md5_marco_v2` en su frontmatter porque el master era un
+> archivo congelado. En la era git **el master cambia con cada parche fusionado**: una
+> huella fija estaría vieja en el siguiente merge, y el primer dominio en saltar
+> abortaría contra una huella que ya nadie tiene. La verificación v3 es **contra el HEAD
+> del canon remoto, recalculada de ambos lados en el momento** — git garantiza la
+> integridad del transporte que el md5 del bundle garantizaba en v2.
+
+**Material que acompaña:** `HUELLAS.md` (el linaje, para identificar la copia vieja) y un
+clon fresco del canon oficial. Nada más viaja en bundle.
+
+> [!warning] La matriz de incorporación del corte 3.0 NO existe — lápida, no relleno
+> El corte 3.0 declaró un corpus de 62 parches incorporados y **su matriz nunca se
+> escribió** (la que existe es del corte v2.0: 46 parches, con frases ancla). No se
+> reconstruye de memoria: una matriz redactada meses después tendría tono de evidencia
+> sin serlo. Consecuencia operativa: la herencia del paso 2 se hace **por fila única de
+> línea base**, no por fila-por-parche; y la verificación por frase ancla de los
+> descartados queda limitada a los parches que declaren la suya. Si algún día la matriz
+> se escribe, será desde los archivos históricos del corte, marcada como reconstrucción
+> con fecha.
+
+---
+
+## PREFLIGHT — compuerta todo-o-nada
+
+**Si CUALQUIER punto falla: CERO escritura.** Se reporta el modo de fallo con sus
+opciones y el salto se reintenta cuando esté resuelto. No hay «casi pasa».
+
+### P0 · El canon de referencia es el REMOTO
+
+`git clone` (o `git fetch`) del canon oficial, y verificar que el `main` local del clon
+coincide con el remoto (`git rev-parse origin/main` contra el publicado). **La
+comparación de referencia de TODO el preflight es contra ese HEAD — nunca contra una
+réplica local o de red.** Caso medido que motiva la regla: una copia y su espejo de red,
+idénticas entre sí y ambas fuera del linaje — todo chequeo que las comparaba entre sí
+salía verde mirando dos huérfanas.
+
+### P1 · La copia local casa con el linaje — y el frontmatter NO es evidencia
+
+`md5` de la copia local de `MARCO_Inicial.md` del dominio, buscado en `HUELLAS.md`.
+**Lo que el frontmatter declare no cuenta**: hay una copia medida que declara «v3.0» con
+toda confianza y su huella no existe en el linaje.
+
+| Resultado | Qué hacer |
+|---|---|
+| Casa con una versión atestada | ✅ sigue |
+| Casa con una versión atestada **solo por el propio dominio** | ✅ sigue — la palabra del dominio en su nacimiento vale; anótalo en la fila de adhesión |
+| Casa con una huella **NO ELEGIBLE** (borradores v3.0-preliminares) | ⛔ **abort duro con camino**: el dominio subió a un borrador que el linaje no libera. Se archiva esa copia con fecha, la adhesión sigue contra HEAD, y la fila del registro viejo **no se reescribe** — gana una nota al lado (el registro es historia, no se maquilla) |
+| Declara versión **sin huella** en el linaje | ⛔ opciones del v2: diff contra la atestada más cercana y adoptar; o tratarla como editada; o abortar y abrir pendiente |
+| No casa con NADA | ⛔ **editada a mano o derivada.** Opciones del v2: diff y rescatar lo local como tropicalización del manifiesto o parche propio; o seguir con respaldo `MARCO_Inicial.md.pre-v3-<fecha>` MÁS la lista literal de líneas que se pierden, impresa antes de tocar nada; o abortar |
+
+### P2 · El registro de parches del dominio es consistente
+
+Igual que en v2: existe, es legible, estados válidos, no registra parches inexistentes,
+ninguna versión registrada mayor que la publicada. ⛔ Si contradice el linaje se listan
+**las filas exactas a cuadrar** con arreglo propuesto. Las filas históricas que citen
+huellas no elegibles **se anotan, no se reescriben**.
+
+### P3 · El validador del dominio corre y pasa
+
+⛔ Si falla, primero se arregla lo roto — la lista de fallos es el trabajo previo. Sin
+validador no es fallo: se declara y se pide confirmación explícita.
+
+### P4 · No hay un salto anterior a medias
+
+Señales: respaldo `pre-v3-*` existente, manifiesto con claves sin valor, copia que ya
+declara v3 sin fila de adhesión. ⛔ Estado «upgrade interrumpido»: reanudar desde el
+primer paso sin línea en el registro, o rollback y reinicio limpio.
+
+---
+
+## Los pasos — cada uno anota su línea en el registro al completar
+
+1. **Diagnóstico.** Versión local detectada (por huella, no por frontmatter), parches del
+   registro por estado, y qué claves le faltan al manifiesto.
+
+2. **Herencia del corte 3.0 — fila única de línea base.** Se escribe:
+   *«corpus del corte 3.0 (62 parches) heredado saldado en bloque — la matriz del corte
+   es la fuente; lápida: matriz pendiente de reconstrucción marcada»*. **Salen aparte,
+   siempre, uno a uno:** los **pospuestos** del dominio (posponer fue decisión activa) y
+   los **descartados** — si el parche descartado declara frase ancla, se verifica contra
+   el master de HEAD y se resuelve como en v2 (`✅ vía v3` o `🚫 sostenido`, con la
+   desviación en los `avisos:` del manifiesto, **nunca en la copia**); si no la declara,
+   queda *«sostenido, sin verificar contra plantilla»*. Los parches **posteriores al
+   corte** llegan por el arranque, uno a uno — no son de este acto.
+
+   > El vocabulario de las filas lo fija el **parser** del validador del dominio, no la
+   > prosa: la fila lleva literalmente `aplicado`, `pospuesto` o `descartado` — una fila
+   > que diga solo «incorporado» no casa con nada y el parche se re-ofrece para siempre.
+
+3. **La copia vieja se ARCHIVA, el clon manda.** `MARCO_Inicial.md` local →
+   `MARCO_Inicial.md.pre-v3-<fecha>` (o al archivo histórico del dominio). El dominio
+   pasa a leer el master **desde el clon del canon**. Si su operación exige copia propia,
+   se toma de HEAD y se anota con la huella recalculada en ese momento.
+
+4. **Manifiesto.** Gana `canon` (default: el oficial) y `aportar_a` (**solo si el dominio
+   dijo que sí** — `ninguno` es el fallback mientras no se decida). Si no hay manifiesto,
+   se genera del contrato de la plantilla preguntando solo lo no deducible.
+
+5. **El cierre migra al motor — donde lo haya.** Igual que v2: con motor en la máquina,
+   el comando propio se vuelve alias fino; sin motor posible, copia declarada con
+   `copia_declarada_de:` versión + md5 + fecha.
+
+   **5b · Los genéricos del ciclo, desde el canon** (`skills/`, hoy nueve comandos con su
+   `MD5SUM.txt`): verificar por huella recalculada; instalar del canon lo que falte.
+
+6. **La semilla del libro se refresca a la vigente.** Si el canon queda clonado al lado,
+   por referencia (una copia junto a su original solo puede divergir); si el dominio vive
+   lejos del clon, copia con la huella y fecha de lo copiado.
+
+7. **La fila de adhesión y el instrumento.**
+   `⬆️ adhesión al canon v3 · <fecha> · HEAD <hash git corto> · <notas del P1>` — y
+   **correr el validador del dominio una vez más**. El salto no está terminado con la
+   última escritura: está terminado cuando el instrumento del dominio lo mira y no grita.
+
+---
+
+## Verificación final
+
+1. La copia local (si existe) casa con HEAD por huella recalculada; la vieja está
+   archivada con fecha ✅
+2. El registro tiene la fila de adhesión, y las históricas anotadas sin reescribir ✅
+3. El arranque del dominio ya no ofrece parches del corpus como «sin mirar» ✅
+4. El manifiesto existe y sus claves obligatorias tienen valor — `canon` y `aportar_a`
+   incluidas ✅
+5. Si hubo migración al motor: el alias existe y el método copiado ya no está duplicado —
+   *comprobable solo en la sesión siguiente; se reporta «movido, sin verificar»* ✅
+
+## La primera ejecución paga el caso
+
+Este documento se escribió **antes de que nadie lo corriera**: el caso de ejecución del
+salto v3 está declarado pendiente en el corpus, y quien lo corra primero lo paga — en
+parches, que es la moneda buena. Corre con el deshacer asegurado (la réplica no es
+deshacer — lección 49), deja que el preflight aborte lo que tenga que abortar, y escribe
+lo que duela.
