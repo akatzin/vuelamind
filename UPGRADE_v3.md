@@ -75,10 +75,31 @@ ninguna versión registrada mayor que la publicada. ⛔ Si contradice el linaje 
 **las filas exactas a cuadrar** con arreglo propuesto. Las filas históricas que citen
 huellas no elegibles **se anotan, no se reescriben**.
 
-### P3 · El validador del dominio corre y pasa
+### P3 · El validador del dominio corre y pasa — con la excepción del arranque
 
-⛔ Si falla, primero se arregla lo roto — la lista de fallos es el trabajo previo. Sin
-validador no es fallo: se declara y se pide confirmación explícita.
+⛔ Si falla por algo ajeno al salto, primero se arregla lo roto — la lista de fallos es
+el trabajo previo. Sin validador no es fallo: se declara y se pide confirmación
+explícita. Un hallazgo **conocido-benigno** puede quedar como excepción explícita
+anotada en el registro, como en v2.
+
+> [!important] La circularidad del arranque, y cómo se resuelve sin ablandar el abort
+> Hay fallos cuya **causa es exactamente lo que este salto viene a arreglar** — el más
+> obvio: un chequeo que grita «plantilla desfasada del canon». Exigir verde absoluto ahí
+> vuelve el salto imposible por construcción: el requisito solo se satisface haciendo lo
+> que el requisito bloquea. Esos fallos **no bloquean, pero tampoco se perdonan en
+> bloque**: se enumeran **uno a uno**, se juzga de cada uno si el salto de verdad lo
+> resuelve, y cada uno queda como **excepción explícita con su folio o su nota** en el
+> registro antes de seguir. Y la contraparte que mantiene el rigor: en la verificación
+> final, **cada fallo excepcionado debe estar apagado** — uno que sobreviva al salto
+> reabre el abort retroactivamente: el salto no terminó.
+>
+> Lo que NO autoriza esta excepción: leerla hacia la propia conveniencia. Si hay duda de
+> si un fallo es «del salto» o es deuda propia del dominio, **se trata como deuda propia
+> y bloquea** — la carga de la prueba es del fallo, no del preflight.
+>
+> *(Descubierto en la primera ejecución real: el preflight abortó contra un dominio cuyo
+> único fallo era el desfase que el salto resolvía — y el ejecutor se negó, con razón, a
+> interpretarlo por su cuenta. Este texto existe para que no haga falta el juicio.)*
 
 ### P4 · No hay un salto anterior a medias
 
