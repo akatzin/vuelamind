@@ -181,6 +181,11 @@ what it watches, what it measures, how it judges, and what is none of its busine
 `WATCHER.md`. It watches **what enters the canon, never who uses it**: there is no
 registry of installations, and there will not be one.
 
+And a domain born on an older baseline is not left behind: **major-version upgrades have
+their own ceremony** — small by design, content stays put, and a preflight that aborts
+rather than breaks. The stable instructions live in `UPGRADE.md`; day-to-day patches
+never go through it.
+
 ## License
 
 Personal, educational, community and research use: **free**. Enterprise use: **paid
