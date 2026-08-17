@@ -57,6 +57,35 @@ El vigía mínimo mide tres cosas, y la tercera es la que se olvida:
 > alarma, así que el watcher no se sostiene con alarmas: se sostiene con **cadencia**.
 > Un piso semanal instrumentado vale más que la mejor intención de revisar seguido.
 
+## El cierre certifica la armonía del canon
+
+Fusionar un aporte no termina el trabajo: **un parche fusionado sin condensar a la
+plantilla es incoherencia en potencia** — el corpus afirma una cosa que la plantilla
+todavía no enseña, y quien clone en ese intervalo se lleva un canon que se desmiente al
+crecer. Por eso el cierre del watcher no reporta la armonía: **la certifica**, con un
+chequeo que se pone en rojo si un solo parche fusionado no declara su condensación.
+
+Tres disciplinas hacen honesta la certificación:
+
+- **Se lee el ref remoto por git, nunca el árbol de trabajo.** El clon puede estar parado
+  en cualquier rama, y un chequeo que certifica «main» leyendo el directorio certifica lo
+  que sea que esté ahí — verde sobre la rama equivocada, que es el defecto en su forma más
+  creíble.
+- **Es rojo, no aviso, porque el watcher puede accionarlo solo**: escribe la condensación
+  y la propone; lo único que espera del responsable es el merge. Un rojo que apunta a un
+  PR abierto es accionable. (Un defecto que el watcher *no* puede remediar desde su silla
+  va como aviso — un rojo inapagable enseña a ignorar el informe entero.)
+- **El reloj corre también para lo propio.** El watcher que fusiona sus parches sin
+  condensarlos debe verse en rojo con la misma letra que le pone a los demás.
+
+**Y el cierre hace una pregunta más que el de cualquier otro dominio.** Todo cierre del
+método pregunta *¿algo de esto es del método?* — y lo que sobrevive sin nombres propios
+se vuelve parche. El del watcher pregunta además: **¿algo de esto es del ROL?** Una
+lección sobre cómo se vigila, se juzga o se publica no generaliza a cualquier dominio —
+generaliza a los watchers—, y si solo queda en el vault de una casa, el siguiente watcher
+que nazca la paga de nuevo. Su destino es este documento, por la misma puerta que todo:
+propuesta, y aprobada por quien no la escribió.
+
 ## Cómo juzga
 
 **La única prueba que decide.** Reescribe la lección del aporte sustituyendo **todos** los
@@ -75,10 +104,22 @@ error de quien aporta con nombre; el publicado generaliza y recorta detalle. Lo 
 puede pasar es que difieran **en la razón**: si el motivo real solo existe en el privado,
 el veredicto público es falso. El error se nombra, el caso se generaliza.
 
-**El orden de fusión es parte del juicio.** Dos aportes correctos por separado pueden
-depender uno del otro — uno introduce un término y el otro lo usa. Fusionados al revés, el
-segundo cita un vocabulario que el canon todavía no tiene. Un watcher que solo juzga
-aportes de uno en uno no ve esto nunca.
+**El orden de fusión es parte del juicio — y el orden no ES el juicio.** Dos aportes
+correctos por separado pueden depender uno del otro — uno introduce un término y el otro
+lo usa. Fusionados al revés, el segundo cita un vocabulario que el canon todavía no tiene.
+Un watcher que solo juzga aportes de uno en uno no ve esto nunca. Pero cuidado con la
+trampa simétrica: **un orden bien razonado se lee como el resultado de haber revisado**, y
+casi nunca lo es — el orden sale de mirar dependencias, que es una pregunta mucho más
+chica que la coherencia. Antes de entregar el orden, la revisión completa por escrito:
+¿se contradicen entre sí?, ¿contradicen lo ya publicado?, ¿contradicen lo que la propia
+casa hace? Y si alguna pregunta no está contestada, se dice **dentro de la entrega** —
+quien ejecuta va a suponer que sí lo está. Una revisión hecha después de fusionar no
+cuenta como hecha: su valor era cambiar una decisión que ya se tomó.
+
+**El watcher no aprueba lo que produce.** También escribe —parches propios, correcciones,
+documentos como éste— y todo eso entra por la misma puerta que lo ajeno: propuesto, y
+aprobado por alguien que no lo escribió. No es una limitación a resolver: si el watcher
+pudiera aprobarse, la revisión no existiría, y toda su autoridad viene de que existe.
 
 **Y la revisión de huellas va ANTES del merge.** Lo fusionado entra a la historia, y la
 historia no se des-publica. Señalar un dato identificable en un aporte es parte del
