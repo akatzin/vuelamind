@@ -39,7 +39,7 @@ A primeira pergunta é o seu idioma. **A segunda decide tudo o que vem depois:**
 
 O assistente não fica só na sua palavra: olha a pasta de destino e **para** se você disse *nasce* e encontrou meses de trabalho lá dentro — ou se disse *soma-se* e não encontrou nada.
 
-**O que você precisa:** um assistente que consiga ler seus arquivos e rodar comandos. Qualquer um serve —o método é texto puro—. Se não tiver nenhum, `npm install -g @anthropic-ai/claude-code` é um caminho conhecido.
+**O que você precisa:** um assistente que consiga ler seus arquivos e rodar comandos. Qualquer um serve —o método é texto puro—. Se não tiver nenhum, `npm install -g @anthropic-ai/claude-code` é um caminho conhecido. Instalação direta (macOS/Linux): `curl -fsSL https://claude.ai/install.sh | bash`. No Windows: via Docker — os dois comandos estão no README principal.
 
 Fora isso, o framework não pede servidor próprio, nem serviço, nem conta com ele: só duas pastas locais.
 

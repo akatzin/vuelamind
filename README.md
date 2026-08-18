@@ -46,7 +46,29 @@ scars you could not.
 
 ## Getting started
 
-Both paths start the same way — with the file, not with a command:
+**Step 0 — install an assistant** (skip if you already have one):
+
+- **macOS / Linux** — the native installer:
+
+  ```
+  curl -fsSL https://claude.ai/install.sh | bash
+  ```
+
+- **Windows (or anywhere without installs)** — Docker, with the method already baked into
+  the image. Two commands, sharing the two folders that persist your work:
+
+  ```
+  docker build -t vuelamind docker/
+  docker run -it -v "%USERPROFILE%\vuelamind:/trabajo" -v "%USERPROFILE%\vuelamind-claude:/home/node/.claude" vuelamind
+  ```
+
+  `/trabajo` is your domain's folder; `/home/node/.claude` keeps the assistant's own setup
+  between runs. Inside, `vuelamind-bienvenida` tells you what is there and what to do next,
+  and `vuelamind-actualizar` refreshes the baked canon — the image is a snapshot of its
+  build day. *(Tested on macOS with `-v "$HOME/..."`; on Windows, `%USERPROFILE%` is the
+  equivalent — if your shell is PowerShell, use `$env:USERPROFILE`.)*
+
+With an assistant in hand, both paths start the same way — with the file, not with a command:
 
 1. Make a folder for your domain and clone the method into it:
 

@@ -40,7 +40,7 @@ La primera pregunta es tu idioma. **La segunda decide todo lo que sigue:** ¿est
 
 El asistente no se queda con tu palabra: mira la carpeta destino y **se detiene** si dijiste *nace* y encontró meses de trabajo dentro — o si dijiste *me sumo* y no encontró nada.
 
-**Lo que necesitas:** un asistente que pueda leer tus archivos y correr comandos. Cualquiera sirve —el método es texto plano—. Si no tienes ninguno, `npm install -g @anthropic-ai/claude-code` es un camino conocido.
+**Lo que necesitas:** un asistente que pueda leer tus archivos y correr comandos. Cualquiera sirve —el método es texto plano—. Si no tienes ninguno, `npm install -g @anthropic-ai/claude-code` es un camino conocido. Instalación directa (macOS/Linux): `curl -fsSL https://claude.ai/install.sh | bash`. En Windows: con Docker — los dos comandos están en el README principal.
 
 Fuera de eso, el marco no te pide servidor propio, ni servicio, ni cuenta suya: solo dos carpetas locales.
 
