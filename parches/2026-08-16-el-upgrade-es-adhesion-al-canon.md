@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: dominio de origen
-estado: armonizado al master el 2026-08-16 · caso de ejecucion pendiente: el primer dominio que se adhiera lo pagara
+estado: armonizado al master el 2026-08-16 · caso de ejecución PAGADO el 2026-08-16 — primer salto real completado (dominio con huella huérfana derivada de borrador: el caso duro), tres defectos de instrumento encontrados y corregidos en la corrida
 ---
 
 # 2026-08-16 · Con canon versionado, el upgrade es adhesión — los upgraders solo migran contenido
