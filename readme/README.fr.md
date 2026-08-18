@@ -39,7 +39,7 @@ La première question est votre langue. **La deuxième décide de tout le reste 
 
 L'assistant ne s'en tient pas à votre parole : il regarde le dossier de destination et **s'arrête** si vous avez dit *naître* et qu'il y trouve des mois de travail — ou si vous avez dit *rejoindre* et qu'il n'y trouve rien.
 
-**Ce qu'il vous faut :** un assistant capable de lire vos fichiers et d'exécuter des commandes. N'importe lequel convient —la méthode est du texte brut—. Si vous n'en avez aucun, `npm install -g @anthropic-ai/claude-code` est une voie connue.
+**Ce qu'il vous faut :** un assistant capable de lire vos fichiers et d'exécuter des commandes. N'importe lequel convient —la méthode est du texte brut—. Si vous n'en avez aucun, `npm install -g @anthropic-ai/claude-code` est une voie connue. Installation directe (macOS/Linux) : `curl -fsSL https://claude.ai/install.sh | bash`. Sous Windows : via Docker — les deux commandes sont dans le README principal.
 
 Au-delà, le cadre n'exige ni serveur propre, ni service, ni compte chez lui : seulement deux dossiers locaux.
 

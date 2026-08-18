@@ -227,6 +227,14 @@
   @media (prefers-reduced-motion: reduce){
     .rev{opacity:1;transform:none;transition:none}.flecha{animation:none}html{scroll-behavior:auto}
   }
+
+/* copiar: el botoncito junto a cada comando */
+.pasos code{position:relative; padding-right:.4em}
+.cop{margin-left:.5em; font:inherit; font-size:.78em; padding:.1em .5em; cursor:pointer;
+  background:transparent; color:inherit; opacity:.55; border:1px solid currentColor;
+  border-radius:6px; vertical-align:middle}
+.cop:hover{opacity:1}
+.cop.ok{opacity:1}
 </style>
 </head>
 <body>
@@ -347,6 +355,7 @@
     <div class="guia">
       <h3 data-t="guiaT"></h3>
       <div class="pasos">
+        <div class="paso"><span class="num" data-t="g0n"></span><p data-t="g0"></p></div>
         <div class="paso"><span class="num" data-t="g1n"></span><p data-t="g1"></p></div>
         <div class="paso"><span class="num" data-t="g2n"></span><p data-t="g2"></p></div>
         <div class="paso"><span class="num" data-t="g3n"></span><p data-t="g3"></p></div>
@@ -485,6 +494,26 @@ persistente. Es el ALMA de la red Inception.</div>
   var RTL = {ar:1};
   var T = window.VM_I18N || {es:{}};
 
+  
+  function decoraCodigos(){
+    [].forEach.call(document.querySelectorAll('.pasos code, .guia code'), function(code){
+      if(code.nextElementSibling && code.nextElementSibling.classList && code.nextElementSibling.classList.contains('cop')) return;
+      var b=document.createElement('button'); b.className='cop'; b.type='button';
+      b.textContent='⧉'; b.setAttribute('aria-label','copiar');
+      b.addEventListener('click', function(){
+        var t=code.textContent;
+        (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){
+          b.textContent='✓'; b.classList.add('ok');
+          setTimeout(function(){ b.textContent='⧉'; b.classList.remove('ok'); }, 1200);
+        }, function(){ /* sin clipboard: seleccionar el texto para copiar a mano */
+          var r=document.createRange(); r.selectNodeContents(code);
+          var sel=getSelection(); sel.removeAllRanges(); sel.addRange(r);
+        });
+      });
+      code.after(b);
+    });
+  }
+
   function pinta(lang){
     var d = T[lang] || T.es, base = T.es;
     document.documentElement.lang = lang;
@@ -496,6 +525,7 @@ persistente. Es el ALMA de la red Inception.</div>
     [].forEach.call(document.querySelectorAll('.trad'), function(el){
       el.hidden = (el.dataset.ol === lang);
     });
+    decoraCodigos();
     [].forEach.call(document.querySelectorAll('.orig'), function(el){
       var c = el.querySelector('.cap');
       if(c) c.textContent = (el.dataset.ol === lang) ? (d.capMismo||'') : (d.capOrig||'');

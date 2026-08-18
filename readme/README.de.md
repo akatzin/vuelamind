@@ -39,7 +39,7 @@ Die erste Frage ist deine Sprache. **Die zweite entscheidet alles Weitere:** wir
 
 Der Assistent verlässt sich nicht auf dein Wort: er schaut in den Zielordner und **hält an**, wenn du *geboren* gesagt hast und dort Monate an Arbeit liegen — oder wenn du *anschließen* gesagt hast und nichts da ist.
 
-**Was du brauchst:** einen Assistenten, der deine Dateien lesen und Befehle ausführen kann. Jeder taugt —die Methode ist reiner Text—. Hast du keinen, ist `npm install -g @anthropic-ai/claude-code` ein bekannter Weg.
+**Was du brauchst:** einen Assistenten, der deine Dateien lesen und Befehle ausführen kann. Jeder taugt —die Methode ist reiner Text—. Hast du keinen, ist `npm install -g @anthropic-ai/claude-code` ein bekannter Weg. Direktinstallation (macOS/Linux): `curl -fsSL https://claude.ai/install.sh | bash`. Unter Windows: per Docker — beide Befehle stehen im Haupt-README.
 
 Darüber hinaus verlangt das Rahmenwerk keinen eigenen Server, keinen Dienst und kein Konto bei ihm: nur zwei lokale Ordner.
 
