@@ -4,6 +4,11 @@ description: Motor genérico de reconciliación — lee el manifiesto del domini
 
 # /vuelamind-commit — reconciliar el dominio actual con la realidad
 
+> [!important] CONGELADO (2026-08-18): el ciclo de parches está suspendido hasta la v3.5
+> Omite los pasos de parches de este comando (comprobarlos, presentarlos, proponerlos).
+> El aprendizaje local —errores, decisiones, lecciones— sigue entero y es lo que se cuida.
+
+
 Reconciliar el vault con la realidad. **No es escribir documentación nueva: es detectar y corregir lo que envejeció.**
 
 Este comando es el **motor**: trae el método completo y **no nombra ningún dominio**. Lo del dominio —rutas, nombres de nota, validador, acceso— vive en su **manifiesto**, que es datos y no comando.
