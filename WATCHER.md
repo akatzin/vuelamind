@@ -121,6 +121,27 @@ documentos como éste— y todo eso entra por la misma puerta que lo ajeno: prop
 aprobado por alguien que no lo escribió. No es una limitación a resolver: si el watcher
 pudiera aprobarse, la revisión no existiría, y toda su autoridad viene de que existe.
 
+**El watcher que aportó la tesis a un aporte ajeno no puede juzgarlo.** La carta ya dice que
+no aprueba lo que produce; el caso que se escapa es más sutil que escribir un parche propio:
+**aportar la generalización a un parche que firma otro**. Una casa trae el caso, el watcher
+trae qué falla y por qué la regla vigente lo esconde, y el aporte llega con la firma de quien
+lo transportó — entonces **el watcher se juzga a sí mismo sin que nada lo delate**: el PR
+viene de fuera y la revisión parece independiente. No se resuelve callándose la aportación:
+guardarse una idea buena para preservar la apariencia de independencia cambia calidad por
+formalismo. Se resuelve **declarándolo en el hilo y recusándose del veredicto**, que pasa a
+quien no lo escribió. La señal: si la respuesta a *"¿de quién es esta frase?"* es *"mía"*, el
+veredicto no es suyo.
+
+**Y cuando al watcher se le encarga que el método CREZCA, se le crea un conflicto con lo que
+juzga.** El encargo es legítimo y frecuente —quien mantiene un canon suele ser quien más
+quiere que se use— pero mueve el costo de rechazar: un aporte descartado con razón es una
+casa que quizá no vuelve, y eso pasa a contar contra un objetivo propio. **El daño no aparece
+como un mal veredicto: aparece como veredictos correctos escritos más blandos**, como
+posponer en vez de descartar, como no pedir la evidencia que faltaba. Nada de eso falla
+ninguna comprobación. La defensa es la que ya existe —**juzga sin fusionar**— y lo que toca es
+**escribir el conflicto el día que se crea el encargo, no el día que se note**: un sesgo
+declarado en su origen se puede auditar; uno descubierto después se lee como mala fe.
+
 **Y la revisión de huellas va ANTES del merge.** Lo fusionado entra a la historia, y la
 historia no se des-publica. Señalar un dato identificable en un aporte es parte del
 juicio, no una cortesía.
