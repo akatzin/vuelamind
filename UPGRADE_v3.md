@@ -75,6 +75,23 @@ ninguna versión registrada mayor que la publicada. ⛔ Si contradice el linaje 
 **las filas exactas a cuadrar** con arreglo propuesto. Las filas históricas que citen
 huellas no elegibles **se anotan, no se reescriben**.
 
+> [!important] Los parches PRE-corte no viven en el repo — y eso no es inconsistencia
+> El repo publica **solo los parches posteriores al corte vigente**; el corpus anterior
+> está incorporado a la plantilla y sus archivos individuales viven en el archivo
+> histórico, fuera del repo. Un registro v1/v2 que cite parches de antes del corte **no
+> está citando inexistentes**: está citando historia real que el repo ya no publica como
+> archivos. Se comprueba contra la línea base heredada, no contra `parches/`. *(Todo
+> dominio viejo que salte choca con esto; el tercero en saltar lo preguntó en vez de
+> suponerlo, y ésa es la conducta que este texto quiere volver innecesaria.)*
+>
+> **Y la línea que separa anotar de reescribir, dicha de una vez:** lo que es HISTORIA
+> —hechos, fechas, veredictos— se anota y nunca se reescribe. Lo que es **estado
+> consumido por un parser** —el vocabulario de las filas (`aplicado`/`pospuesto`/
+> `descartado`)— **se normaliza al vocabulario vigente, con UNA nota fechada** que
+> registre la normalización: cambiar la forma legible de una afirmación que sigue
+> siendo la misma no es maquillar historia, y dejarla ilegible es condenar al dominio a
+> que sus parches se re-ofrezcan para siempre.
+
 ### P3 · El validador del dominio corre y pasa — con la excepción del arranque
 
 ⛔ Si falla por algo ajeno al salto, primero se arregla lo roto — la lista de fallos es
