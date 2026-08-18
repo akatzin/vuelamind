@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: velaAkatzin
-estado: propuesto — 2026-08-17
+estado: armonizado al master el 2026-08-17 (lección 63 del libro heredado)
 ---
 
 # 2026-08-17 · Una decisión escrita en una clave deprecada deja de aplicarse sin avisar, y el archivo sigue leyéndose como vigente

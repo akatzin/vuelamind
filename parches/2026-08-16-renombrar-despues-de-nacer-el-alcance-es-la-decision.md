@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto
+estado: armonizado al master el 2026-08-17 (lección 57 del libro heredado)
 ---
 
 # 2026-08-16 · Renombrar al asistente después de nacer: el alcance es la decisión, no el nombre

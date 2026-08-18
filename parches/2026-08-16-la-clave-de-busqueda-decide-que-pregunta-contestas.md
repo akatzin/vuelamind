@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto
+estado: armonizado al master el 2026-08-17 (lección 55 del libro heredado)
 ---
 
 # 2026-08-16 · La clave de búsqueda decide qué pregunta contestas: «¿está mi texto?» no es «¿está mi lección?»
