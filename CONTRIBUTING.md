@@ -1,3 +1,10 @@
+> [!important] FROZEN until v3.5 (2026-08-18) · CONGELADO hasta la v3.5
+> The patch cycle is suspended: do not open patch PRs for now. Keep writing your error
+> book locally — v3.5 replaces this flow with a central inbox where a watcher does all
+> the ceremony. / El ciclo de parches está suspendido: no abras PRs de parches por ahora.
+> Sigue escribiendo tu libro de errores en tu casa — la v3.5 reemplaza este flujo con un
+> buzón central donde el vigía hace toda la ceremonia.
+
 # Contributing to vuelamind
 
 *Español abajo.*

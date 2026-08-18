@@ -4,6 +4,11 @@ description: Carga el arranque de sesión del dominio actual — lee su initProm
 
 # /vuelamind-load — retomar el trabajo en un dominio
 
+> [!important] CONGELADO (2026-08-18): el ciclo de parches está suspendido hasta la v3.5
+> Omite los pasos de parches de este comando (comprobarlos, presentarlos, proponerlos).
+> El aprendizaje local —errores, decisiones, lecciones— sigue entero y es lo que se cuida.
+
+
 Pone al asistente al día en el dominio donde está, **sin que el usuario tenga que pegar nada**. Es el compañero del acto de nacer —que no es un comando, sino pegar el master— y de `/vuelamind-join`: aquéllos ponen un dominio en pie, éste **retoma** uno que ya vive.
 
 > [!important] No es solo leer un archivo

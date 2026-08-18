@@ -2,6 +2,16 @@
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
 version: 3.0
+
+> [!important] CONGELAMIENTO — el ciclo de parches está suspendido hasta la v3.5 (2026-08-18)
+> Un dominio que nazca de esta plantilla **nace con la lógica de parches apagada**: no
+> recibe, no juzga, no propone ni registra parches del marco. **El aprendizaje local sigue
+> entero** — el libro de errores, las decisiones y las lecciones del vault son el método y
+> no se congelan. La razón, medida: el ciclo de parches costaba más que lo que devolvía y
+> concentraba la carga en cada casa. La v3.5 lo reemplaza — las casas solo escriben sus
+> errores; un buzón central recibe, y un vigía hace toda la ceremonia. Hasta entonces:
+> **escribe tus lecciones donde siempre; no las cargues a ninguna parte.**
+
 corpus_incorporado: 64 parches · corte 2026-08-13 · anonimizado para publicación en el corte 3.0
 canon: declarado en config.yml — de ahí sale el repositorio, la rama y el sitio, y ahí se proponen los parches como pull requests
 origen: destilado de un dominio real, 2026-08-03 — las historias conservan el caso y omiten los nombres
