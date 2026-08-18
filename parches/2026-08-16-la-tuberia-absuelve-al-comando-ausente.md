@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto — transportado por el canal de la watcher el 2026-08-16
+estado: armonizado al master el 2026-08-17 (lección 56 del libro heredado)
 ---
 
 # 2026-08-16 · La tubería absuelve al comando ausente

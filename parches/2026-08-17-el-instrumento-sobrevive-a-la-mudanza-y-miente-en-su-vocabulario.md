@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: velaAkatzin
-estado: propuesto — 2026-08-17
+estado: armonizado al master el 2026-08-17 (lección 61 del libro heredado)
 ---
 
 # 2026-08-17 · Un instrumento que sobrevive a la mudanza sigue midiendo, y su falso negativo no se puede acotar desde él

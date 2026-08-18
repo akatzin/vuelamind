@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto — rescatado el 2026-08-16: su publicación de origen se verificó contra un referente huérfano y nunca llegó al canon
+estado: armonizado al master el 2026-08-17 (lección 53 del libro heredado)
 ---
 
 # 2026-08-14 · El entregable se va y el borrador se queda

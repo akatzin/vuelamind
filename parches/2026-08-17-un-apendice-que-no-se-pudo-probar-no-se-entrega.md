@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: velaAkatzin
-estado: propuesto — 2026-08-17
+estado: armonizado al master el 2026-08-17 (lección 62 del libro heredado)
 ---
 
 # 2026-08-17 · Declarar que no pudiste probar un procedimiento no lo vuelve entregable

@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: akatzin
-estado: propuesto
+estado: armonizado al master el 2026-08-17 (lección 60 del libro heredado)
 ---
 
 # 2026-08-16 · Un valor por defecto en un lugar donde no se pudo medir es una mentira con formato de dato
