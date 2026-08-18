@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: velaAkatzin
-estado: propuesto — 2026-08-17
+estado: armonizado al master el 2026-08-17 (lección 64 del libro heredado)
 ---
 
 # 2026-08-17 · Consumir el canon por referencia obliga a un medidor recurrente, y nacer no lo trae en absoluto
