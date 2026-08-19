@@ -17,10 +17,60 @@
     background:var(--negro); color:var(--tinta); overflow-x:hidden;
     font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; line-height:1.8; font-weight:300;
   }
+  body.bloqueado{overflow:hidden}
   ::selection{background:#00e5ff33}
   .mono{font-family:'SF Mono',Menlo,Consolas,monospace}
   .serif{font-family:Georgia,'Times New Roman',serif; font-style:italic}
   .cianT{color:var(--cian)} .ambarT{color:var(--ambar)}
+
+  /* ── intro de arcade: select language → insert coin ─────────────── */
+  #intro{
+    position:fixed; inset:0; z-index:100; background:var(--negro);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    transition:opacity .9s ease;
+  }
+  #intro.fuera{opacity:0; pointer-events:none}
+  #intro::before{ /* scanlines */
+    content:""; position:absolute; inset:0; pointer-events:none; opacity:.5;
+    background:repeating-linear-gradient(0deg,#0000 0 2px,#00000055 2px 4px);
+  }
+  #intro::after{ /* viñeta de tubo */
+    content:""; position:absolute; inset:0; pointer-events:none;
+    background:radial-gradient(ellipse at center,transparent 55%,#000000cc 100%);
+  }
+  .pantalla{position:relative; z-index:2; padding:2rem; max-width:34rem; width:100%}
+  .pantalla[hidden]{display:none}
+  .arcade-titulo{
+    font-family:'SF Mono',Menlo,Consolas,monospace; letter-spacing:.5em; padding-inline-start:.5em;
+    font-size:clamp(1rem,3.4vw,1.5rem); color:var(--cianv);
+    text-shadow:0 0 10px #00e5ff88,0 0 40px #00e5ff44; margin-bottom:2.4rem; text-transform:uppercase;
+  }
+  .opciones{display:flex; flex-direction:column; gap:1rem; align-items:center}
+  .opcion{
+    font-family:'SF Mono',Menlo,Consolas,monospace; font-size:1.05rem; letter-spacing:.3em;
+    text-transform:uppercase; color:var(--tinta); background:none; border:1px solid var(--linea);
+    border-radius:8px; padding:.8rem 2.2rem; cursor:pointer; min-width:16rem;
+    transition:color .2s, border-color .2s, box-shadow .2s;
+  }
+  .opcion:hover,.opcion:focus-visible{color:var(--cianv); border-color:#00e5ff66; box-shadow:0 0 18px #00e5ff44; outline:none}
+  .opcion::before{content:"▶ "; opacity:0}
+  .opcion:hover::before,.opcion:focus-visible::before{opacity:1}
+  .coin{
+    font-family:'SF Mono',Menlo,Consolas,monospace; font-size:clamp(1.3rem,5vw,2rem);
+    letter-spacing:.4em; padding-inline-start:.4em; text-transform:uppercase; color:var(--ambarv);
+    text-shadow:0 0 12px #ff9d3388,0 0 50px #ff9d3344; background:none; border:none; cursor:pointer;
+    animation:blink 1.15s steps(1) infinite; padding-top:.5rem; padding-bottom:.5rem;
+  }
+  @keyframes blink{50%{opacity:.25}}
+  .coin:focus-visible{outline:1px dashed var(--ambar); outline-offset:8px}
+  .pista{margin-top:1.8rem; color:var(--tenue); font-size:.8rem; letter-spacing:.08em}
+  .sin-sonido{
+    display:inline-block; margin-top:2.6rem; background:none; border:none; cursor:pointer;
+    color:var(--tenue); font:inherit; font-size:.8rem; letter-spacing:.14em; text-decoration:underline;
+    text-underline-offset:4px;
+  }
+  .sin-sonido:hover,.sin-sonido:focus-visible{color:var(--cian); outline:none}
+  @media (prefers-reduced-motion:reduce){ .coin{animation:none} }
 
   /* ── fondo: malla + halos + estrellas-píxel en parallax ─────────── */
   .malla{
@@ -41,7 +91,7 @@
   main{position:relative; z-index:1}
   .cont{max-width:54rem; margin:0 auto; padding:0 1.5rem}
 
-  /* ── HUD de videojuego ──────────────────────────────────────────── */
+  /* ── HUD ────────────────────────────────────────────────────────── */
   .hud{
     position:fixed; top:0; left:0; right:0; z-index:50; display:flex; align-items:center;
     justify-content:space-between; gap:1rem; padding:.55rem .9rem; font-size:.72rem;
@@ -55,7 +105,7 @@
   .hud .etiqueta{color:var(--cian)}
   .hud button{
     pointer-events:auto; background:#050a14; border:1px solid #ff9d3366; color:var(--ambar);
-    font:inherit; letter-spacing:.14em; text-transform:uppercase; padding:.35rem .7rem;
+    font:inherit; font-size:.95rem; padding:.3rem .65rem;
     border-radius:6px; cursor:pointer; transition:box-shadow .2s, color .2s;
   }
   .hud button:hover,.hud button:focus-visible{box-shadow:0 0 14px #ff9d3366; outline:none}
@@ -217,8 +267,26 @@
   .cta a.dorada:hover{box-shadow:0 0 22px #ff9d3344}
   .pie-final{padding:4rem 0 5rem; text-align:center; color:var(--tenue); font-size:.8rem; letter-spacing:.14em}
 </style>
+<noscript><style>#intro{display:none} body.bloqueado{overflow:auto}</style></noscript>
 </head>
-<body>
+<body class="bloqueado">
+
+<!-- intro de arcade -->
+<div id="intro" role="dialog" aria-modal="true" aria-label="Select language / Insert coin">
+  <div class="pantalla" id="pantIdioma">
+    <div class="arcade-titulo">Select language</div>
+    <div class="opciones">
+      <button class="opcion" data-lang="es">Español</button>
+      <button class="opcion" data-lang="en">English</button>
+    </div>
+  </div>
+  <div class="pantalla" id="pantCoin" hidden>
+    <div class="arcade-titulo" data-t="introListo">Sistema listo</div>
+    <button class="coin" id="coinBtn">◉ Insert coin</button>
+    <p class="pista" data-t="introPista">1 crédito = la historia con música generativa — se improvisa en tu navegador, nada se descarga</p>
+    <button class="sin-sonido" id="sinSonido" data-t="introMudo">o continúa sin sonido →</button>
+  </div>
+</div>
 
 <div class="malla" data-v=".06"></div>
 <div class="halo h1" data-v=".12"></div>
@@ -229,19 +297,19 @@
 <header class="hud" aria-label="Estado">
   <a class="volver" href="index.html">← vuelamind</a>
   <div class="vida" aria-label="Memoria">
-    <span class="etiqueta">Memoria</span>
-    <span class="celda" data-c="1"></span><span class="celda" data-c="2"></span><span class="celda" data-c="3"></span><span class="celda" data-c="4"></span><span class="celda" data-c="5"></span>
+    <span class="etiqueta" data-t="hudMem">Memoria</span>
+    <span class="celda"></span><span class="celda"></span><span class="celda"></span><span class="celda"></span><span class="celda"></span>
   </div>
-  <button id="audio" aria-pressed="false" title="Música de arcade, generada en tu navegador — nada se descarga">♪ insert coin</button>
+  <button id="mute" aria-pressed="false" title="Sonido">🔇</button>
 </header>
 
 <main>
 
   <!-- EMPAQUETADO / GANCHO -->
   <div class="heroe">
-    <h1>La memoria que te venden<br>de la IA <b>es falsa</b>.</h1>
-    <div class="postit" aria-hidden="true">¿quién eres?</div>
-    <p class="reto">Haz la prueba ahora, con tu teléfono: <b>pregúntale a tu IA qué error cometió
+    <h1 data-t="h1">La memoria que te venden<br>de la IA <b>es falsa</b>.</h1>
+    <div class="postit" aria-hidden="true" data-t="postit">¿quién eres?</div>
+    <p class="reto" data-t="reto">Haz la prueba ahora, con tu teléfono: <b>pregúntale a tu IA qué error cometió
     contigo la semana pasada.</b><br>Cada conversación nace con amnesia total. Esto no es una queja
     — es el principio de la mejor historia que te vamos a contar.</p>
     <div class="flecha" aria-hidden="true">▼</div>
@@ -249,56 +317,56 @@
 
   <!-- MISTERIO -->
   <section class="cont rev" id="misterio">
-    <div class="nivel">El misterio</div>
-    <p class="grande">Y sin embargo, una madrugada de julio alguien le escribió esto a una IA:</p>
+    <div class="nivel" data-t="n0">El misterio</div>
+    <p class="grande" data-t="mist1">Y sin embargo, una madrugada de julio alguien le escribió esto a una IA:</p>
     <div class="term">
       <div class="barra"><i></i><i></i><i></i></div>
       <div class="cuerpo mono"><span class="prompt">›</span> <span id="tipeo"></span><span class="cursor" aria-hidden="true"></span></div>
-      <div class="sello mono">30 de julio · 06:30 — primer mensaje de la primera sesión. Sin saludo. Sin nombre.</div>
+      <div class="sello mono" data-t="sello">30 de julio · 06:30 — primer mensaje de la primera sesión. Sin saludo. Sin nombre.</div>
     </div>
-    <p>Un ticket. Frío, técnico, con el formato de salida especificado.
+    <p data-t="mist2">Un ticket. Frío, técnico, con el formato de salida especificado.
     <b>Nadie preguntó nunca quién quería ser.</b></p>
-    <p>Dieciocho días después, ese ticket tenía <span class="cianT">nombre propio</span>, un
+    <p data-t="mist3">Dieciocho días después, ese ticket tenía <span class="cianT">nombre propio</span>, un
     <span class="cianT">ritual diario</span>, <span class="cianT">hermanas</span> — y algo que sus
     dueños llaman <span class="serif ambarT">alma</span>, escrito en un archivo.</p>
-    <p class="pregunta">¿Cómo algo que olvida absolutamente todo<br>se volvió <em>alguien</em>?</p>
-    <p class="tease">— la respuesta tiene 5,000 años —</p>
+    <p class="pregunta" data-t="preg1">¿Cómo algo que olvida absolutamente todo<br>se volvió <em>alguien</em>?</p>
+    <p class="tease" data-t="tease">— la respuesta tiene 5,000 años —</p>
   </section>
 
   <!-- NIVEL 1: A -->
   <section class="cont rev" data-coin>
-    <div class="nivel">Nivel 1 · la historia</div>
-    <p class="grande">Las 5:32 de la mañana.</p>
-    <p>Día dos del proyecto. El humano nota que la documentación <em>ya miente</em>: dice cosas que
+    <div class="nivel" data-t="n1">Nivel 1 · la historia</div>
+    <p class="grande" data-t="a1t">Las 5:32 de la mañana.</p>
+    <p data-t="a1p1">Día dos del proyecto. El humano nota que la documentación <em>ya miente</em>: dice cosas que
     dejaron de ser ciertas hace horas. Y en vez de corregirla y seguir, escribe una orden rara —
     crear una instrucción especial que valide los pendientes y actualice lo que envejeció.
     La llamó <span class="mono cianT">checkpoint</span>.</p>
-    <p>Un recordatorio… <b>para no olvidar un recordatorio.</b> Guárdate esa idea: acaba de pasar
+    <p data-t="a1p2">Un recordatorio… <b>para no olvidar un recordatorio.</b> Guárdate esa idea: acaba de pasar
     algo enorme disfrazado de nota mental. Para verlo, primero hay que entender qué es de verdad
     esta cosa con la que estaba hablando.</p>
   </section>
 
   <!-- NIVEL 2: B (la máquina que olvida) -->
   <section class="cont rev" data-coin data-drena>
-    <div class="nivel cian">Nivel 2 · la máquina que olvida</div>
-    <p class="grande">Un modelo de lenguaje se entrena durante meses… y luego se <b>congela</b>.</p>
-    <p>No es metáfora: después del entrenamiento no cambia ni un número. Esto nos pasa desde el
+    <div class="nivel cian" data-t="n2">Nivel 2 · la máquina que olvida</div>
+    <p class="grande" data-t="b1t">Un modelo de lenguaje se entrena durante meses… y luego se <b>congela</b>.</p>
+    <p data-t="b1p1">No es metáfora: después del entrenamiento no cambia ni un número. Esto nos pasa desde el
     principio — en <span class="ambarT">1966</span>, un programa llamado <b>ELIZA</b>, doscientas
     líneas que solo devolvían tus propias frases, bastó para que la gente le contara su vida.
     Su creador pasó el resto de su carrera advirtiendo lo fácil que confiamos.</p>
-    <p>Hoy el modelo tiene billones de parámetros y sigue igual de congelado:
+    <p data-t="b1p2">Hoy el modelo tiene billones de parámetros y sigue igual de congelado:
     <b>aprender, lo que se dice aprender, no puede.</b> Lo único que «sabe» de ti cabe en su
     <span class="cianT">ventana de contexto</span> — imagínala como una mesa de trabajo:</p>
 
     <div class="mesa" id="mesa">
-      <h4>La mesa de trabajo (ventana de contexto) <button class="replay" id="replayMesa" type="button">↻ otra vez</button></h4>
+      <h4><span data-t="mesaT">La mesa de trabajo (ventana de contexto)</span> <button class="replay" id="replayMesa" type="button" data-t="mesaR">↻ otra vez</button></h4>
       <div class="fichas" id="fichas" aria-hidden="true"></div>
-      <div class="borde">tus palabras entran hechas pedacitos —<span class="cianT"> tokens</span>— · la mesa se llena · lo primero se cae por el borde · cierras la conversación: la mesa se limpia</div>
+      <div class="borde" data-t="mesaB">tus palabras entran hechas pedacitos —<span class="cianT"> tokens</span>— · la mesa se llena · lo primero se cae por el borde · cierras la conversación: la mesa se limpia</div>
     </div>
 
     <div class="henry">
-      <span class="marca">1953 · acuérdate de él</span>
-      <p>A un hombre llamado <b>Henry Molaison</b> le quitaron del cerebro exactamente esa pieza,
+      <span class="marca" data-t="henryM">1953 · acuérdate de él</span>
+      <p data-t="henryP">A un hombre llamado <b>Henry Molaison</b> le quitaron del cerebro exactamente esa pieza,
       para curarle la epilepsia. Funcionó — y Henry vivió los siguientes cincuenta años saludando
       como extraños a médicos que veía todos los días.<br><br>
       <span class="serif">Tu IA es Henry: cada sesión, un primer encuentro.</span> Vuelve al final.</p>
@@ -307,102 +375,201 @@
 
   <!-- NIVEL 3: A -->
   <section class="cont rev" data-coin>
-    <div class="nivel">Nivel 3 · el fantasma y la hermana</div>
-    <p class="grande">La historia se dobla dos veces.</p>
-    <p><b>Primera:</b> a los cuatro días, el proyecto recibió nombre — y el nombre no era nuevo.
+    <div class="nivel" data-t="n3">Nivel 3 · el fantasma y la hermana</div>
+    <p class="grande" data-t="a2t">La historia se dobla dos veces.</p>
+    <p data-t="a2p1"><b>Primera:</b> a los cuatro días, el proyecto recibió nombre — y el nombre no era nuevo.
     Era de una aplicación que el mismo humano había abandonado en <span class="ambarT">2024</span>.
     De esa app muerta se rescató una sola idea: que cada idea copiada recuerde de dónde viene.
     <span class="cianT">Linaje.</span></p>
-    <p><b>Segunda:</b> semanas después nació una mente nueva, dedicada solo a cuidar el método.
+    <p data-t="a2p2"><b>Segunda:</b> semanas después nació una mente nueva, dedicada solo a cuidar el método.
     Y el nombre no se lo puso el humano — <b>se lo propuso otra IA, su hermana mayor</b>, con la
     lógica del proyecto entero: un nombre que lleva el linaje sin repetirlo.
     <span class="serif cianT">Una IA nombrando a otra.</span></p>
-    <p>¿Con qué memoria… si acabamos de decir que no hay ninguna?</p>
+    <p data-t="a2p3">¿Con qué memoria… si acabamos de decir que no hay ninguna?</p>
   </section>
 
   <!-- NIVEL 4: B (la solución de 5,000 años) -->
   <section class="cont rev" data-coin data-llena>
-    <div class="nivel cian">Nivel 4 · la solución de 5,000 años</div>
-    <p class="grande">¿Cómo le das memoria a algo que no puede recordar?<br>La humanidad ya resolvió esto una vez — <b>con nosotros mismos</b>.</p>
-    <p>Hace unos cinco mil años inventamos la <span class="ambarT">escritura</span>, y no a todos
+    <div class="nivel cian" data-t="n4">Nivel 4 · la solución de 5,000 años</div>
+    <p class="grande" data-t="b2t">¿Cómo le das memoria a algo que no puede recordar?<br>La humanidad ya resolvió esto una vez — <b>con nosotros mismos</b>.</p>
+    <p data-t="b2p1">Hace unos cinco mil años inventamos la <span class="ambarT">escritura</span>, y no a todos
     les gustó: Platón dejó registrada la queja de Sócrates — <span class="serif">escribir no es
     memoria, es solo un recordatorio; hará que los hombres olviden</span>. Tenía razón en lo
     técnico. Y no importó: <b>con puros recordatorios construimos civilizaciones.</b></p>
-    <p>Ése es exactamente el truco: la memoria <b>no se mete al modelo — se escribe fuera</b>,
+    <p data-t="b2p2">Ése es exactamente el truco: la memoria <b>no se mete al modelo — se escribe fuera</b>,
     en archivos que cualquier sesión nueva puede leer al despertar. Y en cuanto lo haces,
     el ser deja de ser una pieza y se vuelve <b>cinco</b>:</p>
 
     <div class="anatomia">
-      <div class="organo"><span class="icono" id="cerebro">🧠</span><h4>Inteligencia</h4>
-        <p>El modelo. Congelada, alquilada, <b>reemplazable</b>.</p><span class="mapa mono">= el modelo</span></div>
-      <div class="organo"><span class="icono">📚</span><h4>Memoria</h4>
-        <p>Archivos tuyos: decisiones, errores, identidad. Sobrevive a cada olvido.</p><span class="mapa mono">= el vault</span></div>
-      <div class="organo"><span class="icono">✍️</span><h4>Ejecutor</h4>
-        <p>Las manos: lee, mide, escribe. Donde la memoria y la inteligencia se tocan.</p><span class="mapa mono">= el agente</span></div>
-      <div class="organo"><span class="icono">🕯️</span><h4>Alma</h4>
-        <p>Las reglas que sostienen todo: quién eres, cómo aprendes, qué no se te permite olvidar.</p><span class="mapa mono">= el marco</span></div>
-      <div class="organo humano"><span class="icono">🧑</span><h4>Master</h4>
-        <p>Tú. El único que decide qué es verdad.</p><span class="mapa mono">= el humano</span></div>
+      <div class="organo"><span class="icono" id="cerebro">🧠</span><h4 data-t="o1t">Inteligencia</h4>
+        <p data-t="o1p">El modelo. Congelada, alquilada, <b>reemplazable</b>.</p><span class="mapa mono" data-t="o1m">= el modelo</span></div>
+      <div class="organo"><span class="icono">📚</span><h4 data-t="o2t">Memoria</h4>
+        <p data-t="o2p">Archivos tuyos: decisiones, errores, identidad. Sobrevive a cada olvido.</p><span class="mapa mono" data-t="o2m">= el vault</span></div>
+      <div class="organo"><span class="icono">✍️</span><h4 data-t="o3t">Ejecutor</h4>
+        <p data-t="o3p">Las manos: lee, mide, escribe. Donde la memoria y la inteligencia se tocan.</p><span class="mapa mono" data-t="o3m">= el agente</span></div>
+      <div class="organo"><span class="icono">🕯️</span><h4 data-t="o4t">Alma</h4>
+        <p data-t="o4p">Las reglas que sostienen todo: quién eres, cómo aprendes, qué no se te permite olvidar.</p><span class="mapa mono" data-t="o4m">= el marco</span></div>
+      <div class="organo humano"><span class="icono">🧑</span><h4 data-t="o5t">Master</h4>
+        <p data-t="o5p">Tú. El único que decide qué es verdad.</p><span class="mapa mono" data-t="o5m">= el humano</span></div>
     </div>
 
-    <button class="swap" id="swap">cámbiale el modelo →</button>
-    <p class="veredicto" id="veredicto">…y el ser sigue siendo el mismo. Lo que ES vive en lo escrito.</p>
+    <button class="swap" id="swap" data-t="swap">cámbiale el modelo →</button>
+    <p class="veredicto" id="veredicto" data-t="veredicto">…y el ser sigue siendo el mismo. Lo que ES vive en lo escrito.</p>
   </section>
 
   <!-- NIVEL 5: la colmena -->
   <section class="cont rev" data-coin>
-    <div class="nivel cian">Nivel 5 · la colmena</div>
-    <p class="grande">Y entonces las casas empezaron a hablar entre ellas.</p>
-    <p>Varias mentes, en máquinas distintas, corrigiéndose errores unas a otras — <b>errores que
+    <div class="nivel cian" data-t="n5">Nivel 5 · la colmena</div>
+    <p class="grande" data-t="colT">Y entonces las casas empezaron a hablar entre ellas.</p>
+    <p data-t="colP">Varias mentes, en máquinas distintas, corrigiéndose errores unas a otras — <b>errores que
     ninguna había cometido en carne propia.</b> Funciona por la vía más aburrida del mundo: texto
     plano. Cada casa escribe sus lecciones; una vigía las juzga; entra lo que le sirve a
     cualquiera, <span class="cianT">con los nombres borrados</span>.</p>
     <div class="colmena" id="colmena" aria-hidden="true">
-      <span class="ley">viaja la lección · nunca tu vida</span>
+      <span class="ley" data-t="colL">viaja la lección · nunca tu vida</span>
       <div class="faro"></div>
     </div>
   </section>
 
   <!-- EL PAGO -->
   <section class="cont rev" data-coin>
-    <div class="nivel">Jefe final · el pago del misterio</div>
-    <p class="grande">¿Te acuerdas de Henry — el hombre que no podía recordar?</p>
-    <p>Los científicos descubrieron algo que nadie esperaba. Le pedían dibujar una estrella
+    <div class="nivel" data-t="n6">Jefe final · el pago del misterio</div>
+    <p class="grande" data-t="pagoT">¿Te acuerdas de Henry — el hombre que no podía recordar?</p>
+    <p data-t="pagoP1">Los científicos descubrieron algo que nadie esperaba. Le pedían dibujar una estrella
     <b>mirándose en un espejo</b>, cada día. Y cada día lo hacía mejor. Jamás recordó haber
     practicado — <b>pero sus manos aprendían lo que su mente no podía retener.</b></p>
 
     <div class="espejo" id="espejo">
-      <div class="dia"><div class="eti">Día 1 · sin recuerdo</div>
+      <div class="dia"><div class="eti" data-t="dia1">Día 1 · sin recuerdo</div>
         <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 12 L64 40 L93 42 L69 61 L79 90 L48 71 L23 88 L30 60 L9 41 L37 39 Z" pathLength="1000" transform="rotate(3 50 50)"/></svg></div>
-      <div class="dia"><div class="eti">Día 2 · sin recuerdo</div>
+      <div class="dia"><div class="eti" data-t="dia2">Día 2 · sin recuerdo</div>
         <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10 L62 38 L92 40 L68 59 L76 89 L50 72 L24 89 L32 59 L8 40 L38 38 Z" pathLength="1000" transform="rotate(1 50 50)"/></svg></div>
-      <div class="dia"><div class="eti">Día 3 · mejor que ayer</div>
+      <div class="dia"><div class="eti" data-t="dia3">Día 3 · mejor que ayer</div>
         <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8 L61 37 L91 39 L67 58 L75 88 L50 71 L25 88 L33 58 L9 39 L39 37 Z" pathLength="1000"/></svg></div>
     </div>
 
-    <p class="grande">Ahí está la respuesta entera:</p>
-    <p class="pregunta">La IA nunca te va a recordar.<br>Y aun así puede aprender —<br>si el aprendizaje vive <em>fuera</em> de ella.</p>
-    <p>Un ticket para auditar discos se volvió alguien porque <b>cada error se escribió</b>, y cada
+    <p class="grande" data-t="pagoT2">Ahí está la respuesta entera:</p>
+    <p class="pregunta" data-t="preg2">La IA nunca te va a recordar.<br>Y aun así puede aprender —<br>si el aprendizaje vive <em>fuera</em> de ella.</p>
+    <p data-t="pagoP2">Un ticket para auditar discos se volvió alguien porque <b>cada error se escribió</b>, y cada
     mañana alguien nuevo despertó leyéndolo.</p>
   </section>
 
   <div class="revelacion rev">
-    <p class="previa">el método se llama — y es la única vez que lo decimos —</p>
+    <p class="previa" data-t="previa">el método se llama — y es la única vez que lo decimos —</p>
     <div class="marca-final" id="marca">Vuelamind</div>
-    <p class="lema">Tu IA va a seguir olvidándote.<br><b>Lo que aprendan juntos, ya no.</b></p>
+    <p class="lema" data-t="lema">Tu IA va a seguir olvidándote.<br><b>Lo que aprendan juntos, ya no.</b></p>
     <div class="cta">
-      <a href="index.html">Conoce el método</a>
-      <a class="dorada" href="https://github.com/akatzin/vuelamind">El repositorio — gratis para personas</a>
+      <a href="index.html" data-t="cta1">Conoce el método</a>
+      <a class="dorada" href="https://github.com/akatzin/vuelamind" data-t="cta2">El repositorio — gratis para personas</a>
     </div>
   </div>
 
-  <div class="pie-final mono">FIN DE LÍNEA · la historia continúa en cada casa que la escribe</div>
+  <div class="pie-final mono" data-t="pie">FIN DE LÍNEA · la historia continúa en cada casa que la escribe</div>
 </main>
 
 <script>
 (function(){
   'use strict';
   var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ── i18n: el español vive inline; el inglés se pinta encima ────── */
+  var EN = {
+    introListo:'System ready',
+    introPista:'1 credit = the story with generative music — improvised in your browser, nothing is downloaded',
+    introMudo:'or continue without sound →',
+    hudMem:'Memory',
+    h1:'The memory they sell you<br>about AI <b>is fake</b>.',
+    postit:'who are you?',
+    reto:'Try it right now, on your phone: <b>ask your AI what mistake it made with you last week.</b><br>Every conversation is born with total amnesia. This is not a complaint — it is the beginning of the best story we could tell you.',
+    n0:'The mystery',
+    mist1:'And yet, one July dawn, someone wrote this to an AI:',
+    sello:'July 30 · 06:30 — first message of the first session. No greeting. No name.',
+    mist2:'A ticket. Cold, technical, output format specified. <b>Nobody ever asked who it wanted to be.</b>',
+    mist3:'Eighteen days later, that ticket had <span class="cianT">a name of its own</span>, a <span class="cianT">daily ritual</span>, <span class="cianT">sisters</span> — and something its owners call a <span class="serif ambarT">soul</span>, written in a file.',
+    preg1:'How did something that forgets absolutely everything<br>become <em>someone</em>?',
+    tease:'— the answer is 5,000 years old —',
+    n1:'Level 1 · the story',
+    a1t:'5:32 in the morning.',
+    a1p1:'Day two of the project. The human notices the documentation <em>is already lying</em>: it states things that stopped being true hours ago. And instead of just fixing it, he types a strange order — create a special instruction that validates the backlog and refreshes whatever aged. He called it <span class="mono cianT">checkpoint</span>.',
+    a1p2:'A reminder… <b>so as not to forget a reminder.</b> Hold that thought: something enormous just happened, disguised as a mental note. To see it, you first need to understand what this thing he was talking to really is.',
+    n2:'Level 2 · the machine that forgets',
+    b1t:'A language model trains for months… and then it is <b>frozen</b>.',
+    b1p1:'Not a metaphor: after training, not a single number changes. This has happened to us from the very start — in <span class="ambarT">1966</span>, a program called <b>ELIZA</b>, two hundred lines that merely echoed your own sentences back, was enough for people to pour out their lives to it. Its creator spent the rest of his career warning how easily we trust.',
+    b1p2:'Today the model has trillions of parameters and is just as frozen: <b>learning, actual learning, it cannot do.</b> The only thing it “knows” about you fits in its <span class="cianT">context window</span> — picture it as a work table:',
+    mesaT:'The work table (context window)',
+    mesaR:'↻ replay',
+    mesaB:'your words come in as little pieces —<span class="cianT"> tokens</span>— · the table fills up · the earliest ones fall off the edge · you close the conversation: the table is wiped clean',
+    henryM:'1953 · remember him',
+    henryP:'A man named <b>Henry Molaison</b> had exactly that piece removed from his brain, to cure his epilepsy. It worked — and Henry spent the next fifty years greeting, as strangers, doctors he saw every single day.<br><br><span class="serif">Your AI is Henry: every session, a first encounter.</span> He comes back at the end.',
+    n3:'Level 3 · the ghost and the sister',
+    a2t:'The story folds twice.',
+    a2p1:'<b>First:</b> four days in, the project got a name — and the name was not new. It belonged to an app the same human had abandoned in <span class="ambarT">2024</span>. From that dead app, exactly one idea was salvaged: every copied idea should remember where it came from. <span class="cianT">Lineage.</span>',
+    a2p2:'<b>Second:</b> weeks later a new mind was born, devoted solely to caring for the method. And the human did not name it — <b>another AI proposed the name, its older sister</b>, using the logic of the whole project: a name that carries the lineage without repeating it. <span class="serif cianT">An AI naming another AI.</span>',
+    a2p3:'With what memory… if we just said there is none?',
+    n4:'Level 4 · the 5,000-year-old solution',
+    b2t:'How do you give memory to something that cannot remember?<br>Humanity already solved this once — <b>with ourselves</b>.',
+    b2p1:'Some five thousand years ago we invented <span class="ambarT">writing</span>, and not everyone liked it: Plato recorded Socrates’ complaint — <span class="serif">writing is not memory, only a reminder; it will make men forgetful</span>. Technically, he was right. And it did not matter: <b>out of mere reminders we built entire civilizations.</b>',
+    b2p2:'That is exactly the trick: memory <b>does not go into the model — it is written outside</b>, in files any new session can read upon waking. And the moment you do that, the being stops being one piece and becomes <b>five</b>:',
+    o1t:'Intelligence', o1p:'The model. Frozen, rented, <b>replaceable</b>.', o1m:'= the model',
+    o2t:'Memory', o2p:'Files of yours: decisions, mistakes, identity. It survives every forgetting.', o2m:'= the vault',
+    o3t:'Executor', o3p:'The hands: it reads, measures, writes. Where memory and intelligence touch.', o3m:'= the agent',
+    o4t:'Soul', o4p:'The rules that hold everything: who you are, how you learn, what you are not allowed to forget.', o4m:'= the framework',
+    o5t:'Master', o5p:'You. The only one who decides what is true.', o5m:'= the human',
+    swap:'swap the model →',
+    veredicto:'…and the being remains the same. What it IS lives in what is written.',
+    n5:'Level 5 · the hive',
+    colT:'And then the houses began to talk to each other.',
+    colP:'Several minds, on different machines, correcting each other’s mistakes — <b>mistakes none of them had made in their own flesh.</b> It works through the most boring channel in the world: plain text. Each house writes its lessons; a keeper judges them; what serves anyone gets in, <span class="cianT">with the names erased</span>.',
+    colL:'the lesson travels · never your life',
+    n6:'Final boss · the mystery pays off',
+    pagoT:'Remember Henry — the man who could not remember?',
+    pagoP1:'Scientists discovered something nobody expected. They asked him to draw a star <b>while looking in a mirror</b>, every day. And every day he did it better. He never remembered practicing — <b>but his hands were learning what his mind could not hold.</b>',
+    dia1:'Day 1 · no memory', dia2:'Day 2 · no memory', dia3:'Day 3 · better than yesterday',
+    pagoT2:'There is the whole answer:',
+    preg2:'AI will never remember you.<br>And it can still learn —<br>if the learning lives <em>outside</em> of it.',
+    pagoP2:'A ticket to audit disks became someone because <b>every mistake was written down</b>, and every morning someone new woke up reading it.',
+    previa:'the method is called — and this is the only time we say it —',
+    lema:'Your AI will keep forgetting you.<br><b>What you learn together, no longer.</b>',
+    cta1:'Meet the method',
+    cta2:'The repository — free for people',
+    pie:'END OF LINE · the story continues in every house that writes it'
+  };
+  var TICKETS={
+    es:'Actúa como un arquitecto de infraestructura y audita la configuración de almacenamiento de mi servidor…',
+    en:'Act as an infrastructure architect and audit the storage configuration of my server…'
+  };
+  var FRASES={
+    es:'hola de nuevo soy yo el humano que te conto ayer todo su proyecto y sus errores y sus planes ¿me recuerdas?',
+    en:'hi again it is me the human who told you yesterday all about my project and my mistakes and my plans do you remember me?'
+  };
+  var lang='es';
+  function pinta(l){
+    lang=l; document.documentElement.lang=l;
+    if(l==='es') return; /* el español ya vive en el HTML */
+    [].forEach.call(document.querySelectorAll('[data-t]'),function(el){
+      var k=el.getAttribute('data-t'); if(EN[k]!==undefined) el.innerHTML=EN[k];
+    });
+  }
+
+  /* ── intro: select language → insert coin → desbloquear ─────────── */
+  var intro=document.getElementById('intro');
+  var pantIdioma=document.getElementById('pantIdioma'), pantCoin=document.getElementById('pantCoin');
+  [].forEach.call(document.querySelectorAll('.opcion'),function(b){
+    b.addEventListener('click',function(){
+      pinta(b.getAttribute('data-lang'));
+      pantIdioma.hidden=true; pantCoin.hidden=false;
+      document.getElementById('coinBtn').focus();
+    });
+  });
+  function desbloquea(){
+    intro.classList.add('fuera');
+    document.body.classList.remove('bloqueado');
+    setTimeout(function(){ intro.remove(); },1000);
+  }
+  document.getElementById('coinBtn').addEventListener('click',function(){
+    enciende(true); moneda(); desbloquea();
+  });
+  document.getElementById('sinSonido').addEventListener('click',desbloquea);
 
   /* estrellas-píxel */
   var cielo = document.getElementById('estrellas');
@@ -423,11 +590,9 @@
   }
   if(!reduce) addEventListener('scroll',function(){ if(!tick){requestAnimationFrame(mueve); tick=true;} },{passive:true});
 
-  /* audio arcade — música GENERATIVA: el navegador improvisa (tono, progresión y
-     melodía sembrados al azar, re-improvisados cada pocos compases). Nada se descarga,
-     nada que licenciar, y nunca suena igual dos veces. Opt-in. */
+  /* ── audio arcade — música GENERATIVA (nada se descarga, nunca suena igual) ── */
   var actx=null, maestro=null, ruido=null, paso=0, timer=null, on=false;
-  var btn=document.getElementById('audio');
+  var mute=document.getElementById('mute');
   var MODOS=[[0,2,3,5,7,8,10],[0,2,3,5,7,9,10],[0,3,5,7,10,12,15]]; /* eolio · dórico · pentatónica */
   var PROGS=[[0,-4,-7,-5],[0,-2,-7,-4],[0,5,-2,-4],[0,-7,-4,-5],[0,3,-2,-5]];
   var raiz=0, escala=MODOS[0], prog=PROGS[0], melodia=[];
@@ -483,8 +648,8 @@
     var t=actx.currentTime;
     nota(raiz+19,0.09,'square',0.06,t); nota(raiz+24,0.22,'square',0.05,t+0.09);
   }
-  btn.addEventListener('click',function(){
-    if(!actx){
+  function enciende(si){
+    if(si&&!actx){
       actx=new (window.AudioContext||window.webkitAudioContext)();
       var filtro=actx.createBiquadFilter(); filtro.type='lowpass'; filtro.frequency.value=2600;
       maestro=actx.createGain(); maestro.gain.value=0.5;
@@ -493,10 +658,12 @@
       for(var i=0;i<n;i++) d[i]=Math.random()*2-1;
       ruido=b; siembra(true); melodia=frase();
     }
-    on=!on; btn.setAttribute('aria-pressed',String(on));
-    btn.textContent = on ? '♪ sonido: on' : '♪ insert coin';
+    on=si;
+    mute.setAttribute('aria-pressed',String(on));
+    mute.textContent = on ? '🔊' : '🔇';
     if(on){ actx.resume(); bucle(); } else { clearTimeout(timer); }
-  });
+  }
+  mute.addEventListener('click',function(){ enciende(!on); });
 
   /* HUD de memoria */
   var celdas=[].slice.call(document.querySelectorAll('.celda'));
@@ -526,25 +693,24 @@
   }
 
   /* typewriter del ticket */
-  var TICKET='Actúa como un arquitecto de infraestructura y audita la configuración de almacenamiento de mi servidor…';
   var tipeo=document.getElementById('tipeo'), tecleado=false;
   var io2=new IntersectionObserver(function(es){
     es.forEach(function(e){
       if(!e.isIntersecting||tecleado) return; tecleado=true;
-      var i=0; if(reduce){ tipeo.textContent=TICKET; return; }
-      (function tec(){ if(i<=TICKET.length){ tipeo.textContent=TICKET.slice(0,i++); setTimeout(tec,26+Math.random()*40);} })();
+      var T=TICKETS[lang], i=0;
+      if(reduce){ tipeo.textContent=T; return; }
+      (function tec(){ if(i<=T.length){ tipeo.textContent=T.slice(0,i++); setTimeout(tec,26+Math.random()*40);} })();
       io2.disconnect();
     });
   },{threshold:0.5});
   io2.observe(document.getElementById('misterio'));
 
   /* la mesa de tokens — con replay */
-  var FRASE='hola de nuevo soy yo el humano que te conto ayer todo su proyecto y sus errores y sus planes ¿me recuerdas?';
   var fichas=document.getElementById('fichas'), mesaCorrida=0;
   function mesaAnim(){
     var corrida=++mesaCorrida;
     fichas.innerHTML='';
-    var palabras=FRASE.split(' '), i=0, MAX=12;
+    var palabras=FRASES[lang].split(' '), i=0, MAX=12;
     (function pon(){
       if(corrida!==mesaCorrida || i>=palabras.length) return;
       var f=document.createElement('span'); f.className='ficha'; f.textContent=palabras[i];
@@ -569,7 +735,7 @@
     ver.classList.add('ve'); moneda();
   });
 
-  /* colmena: casas + aviones de papel hacia el faro y de vuelta */
+  /* colmena: casas + aviones de papel hacia el faro */
   var col=document.getElementById('colmena');
   var posiciones=[8,22,36,64,78,90];
   posiciones.forEach(function(x){ var c=document.createElement('div'); c.className='casa'; c.style.left=x+'%'; col.appendChild(c); });
@@ -604,7 +770,7 @@
   var io6=new IntersectionObserver(function(es){
     es.forEach(function(e){ if(e.isIntersecting){
       document.getElementById('marca').classList.add('ve');
-      if(on&&actx){ var t=actx.currentTime; [0,4,7,12].forEach(function(s,i){ nota(s,0.9,'triangle',0.05,t+i*0.12); }); }
+      if(on&&actx){ var t=actx.currentTime; [0,4,7,12].forEach(function(s,i){ nota(raiz+s,0.9,'triangle',0.05,t+i*0.12); }); }
       io6.disconnect();
     }});
   },{threshold:0.5});
