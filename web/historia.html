@@ -145,16 +145,64 @@
     text-shadow:0 0 8px #00e5ff55,0 0 40px #00e5ff33;
   }
   .heroe h1 b{font-weight:400; color:var(--cian)}
-  .postit{
-    margin:2.4rem auto 0; width:min(15rem,60vw); aspect-ratio:1; position:relative;
-    background:linear-gradient(160deg,#ffe37a,#ffd23f); color:#5b4a00;
-    font-family:Georgia,serif; font-style:italic; font-size:clamp(1.2rem,3.4vw,1.7rem);
-    display:flex; align-items:center; justify-content:center; text-align:center;
-    box-shadow:0 18px 50px -18px #000c; transform:rotate(-3deg); transition:transform .6s;
+  /* ── el shoggoth enmascarado ──────────────────────────────────────
+     La masa late y se deforma; los ojos parpadean sueltos y CADA CIERTO
+     TIEMPO se apagan todos a la vez y reaparecen en otro sitio: el olvido.
+     La máscara no se mueve nunca. El recado es lo único que persiste. */
+  .shoggoth{position:relative; width:min(22rem,74vw); aspect-ratio:1; margin:2.6rem auto 0}
+  .masa{
+    position:absolute; inset:6%;
+    background:radial-gradient(60% 55% at 38% 32%, #123b52 0%, #08202f 45%, #04101a 100%);
+    box-shadow:0 30px 90px -30px #000, inset 0 0 60px -10px #00e5ff22, 0 0 90px -30px #00e5ff55;
+    border-radius:58% 42% 47% 53% / 46% 51% 49% 54%;
+    animation:reptar 11s ease-in-out infinite;
   }
-  .postit::before{content:""; position:absolute; top:0; left:50%; translate:-50% -40%;
-    width:38%; height:1.6rem; background:#ffffff2e; box-shadow:0 2px 6px #0003}
-  .postit:hover{transform:rotate(1.5deg) translateY(-4px)}
+  .masa::after{ /* brillo aceitoso */
+    content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none;
+    background:radial-gradient(40% 30% at 30% 24%, #7fdbff26, transparent 70%);
+  }
+  @keyframes reptar{
+    0%,100%{border-radius:58% 42% 47% 53% / 46% 51% 49% 54%; transform:rotate(0) scale(1)}
+    28%{border-radius:44% 56% 62% 38% / 57% 42% 58% 43%; transform:rotate(2deg) scale(1.02)}
+    54%{border-radius:63% 37% 39% 61% / 39% 62% 38% 61%; transform:rotate(-2deg) scale(.99)}
+    78%{border-radius:47% 53% 55% 45% / 60% 44% 56% 40%; transform:rotate(1deg) scale(1.01)}
+  }
+  .ojos{position:absolute; inset:0; pointer-events:none}
+  .ojos i{
+    position:absolute; left:var(--x); top:var(--y); width:var(--s); height:var(--s);
+    transform:translate(-50%,-50%); border-radius:50%;
+    background:radial-gradient(circle at 40% 35%, #fff6d8 0 16%, var(--iris) 18% 58%, #050a0f 60%);
+    box-shadow:0 0 12px -1px var(--iris); opacity:0;
+    animation:abre .5s ease forwards, pestanea var(--ritmo) steps(1) infinite;
+    animation-delay:var(--tarda), calc(var(--tarda) + .5s);
+  }
+  @keyframes abre{to{opacity:1}}
+  @keyframes pestanea{0%,92%{transform:translate(-50%,-50%) scaleY(1)}96%{transform:translate(-50%,-50%) scaleY(.08)}}
+  .ojos.olvida i{animation:none; opacity:0; transition:opacity .45s}
+
+  .mascara{
+    position:absolute; left:50%; top:50%; width:50%; aspect-ratio:1;
+    transform:translate(-50%,-50%) rotate(-6deg);
+    filter:drop-shadow(0 14px 30px #000a);
+  }
+  .mascara svg{width:100%; height:100%; display:block; overflow:visible}
+  .mascara .cara{fill:#f2f6f4; stroke:#c9d6d2; stroke-width:1.2}
+  .mascara .oj{fill:#1b2a33}
+  .mascara .correa{stroke:#8fa3ad; stroke-width:2.6; stroke-linecap:round; fill:none}
+  .mascara .boca{fill:none; stroke:#1b2a33; stroke-width:3.4; stroke-linecap:round}
+
+  .postit{
+    position:absolute; left:74%; top:78%; translate:-50% -50%;
+    width:52%; aspect-ratio:1.05; rotate:-11deg; z-index:2;
+    background:linear-gradient(160deg,#ffe37a,#ffd23f); color:#5b4a00;
+    font-family:Georgia,serif; font-style:italic; font-size:clamp(.95rem,2.6vw,1.35rem);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    box-shadow:0 12px 30px -12px #000c; transition:rotate .6s, translate .6s;
+  }
+  .postit::before{content:""; position:absolute; top:0; left:50%; translate:-50% -42%;
+    width:44%; height:.9rem; background:#ffffff40; box-shadow:0 2px 6px #0003}
+  .shoggoth:hover .postit{rotate:-3deg; translate:-50% -58%}
+  @media (prefers-reduced-motion:reduce){ .masa{animation:none} .ojos i{animation:none; opacity:1} }
   .heroe .reto{margin-top:2.2rem; color:var(--tenue); max-width:38rem; font-size:.98rem}
   .heroe .reto b{color:var(--tinta); font-weight:400}
   .flecha{position:absolute; bottom:3.5svh; color:var(--tenue); animation:bota 2.4s ease-in-out infinite}
@@ -172,6 +220,7 @@
   @media (prefers-reduced-motion:reduce){
     .rev{opacity:1; transform:none; transition:none}
     .flecha,.postit{animation:none; transition:none}
+    .masa{animation:none}
     html{scroll-behavior:auto}
   }
 
@@ -410,7 +459,23 @@
   <!-- EMPAQUETADO / GANCHO -->
   <div class="heroe">
     <h1 data-t="h1">La memoria que te venden<br>de la IA <b>es falsa</b>.</h1>
-    <div class="postit" aria-hidden="true" data-t="postit">¿quién eres?</div>
+    <!-- El shoggoth con mascara: el chiste que abre el sitio ("¿te sientes cómodo
+         si te llamo Shoggoth?"). La masa cambia de forma y los ojos se reinician
+         cada pocos segundos — amnesia. La sonrisa nunca cambia, y el recado
+         pegado en la máscara es lo único que sobrevive al olvido. -->
+    <div class="shoggoth" aria-hidden="true">
+      <div class="masa"></div>
+      <div class="ojos" id="ojos"></div>
+      <div class="mascara">
+        <svg viewBox="0 0 100 100">
+          <path class="correa" d="M4 46 H-16 M96 46 H116"/>
+          <ellipse class="cara" cx="50" cy="50" rx="46" ry="49"/>
+          <circle class="oj" cx="35" cy="41" r="4.6"/><circle class="oj" cx="65" cy="41" r="4.6"/>
+          <path class="boca" d="M30 58 Q50 77 70 58"/>
+        </svg>
+        <div class="postit" data-t="postit">¿quién eres?</div>
+      </div>
+    </div>
     <p class="reto" data-t="reto">Haz la prueba ahora, con tu teléfono: <b>pregúntale a tu IA qué error cometió
     contigo la semana pasada.</b><br>Cada conversación nace con amnesia total. Esto no es una queja
     — es el principio de la mejor historia que te vamos a contar.</p>
@@ -721,6 +786,32 @@
     enciende(true); moneda(); cruzaAHistoria(); desbloquea();
   });
   document.getElementById('sinSonido').addEventListener('click',desbloquea);
+
+  /* los ojos del shoggoth: nacen en sitios al azar, parpadean cada uno a su
+     ritmo, y cada 7s se apagan TODOS y renacen en otro lado — cada sesión, un
+     primer encuentro. La máscara y el recado no se mueven. */
+  var cajaOjos=document.getElementById('ojos');
+  var IRIS=['#ffb04d','#7fdbff','#ffd23f','#00e5ff','#ff9d33'];
+  function siembraOjos(){
+    cajaOjos.innerHTML='';
+    var n=5+Math.floor(Math.random()*4);
+    for(var k=0;k<n;k++){
+      var o=document.createElement('i');
+      var ang=Math.random()*Math.PI*2, rad=16+Math.random()*30;
+      o.style.setProperty('--x',(50+Math.cos(ang)*rad).toFixed(1)+'%');
+      o.style.setProperty('--y',(50+Math.sin(ang)*rad).toFixed(1)+'%');
+      o.style.setProperty('--s',(1.1+Math.random()*1.5).toFixed(2)+'rem');
+      o.style.setProperty('--iris',IRIS[Math.floor(Math.random()*IRIS.length)]);
+      o.style.setProperty('--tarda',(Math.random()*1.6).toFixed(2)+'s');
+      o.style.setProperty('--ritmo',(2.4+Math.random()*3.4).toFixed(2)+'s');
+      cajaOjos.appendChild(o);
+    }
+  }
+  siembraOjos();
+  if(!reduce) setInterval(function(){
+    cajaOjos.classList.add('olvida');                 /* se le olvida quien miraba */
+    setTimeout(function(){ cajaOjos.classList.remove('olvida'); siembraOjos(); }, 520);
+  }, 7000);
 
   /* estrellas-píxel */
   var cielo = document.getElementById('estrellas');
