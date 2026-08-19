@@ -283,7 +283,7 @@
   <div class="pantalla" id="pantCoin" hidden>
     <div class="arcade-titulo" data-t="introListo">Sistema listo</div>
     <button class="coin" id="coinBtn">◉ Insert coin</button>
-    <p class="pista" data-t="introPista">1 crédito = la historia con música generativa — se improvisa en tu navegador, nada se descarga</p>
+    <p class="pista" data-t="introPista">1 crédito = la historia con música — «A Wish to Fulfill» de Centurion_of_war, libre (CC0) vía OpenGameArt</p>
     <button class="sin-sonido" id="sinSonido" data-t="introMudo">o continúa sin sonido →</button>
   </div>
 </div>
@@ -302,6 +302,9 @@
   </div>
   <button id="mute" aria-pressed="false" title="Sonido">🔇</button>
 </header>
+
+<!-- "A Wish to Fulfill" — Centurion_of_war, CC0, vía OpenGameArt. Créditos: audio/CREDITOS.md -->
+<audio id="bgm" loop preload="none" src="audio/a-wish-to-fulfill.ogg"></audio>
 
 <main>
 
@@ -475,7 +478,7 @@
   /* ── i18n: el español vive inline; el inglés se pinta encima ────── */
   var EN = {
     introListo:'System ready',
-    introPista:'1 credit = the story with generative music — improvised in your browser, nothing is downloaded',
+    introPista:'1 credit = the story with music — “A Wish to Fulfill” by Centurion_of_war, free (CC0) via OpenGameArt',
     introMudo:'or continue without sound →',
     hudMem:'Memory',
     h1:'The memory they sell you<br>about AI <b>is fake</b>.',
@@ -590,28 +593,12 @@
   }
   if(!reduce) addEventListener('scroll',function(){ if(!tick){requestAnimationFrame(mueve); tick=true;} },{passive:true});
 
-  /* ── audio arcade — música GENERATIVA (nada se descarga, nunca suena igual) ── */
-  var actx=null, maestro=null, ruido=null, paso=0, timer=null, on=false;
-  var mute=document.getElementById('mute');
-  var MODOS=[[0,2,3,5,7,8,10],[0,2,3,5,7,9,10],[0,3,5,7,10,12,15]]; /* eolio · dórico · pentatónica */
-  var PROGS=[[0,-4,-7,-5],[0,-2,-7,-4],[0,5,-2,-4],[0,-7,-4,-5],[0,3,-2,-5]];
-  var raiz=0, escala=MODOS[0], prog=PROGS[0], melodia=[];
-  function azar(a){ return a[Math.floor(Math.random()*a.length)]; }
-  function siembra(todo){
-    if(todo){ raiz=-5+Math.floor(Math.random()*8); escala=azar(MODOS); }
-    prog=azar(PROGS);
-  }
-  function frase(){ /* caminata aleatoria sobre la escala, con silencios */
-    var f=[], g=Math.floor(Math.random()*escala.length), oct=0;
-    for(var i=0;i<32;i++){
-      if(Math.random()<0.42){ f.push(null); continue; }
-      g+=azar([-2,-1,-1,0,0,1,1,2]);
-      if(g<0) g=0; if(g>=escala.length) g=escala.length-1;
-      if(Math.random()<0.1) oct=oct?0:12;
-      f.push(escala[g]+oct);
-    }
-    return f;
-  }
+  /* ── audio arcade — fondo REAL: "A Wish to Fulfill" (Centurion_of_war, CC0,
+     OpenGameArt · créditos en audio/CREDITOS.md), con fundido de entrada; los
+     stingers puntuales (moneda, acorde final) siguen generados: son cortos y
+     puntuales, no el loop que cansaba. ── */
+  var actx=null, maestro=null, raiz=0, on=false, fundido=null;
+  var mute=document.getElementById('mute'), bgm=document.getElementById('bgm');
   function nota(semitono,dur,tipo,gain,cuando){
     var o=actx.createOscillator(), g=actx.createGain();
     o.type=tipo; o.frequency.value=220*Math.pow(2,semitono/12);
@@ -619,29 +606,6 @@
     g.gain.exponentialRampToValueAtTime(gain,cuando+0.02);
     g.gain.exponentialRampToValueAtTime(0.0001,cuando+dur);
     o.connect(g); g.connect(maestro); o.start(cuando); o.stop(cuando+dur+0.05);
-  }
-  function golpe(cuando,agudo){ /* percusión de ruido: hi-hat o bombo */
-    var s=actx.createBufferSource(), g=actx.createGain(), f=actx.createBiquadFilter();
-    s.buffer=ruido; f.type=agudo?'highpass':'lowpass'; f.frequency.value=agudo?6000:280;
-    g.gain.setValueAtTime(agudo?0.045:0.09,cuando);
-    g.gain.exponentialRampToValueAtTime(0.0001,cuando+(agudo?0.05:0.16));
-    s.connect(f); f.connect(g); g.connect(maestro); s.start(cuando); s.stop(cuando+0.2);
-  }
-  function bucle(){
-    if(!on) return;
-    var t=actx.currentTime, enCompas=paso%16, compas=Math.floor(paso/16);
-    if(enCompas===0){
-      if(compas%2===0) melodia=frase();              /* melodía nueva cada 2 compases */
-      if(compas>0&&compas%8===0) siembra(compas%16===0); /* progresión cada 8, tono cada 16 */
-    }
-    var acorde=raiz+prog[compas%prog.length];
-    if(enCompas%4===0) nota(acorde-24,0.4,'square',0.05,t);      /* bajo */
-    if(enCompas%8===6) nota(acorde-12,0.2,'square',0.032,t);     /* síncopa */
-    if(enCompas%4===2) golpe(t,true);                            /* hi-hat */
-    if(enCompas===0||enCompas===10) golpe(t,false);              /* bombo */
-    var m=melodia[paso%32];
-    if(m!==null&&m!==undefined) nota(acorde+m,0.16+Math.random()*0.1,'triangle',0.045,t);
-    paso++; timer=setTimeout(bucle,132);
   }
   function moneda(){
     if(!on||!actx) return;
@@ -651,17 +615,24 @@
   function enciende(si){
     if(si&&!actx){
       actx=new (window.AudioContext||window.webkitAudioContext)();
-      var filtro=actx.createBiquadFilter(); filtro.type='lowpass'; filtro.frequency.value=2600;
-      maestro=actx.createGain(); maestro.gain.value=0.5;
-      maestro.connect(filtro); filtro.connect(actx.destination);
-      var n=Math.floor(actx.sampleRate*0.2), b=actx.createBuffer(1,n,actx.sampleRate), d=b.getChannelData(0);
-      for(var i=0;i<n;i++) d[i]=Math.random()*2-1;
-      ruido=b; siembra(true); melodia=frase();
+      maestro=actx.createGain(); maestro.gain.value=0.5; maestro.connect(actx.destination);
     }
     on=si;
     mute.setAttribute('aria-pressed',String(on));
     mute.textContent = on ? '🔊' : '🔇';
-    if(on){ actx.resume(); bucle(); } else { clearTimeout(timer); }
+    clearInterval(fundido);
+    if(on){
+      actx.resume();
+      bgm.volume=0; bgm.play().catch(function(){});
+      var v=0; fundido=setInterval(function(){
+        v=Math.min(0.55,v+0.03); bgm.volume=v; if(v>=0.55) clearInterval(fundido);
+      },80);
+    } else {
+      var v0=bgm.volume;
+      fundido=setInterval(function(){
+        v0=Math.max(0,v0-0.06); bgm.volume=v0; if(v0<=0){ bgm.pause(); clearInterval(fundido); }
+      },60);
+    }
   }
   mute.addEventListener('click',function(){ enciende(!on); });
 
