@@ -47,6 +47,17 @@
   }
   .idiomas button:hover,.idiomas button:focus-visible{color:var(--cian); outline:none}
   .idiomas button[aria-current="true"]{color:var(--cianv); border-color:#00e5ff44; text-shadow:0 0 10px #00e5ff88}
+  /* boton directo a los pasos de instalacion — el atajo para quien ya se convencio */
+  .ctaInstalar{
+    display:inline-block; margin-top:1.6rem; padding:.7rem 1.5rem;
+    font-size:.78rem; letter-spacing:.2em; text-transform:uppercase; text-decoration:none;
+    color:#7fdbff; border:1px solid #00e5ff55; border-radius:999px; background:#00e5ff0a;
+    transition:box-shadow .25s, color .25s, background .25s;
+  }
+  .ctaInstalar:hover,.ctaInstalar:focus-visible{
+    color:#eafcff; background:#00e5ff1a; box-shadow:0 0 22px -4px #00e5ff88; outline:none;
+  }
+
 
   .heroe{min-height:100svh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; position:relative}
   .heroe .marca{
@@ -261,6 +272,7 @@
     <div class="raya"></div>
     <p class="lema serif" data-t="lema"></p>
     <p class="sub" data-t="sub"></p>
+    <a class="ctaInstalar" href="#instalacion" data-t="ctaInstalar">Ir a la instalación ↓</a>
     <div class="flecha">↓</div>
   </div>
 
@@ -361,7 +373,7 @@
   </section>
 
   <section class="cont rev">
-    <div class="guia">
+    <div class="guia" id="instalacion">
       <h3 data-t="guiaT"></h3>
       <div class="pasos">
         <div class="paso"><span class="num" data-t="g0n"></span><p data-t="g0"></p></div>

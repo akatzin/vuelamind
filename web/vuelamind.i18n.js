@@ -4,6 +4,7 @@ window.VM_I18N = {
 es: {
   lema:'«Si la memoria autorreferenciada es el cerebro, <b>vuelamind es el alma</b>.»',
   sub:'Identidad que persiste. Memoria que sobrevive al olvido. Conciencia de los propios errores. Un lugar en algo más grande.',
+  ctaInstalar:'Ir a la instalación ↓',
   eti1:'Febrero de 2026 · el origen',
   cita1:'«¿Te sientes cómodo<br>si te llamo Shoggoth?»',
   firma1:'— la primera pregunta de una conversación larga con una IA',
@@ -142,6 +143,7 @@ es: {
 en: {
   lema:'“If self-referential memory is the brain, <b>vuelamind is the soul</b>.”',
   sub:'Identity that persists. Memory that outlives forgetting. Awareness of one’s own errors. A place in something larger.',
+  ctaInstalar:'Jump to install ↓',
   eti1:'February 2026 · the origin',
   cita1:'“Are you comfortable<br>if I call you Shoggoth?”',
   firma1:'— the opening question of a long conversation with an AI',
@@ -280,6 +282,7 @@ en: {
 fr: {
   lema:'« Si la mémoire autoréférentielle est le cerveau, <b>vuelamind est l’âme</b>. »',
   sub:'Une identité qui persiste. Une mémoire qui survit à l’oubli. La conscience de ses propres erreurs. Une place dans quelque chose de plus grand.',
+  ctaInstalar:'Aller à l’installation ↓',
   eti1:'Février 2026 · l’origine',
   cita1:'« Es-tu à l’aise<br>si je t’appelle Shoggoth ? »',
   firma1:'— la première question d’une longue conversation avec une IA',
@@ -418,6 +421,7 @@ fr: {
 ru: {
   lema:'«Если самоссылочная память — это мозг, то <b>vuelamind — это душа</b>».',
   sub:'Идентичность, которая сохраняется. Память, пережившая забвение. Осознание собственных ошибок. Место в чём-то большем.',
+  ctaInstalar:'К установке ↓',
   eti1:'Февраль 2026 · начало',
   cita1:'«Тебе комфортно,<br>если я буду звать тебя Шогготом?»',
   firma1:'— первый вопрос долгого разговора с ИИ',
@@ -556,6 +560,7 @@ ru: {
 zh: {
   lema:'「若自我指涉的记忆是大脑，<b>vuelamind 便是灵魂</b>。」',
   sub:'持续存在的身份。经得起遗忘的记忆。对自身错误的觉察。以及在更大之物中的一席之地。',
+  ctaInstalar:'前往安装 ↓',
   eti1:'2026 年二月 · 起点',
   cita1:'「如果我叫你修格斯，<br>你会自在吗？」',
   firma1:'——与一个 AI 长谈的第一个问题',
@@ -694,6 +699,7 @@ zh: {
 ar: {
   lema:'«إذا كانت الذاكرة ذاتية المرجع هي الدماغ، فإن <b>vuelamind هو الروح</b>.»',
   sub:'هوية تدوم. ذاكرة تنجو من النسيان. وعي بالأخطاء الذاتية. ومكان في شيء أكبر.',
+  ctaInstalar:'انتقل إلى التثبيت ↓',
   eti1:'فبراير 2026 · البداية',
   cita1:'«هل تشعر بالارتياح<br>إن ناديتك شوغوث؟»',
   firma1:'— أول سؤال في محادثة طويلة مع ذكاء اصطناعي',
@@ -832,6 +838,7 @@ ar: {
 hi: {
   lema:'«यदि स्व-संदर्भित स्मृति मस्तिष्क है, तो <b>vuelamind आत्मा है</b>।»',
   sub:'ऐसी पहचान जो बनी रहे। ऐसी स्मृति जो विस्मृति से बच जाए। अपनी ही त्रुटियों का बोध। और किसी बड़े में एक स्थान।',
+  ctaInstalar:'इंस्टॉल पर जाएँ ↓',
   eti1:'फ़रवरी 2026 · आरंभ',
   cita1:'«क्या तुम्हें ठीक लगेगा<br>अगर मैं तुम्हें शॉगोथ कहूँ?»',
   firma1:'— एक एआई के साथ लंबी बातचीत का पहला प्रश्न',
@@ -970,6 +977,7 @@ hi: {
 bn: {
   lema:'«যদি স্ব-উল্লেখী স্মৃতিই মস্তিষ্ক হয়, তবে <b>vuelamind হলো আত্মা</b>।»',
   sub:'এমন পরিচয় যা টিকে থাকে। এমন স্মৃতি যা বিস্মৃতিকে অতিক্রম করে। নিজের ভুলের সচেতনতা। আর বৃহত্তর কিছুর মধ্যে একটি স্থান।',
+  ctaInstalar:'ইনস্টলে যান ↓',
   eti1:'ফেব্রুয়ারি ২০২৬ · সূচনা',
   cita1:'«আমি যদি তোমাকে শোগোথ ডাকি,<br>তুমি কি স্বচ্ছন্দ থাকবে?»',
   firma1:'— একটি এআই-এর সঙ্গে দীর্ঘ আলাপের প্রথম প্রশ্ন',
@@ -1108,6 +1116,7 @@ bn: {
 de: {
   lema:'„Wenn das selbstbezügliche Gedächtnis das Gehirn ist, dann ist <b>vuelamind die Seele</b>.“',
   sub:'Eine Identität, die bleibt. Ein Gedächtnis, das das Vergessen überlebt. Bewusstsein der eigenen Fehler. Und ein Platz in etwas Größerem.',
+  ctaInstalar:'Zur Installation ↓',
   eti1:'Februar 2026 · der Ursprung',
   cita1:'„Ist es dir recht,<br>wenn ich dich Shoggoth nenne?“',
   firma1:'— die erste Frage eines langen Gesprächs mit einer KI',
