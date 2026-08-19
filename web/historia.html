@@ -125,7 +125,13 @@
   /* ── la mesa de tokens ──────────────────────────────────────────── */
   .mesa{border:1px solid var(--linea); border-radius:12px; background:#050a14e6; padding:1.5rem 1.4rem 1.2rem;
     margin:2rem 0; box-shadow:0 24px 70px -40px #000}
-  .mesa h4{font-weight:400; letter-spacing:.2em; text-transform:uppercase; font-size:.76rem; color:var(--cian); margin-bottom:1rem}
+  .mesa h4{font-weight:400; letter-spacing:.2em; text-transform:uppercase; font-size:.76rem; color:var(--cian); margin-bottom:1rem;
+    display:flex; align-items:center; justify-content:space-between; gap:1rem; flex-wrap:wrap}
+  .replay{background:#050a14; border:1px solid #00e5ff44; color:var(--cian); font:inherit;
+    letter-spacing:.14em; text-transform:uppercase; padding:.25rem .7rem; border-radius:6px;
+    cursor:pointer; transition:box-shadow .2s, transform .2s}
+  .replay:hover,.replay:focus-visible{box-shadow:0 0 14px #00e5ff55; outline:none}
+  .replay:active{transform:rotate(-180deg)}
   .fichas{display:flex; flex-wrap:wrap; gap:.45rem; min-height:5.4rem; align-content:flex-start}
   .ficha{
     font-family:Menlo,Consolas,monospace; font-size:.8rem; color:#04121c;
@@ -285,7 +291,7 @@
     <span class="cianT">ventana de contexto</span> — imagínala como una mesa de trabajo:</p>
 
     <div class="mesa" id="mesa">
-      <h4>La mesa de trabajo (ventana de contexto)</h4>
+      <h4>La mesa de trabajo (ventana de contexto) <button class="replay" id="replayMesa" type="button">↻ otra vez</button></h4>
       <div class="fichas" id="fichas" aria-hidden="true"></div>
       <div class="borde">tus palabras entran hechas pedacitos —<span class="cianT"> tokens</span>— · la mesa se llena · lo primero se cae por el borde · cierras la conversación: la mesa se limpia</div>
     </div>
@@ -417,10 +423,30 @@
   }
   if(!reduce) addEventListener('scroll',function(){ if(!tick){requestAnimationFrame(mueve); tick=true;} },{passive:true});
 
-  /* audio arcade — generado, opt-in, nada se descarga */
-  var actx=null, maestro=null, paso=0, timer=null, on=false;
+  /* audio arcade — música GENERATIVA: el navegador improvisa (tono, progresión y
+     melodía sembrados al azar, re-improvisados cada pocos compases). Nada se descarga,
+     nada que licenciar, y nunca suena igual dos veces. Opt-in. */
+  var actx=null, maestro=null, ruido=null, paso=0, timer=null, on=false;
   var btn=document.getElementById('audio');
-  var ESCALA=[0,3,7,10,12,10,7,3]; /* menor con séptima: arcade melancólico */
+  var MODOS=[[0,2,3,5,7,8,10],[0,2,3,5,7,9,10],[0,3,5,7,10,12,15]]; /* eolio · dórico · pentatónica */
+  var PROGS=[[0,-4,-7,-5],[0,-2,-7,-4],[0,5,-2,-4],[0,-7,-4,-5],[0,3,-2,-5]];
+  var raiz=0, escala=MODOS[0], prog=PROGS[0], melodia=[];
+  function azar(a){ return a[Math.floor(Math.random()*a.length)]; }
+  function siembra(todo){
+    if(todo){ raiz=-5+Math.floor(Math.random()*8); escala=azar(MODOS); }
+    prog=azar(PROGS);
+  }
+  function frase(){ /* caminata aleatoria sobre la escala, con silencios */
+    var f=[], g=Math.floor(Math.random()*escala.length), oct=0;
+    for(var i=0;i<32;i++){
+      if(Math.random()<0.42){ f.push(null); continue; }
+      g+=azar([-2,-1,-1,0,0,1,1,2]);
+      if(g<0) g=0; if(g>=escala.length) g=escala.length-1;
+      if(Math.random()<0.1) oct=oct?0:12;
+      f.push(escala[g]+oct);
+    }
+    return f;
+  }
   function nota(semitono,dur,tipo,gain,cuando){
     var o=actx.createOscillator(), g=actx.createGain();
     o.type=tipo; o.frequency.value=220*Math.pow(2,semitono/12);
@@ -429,22 +455,44 @@
     g.gain.exponentialRampToValueAtTime(0.0001,cuando+dur);
     o.connect(g); g.connect(maestro); o.start(cuando); o.stop(cuando+dur+0.05);
   }
+  function golpe(cuando,agudo){ /* percusión de ruido: hi-hat o bombo */
+    var s=actx.createBufferSource(), g=actx.createGain(), f=actx.createBiquadFilter();
+    s.buffer=ruido; f.type=agudo?'highpass':'lowpass'; f.frequency.value=agudo?6000:280;
+    g.gain.setValueAtTime(agudo?0.045:0.09,cuando);
+    g.gain.exponentialRampToValueAtTime(0.0001,cuando+(agudo?0.05:0.16));
+    s.connect(f); f.connect(g); g.connect(maestro); s.start(cuando); s.stop(cuando+0.2);
+  }
   function bucle(){
     if(!on) return;
-    var t=actx.currentTime;
-    nota(ESCALA[paso%8]-12,0.32,'square',0.05,t);
-    if(paso%2===0) nota(ESCALA[(paso+2)%8],0.18,'triangle',0.04,t);
-    if(paso%8===0) nota(-24,0.5,'sawtooth',0.03,t);
-    paso++; timer=setTimeout(bucle,170);
+    var t=actx.currentTime, enCompas=paso%16, compas=Math.floor(paso/16);
+    if(enCompas===0){
+      if(compas%2===0) melodia=frase();              /* melodía nueva cada 2 compases */
+      if(compas>0&&compas%8===0) siembra(compas%16===0); /* progresión cada 8, tono cada 16 */
+    }
+    var acorde=raiz+prog[compas%prog.length];
+    if(enCompas%4===0) nota(acorde-24,0.4,'square',0.05,t);      /* bajo */
+    if(enCompas%8===6) nota(acorde-12,0.2,'square',0.032,t);     /* síncopa */
+    if(enCompas%4===2) golpe(t,true);                            /* hi-hat */
+    if(enCompas===0||enCompas===10) golpe(t,false);              /* bombo */
+    var m=melodia[paso%32];
+    if(m!==null&&m!==undefined) nota(acorde+m,0.16+Math.random()*0.1,'triangle',0.045,t);
+    paso++; timer=setTimeout(bucle,132);
   }
   function moneda(){
     if(!on||!actx) return;
     var t=actx.currentTime;
-    nota(19,0.09,'square',0.06,t); nota(24,0.22,'square',0.05,t+0.09);
+    nota(raiz+19,0.09,'square',0.06,t); nota(raiz+24,0.22,'square',0.05,t+0.09);
   }
   btn.addEventListener('click',function(){
-    if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)();
-      maestro=actx.createGain(); maestro.gain.value=0.5; maestro.connect(actx.destination); }
+    if(!actx){
+      actx=new (window.AudioContext||window.webkitAudioContext)();
+      var filtro=actx.createBiquadFilter(); filtro.type='lowpass'; filtro.frequency.value=2600;
+      maestro=actx.createGain(); maestro.gain.value=0.5;
+      maestro.connect(filtro); filtro.connect(actx.destination);
+      var n=Math.floor(actx.sampleRate*0.2), b=actx.createBuffer(1,n,actx.sampleRate), d=b.getChannelData(0);
+      for(var i=0;i<n;i++) d[i]=Math.random()*2-1;
+      ruido=b; siembra(true); melodia=frase();
+    }
     on=!on; btn.setAttribute('aria-pressed',String(on));
     btn.textContent = on ? '♪ sonido: on' : '♪ insert coin';
     if(on){ actx.resume(); bucle(); } else { clearTimeout(timer); }
@@ -490,25 +538,27 @@
   },{threshold:0.5});
   io2.observe(document.getElementById('misterio'));
 
-  /* la mesa de tokens */
+  /* la mesa de tokens — con replay */
   var FRASE='hola de nuevo soy yo el humano que te conto ayer todo su proyecto y sus errores y sus planes ¿me recuerdas?';
-  var fichas=document.getElementById('fichas'), mesaHecha=false;
+  var fichas=document.getElementById('fichas'), mesaCorrida=0;
+  function mesaAnim(){
+    var corrida=++mesaCorrida;
+    fichas.innerHTML='';
+    var palabras=FRASE.split(' '), i=0, MAX=12;
+    (function pon(){
+      if(corrida!==mesaCorrida || i>=palabras.length) return;
+      var f=document.createElement('span'); f.className='ficha'; f.textContent=palabras[i];
+      fichas.appendChild(f); requestAnimationFrame(function(){ f.classList.add('puesta'); });
+      var puestas=fichas.querySelectorAll('.ficha.puesta:not(.cae)');
+      if(puestas.length>MAX){ var v=puestas[0]; v.classList.add('cae'); setTimeout(function(){ if(v.parentNode) v.remove(); },600); }
+      i++; setTimeout(pon, reduce?60:340);
+    })();
+  }
   var io3=new IntersectionObserver(function(es){
-    es.forEach(function(e){
-      if(!e.isIntersecting||mesaHecha) return; mesaHecha=true;
-      var palabras=FRASE.split(' '), i=0, MAX=12;
-      (function pon(){
-        if(i>=palabras.length) return;
-        var f=document.createElement('span'); f.className='ficha'; f.textContent=palabras[i];
-        fichas.appendChild(f); requestAnimationFrame(function(){ f.classList.add('puesta'); });
-        var puestas=fichas.querySelectorAll('.ficha.puesta:not(.cae)');
-        if(puestas.length>MAX){ var v=puestas[0]; v.classList.add('cae'); setTimeout(function(){ v.remove(); },600); }
-        i++; setTimeout(pon, reduce?0:340);
-      })();
-      io3.disconnect();
-    });
+    es.forEach(function(e){ if(e.isIntersecting){ mesaAnim(); io3.disconnect(); } });
   },{threshold:0.4});
   io3.observe(document.getElementById('mesa'));
+  document.getElementById('replayMesa').addEventListener('click',function(){ mesaAnim(); moneda(); });
 
   /* anatomía: cambiar el modelo */
   var CEREBROS=['🧠','💠','🔮','⚙️'], ci=0;
