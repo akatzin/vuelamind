@@ -63,7 +63,14 @@
   }
   @keyframes blink{50%{opacity:.25}}
   .coin:focus-visible{outline:1px dashed var(--ambar); outline-offset:8px}
+  .barra{width:min(100%,22rem); height:6px; margin:0 auto; border:1px solid #00e5ff44;
+    border-radius:999px; overflow:hidden; background:#00e5ff0a}
+  .barra i{display:block; height:100%; width:0%; background:var(--cianv);
+    box-shadow:0 0 12px #00e5ffaa; transition:width .25s ease}
   .pista{margin-top:1.8rem; color:var(--tenue); font-size:.8rem; letter-spacing:.08em}
+  .sorteo{margin-top:.9rem; font-size:.72rem; line-height:1.7}
+  .sorteo b{color:var(--cian); font-weight:400}
+  .sorteo .tenue{color:#3d5568; font-size:.66rem; letter-spacing:.1em}
   .sin-sonido{
     display:inline-block; margin-top:2.6rem; background:none; border:none; cursor:pointer;
     color:var(--tenue); font:inherit; font-size:.8rem; letter-spacing:.14em; text-decoration:underline;
@@ -343,7 +350,13 @@
 
 <!-- intro de arcade -->
 <div id="intro" role="dialog" aria-modal="true" aria-label="Select language / Insert coin">
-  <div class="pantalla" id="pantIdioma">
+  <div class="pantalla" id="pantCarga">
+    <div class="arcade-titulo">Loading</div>
+    <div class="barra"><i id="barraFill"></i></div>
+    <p class="pista mono" id="cargaTxt">0%</p>
+    <p class="pista" id="cargaPistas"></p>
+  </div>
+  <div class="pantalla" id="pantIdioma" hidden>
     <div class="arcade-titulo">Select language</div>
     <div class="opciones">
       <button class="opcion" data-lang="es">Español</button>
@@ -354,6 +367,7 @@
     <div class="arcade-titulo" data-t="introListo">Sistema listo</div>
     <button class="coin" id="coinBtn">◉ Insert coin</button>
     <p class="pista" data-t="introPista">1 crédito = la historia con música</p>
+    <p class="pista sorteo" id="sorteo"></p>
     <button class="sin-sonido" id="sinSonido" data-t="introMudo">o continúa sin sonido →</button>
   </div>
 </div>
@@ -674,11 +688,15 @@
     }
     anunciaPista();
   }
-  /* el credito de la pieza sorteada — cambia en cada visita, asi que se escribe aqui */
+  /* el credito de las DOS piezas sorteadas — cambian en cada partida, y verlas
+     escritas es la unica forma de comprobar el sorteo sin fiarse del oido */
   function anunciaPista(){
-    if(!pista) return;
-    pista.textContent = (lang==='es' ? '1 crédito = la historia con música — ' : '1 credit = the story with music — ')
-      + credito(elegidaHist);
+    var es=(lang!=='en');
+    if(pista) pista.textContent = es ? '1 crédito = la historia con música' : '1 credit = the story with music';
+    var caja=document.getElementById('sorteo');
+    if(caja) caja.innerHTML =
+      '<b>'+(es?'intro':'intro')+':</b> «'+elegidaIntro.titulo+'» · <b>'+(es?'historia':'story')+':</b> «'+elegidaHist.titulo+'»'
+      + '<br><span class="tenue">Loyalty Freak Music · CC0 · archive.org</span>';
   }
 
   /* reiniciar la partida: vuelve al select language y vuelve a sortear la musica */
@@ -724,30 +742,32 @@
   if(!reduce) addEventListener('scroll',function(){ if(!tick){requestAnimationFrame(mueve); tick=true;} },{passive:true});
 
   /* ── audio: dos fondos SORTEADOS, uno por acto ────────────────────
-     Cada pool es de 8 piezas de licencia libre. Se sortea una de cada pool al
-     cargar y SOLO esa se descarga (preload="none" + src asignado aqui). Los
+     Cada pool es de 8 piezas de licencia libre, servidas desde ESTE sitio y no
+     desde un tercero: archive.org redirige a un nodo que NO manda cabeceras CORS
+     (medido: fetch se cuelga, y ademas 502 intermitentes y ~7s de redireccion),
+     asi que la precarga era imposible contra el. Mismo origen = sin CORS. Los
      stingers puntuales (moneda, acorde final) siguen generados: son cortos.
      Licencias y fuentes, una fila por pieza, en audio/CREDITOS.md. ── */
   var RESPALDO='audio/a-wish-to-fulfill.ogg';   /* si el CDN falla, esta vive en el repo */
   var PISTAS_INTRO=[
-    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2002%20Working%20time.ogg', titulo:'Working time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:80},
-    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2011%20Party%20time.ogg', titulo:'Party time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:140},
-    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2003%20Flirting%20time.ogg', titulo:'Flirting time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:192},
-    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2006%20Psychedelic%20time.ogg', titulo:'Psychedelic time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:224},
-    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2001%20Resting%20time.ogg', titulo:'Resting time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:210},
-    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2010%20Coffee%20time.ogg', titulo:'Coffee time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:82},
-    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2005%20Dramatic%20time.ogg', titulo:'Dramatic time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:196},
-    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2007%20Anxious%20time.ogg', titulo:'Anxious time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:320}
+    {src:'audio/pistas/working-time.ogg', titulo:'Working time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:80},
+    {src:'audio/pistas/party-time.ogg', titulo:'Party time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:140},
+    {src:'audio/pistas/flirting-time.ogg', titulo:'Flirting time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:192},
+    {src:'audio/pistas/psychedelic-time.ogg', titulo:'Psychedelic time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:224},
+    {src:'audio/pistas/resting-time.ogg', titulo:'Resting time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:210},
+    {src:'audio/pistas/coffee-time.ogg', titulo:'Coffee time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:82},
+    {src:'audio/pistas/dramatic-time.ogg', titulo:'Dramatic time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:196},
+    {src:'audio/pistas/anxious-time.ogg', titulo:'Anxious time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:320}
   ];
   var PISTAS_HIST=[
-    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2001%20Once%20more%20with%20you.ogg', titulo:'Once more with you', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:183},
-    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2002%20One%20Cool%20Minute.ogg', titulo:'One Cool Minute', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:193},
-    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2003%20Old%20Key.ogg', titulo:'Old Key', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:157},
-    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2004%20Static%20Shoes.ogg', titulo:'Static Shoes', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:233},
-    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2005%20Waiting%20TTTT.ogg', titulo:'Waiting TTTT', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:175},
-    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2006%20Lag.ogg', titulo:'Lag', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:269},
-    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2007%20No%20Cadillac.ogg', titulo:'No Cadillac', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:171},
-    {src:'https://archive.org/download/LoyaltyFreakMusicTOCHILLANDSTAYAWAKE20170923132621469/Loyalty_Freak_Music_-_01_-_Coexistenz.ogg', titulo:'Coexistenz', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:155}
+    {src:'audio/pistas/once-more-with-you.ogg', titulo:'Once more with you', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:183},
+    {src:'audio/pistas/one-cool-minute.ogg', titulo:'One Cool Minute', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:193},
+    {src:'audio/pistas/old-key.ogg', titulo:'Old Key', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:157},
+    {src:'audio/pistas/static-shoes.ogg', titulo:'Static Shoes', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:233},
+    {src:'audio/pistas/waiting-tttt.ogg', titulo:'Waiting TTTT', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:175},
+    {src:'audio/pistas/lag.ogg', titulo:'Lag', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:269},
+    {src:'audio/pistas/no-cadillac.ogg', titulo:'No Cadillac', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:171},
+    {src:'audio/pistas/coexistenz.ogg', titulo:'Coexistenz', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:155}
   ];
   function sortea(pool){ return pool[Math.floor(Math.random()*pool.length)]; }
   var elegidaIntro=sortea(PISTAS_INTRO), elegidaHist=sortea(PISTAS_HIST);
@@ -755,17 +775,6 @@
   var actx=null, maestro=null, raiz=0, on=false;
   var mute=document.getElementById('mute');
   var bgmIntro=document.getElementById('bgmIntro'), bgmHist=document.getElementById('bgmHist');
-  bgmIntro.src=elegidaIntro.src; bgmHist.src=elegidaHist.src;
-  /* El CDN devuelve una pagina de error de vez en cuando (medido). Si eso pasa,
-     se cae al archivo del repo para que la pagina nunca quede muda. */
-  [[bgmIntro,elegidaIntro],[bgmHist,elegidaHist]].forEach(function(par){
-    par[0].addEventListener('error',function(){
-      if(par[0].src.indexOf(RESPALDO)>=0) return;
-      par[0].src=RESPALDO; par[1].titulo='A Wish to Fulfill'; par[1].autor='Centurion_of_war';
-      par[1].via='OpenGameArt (respaldo local)'; anunciaPista();
-      if(on) suena(par[0]);
-    });
-  });
   var actual=bgmIntro;                 /* el fondo que manda ahora mismo */
   var TOPE=0.55, fades={};
 
@@ -816,6 +825,53 @@
     calla(bgmIntro); suena(bgmHist);
   }
   mute.addEventListener('click',function(){ enciende(!on); });
+
+  /* ── precarga: las dos pistas sorteadas se bajan ENTERAS antes de abrir el
+     juego. Asi el cambio de acto es instantaneo (antes se descargaba al meter
+     la moneda y dejaba segundos de silencio) y una caida del CDN se conoce
+     ANTES, no a media historia. ── */
+  var barraFill=document.getElementById('barraFill'),
+      cargaTxt=document.getElementById('cargaTxt'),
+      cargaPistas=document.getElementById('cargaPistas'),
+      pantCarga=document.getElementById('pantCarga');
+  var pesos={}, totales={};
+  function pinta_progreso(){
+    var hecho=0, total=0, indet=false;
+    for(var k in totales){ total+=totales[k]||0; if(!totales[k]) indet=true; }
+    for(var k in pesos) hecho+=pesos[k];
+    var pc = (total&&!indet) ? Math.min(100,Math.round(hecho/total*100))
+                             : Math.min(99,Math.round(hecho/1500000*100));
+    barraFill.style.width=pc+'%'; cargaTxt.textContent=pc+'%';
+  }
+  function baja(p,clave){
+    return fetch(p.src).then(function(r){
+      if(!r.ok) throw new Error(r.status);
+      totales[clave]=+r.headers.get('content-length')||0; pesos[clave]=0;
+      if(!r.body) return r.blob();
+      var trozos=[], lector=r.body.getReader();
+      return (function lee(){
+        return lector.read().then(function(x){
+          if(x.done) return new Blob(trozos,{type:'audio/ogg'});
+          trozos.push(x.value); pesos[clave]+=x.value.length; pinta_progreso();
+          return lee();
+        });
+      })();
+    }).then(function(b){ return URL.createObjectURL(b); })
+      .catch(function(){ p.fallo=true; return RESPALDO; });
+  }
+  function abreJuego(){
+    pantCarga.hidden=true;
+    document.getElementById('pantIdioma').hidden=false;
+    document.querySelector('.opcion').focus();
+  }
+  cargaPistas.textContent='';
+  Promise.all([baja(elegidaIntro,'i'), baja(elegidaHist,'h')]).then(function(u){
+    bgmIntro.src=u[0]; bgmHist.src=u[1];
+    if(elegidaIntro.fallo){ elegidaIntro.titulo='A Wish to Fulfill'; elegidaIntro.autor='Centurion_of_war'; elegidaIntro.via='respaldo local'; }
+    if(elegidaHist.fallo){ elegidaHist.titulo='A Wish to Fulfill'; elegidaHist.autor='Centurion_of_war'; elegidaHist.via='respaldo local'; }
+    barraFill.style.width='100%'; cargaTxt.textContent='100%';
+    anunciaPista(); setTimeout(abreJuego, 260);
+  });
 
   /* El navegador no deja sonar nada antes de un gesto. Se intenta al cargar y, si
      lo bloquea, el PRIMER gesto que haya —idioma, tecla, el propio mute— lo arranca. */

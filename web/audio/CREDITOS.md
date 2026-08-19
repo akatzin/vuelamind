@@ -23,49 +23,56 @@ en la página que lo usa, no solo aquí.
 
 ## Los dos fondos sorteados (2026-08-19)
 
-`historia.html` sortea una pieza de cada pool al cargar y **solo descarga la sorteada**.
-Se sirven **desde archive.org**, no desde este repositorio: son ~30 MB en total y meterlos
-aquí los dejaría en el historial de git para siempre. La página trae **respaldo local**
-(`a-wish-to-fulfill.ogg`) para el caso en que el CDN falle.
+`historia.html` sortea una pieza de cada pool al cargar, **baja las dos enteras** con una
+pantalla de progreso, y solo entonces abre el juego. Viven **en este repositorio**
+(`web/audio/pistas/`, 15.03 MB en 16 archivos) — ver abajo por qué no se sirven del CDN.
 
-| Pool | Pista | Álbum | Autor | Licencia | Fuente | Dur. |
-|---|---|---|---|---|---|---|
-| `intro (arcade)` | *Working time* | GAME JAM VOL 1 !!! | Loyalty Freak Music | **CC0** | [archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 80s |
-| `intro (arcade)` | *Party time* | GAME JAM VOL 1 !!! | Loyalty Freak Music | **CC0** | [archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 140s |
-| `intro (arcade)` | *Flirting time* | GAME JAM VOL 1 !!! | Loyalty Freak Music | **CC0** | [archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 192s |
-| `intro (arcade)` | *Psychedelic time* | GAME JAM VOL 1 !!! | Loyalty Freak Music | **CC0** | [archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 224s |
-| `intro (arcade)` | *Resting time* | GAME JAM VOL 1 !!! | Loyalty Freak Music | **CC0** | [archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 210s |
-| `intro (arcade)` | *Coffee time* | GAME JAM VOL 1 !!! | Loyalty Freak Music | **CC0** | [archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 82s |
-| `intro (arcade)` | *Dramatic time* | GAME JAM VOL 1 !!! | Loyalty Freak Music | **CC0** | [archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 196s |
-| `intro (arcade)` | *Anxious time* | GAME JAM VOL 1 !!! | Loyalty Freak Music | **CC0** | [archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 320s |
-| `historia (deep focus)` | *Once more with you* | MINIMAL AMBIENT BOUNCE | Loyalty Freak Music | **CC0** | [archive.org/details/MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 183s |
-| `historia (deep focus)` | *One Cool Minute* | MINIMAL AMBIENT BOUNCE | Loyalty Freak Music | **CC0** | [archive.org/details/MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 193s |
-| `historia (deep focus)` | *Old Key* | MINIMAL AMBIENT BOUNCE | Loyalty Freak Music | **CC0** | [archive.org/details/MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 157s |
-| `historia (deep focus)` | *Static Shoes* | MINIMAL AMBIENT BOUNCE | Loyalty Freak Music | **CC0** | [archive.org/details/MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 233s |
-| `historia (deep focus)` | *Waiting TTTT* | MINIMAL AMBIENT BOUNCE | Loyalty Freak Music | **CC0** | [archive.org/details/MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 175s |
-| `historia (deep focus)` | *Lag* | MINIMAL AMBIENT BOUNCE | Loyalty Freak Music | **CC0** | [archive.org/details/MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 269s |
-| `historia (deep focus)` | *No Cadillac* | MINIMAL AMBIENT BOUNCE | Loyalty Freak Music | **CC0** | [archive.org/details/MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 171s |
-| `historia (deep focus)` | *Coexistenz* | TO CHILL AND STAY AWAKE | Loyalty Freak Music | **CC0** | [archive.org/details/LoyaltyFreakMusicTOCHILLANDSTAYAWAKE20170923132621469](https://archive.org/details/LoyaltyFreakMusicTOCHILLANDSTAYAWAKE20170923132621469) | 155s |
+Todas se re-encodearon a **mono, calidad Vorbis 0** (`sox -C 0 -c 1`): a la mitad del peso
+y sin pérdida audible en música de fondo.
+
+| Pool | Archivo | Pista | Álbum | Licencia | Fuente | Dur. | Peso |
+|---|---|---|---|---|---|---|---|
+| intro · arcade | `pistas/working-time.ogg` | *Working time* | GAME JAM VOL 1 !!! | **CC0** | [LoyaltyFreakMusic-GAMEJAMV](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 80s | 0.38 MB |
+| intro · arcade | `pistas/party-time.ogg` | *Party time* | GAME JAM VOL 1 !!! | **CC0** | [LoyaltyFreakMusic-GAMEJAMV](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 140s | 0.86 MB |
+| intro · arcade | `pistas/flirting-time.ogg` | *Flirting time* | GAME JAM VOL 1 !!! | **CC0** | [LoyaltyFreakMusic-GAMEJAMV](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 192s | 1.07 MB |
+| intro · arcade | `pistas/psychedelic-time.ogg` | *Psychedelic time* | GAME JAM VOL 1 !!! | **CC0** | [LoyaltyFreakMusic-GAMEJAMV](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 224s | 0.79 MB |
+| intro · arcade | `pistas/resting-time.ogg` | *Resting time* | GAME JAM VOL 1 !!! | **CC0** | [LoyaltyFreakMusic-GAMEJAMV](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 210s | 1.11 MB |
+| intro · arcade | `pistas/coffee-time.ogg` | *Coffee time* | GAME JAM VOL 1 !!! | **CC0** | [LoyaltyFreakMusic-GAMEJAMV](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 82s | 0.33 MB |
+| intro · arcade | `pistas/dramatic-time.ogg` | *Dramatic time* | GAME JAM VOL 1 !!! | **CC0** | [LoyaltyFreakMusic-GAMEJAMV](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 196s | 0.96 MB |
+| intro · arcade | `pistas/anxious-time.ogg` | *Anxious time* | GAME JAM VOL 1 !!! | **CC0** | [LoyaltyFreakMusic-GAMEJAMV](https://archive.org/details/LoyaltyFreakMusic-GAMEJAMVOL1) | 320s | 1.21 MB |
+| historia · deep focus | `pistas/once-more-with-you.ogg` | *Once more with you* | MINIMAL AMBIENT BOUNCE | **CC0** | [MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 183s | 1.04 MB |
+| historia · deep focus | `pistas/one-cool-minute.ogg` | *One Cool Minute* | MINIMAL AMBIENT BOUNCE | **CC0** | [MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 193s | 0.99 MB |
+| historia · deep focus | `pistas/old-key.ogg` | *Old Key* | MINIMAL AMBIENT BOUNCE | **CC0** | [MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 157s | 0.92 MB |
+| historia · deep focus | `pistas/static-shoes.ogg` | *Static Shoes* | MINIMAL AMBIENT BOUNCE | **CC0** | [MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 233s | 1.25 MB |
+| historia · deep focus | `pistas/waiting-tttt.ogg` | *Waiting TTTT* | MINIMAL AMBIENT BOUNCE | **CC0** | [MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 175s | 1.02 MB |
+| historia · deep focus | `pistas/lag.ogg` | *Lag* | MINIMAL AMBIENT BOUNCE | **CC0** | [MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 269s | 1.49 MB |
+| historia · deep focus | `pistas/no-cadillac.ogg` | *No Cadillac* | MINIMAL AMBIENT BOUNCE | **CC0** | [MINIMALAMBIENTBOUNCE](https://archive.org/details/MINIMALAMBIENTBOUNCE) | 171s | 0.73 MB |
+| historia · deep focus | `pistas/coexistenz.ogg` | *Coexistenz* | TO CHILL AND STAY AWAKE | **CC0** | [LoyaltyFreakMusicTOCHILLAN](https://archive.org/details/LoyaltyFreakMusicTOCHILLANDSTAYAWAKE20170923132621469) | 155s | 0.89 MB |
 
 ### Cómo se comprobaron — MEDIDO 2026-08-19
 
-- La licencia se leyó del campo `licenseurl` de la **API de metadatos** de archive.org,
-  no del título de un resultado: las 16 devuelven
-  `http://creativecommons.org/publicdomain/zero/1.0/`.
-- La procedencia importa tanto como la etiqueta: **las tres son subidas del propio
-  artista** (Loyalty Freak Music, autor CC0 conocido), no copias de terceros.
-- Cada URL se pidió y se verificó con `file` sobre los primeros 2 KB: las 16 son
-  `Ogg data, Vorbis audio, stereo, 44100 Hz`. No se confía en la extensión.
-- Las cabeceras traen `access-control-allow-origin: *` y `accept-ranges: bytes`, así que
-  el `<audio>` puede transmitirlas y buscar dentro sin descargar todo.
+- La licencia se leyó del campo `licenseurl` de la **API de metadatos** de archive.org: las
+  16 devuelven `http://creativecommons.org/publicdomain/zero/1.0/`.
+- La procedencia importa tanto como la etiqueta: **las tres son subidas del propio artista**
+  (Loyalty Freak Music, autor CC0 conocido), no copias de terceros.
+- Cada archivo verificado con `file` tras convertir: las 16 son `Ogg data, Vorbis audio`.
 
-> [!warning] El CDN falla de vez en cuando, y está medido
-> Dos de las 16 devolvieron una **página HTML de error** en el primer intento y el archivo
-> correcto en el segundo. Por eso la página lleva respaldo local: sin él, una visita de
-> cada tantas se quedaría muda sin que nadie se entere.
+> [!danger] Por qué NO se sirven desde archive.org — se intentó y falló
+> Parecía la opción correcta: enlaces directos, sin peso en el repo, y un `curl -I` mostraba
+> `access-control-allow-origin: *`. **Esa comprobación era falsa.** `curl` sigue la
+> redirección y no aplica CORS; el navegador sí. Medido:
+>
+> - `archive.org/download/…` **redirige** a un nodo por petición (`dn601301.us.archive.org`).
+> - **El nodo final NO manda cabeceras CORS** → `fetch()` se cuelga y la precarga cae al
+>   respaldo. Síntoma en la página: «siempre suena la misma canción».
+> - Ese nodo devolvió **HTTP 502** en pruebas directas, y la cadena tarda **~7 s**.
+> - Bajando las 16 para convertirlas, **una falló 8 intentos seguidos**.
+>
+> Regla: **un asset de terceros se comprueba desde el navegador, no desde `curl`** — son
+> dos clientes con reglas distintas, y el que importa es el del visitante. Mismo origen
+> elimina el problema entero.
 
 > [!danger] Buscar «CC0» en archive.org NO basta
 > La consulta por género devolvió discos comerciales —Neurosis, Current 93— con etiqueta
 > CC0 puesta por quien los subió. **La etiqueta la escribe el que sube, no el titular.**
-> Regla de esta casa: la licencia se acepta solo cuando el que sube ES el autor, o cuando
-> la obra es verificablemente de dominio público por edad.
+> Solo se acepta cuando el que sube ES el autor, o la obra es de dominio público por edad.
