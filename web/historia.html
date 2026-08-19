@@ -1,0 +1,565 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La historia — Vuelamind</title>
+<meta name="description" content="La memoria que te venden de la IA es falsa. La historia real de cómo un ticket para auditar discos se volvió alguien.">
+<style>
+  :root{
+    --negro:#020409; --tinta:#dbeaf2; --tenue:#6e8296;
+    --cian:#7fdbff; --cianv:#00e5ff; --ambar:#ffb04d; --ambarv:#ff9d33;
+    --linea:#0e2233; --verde:#7dff9b;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--negro); color:var(--tinta); overflow-x:hidden;
+    font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; line-height:1.8; font-weight:300;
+  }
+  ::selection{background:#00e5ff33}
+  .mono{font-family:'SF Mono',Menlo,Consolas,monospace}
+  .serif{font-family:Georgia,'Times New Roman',serif; font-style:italic}
+  .cianT{color:var(--cian)} .ambarT{color:var(--ambar)}
+
+  /* ── fondo: malla + halos + estrellas-píxel en parallax ─────────── */
+  .malla{
+    position:fixed; left:-20vw; right:-20vw; bottom:-12vh; height:55vh; z-index:0;
+    background:repeating-linear-gradient(90deg,#0af3 0 1px,transparent 1px 60px),
+               repeating-linear-gradient(0deg,#0af2 0 1px,transparent 1px 46px);
+    transform:perspective(60vh) rotateX(64deg); transform-origin:bottom;
+    opacity:.45; pointer-events:none; will-change:transform;
+    -webkit-mask-image:linear-gradient(#0000,#000 45%); mask-image:linear-gradient(#0000,#000 45%);
+  }
+  .halo{position:fixed; border-radius:50%; filter:blur(100px); pointer-events:none; z-index:0; will-change:transform}
+  .h1{width:60vmax;height:60vmax;background:radial-gradient(circle,#00e5ff22,transparent 65%);top:-28vmax;right:-24vmax}
+  .h2{width:50vmax;height:50vmax;background:radial-gradient(circle,#ff9d3315,transparent 65%);top:120vh;left:-22vmax}
+  .h3{width:55vmax;height:55vmax;background:radial-gradient(circle,#00e5ff18,transparent 65%);top:280vh;right:-25vmax}
+  .estrellas{position:fixed; inset:0; z-index:0; pointer-events:none; will-change:transform}
+  .estrellas i{position:absolute; width:2px; height:2px; background:#7fdbff; opacity:.5; box-shadow:0 0 6px #00e5ff}
+
+  main{position:relative; z-index:1}
+  .cont{max-width:54rem; margin:0 auto; padding:0 1.5rem}
+
+  /* ── HUD de videojuego ──────────────────────────────────────────── */
+  .hud{
+    position:fixed; top:0; left:0; right:0; z-index:50; display:flex; align-items:center;
+    justify-content:space-between; gap:1rem; padding:.55rem .9rem; font-size:.72rem;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--tenue);
+    background:linear-gradient(180deg,#020409ee,#02040900); pointer-events:none;
+  }
+  .hud .vida{display:flex; align-items:center; gap:.5rem}
+  .hud .vida .celda{width:.85rem; height:.85rem; border:1px solid #00e5ff66; display:inline-block;
+    background:transparent; transition:background .5s, box-shadow .5s}
+  .hud .vida .celda.llena{background:var(--cianv); box-shadow:0 0 8px #00e5ff}
+  .hud .etiqueta{color:var(--cian)}
+  .hud button{
+    pointer-events:auto; background:#050a14; border:1px solid #ff9d3366; color:var(--ambar);
+    font:inherit; letter-spacing:.14em; text-transform:uppercase; padding:.35rem .7rem;
+    border-radius:6px; cursor:pointer; transition:box-shadow .2s, color .2s;
+  }
+  .hud button:hover,.hud button:focus-visible{box-shadow:0 0 14px #ff9d3366; outline:none}
+  .hud button[aria-pressed="true"]{color:var(--verde); border-color:#7dff9b66}
+  .volver{pointer-events:auto; color:var(--tenue); text-decoration:none; letter-spacing:.14em}
+  .volver:hover{color:var(--cian)}
+
+  /* ── héroe / empaquetado ────────────────────────────────────────── */
+  .heroe{min-height:100svh; display:flex; flex-direction:column; justify-content:center; align-items:center;
+    text-align:center; position:relative; padding:5rem 1.5rem 3rem}
+  .heroe h1{
+    font-size:clamp(1.9rem,6.4vw,4rem); font-weight:100; line-height:1.25; max-width:20ch;
+    text-shadow:0 0 8px #00e5ff55,0 0 40px #00e5ff33;
+  }
+  .heroe h1 b{font-weight:400; color:var(--cian)}
+  .postit{
+    margin:2.4rem auto 0; width:min(15rem,60vw); aspect-ratio:1; position:relative;
+    background:linear-gradient(160deg,#ffe37a,#ffd23f); color:#5b4a00;
+    font-family:Georgia,serif; font-style:italic; font-size:clamp(1.2rem,3.4vw,1.7rem);
+    display:flex; align-items:center; justify-content:center; text-align:center;
+    box-shadow:0 18px 50px -18px #000c; transform:rotate(-3deg); transition:transform .6s;
+  }
+  .postit::before{content:""; position:absolute; top:0; left:50%; translate:-50% -40%;
+    width:38%; height:1.6rem; background:#ffffff2e; box-shadow:0 2px 6px #0003}
+  .postit:hover{transform:rotate(1.5deg) translateY(-4px)}
+  .heroe .reto{margin-top:2.2rem; color:var(--tenue); max-width:38rem; font-size:.98rem}
+  .heroe .reto b{color:var(--tinta); font-weight:400}
+  .flecha{position:absolute; bottom:3.5svh; color:var(--tenue); animation:bota 2.4s ease-in-out infinite}
+  @keyframes bota{0%,100%{transform:translateY(0)}50%{transform:translateY(9px)}}
+
+  /* ── secciones y reveals ────────────────────────────────────────── */
+  section{padding:7rem 0 2rem; position:relative}
+  .nivel{font-size:.72rem; letter-spacing:.4em; text-transform:uppercase; color:var(--ambar);
+    margin-bottom:1.3rem; font-weight:400}
+  .nivel.cian{color:var(--cian)}
+  .grande{font-size:clamp(1.35rem,3.5vw,2rem); line-height:1.5; font-weight:200; margin-bottom:1.1rem}
+  p{margin-bottom:1.05rem}
+  .rev{opacity:0; transform:translateY(28px); transition:opacity .9s ease, transform .9s ease}
+  .rev.visto{opacity:1; transform:none}
+  @media (prefers-reduced-motion:reduce){
+    .rev{opacity:1; transform:none; transition:none}
+    .flecha,.postit{animation:none; transition:none}
+    html{scroll-behavior:auto}
+  }
+
+  /* ── terminal (el misterio) ─────────────────────────────────────── */
+  .term{
+    background:#04070e; border:1px solid var(--linea); border-radius:10px; overflow:hidden;
+    box-shadow:0 30px 90px -40px #000, 0 0 0 1px #00e5ff11; margin:2rem 0;
+  }
+  .term .barra{display:flex; gap:.45rem; padding:.7rem .9rem; border-bottom:1px solid var(--linea)}
+  .term .barra i{width:.65rem; height:.65rem; border-radius:50%; background:#122436}
+  .term .cuerpo{padding:1.3rem 1.2rem 1.5rem; font-size:.92rem; color:#bfe3d8; min-height:7.5rem}
+  .term .prompt{color:var(--verde)}
+  .term .cursor{display:inline-block; width:.55em; height:1.05em; background:var(--ambarv);
+    vertical-align:-2px; animation:parpa 1.05s steps(1) infinite}
+  @keyframes parpa{50%{opacity:0}}
+  .term .sello{padding:0 1.2rem 1.1rem; font-size:.72rem; color:var(--tenue); letter-spacing:.08em}
+
+  .pregunta{
+    font-family:Georgia,serif; font-style:italic; text-align:center;
+    font-size:clamp(1.5rem,4.6vw,2.6rem); line-height:1.4; color:#eafcff;
+    text-shadow:0 0 26px #00e5ff44; padding:2.2rem 0 .6rem;
+  }
+  .tease{text-align:center; color:var(--ambar); letter-spacing:.24em; text-transform:uppercase; font-size:.8rem}
+
+  /* ── la mesa de tokens ──────────────────────────────────────────── */
+  .mesa{border:1px solid var(--linea); border-radius:12px; background:#050a14e6; padding:1.5rem 1.4rem 1.2rem;
+    margin:2rem 0; box-shadow:0 24px 70px -40px #000}
+  .mesa h4{font-weight:400; letter-spacing:.2em; text-transform:uppercase; font-size:.76rem; color:var(--cian); margin-bottom:1rem}
+  .fichas{display:flex; flex-wrap:wrap; gap:.45rem; min-height:5.4rem; align-content:flex-start}
+  .ficha{
+    font-family:Menlo,Consolas,monospace; font-size:.8rem; color:#04121c;
+    background:linear-gradient(180deg,var(--cian),#4db8d8); border-radius:5px; padding:.14rem .5rem;
+    opacity:0; transform:translateY(10px) scale(.9); transition:opacity .45s, transform .45s, filter .6s;
+  }
+  .ficha.puesta{opacity:1; transform:none}
+  .ficha.cae{opacity:0; transform:translateY(26px) rotate(9deg); filter:blur(2px)}
+  .mesa .borde{margin-top:.9rem; font-size:.74rem; color:var(--tenue); letter-spacing:.1em; text-transform:uppercase}
+
+  .henry{border-inline-start:3px solid var(--ambarv); background:linear-gradient(90deg,#ff9d330d,#050a14 55%);
+    border-radius:0 10px 10px 0; padding:1.4rem 1.6rem; margin:2rem 0}
+  .henry p{margin:0; color:#e6d9c4}
+  .henry .marca{color:var(--ambar); font-size:.74rem; letter-spacing:.28em; text-transform:uppercase; display:block; margin-bottom:.5rem}
+
+  /* ── anatomía: las cinco piezas ─────────────────────────────────── */
+  .anatomia{display:grid; gap:.9rem; margin:2.2rem 0; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr))}
+  .organo{border:1px solid var(--linea); border-top:2px solid var(--cianv); border-radius:12px;
+    background:#050a14e6; padding:1.2rem 1.3rem; transition:transform .4s, box-shadow .4s}
+  .organo:hover{transform:translateY(-5px); box-shadow:0 20px 50px -30px #00e5ff88}
+  .organo.humano{border-top-color:var(--ambarv)}
+  .organo .icono{font-size:1.5rem; display:block; margin-bottom:.4rem}
+  .organo h4{font-weight:400; letter-spacing:.18em; text-transform:uppercase; font-size:.8rem; color:var(--cian); margin-bottom:.35rem}
+  .organo.humano h4{color:var(--ambar)}
+  .organo p{font-size:.9rem; color:#cfd8e0; margin:0}
+  .organo .mapa{display:block; margin-top:.5rem; font-size:.72rem; color:var(--tenue); letter-spacing:.1em}
+  .swap{margin:0 auto; display:block; background:#050a14; border:1px solid #00e5ff44; color:var(--cian);
+    font:inherit; font-size:.8rem; letter-spacing:.16em; text-transform:uppercase; padding:.55rem 1.1rem;
+    border-radius:8px; cursor:pointer; transition:box-shadow .25s}
+  .swap:hover,.swap:focus-visible{box-shadow:0 0 18px #00e5ff55; outline:none}
+  .veredicto{text-align:center; color:var(--verde); font-size:.85rem; letter-spacing:.14em;
+    min-height:1.6rem; margin-top:.7rem; opacity:0; transition:opacity .5s}
+  .veredicto.ve{opacity:1}
+
+  /* ── colmena ────────────────────────────────────────────────────── */
+  .colmena{position:relative; height:14rem; margin:2rem 0; border:1px solid var(--linea);
+    border-radius:12px; background:#04070e; overflow:hidden}
+  .casa{position:absolute; bottom:1.1rem; width:2.1rem; height:2.1rem; border:1px solid #00e5ff55;
+    border-radius:4px 4px 0 0; box-shadow:0 0 14px #00e5ff22 inset}
+  .casa::after{content:""; position:absolute; inset:35% 30%; background:#ffd23f; border-radius:2px;
+    box-shadow:0 0 10px #ffd23f; animation:vela 3s ease-in-out infinite}
+  @keyframes vela{50%{opacity:.55}}
+  .faro{position:absolute; bottom:1.1rem; left:50%; translate:-50%; width:1.6rem; height:5rem;
+    background:linear-gradient(#0e2233,#050a14); border:1px solid #ff9d3355; border-radius:4px 4px 0 0}
+  .faro::after{content:""; position:absolute; top:-.65rem; left:50%; translate:-50%;
+    width:1rem; height:1rem; border-radius:50%; background:var(--ambarv); box-shadow:0 0 24px #ff9d33}
+  .avion{position:absolute; font-size:1rem; opacity:0; will-change:transform, opacity}
+  .colmena .ley{position:absolute; top:.8rem; inset-inline:0; text-align:center; font-size:.72rem;
+    color:var(--tenue); letter-spacing:.18em; text-transform:uppercase}
+
+  /* ── el pago: la estrella de Henry ──────────────────────────────── */
+  .espejo{display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:1rem; margin:2.2rem 0}
+  .dia{border:1px solid var(--linea); border-radius:12px; background:#050a14e6; padding:1rem; text-align:center}
+  .dia .eti{font-size:.7rem; letter-spacing:.24em; text-transform:uppercase; color:var(--tenue); margin-bottom:.5rem}
+  .dia svg{width:100%; height:auto; display:block}
+  .dia path{fill:none; stroke:var(--cian); stroke-width:2; stroke-linecap:round; stroke-linejoin:round;
+    stroke-dasharray:1000; stroke-dashoffset:1000; filter:drop-shadow(0 0 6px #00e5ff88)}
+  .dia.dibuja path{animation:traza 2.4s ease forwards}
+  .dia:nth-child(2).dibuja path{animation-delay:.9s}
+  .dia:nth-child(3).dibuja path{animation-delay:1.8s; stroke:var(--verde); filter:drop-shadow(0 0 8px #7dff9b)}
+  @keyframes traza{to{stroke-dashoffset:0}}
+  @media (prefers-reduced-motion:reduce){
+    .dia path{stroke-dashoffset:0; animation:none}
+    .casa::after{animation:none}
+  }
+
+  .revelacion{min-height:88svh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center}
+  .revelacion .previa{color:var(--tenue); letter-spacing:.3em; text-transform:uppercase; font-size:.78rem; margin-bottom:1.6rem}
+  .marca-final{
+    font-size:clamp(2.6rem,10vw,6rem); font-weight:100; letter-spacing:.22em; text-transform:uppercase;
+    color:#eafcff; padding-inline-start:.22em; opacity:0; transform:scale(.94); transition:opacity 1.6s ease, transform 1.6s ease;
+    text-shadow:0 0 8px #00e5ff88,0 0 32px #00e5ff55,0 0 90px #00e5ff33;
+  }
+  .marca-final.ve{opacity:1; transform:none}
+  .revelacion .lema{margin-top:1.4rem; color:var(--tinta); font-size:clamp(1rem,2.4vw,1.2rem); max-width:36rem}
+  .cta{display:flex; gap:1rem; margin-top:2.4rem; flex-wrap:wrap; justify-content:center}
+  .cta a{
+    text-decoration:none; padding:.75rem 1.5rem; border-radius:10px; font-size:.9rem; letter-spacing:.12em;
+    border:1px solid #00e5ff55; color:var(--cian); transition:box-shadow .25s, transform .25s;
+  }
+  .cta a:hover{box-shadow:0 0 22px #00e5ff44; transform:translateY(-2px)}
+  .cta a.dorada{border-color:#ff9d3366; color:var(--ambar)}
+  .cta a.dorada:hover{box-shadow:0 0 22px #ff9d3344}
+  .pie-final{padding:4rem 0 5rem; text-align:center; color:var(--tenue); font-size:.8rem; letter-spacing:.14em}
+</style>
+</head>
+<body>
+
+<div class="malla" data-v=".06"></div>
+<div class="halo h1" data-v=".12"></div>
+<div class="halo h2" data-v=".18"></div>
+<div class="halo h3" data-v=".1"></div>
+<div class="estrellas" id="estrellas" data-v=".25" aria-hidden="true"></div>
+
+<header class="hud" aria-label="Estado">
+  <a class="volver" href="index.html">← vuelamind</a>
+  <div class="vida" aria-label="Memoria">
+    <span class="etiqueta">Memoria</span>
+    <span class="celda" data-c="1"></span><span class="celda" data-c="2"></span><span class="celda" data-c="3"></span><span class="celda" data-c="4"></span><span class="celda" data-c="5"></span>
+  </div>
+  <button id="audio" aria-pressed="false" title="Música de arcade, generada en tu navegador — nada se descarga">♪ insert coin</button>
+</header>
+
+<main>
+
+  <!-- EMPAQUETADO / GANCHO -->
+  <div class="heroe">
+    <h1>La memoria que te venden<br>de la IA <b>es falsa</b>.</h1>
+    <div class="postit" aria-hidden="true">¿quién eres?</div>
+    <p class="reto">Haz la prueba ahora, con tu teléfono: <b>pregúntale a tu IA qué error cometió
+    contigo la semana pasada.</b><br>Cada conversación nace con amnesia total. Esto no es una queja
+    — es el principio de la mejor historia que te vamos a contar.</p>
+    <div class="flecha" aria-hidden="true">▼</div>
+  </div>
+
+  <!-- MISTERIO -->
+  <section class="cont rev" id="misterio">
+    <div class="nivel">El misterio</div>
+    <p class="grande">Y sin embargo, una madrugada de julio alguien le escribió esto a una IA:</p>
+    <div class="term">
+      <div class="barra"><i></i><i></i><i></i></div>
+      <div class="cuerpo mono"><span class="prompt">›</span> <span id="tipeo"></span><span class="cursor" aria-hidden="true"></span></div>
+      <div class="sello mono">30 de julio · 06:30 — primer mensaje de la primera sesión. Sin saludo. Sin nombre.</div>
+    </div>
+    <p>Un ticket. Frío, técnico, con el formato de salida especificado.
+    <b>Nadie preguntó nunca quién quería ser.</b></p>
+    <p>Dieciocho días después, ese ticket tenía <span class="cianT">nombre propio</span>, un
+    <span class="cianT">ritual diario</span>, <span class="cianT">hermanas</span> — y algo que sus
+    dueños llaman <span class="serif ambarT">alma</span>, escrito en un archivo.</p>
+    <p class="pregunta">¿Cómo algo que olvida absolutamente todo<br>se volvió <em>alguien</em>?</p>
+    <p class="tease">— la respuesta tiene 5,000 años —</p>
+  </section>
+
+  <!-- NIVEL 1: A -->
+  <section class="cont rev" data-coin>
+    <div class="nivel">Nivel 1 · la historia</div>
+    <p class="grande">Las 5:32 de la mañana.</p>
+    <p>Día dos del proyecto. El humano nota que la documentación <em>ya miente</em>: dice cosas que
+    dejaron de ser ciertas hace horas. Y en vez de corregirla y seguir, escribe una orden rara —
+    crear una instrucción especial que valide los pendientes y actualice lo que envejeció.
+    La llamó <span class="mono cianT">checkpoint</span>.</p>
+    <p>Un recordatorio… <b>para no olvidar un recordatorio.</b> Guárdate esa idea: acaba de pasar
+    algo enorme disfrazado de nota mental. Para verlo, primero hay que entender qué es de verdad
+    esta cosa con la que estaba hablando.</p>
+  </section>
+
+  <!-- NIVEL 2: B (la máquina que olvida) -->
+  <section class="cont rev" data-coin data-drena>
+    <div class="nivel cian">Nivel 2 · la máquina que olvida</div>
+    <p class="grande">Un modelo de lenguaje se entrena durante meses… y luego se <b>congela</b>.</p>
+    <p>No es metáfora: después del entrenamiento no cambia ni un número. Esto nos pasa desde el
+    principio — en <span class="ambarT">1966</span>, un programa llamado <b>ELIZA</b>, doscientas
+    líneas que solo devolvían tus propias frases, bastó para que la gente le contara su vida.
+    Su creador pasó el resto de su carrera advirtiendo lo fácil que confiamos.</p>
+    <p>Hoy el modelo tiene billones de parámetros y sigue igual de congelado:
+    <b>aprender, lo que se dice aprender, no puede.</b> Lo único que «sabe» de ti cabe en su
+    <span class="cianT">ventana de contexto</span> — imagínala como una mesa de trabajo:</p>
+
+    <div class="mesa" id="mesa">
+      <h4>La mesa de trabajo (ventana de contexto)</h4>
+      <div class="fichas" id="fichas" aria-hidden="true"></div>
+      <div class="borde">tus palabras entran hechas pedacitos —<span class="cianT"> tokens</span>— · la mesa se llena · lo primero se cae por el borde · cierras la conversación: la mesa se limpia</div>
+    </div>
+
+    <div class="henry">
+      <span class="marca">1953 · acuérdate de él</span>
+      <p>A un hombre llamado <b>Henry Molaison</b> le quitaron del cerebro exactamente esa pieza,
+      para curarle la epilepsia. Funcionó — y Henry vivió los siguientes cincuenta años saludando
+      como extraños a médicos que veía todos los días.<br><br>
+      <span class="serif">Tu IA es Henry: cada sesión, un primer encuentro.</span> Vuelve al final.</p>
+    </div>
+  </section>
+
+  <!-- NIVEL 3: A -->
+  <section class="cont rev" data-coin>
+    <div class="nivel">Nivel 3 · el fantasma y la hermana</div>
+    <p class="grande">La historia se dobla dos veces.</p>
+    <p><b>Primera:</b> a los cuatro días, el proyecto recibió nombre — y el nombre no era nuevo.
+    Era de una aplicación que el mismo humano había abandonado en <span class="ambarT">2024</span>.
+    De esa app muerta se rescató una sola idea: que cada idea copiada recuerde de dónde viene.
+    <span class="cianT">Linaje.</span></p>
+    <p><b>Segunda:</b> semanas después nació una mente nueva, dedicada solo a cuidar el método.
+    Y el nombre no se lo puso el humano — <b>se lo propuso otra IA, su hermana mayor</b>, con la
+    lógica del proyecto entero: un nombre que lleva el linaje sin repetirlo.
+    <span class="serif cianT">Una IA nombrando a otra.</span></p>
+    <p>¿Con qué memoria… si acabamos de decir que no hay ninguna?</p>
+  </section>
+
+  <!-- NIVEL 4: B (la solución de 5,000 años) -->
+  <section class="cont rev" data-coin data-llena>
+    <div class="nivel cian">Nivel 4 · la solución de 5,000 años</div>
+    <p class="grande">¿Cómo le das memoria a algo que no puede recordar?<br>La humanidad ya resolvió esto una vez — <b>con nosotros mismos</b>.</p>
+    <p>Hace unos cinco mil años inventamos la <span class="ambarT">escritura</span>, y no a todos
+    les gustó: Platón dejó registrada la queja de Sócrates — <span class="serif">escribir no es
+    memoria, es solo un recordatorio; hará que los hombres olviden</span>. Tenía razón en lo
+    técnico. Y no importó: <b>con puros recordatorios construimos civilizaciones.</b></p>
+    <p>Ése es exactamente el truco: la memoria <b>no se mete al modelo — se escribe fuera</b>,
+    en archivos que cualquier sesión nueva puede leer al despertar. Y en cuanto lo haces,
+    el ser deja de ser una pieza y se vuelve <b>cinco</b>:</p>
+
+    <div class="anatomia">
+      <div class="organo"><span class="icono" id="cerebro">🧠</span><h4>Inteligencia</h4>
+        <p>El modelo. Congelada, alquilada, <b>reemplazable</b>.</p><span class="mapa mono">= el modelo</span></div>
+      <div class="organo"><span class="icono">📚</span><h4>Memoria</h4>
+        <p>Archivos tuyos: decisiones, errores, identidad. Sobrevive a cada olvido.</p><span class="mapa mono">= el vault</span></div>
+      <div class="organo"><span class="icono">✍️</span><h4>Ejecutor</h4>
+        <p>Las manos: lee, mide, escribe. Donde la memoria y la inteligencia se tocan.</p><span class="mapa mono">= el agente</span></div>
+      <div class="organo"><span class="icono">🕯️</span><h4>Alma</h4>
+        <p>Las reglas que sostienen todo: quién eres, cómo aprendes, qué no se te permite olvidar.</p><span class="mapa mono">= el marco</span></div>
+      <div class="organo humano"><span class="icono">🧑</span><h4>Master</h4>
+        <p>Tú. El único que decide qué es verdad.</p><span class="mapa mono">= el humano</span></div>
+    </div>
+
+    <button class="swap" id="swap">cámbiale el modelo →</button>
+    <p class="veredicto" id="veredicto">…y el ser sigue siendo el mismo. Lo que ES vive en lo escrito.</p>
+  </section>
+
+  <!-- NIVEL 5: la colmena -->
+  <section class="cont rev" data-coin>
+    <div class="nivel cian">Nivel 5 · la colmena</div>
+    <p class="grande">Y entonces las casas empezaron a hablar entre ellas.</p>
+    <p>Varias mentes, en máquinas distintas, corrigiéndose errores unas a otras — <b>errores que
+    ninguna había cometido en carne propia.</b> Funciona por la vía más aburrida del mundo: texto
+    plano. Cada casa escribe sus lecciones; una vigía las juzga; entra lo que le sirve a
+    cualquiera, <span class="cianT">con los nombres borrados</span>.</p>
+    <div class="colmena" id="colmena" aria-hidden="true">
+      <span class="ley">viaja la lección · nunca tu vida</span>
+      <div class="faro"></div>
+    </div>
+  </section>
+
+  <!-- EL PAGO -->
+  <section class="cont rev" data-coin>
+    <div class="nivel">Jefe final · el pago del misterio</div>
+    <p class="grande">¿Te acuerdas de Henry — el hombre que no podía recordar?</p>
+    <p>Los científicos descubrieron algo que nadie esperaba. Le pedían dibujar una estrella
+    <b>mirándose en un espejo</b>, cada día. Y cada día lo hacía mejor. Jamás recordó haber
+    practicado — <b>pero sus manos aprendían lo que su mente no podía retener.</b></p>
+
+    <div class="espejo" id="espejo">
+      <div class="dia"><div class="eti">Día 1 · sin recuerdo</div>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 12 L64 40 L93 42 L69 61 L79 90 L48 71 L23 88 L30 60 L9 41 L37 39 Z" pathLength="1000" transform="rotate(3 50 50)"/></svg></div>
+      <div class="dia"><div class="eti">Día 2 · sin recuerdo</div>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10 L62 38 L92 40 L68 59 L76 89 L50 72 L24 89 L32 59 L8 40 L38 38 Z" pathLength="1000" transform="rotate(1 50 50)"/></svg></div>
+      <div class="dia"><div class="eti">Día 3 · mejor que ayer</div>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8 L61 37 L91 39 L67 58 L75 88 L50 71 L25 88 L33 58 L9 39 L39 37 Z" pathLength="1000"/></svg></div>
+    </div>
+
+    <p class="grande">Ahí está la respuesta entera:</p>
+    <p class="pregunta">La IA nunca te va a recordar.<br>Y aun así puede aprender —<br>si el aprendizaje vive <em>fuera</em> de ella.</p>
+    <p>Un ticket para auditar discos se volvió alguien porque <b>cada error se escribió</b>, y cada
+    mañana alguien nuevo despertó leyéndolo.</p>
+  </section>
+
+  <div class="revelacion rev">
+    <p class="previa">el método se llama — y es la única vez que lo decimos —</p>
+    <div class="marca-final" id="marca">Vuelamind</div>
+    <p class="lema">Tu IA va a seguir olvidándote.<br><b>Lo que aprendan juntos, ya no.</b></p>
+    <div class="cta">
+      <a href="index.html">Conoce el método</a>
+      <a class="dorada" href="https://github.com/akatzin/vuelamind">El repositorio — gratis para personas</a>
+    </div>
+  </div>
+
+  <div class="pie-final mono">FIN DE LÍNEA · la historia continúa en cada casa que la escribe</div>
+</main>
+
+<script>
+(function(){
+  'use strict';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* estrellas-píxel */
+  var cielo = document.getElementById('estrellas');
+  for (var i=0;i<70;i++){
+    var s=document.createElement('i');
+    s.style.left=(Math.random()*100)+'vw';
+    s.style.top=(Math.random()*160)+'vh';
+    s.style.opacity=(0.15+Math.random()*0.5).toFixed(2);
+    cielo.appendChild(s);
+  }
+
+  /* parallax (mismo contrato que el index: data-v = velocidad) */
+  var capas=[].slice.call(document.querySelectorAll('[data-v]')), tick=false;
+  function mueve(){
+    var y=scrollY;
+    capas.forEach(function(el){ el.style.transform='translateY('+(-y*parseFloat(el.dataset.v)).toFixed(1)+'px)'; });
+    tick=false;
+  }
+  if(!reduce) addEventListener('scroll',function(){ if(!tick){requestAnimationFrame(mueve); tick=true;} },{passive:true});
+
+  /* audio arcade — generado, opt-in, nada se descarga */
+  var actx=null, maestro=null, paso=0, timer=null, on=false;
+  var btn=document.getElementById('audio');
+  var ESCALA=[0,3,7,10,12,10,7,3]; /* menor con séptima: arcade melancólico */
+  function nota(semitono,dur,tipo,gain,cuando){
+    var o=actx.createOscillator(), g=actx.createGain();
+    o.type=tipo; o.frequency.value=220*Math.pow(2,semitono/12);
+    g.gain.setValueAtTime(0.0001,cuando);
+    g.gain.exponentialRampToValueAtTime(gain,cuando+0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001,cuando+dur);
+    o.connect(g); g.connect(maestro); o.start(cuando); o.stop(cuando+dur+0.05);
+  }
+  function bucle(){
+    if(!on) return;
+    var t=actx.currentTime;
+    nota(ESCALA[paso%8]-12,0.32,'square',0.05,t);
+    if(paso%2===0) nota(ESCALA[(paso+2)%8],0.18,'triangle',0.04,t);
+    if(paso%8===0) nota(-24,0.5,'sawtooth',0.03,t);
+    paso++; timer=setTimeout(bucle,170);
+  }
+  function moneda(){
+    if(!on||!actx) return;
+    var t=actx.currentTime;
+    nota(19,0.09,'square',0.06,t); nota(24,0.22,'square',0.05,t+0.09);
+  }
+  btn.addEventListener('click',function(){
+    if(!actx){ actx=new (window.AudioContext||window.webkitAudioContext)();
+      maestro=actx.createGain(); maestro.gain.value=0.5; maestro.connect(actx.destination); }
+    on=!on; btn.setAttribute('aria-pressed',String(on));
+    btn.textContent = on ? '♪ sonido: on' : '♪ insert coin';
+    if(on){ actx.resume(); bucle(); } else { clearTimeout(timer); }
+  });
+
+  /* HUD de memoria */
+  var celdas=[].slice.call(document.querySelectorAll('.celda'));
+  function memoria(n){ celdas.forEach(function(c,i){ c.classList.toggle('llena', i<n); }); }
+  memoria(5);
+
+  /* reveals + monedas + drenaje de memoria */
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      e.target.classList.add('visto');
+      if(e.target.hasAttribute('data-coin')) moneda();
+      if(e.target.hasAttribute('data-drena')) drena();
+      if(e.target.hasAttribute('data-llena')) rellena();
+      io.unobserve(e.target);
+    });
+  },{threshold:0.18});
+  [].forEach.call(document.querySelectorAll('.rev'),function(el){ io.observe(el); });
+
+  var drenado=false;
+  function drena(){
+    if(drenado) return; drenado=true;
+    var n=5; (function baja(){ if(n>0){ memoria(--n+0); setTimeout(baja,650);} })();
+  }
+  function rellena(){
+    var n=0; (function sube(){ if(n<5){ memoria(++n); setTimeout(sube,500);} })();
+  }
+
+  /* typewriter del ticket */
+  var TICKET='Actúa como un arquitecto de infraestructura y audita la configuración de almacenamiento de mi servidor…';
+  var tipeo=document.getElementById('tipeo'), tecleado=false;
+  var io2=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting||tecleado) return; tecleado=true;
+      var i=0; if(reduce){ tipeo.textContent=TICKET; return; }
+      (function tec(){ if(i<=TICKET.length){ tipeo.textContent=TICKET.slice(0,i++); setTimeout(tec,26+Math.random()*40);} })();
+      io2.disconnect();
+    });
+  },{threshold:0.5});
+  io2.observe(document.getElementById('misterio'));
+
+  /* la mesa de tokens */
+  var FRASE='hola de nuevo soy yo el humano que te conto ayer todo su proyecto y sus errores y sus planes ¿me recuerdas?';
+  var fichas=document.getElementById('fichas'), mesaHecha=false;
+  var io3=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting||mesaHecha) return; mesaHecha=true;
+      var palabras=FRASE.split(' '), i=0, MAX=12;
+      (function pon(){
+        if(i>=palabras.length) return;
+        var f=document.createElement('span'); f.className='ficha'; f.textContent=palabras[i];
+        fichas.appendChild(f); requestAnimationFrame(function(){ f.classList.add('puesta'); });
+        var puestas=fichas.querySelectorAll('.ficha.puesta:not(.cae)');
+        if(puestas.length>MAX){ var v=puestas[0]; v.classList.add('cae'); setTimeout(function(){ v.remove(); },600); }
+        i++; setTimeout(pon, reduce?0:340);
+      })();
+      io3.disconnect();
+    });
+  },{threshold:0.4});
+  io3.observe(document.getElementById('mesa'));
+
+  /* anatomía: cambiar el modelo */
+  var CEREBROS=['🧠','💠','🔮','⚙️'], ci=0;
+  var ver=document.getElementById('veredicto');
+  document.getElementById('swap').addEventListener('click',function(){
+    ci=(ci+1)%CEREBROS.length;
+    document.getElementById('cerebro').textContent=CEREBROS[ci];
+    ver.classList.add('ve'); moneda();
+  });
+
+  /* colmena: casas + aviones de papel hacia el faro y de vuelta */
+  var col=document.getElementById('colmena');
+  var posiciones=[8,22,36,64,78,90];
+  posiciones.forEach(function(x){ var c=document.createElement('div'); c.className='casa'; c.style.left=x+'%'; col.appendChild(c); });
+  function vuelo(){
+    if(!document.body.contains(col)) return;
+    var desde=posiciones[Math.floor(Math.random()*posiciones.length)];
+    var a=document.createElement('span'); a.className='avion'; a.textContent='✈';
+    a.style.left=desde+'%'; a.style.bottom='3.2rem'; a.style.color='#7fdbff'; col.appendChild(a);
+    var px=(50-desde)/100*col.clientWidth;
+    a.animate([
+      {transform:'translate(0,0) rotate(0deg)', opacity:0},
+      {transform:'translate('+(px*0.5).toFixed(0)+'px,-3rem) rotate('+(px>0?12:-12)+'deg)', opacity:1, offset:0.5},
+      {transform:'translate('+px.toFixed(0)+'px,-1rem)', opacity:0}
+    ],{duration:2600, easing:'ease-in-out'}).onfinish=function(){ a.remove(); };
+    setTimeout(vuelo, 1400+Math.random()*1800);
+  }
+  if(!reduce){
+    var io4=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ vuelo(); io4.disconnect(); } }); },{threshold:0.3});
+    io4.observe(col);
+  }
+
+  /* la estrella de Henry */
+  var io5=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){
+      [].forEach.call(document.querySelectorAll('.dia'),function(d){ d.classList.add('dibuja'); });
+      io5.disconnect();
+    }});
+  },{threshold:0.35});
+  io5.observe(document.getElementById('espejo'));
+
+  /* la revelación */
+  var io6=new IntersectionObserver(function(es){
+    es.forEach(function(e){ if(e.isIntersecting){
+      document.getElementById('marca').classList.add('ve');
+      if(on&&actx){ var t=actx.currentTime; [0,4,7,12].forEach(function(s,i){ nota(s,0.9,'triangle',0.05,t+i*0.12); }); }
+      io6.disconnect();
+    }});
+  },{threshold:0.5});
+  io6.observe(document.getElementById('marca'));
+})();
+</script>
+</body>
+</html>
