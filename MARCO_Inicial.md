@@ -461,10 +461,11 @@ La forma que menos se degrada al agregar dominios: **dos carpetas sincronizadas 
 ├── Errores.md
 ├── Bitacora.md
 ├── initPrompt.md
-└── Entidades/
+├── Entidades/
+└── borradores/                 ← el taller: ideas y features en progreso, con su índice
 ```
 
-**Las tres reglas que hacen que esto escale:**
+**Las cuatro reglas que hacen que esto escale:**
 
 1. **Los comandos de dominio viven en el proyecto, y el nivel personal se queda VACÍO de ellos.** Las dos mitades importan, y la segunda es la que se olvida.
 
@@ -491,6 +492,17 @@ La forma que menos se degrada al agregar dominios: **dos carpetas sincronizadas 
    el día que la necesite, baja.
 2. **Si la herramienta exige que la memoria esté en una ruta suya, apúntala hacia acá**, no muevas la carpeta sincronizada allá. Un enlace simbólico desde la ruta que la herramienta espera hacia `memory/` deja el archivo real en territorio que tú controlas. *(Verifica que la herramienta siga el enlace: es una suposición hasta que lo pruebes — ver la lección 4.)*
 3. **Nada se comparte entre dominios por default.** Si algo debe compartirse —una convención, una plantilla— se copia a propósito y se anota en `Decisiones.md` que ahora existe en dos lados y hay que mantener los dos.
+4. **Los borradores viven EN el vault, y se referencian.** El material a medio hacer —el
+   diseño de un feature, la idea que aún no es folio, el cuerpo de una propuesta— existe
+   por algo, y **todo lo que el método sabe hacer depende del grafo**: un borrador fuera
+   del vault no es enlazable, ningún nodo lo cita, ningún barrido lo pisa, y una búsqueda
+   hecha exactamente como el método manda devuelve un resultado incompleto **sin señal de
+   que falta algo**. La regla: cada borrador con fila en el índice del taller
+   (`borradores/0_Borradores.md`: borrador · qué es · nota dueña) y las piezas vivas
+   citadas desde su nota dueña. Al fusionarse o superarse, la fila lo declara — no se
+   borra. *(Parche `los-borradores-viven-en-el-vault`: en el dominio de origen, el modelo
+   de diseño más importante del track de crecimiento vivió en una carpeta fuera del vault
+   y una búsqueda desde el nodo correcto falló — 43 de 50 borradores estaban huérfanos.)*
 
 > [!warning] Lo que pasa si te saltas esto
 > El vault de origen llegó a **cuatro carpetas sincronizadas** para un solo
