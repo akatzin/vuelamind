@@ -126,8 +126,9 @@
   .mute:hover{color:var(--ambarv); filter:drop-shadow(0 0 6px #ff9d3388)}
   .mute[aria-pressed="true"]:hover{color:#b8f6ff}
   .mute:focus-visible{outline:1px dashed currentColor; outline-offset:4px}
-  .volver{pointer-events:auto; color:var(--tenue); text-decoration:none; letter-spacing:.14em}
-  .volver:hover{color:var(--cian)}
+  .volver{pointer-events:auto; color:var(--tenue); background:none; border:none; font:inherit;
+    letter-spacing:.14em; text-transform:uppercase; cursor:pointer; padding:0; transition:color .2s, text-shadow .2s}
+  .volver:hover,.volver:focus-visible{color:var(--cianv); text-shadow:0 0 10px #00e5ff88; outline:none}
 
   /* ── héroe / empaquetado ────────────────────────────────────────── */
   .heroe{min-height:100svh; display:flex; flex-direction:column; justify-content:center; align-items:center;
@@ -213,62 +214,60 @@
   .henry p{margin:0; color:#e6d9c4}
   .henry .marca{color:var(--ambar); font-size:.74rem; letter-spacing:.28em; text-transform:uppercase; display:block; margin-bottom:.5rem}
 
-  /* ── anatomía: las cinco piezas ─────────────────────────────────── */
-  .anatomia{display:grid; gap:.9rem; margin:2.2rem 0; grid-template-columns:repeat(auto-fit,minmax(14rem,1fr))}
-  .organo{border:1px solid var(--linea); border-top:2px solid var(--cianv); border-radius:12px;
-    background:#050a14e6; padding:1.2rem 1.3rem; transition:transform .4s, box-shadow .4s}
-  .organo:hover{transform:translateY(-5px); box-shadow:0 20px 50px -30px #00e5ff88}
-  .organo.humano{border-top-color:var(--ambarv)}
-  .organo .icono{font-size:1.5rem; display:block; margin-bottom:.4rem}
-  .organo h4{font-weight:400; letter-spacing:.18em; text-transform:uppercase; font-size:.8rem; color:var(--cian); margin-bottom:.35rem}
-  .organo.humano h4{color:var(--ambar)}
-  .organo p{font-size:.9rem; color:#cfd8e0; margin:0}
-  .organo .mapa{display:block; margin-top:.5rem; font-size:.72rem; color:var(--tenue); letter-spacing:.1em}
-  /* el ciclo vivo: el pulso recorre las piezas en orden de trabajo */
-  .organo{position:relative; overflow:hidden}
-  .organo::after{ /* barrido de luz cuando le toca el turno */
-    content:""; position:absolute; inset:0; pointer-events:none; opacity:0;
-    background:linear-gradient(120deg,transparent 30%,#00e5ff22 50%,transparent 70%);
-    transition:opacity .3s;
-  }
-  .organo.activo{border-color:#00e5ff88; box-shadow:0 0 26px -8px #00e5ffaa}
-  .organo.activo::after{opacity:1}
-  .organo.activo .icono{filter:drop-shadow(0 0 10px #00e5ffcc)}
-  .organo.humano.activo{border-color:#ff9d3388; box-shadow:0 0 26px -8px #ff9d33aa}
-  .organo.humano.activo .icono{filter:drop-shadow(0 0 10px #ff9d33cc)}
-  .organo .paso{ /* el numero de orden en el ciclo */
-    position:absolute; top:.55rem; right:.7rem; font-family:'SF Mono',Menlo,monospace;
-    font-size:.62rem; letter-spacing:.1em; color:#24425a; transition:color .3s, text-shadow .3s;
-  }
-  .organo.activo .paso{color:var(--cianv); text-shadow:0 0 8px #00e5ff}
-  .organo.humano.activo .paso{color:var(--ambarv); text-shadow:0 0 8px #ff9d33}
-  .cicloLey{text-align:center; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
-    color:var(--tenue); margin:-.6rem 0 1.4rem}
-  .cicloLey b{color:var(--cian); font-weight:400}
+  /* ── el circuito: cinco piezas en circulo, TODAS las conexiones dibujadas ──
+     Solo algunas se encienden cuando corre un mensaje — y cuales, es la leccion. */
+  .circuito{position:relative; width:min(100%,34rem); aspect-ratio:1; margin:1.4rem auto .4rem}
+  .lazos{position:absolute; inset:0; width:100%; height:100%; overflow:visible}
+  .lazo{stroke:#12324a; stroke-width:.45; transition:stroke .35s, stroke-width .35s, filter .35s}
+  .lazo.viva{stroke:var(--cianv); stroke-width:1.1; filter:drop-shadow(0 0 1.6px #00e5ff)}
+  .lazo.usada{stroke:#1d6c8c; stroke-width:.7}
 
-  /* hot-swap: solo la inteligencia parpadea y cambia; el ciclo NO se detiene */
-  .organo.cambiando{animation:glitch .5s steps(2) 1}
-  .organo.cambiando .icono{animation:vuelca .5s ease 1}
-  @keyframes glitch{
-    0%,100%{transform:none; filter:none}
-    25%{transform:translateX(-3px); filter:hue-rotate(70deg)}
-    50%{transform:translateX(3px); filter:brightness(1.7)}
-    75%{transform:translateX(-1px); filter:hue-rotate(-50deg)}
+  .nodo{
+    position:absolute; transform:translate(-50%,-50%); width:7.6rem; text-align:center;
+    padding:.5rem .3rem; border-radius:12px; border:1px solid var(--linea);
+    background:#050a14f2; transition:border-color .3s, box-shadow .3s, transform .3s;
   }
-  @keyframes vuelca{0%{transform:rotateY(0)}50%{transform:rotateY(90deg); opacity:.2}100%{transform:rotateY(0)}}
-  .organo .serie{display:block; margin-top:.35rem; font-family:'SF Mono',Menlo,monospace;
-    font-size:.68rem; letter-spacing:.12em; color:var(--ambar); min-height:1em}
-  @media (prefers-reduced-motion:reduce){
-    .organo.cambiando,.organo.cambiando .icono{animation:none}
-    .organo::after{display:none}
-  }
-  .swap{margin:0 auto; display:block; background:#050a14; border:1px solid #00e5ff44; color:var(--cian);
-    font:inherit; font-size:.8rem; letter-spacing:.16em; text-transform:uppercase; padding:.55rem 1.1rem;
-    border-radius:8px; cursor:pointer; transition:box-shadow .25s}
+  .nodo .ico{display:block; font-size:1.45rem; line-height:1.5; transition:filter .3s, transform .4s}
+  .nodo .nom{display:block; font-size:.7rem; letter-spacing:.14em; text-transform:uppercase; color:var(--cian)}
+  .nodo .map{display:block; font-size:.62rem; color:var(--tenue); letter-spacing:.06em; margin-top:.1rem}
+  .nodo.humano{border-color:#ff9d3344} .nodo.humano .nom{color:var(--ambar)}
+  .nodo.on{border-color:#00e5ffaa; box-shadow:0 0 26px -6px #00e5ffcc; transform:translate(-50%,-50%) scale(1.07)}
+  .nodo.on .ico{filter:drop-shadow(0 0 10px #00e5ffcc)}
+  .nodo.humano.on{border-color:#ff9d33cc; box-shadow:0 0 26px -6px #ff9d33cc}
+  .nodo.humano.on .ico{filter:drop-shadow(0 0 10px #ff9d33cc)}
+
+  .chispa{r:1.5; fill:var(--cianv); filter:drop-shadow(0 0 3px #00e5ff)}
+  .serie{position:absolute; left:50%; top:50%; transform:translate(-50%,-50%);
+    font-family:'SF Mono',Menlo,monospace; font-size:.7rem; letter-spacing:.14em;
+    color:var(--ambar); text-align:center; max-width:9rem}
+  .narra{text-align:center; color:#cfd8e0; font-size:.9rem; min-height:3.2rem; margin:.2rem auto 1rem; max-width:34rem}
+  .narra b{color:var(--cianv); font-weight:400}
+  .mandos{display:flex; gap:.7rem; justify-content:center; flex-wrap:wrap}
+  .swap{background:#050a14; border:1px solid #00e5ff55; color:var(--cian);
+    font:inherit; font-size:.78rem; letter-spacing:.16em; text-transform:uppercase; padding:.6rem 1.2rem;
+    border-radius:8px; cursor:pointer; transition:box-shadow .25s, opacity .25s}
   .swap:hover,.swap:focus-visible{box-shadow:0 0 18px #00e5ff55; outline:none}
+  .swap.fantasma{border-color:#ff9d3344; color:var(--ambar)}
+  .swap.fantasma:hover{box-shadow:0 0 18px #ff9d3355}
+  .swap[disabled]{opacity:.4; cursor:default; box-shadow:none}
   .veredicto{text-align:center; color:var(--verde); font-size:.85rem; letter-spacing:.14em;
-    min-height:1.6rem; margin-top:.7rem; opacity:0; transition:opacity .5s}
+    min-height:1.6rem; margin-top:1rem; opacity:0; transition:opacity .5s}
   .veredicto.ve{opacity:1}
+  .cicloLey{text-align:center; font-size:.72rem; letter-spacing:.14em; text-transform:uppercase;
+    color:var(--tenue); margin:1.6rem 0 0}
+  .cicloLey b{color:var(--cian); font-weight:400}
+  .nodo.cambiando{animation:glitch .5s steps(2) 1}
+  .nodo.cambiando .ico{animation:vuelca .5s ease 1}
+  @keyframes glitch{0%,100%{filter:none}25%{filter:hue-rotate(70deg)}50%{filter:brightness(1.7)}75%{filter:hue-rotate(-50deg)}}
+  @keyframes vuelca{0%{transform:rotateY(0)}50%{transform:rotateY(90deg); opacity:.2}100%{transform:rotateY(0)}}
+
+  @media (max-width:34rem){
+    .circuito{width:min(100%,22rem)}
+    .nodo{width:5.6rem; padding:.35rem .2rem}
+    .nodo .ico{font-size:1.15rem} .nodo .nom{font-size:.58rem; letter-spacing:.08em}
+    .nodo .map{display:none}
+  }
+  @media (prefers-reduced-motion:reduce){ .nodo.cambiando,.nodo.cambiando .ico{animation:none} }
 
   /* ── anzuelo al siguiente nivel del embudo (aqui ira el video corto) ── */
   .proxima{
@@ -366,7 +365,7 @@
 <div class="estrellas" id="estrellas" data-v=".25" aria-hidden="true"></div>
 
 <header class="hud" aria-label="Estado">
-  <a class="volver" href="index.html">← vuelamind</a>
+  <button class="volver" id="reinicia" data-t="reinicia">↻ otra partida</button>
   <div class="vida" aria-label="Memoria">
     <span class="etiqueta" data-t="hudMem">Memoria</span>
     <span class="celda"></span><span class="celda"></span><span class="celda"></span><span class="celda"></span><span class="celda"></span>
@@ -490,21 +489,44 @@
     en archivos que cualquier sesión nueva puede leer al despertar. Y en cuanto lo haces,
     el ser deja de ser una pieza y se vuelve <b>cinco</b>:</p>
 
-    <p class="cicloLey" id="cicloLey" data-t="cicloLey">el ciclo, cada vez que despierta: <b>tú</b> pides · lee su <b>memoria</b> · piensa con el <b>modelo</b> · las <b>manos</b> escriben · el <b>alma</b> lo permite</p>
-    <div class="anatomia" id="anatomia">
-      <div class="organo"><span class="paso mono" aria-hidden="true">3</span><span class="icono" id="cerebro">🧠</span><h4 data-t="o1t">Inteligencia</h4>
-        <p data-t="o1p">El modelo. Congelada, alquilada, <b>reemplazable</b>.</p><span class="mapa mono" data-t="o1m">= el modelo</span><span class="serie mono" id="serie" aria-live="polite"></span></div>
-      <div class="organo"><span class="paso mono" aria-hidden="true">2</span><span class="icono">📚</span><h4 data-t="o2t">Memoria</h4>
-        <p data-t="o2p">Archivos tuyos: decisiones, errores, identidad. Sobrevive a cada olvido.</p><span class="mapa mono" data-t="o2m">= el vault</span></div>
-      <div class="organo"><span class="paso mono" aria-hidden="true">4</span><span class="icono">✍️</span><h4 data-t="o3t">Ejecutor</h4>
-        <p data-t="o3p">Las manos: lee, mide, escribe. Donde la memoria y la inteligencia se tocan.</p><span class="mapa mono" data-t="o3m">= el agente</span></div>
-      <div class="organo"><span class="paso mono" aria-hidden="true">5</span><span class="icono">🕯️</span><h4 data-t="o4t">Alma</h4>
-        <p data-t="o4p">Las reglas que sostienen todo: quién eres, cómo aprendes, qué no se te permite olvidar.</p><span class="mapa mono" data-t="o4m">= el marco</span></div>
-      <div class="organo humano"><span class="paso mono" aria-hidden="true">1</span><span class="icono">🧑</span><h4 data-t="o5t">Master</h4>
-        <p data-t="o5p">Tú. El único que decide qué es verdad.</p><span class="mapa mono" data-t="o5m">= el humano</span></div>
+    <p class="cicloLey" data-t="cicloLey">las cinco piezas, y <b>todas</b> las conexiones posibles entre ellas</p>
+
+    <div class="circuito" id="circuito">
+      <svg class="lazos" viewBox="0 0 100 100" aria-hidden="true">
+      <line class="lazo" data-par="inteligencia|master" x1="50.00" y1="15.00" x2="83.29" y2="39.18"/>
+      <line class="lazo" data-par="master|memoria" x1="50.00" y1="15.00" x2="70.57" y2="78.32"/>
+      <line class="lazo" data-par="alma|master" x1="50.00" y1="15.00" x2="29.43" y2="78.32"/>
+      <line class="lazo" data-par="agente|master" x1="50.00" y1="15.00" x2="16.71" y2="39.18"/>
+      <line class="lazo" data-par="inteligencia|memoria" x1="83.29" y1="39.18" x2="70.57" y2="78.32"/>
+      <line class="lazo" data-par="alma|inteligencia" x1="83.29" y1="39.18" x2="29.43" y2="78.32"/>
+      <line class="lazo" data-par="agente|inteligencia" x1="83.29" y1="39.18" x2="16.71" y2="39.18"/>
+      <line class="lazo" data-par="alma|memoria" x1="70.57" y1="78.32" x2="29.43" y2="78.32"/>
+      <line class="lazo" data-par="agente|memoria" x1="70.57" y1="78.32" x2="16.71" y2="39.18"/>
+      <line class="lazo" data-par="agente|alma" x1="29.43" y1="78.32" x2="16.71" y2="39.18"/>
+      </svg>
+    <div class="nodo humano" data-id="master" style="left:50.00%; top:15.00%">
+      <span class="ico" >🧑</span><span class="nom">Master</span><span class="map mono">= el humano</span>
+    </div>
+    <div class="nodo " data-id="inteligencia" style="left:83.29%; top:39.18%">
+      <span class="ico" id="cerebro">🧠</span><span class="nom">Inteligencia</span><span class="map mono">= el modelo</span>
+    </div>
+    <div class="nodo " data-id="memoria" style="left:70.57%; top:78.32%">
+      <span class="ico" >📚</span><span class="nom">Memoria</span><span class="map mono">= el vault</span>
+    </div>
+    <div class="nodo " data-id="alma" style="left:29.43%; top:78.32%">
+      <span class="ico" >🕯️</span><span class="nom">Alma</span><span class="map mono">= el marco</span>
+    </div>
+    <div class="nodo " data-id="agente" style="left:16.71%; top:39.18%">
+      <span class="ico" >✍️</span><span class="nom">Ejecutor</span><span class="map mono">= el agente</span>
+    </div>
+      <span class="serie mono" id="serie" aria-live="polite"></span>
     </div>
 
-    <button class="swap" id="swap" data-t="swap">cámbiale el modelo →</button>
+    <p class="narra" id="narra" aria-live="polite" data-t="narraIni">Manda un mensaje y mira qué conexiones se encienden.</p>
+    <div class="mandos">
+      <button class="swap" id="manda" data-t="manda">▸ manda un mensaje</button>
+      <button class="swap fantasma" id="swap" data-t="swap">cámbiale el modelo →</button>
+    </div>
     <p class="veredicto" id="veredicto" data-t="veredicto">…y el ser sigue siendo el mismo. Lo que ES vive en lo escrito.</p>
 
     <!-- Nivel 2 del embudo: cuando el video corto exista, este bloque se vuelve su enlace. -->
@@ -574,7 +596,7 @@
     introListo:'System ready',
     introPista:'1 credit = the story with music',
     introMudo:'or continue without sound →',
-    hudMem:'Memory',
+    hudMem:'Memory', reinicia:'↻ play again',
     h1:'The memory they sell you<br>about AI <b>is fake</b>.',
     postit:'who are you?',
     reto:'Try it right now, on your phone: <b>ask your AI what mistake it made with you last week.</b><br>Every conversation is born with total amnesia. This is not a complaint — it is the beginning of the best story we could tell you.',
@@ -614,7 +636,8 @@
     o5t:'Master', o5p:'You. The only one who decides what is true.', o5m:'= the human',
     swap:'swap the model →',
     veredicto:'…and the being remains the same. What it IS lives in what is written.',
-    cicloLey:'the cycle, every time it wakes: <b>you</b> ask · it reads its <b>memory</b> · thinks with the <b>model</b> · the <b>hands</b> write · the <b>soul</b> allows it',
+    cicloLey:'the five pieces, and <b>every</b> possible connection between them',
+    narraIni:'Send a message and watch which connections light up.', manda:'\u25b8 send a message',
     proxQ:'Want the whole story, told in five minutes?', proxS:'Coming soon · the film',
     n5:'Level 5 · the hive',
     colT:'And then the houses began to talk to each other.',
@@ -657,6 +680,9 @@
     pista.textContent = (lang==='es' ? '1 crédito = la historia con música — ' : '1 credit = the story with music — ')
       + credito(elegidaHist);
   }
+
+  /* reiniciar la partida: vuelve al select language y vuelve a sortear la musica */
+  document.getElementById('reinicia').addEventListener('click',function(){ location.reload(); });
 
   /* ── intro: select language → insert coin → desbloquear ─────────── */
   var intro=document.getElementById('intro');
@@ -702,11 +728,26 @@
      cargar y SOLO esa se descarga (preload="none" + src asignado aqui). Los
      stingers puntuales (moneda, acorde final) siguen generados: son cortos.
      Licencias y fuentes, una fila por pieza, en audio/CREDITOS.md. ── */
+  var RESPALDO='audio/a-wish-to-fulfill.ogg';   /* si el CDN falla, esta vive en el repo */
   var PISTAS_INTRO=[
-    {src:'audio/a-wish-to-fulfill.ogg', titulo:'A Wish to Fulfill', autor:'Centurion_of_war', lic:'CC0', via:'OpenGameArt'}
+    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2002%20Working%20time.ogg', titulo:'Working time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:80},
+    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2011%20Party%20time.ogg', titulo:'Party time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:140},
+    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2003%20Flirting%20time.ogg', titulo:'Flirting time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:192},
+    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2006%20Psychedelic%20time.ogg', titulo:'Psychedelic time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:224},
+    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2001%20Resting%20time.ogg', titulo:'Resting time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:210},
+    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2010%20Coffee%20time.ogg', titulo:'Coffee time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:82},
+    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2005%20Dramatic%20time.ogg', titulo:'Dramatic time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:196},
+    {src:'https://archive.org/download/LoyaltyFreakMusic-GAMEJAMVOL1/Loyalty%20Freak%20Music%20-%20GAME%20JAM%20VOL1%20%21%21%21%20-%2007%20Anxious%20time.ogg', titulo:'Anxious time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:320}
   ];
   var PISTAS_HIST=[
-    {src:'audio/a-wish-to-fulfill.ogg', titulo:'A Wish to Fulfill', autor:'Centurion_of_war', lic:'CC0', via:'OpenGameArt'}
+    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2001%20Once%20more%20with%20you.ogg', titulo:'Once more with you', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:183},
+    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2002%20One%20Cool%20Minute.ogg', titulo:'One Cool Minute', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:193},
+    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2003%20Old%20Key.ogg', titulo:'Old Key', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:157},
+    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2004%20Static%20Shoes.ogg', titulo:'Static Shoes', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:233},
+    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2005%20Waiting%20TTTT.ogg', titulo:'Waiting TTTT', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:175},
+    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2006%20Lag.ogg', titulo:'Lag', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:269},
+    {src:'https://archive.org/download/MINIMALAMBIENTBOUNCE/Loyalty%20Freak%20Music%20-%20MINIMAL%20AMBIENT%20BOUNCE%20-%2007%20No%20Cadillac.ogg', titulo:'No Cadillac', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:171},
+    {src:'https://archive.org/download/LoyaltyFreakMusicTOCHILLANDSTAYAWAKE20170923132621469/Loyalty_Freak_Music_-_01_-_Coexistenz.ogg', titulo:'Coexistenz', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:155}
   ];
   function sortea(pool){ return pool[Math.floor(Math.random()*pool.length)]; }
   var elegidaIntro=sortea(PISTAS_INTRO), elegidaHist=sortea(PISTAS_HIST);
@@ -715,6 +756,16 @@
   var mute=document.getElementById('mute');
   var bgmIntro=document.getElementById('bgmIntro'), bgmHist=document.getElementById('bgmHist');
   bgmIntro.src=elegidaIntro.src; bgmHist.src=elegidaHist.src;
+  /* El CDN devuelve una pagina de error de vez en cuando (medido). Si eso pasa,
+     se cae al archivo del repo para que la pagina nunca quede muda. */
+  [[bgmIntro,elegidaIntro],[bgmHist,elegidaHist]].forEach(function(par){
+    par[0].addEventListener('error',function(){
+      if(par[0].src.indexOf(RESPALDO)>=0) return;
+      par[0].src=RESPALDO; par[1].titulo='A Wish to Fulfill'; par[1].autor='Centurion_of_war';
+      par[1].via='OpenGameArt (respaldo local)'; anunciaPista();
+      if(on) suena(par[0]);
+    });
+  });
   var actual=bgmIntro;                 /* el fondo que manda ahora mismo */
   var TOPE=0.55, fades={};
 
@@ -840,34 +891,98 @@
   io3.observe(document.getElementById('mesa'));
   document.getElementById('replayMesa').addEventListener('click',function(){ mesaAnim(); moneda(); });
 
-  /* anatomía: el ciclo vivo + hot-swap del modelo */
-  var CEREBROS=['🧠','💠','🔮','⚙️','🜁'], ci=0;
-  var ver=document.getElementById('veredicto');
-  var tarjetaIA=document.getElementById('cerebro').closest('.organo');
-  var serie=document.getElementById('serie');
-  var organos=[].slice.call(document.querySelectorAll('#anatomia .organo'));
-  /* orden de trabajo: master(1) → memoria(2) → modelo(3) → manos(4) → alma(5) */
-  var ORDEN=organos.slice().sort(function(a,b){
-    return (+a.querySelector('.paso').textContent) - (+b.querySelector('.paso').textContent);
+  /* ── el circuito: correr un mensaje y ver QUE conexiones se encienden ──
+     De las 10 conexiones posibles solo 4 se usan, y el modelo nunca toca la
+     memoria: el ejecutor es el unico puente. Esa es la leccion del bloque. */
+  var circuito=document.getElementById('circuito');
+  var narra=document.getElementById('narra');
+  var btnManda=document.getElementById('manda');
+  var svgLazos=circuito.querySelector('.lazos');
+  function nodo(id){ return circuito.querySelector('.nodo[data-id="'+id+'"]'); }
+  function lazo(a,b){ return circuito.querySelector('.lazo[data-par="'+[a,b].sort().join('|')+'"]'); }
+
+  var FLUJO={
+    es:[{de:'master',a:'agente',t:'Mandas tu mensaje. Llega al <b>ejecutor</b> — nunca al modelo directamente.'},
+        {de:'agente',a:'alma',t:'El ejecutor consulta el <b>alma</b>: quién es, cómo trabaja, qué no se le permite olvidar.'},
+        {de:'agente',a:'memoria',t:'Lee la <b>memoria</b>: decisiones viejas, errores cometidos, lo que ya sabe de ti.'},
+        {de:'agente',a:'inteligencia',t:'Le entrega todo al <b>modelo</b> — tu mensaje, las reglas y la memoria, juntos.'},
+        {de:'inteligencia',a:'agente',t:'El modelo responde… <b>y lo olvida en el acto</b>. No se quedó con nada.'},
+        {de:'agente',a:'memoria',t:'El ejecutor <b>escribe</b> lo aprendido. Esto es lo único que sobrevive.'},
+        {de:'agente',a:'master',t:'Recibes la respuesta.'}],
+    en:[{de:'master',a:'agente',t:'You send your message. It reaches the <b>executor</b> — never the model directly.'},
+        {de:'agente',a:'alma',t:'The executor consults the <b>soul</b>: who it is, how it works, what it may not forget.'},
+        {de:'agente',a:'memoria',t:'It reads the <b>memory</b>: old decisions, past mistakes, what it already knows about you.'},
+        {de:'agente',a:'inteligencia',t:'It hands everything to the <b>model</b> — your message, the rules and the memory, together.'},
+        {de:'inteligencia',a:'agente',t:'The model answers… <b>and forgets instantly</b>. It kept nothing.'},
+        {de:'agente',a:'memoria',t:'The executor <b>writes down</b> what was learned. This is the only thing that survives.'},
+        {de:'agente',a:'master',t:'You get your answer.'}]
+  };
+  var CIERRE={
+    es:'<b>4 conexiones de 10.</b> Y el modelo jamás tocó tu memoria: el ejecutor es el único puente.',
+    en:'<b>4 connections out of 10.</b> And the model never touched your memory: the executor is the only bridge.'
+  };
+  var corriendo=false;
+  function limpia(){
+    [].forEach.call(circuito.querySelectorAll('.nodo'),function(n){ n.classList.remove('on'); });
+    [].forEach.call(circuito.querySelectorAll('.lazo'),function(l){ l.classList.remove('viva'); });
+  }
+  /* la chispa que viaja por la conexion — se lanza y se olvida: el avance del
+     flujo NO depende de su onfinish, que el navegador no dispara con fiabilidad
+     (medido: el paso se atoraba en el 2). Tiempos propios, deterministas. */
+  function chispa(l){
+    if(reduce) return;
+    var c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('class','chispa'); c.setAttribute('r','1.5');
+    c.setAttribute('cx',l.getAttribute('x1')); c.setAttribute('cy',l.getAttribute('y1'));
+    svgLazos.appendChild(c);
+    var t0=null, x1=+l.getAttribute('x1'), y1=+l.getAttribute('y1'),
+        x2=+l.getAttribute('x2'), y2=+l.getAttribute('y2'), DUR=560;
+    (function anda(t){
+      if(t0===null) t0=t;
+      var k=Math.min(1,(t-t0)/DUR), e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+      c.setAttribute('cx',(x1+(x2-x1)*e).toFixed(2));
+      c.setAttribute('cy',(y1+(y2-y1)*e).toFixed(2));
+      if(k<1) requestAnimationFrame(anda); else c.remove();
+    })(performance.now());
+  }
+  var relojes=[];
+  function paso(i){
+    var F=FLUJO[lang]||FLUJO.es;
+    if(i>=F.length){
+      narra.innerHTML=CIERRE[lang]||CIERRE.es;
+      document.getElementById('veredicto').classList.add('ve');
+      corriendo=false; btnManda.disabled=false;
+      return;
+    }
+    var e=F[i], l=lazo(e.de,e.a);
+    limpia();
+    nodo(e.de).classList.add('on');
+    l.classList.add('viva'); l.classList.add('usada');
+    narra.innerHTML='<b>'+(i+1)+'.</b> '+e.t;
+    moneda(); chispa(l);
+    relojes.push(setTimeout(function(){ nodo(e.a).classList.add('on'); }, reduce?0:560));
+    relojes.push(setTimeout(function(){ paso(i+1); }, reduce?400:1240));
+  }
+  btnManda.addEventListener('click',function(){
+    if(corriendo) return;
+    corriendo=true; btnManda.disabled=true;
+    relojes.forEach(clearTimeout); relojes=[];
+    [].forEach.call(circuito.querySelectorAll('.lazo'),function(l){ l.classList.remove('usada'); });
+    paso(0);
   });
-  var pi=0, latido=null;
-  function pulso(){
-    ORDEN.forEach(function(o){ o.classList.remove('activo'); });
-    ORDEN[pi].classList.add('activo');
-    pi=(pi+1)%ORDEN.length;
-  }
-  function arrancaCiclo(){
-    if(latido||reduce) return;
-    pulso(); latido=setInterval(pulso,900);
-  }
-  /* el ciclo solo corre cuando la sección se ve — no gasta batería fuera de pantalla */
-  var ioA=new IntersectionObserver(function(es){
-    es.forEach(function(e){
-      if(e.isIntersecting) arrancaCiclo();
-      else { clearInterval(latido); latido=null; ORDEN.forEach(function(o){o.classList.remove('activo');}); }
-    });
-  },{threshold:0.25});
-  ioA.observe(document.getElementById('anatomia'));
+
+  /* hot-swap del modelo: solo su nodo parpadea; lo escrito no se mueve */
+  var CEREBROS=['🧠','💠','🔮','⚙️','🜁'], ci=0;
+  var serie=document.getElementById('serie');
+  document.getElementById('swap').addEventListener('click',function(){
+    ci=(ci+1)%CEREBROS.length;
+    var n=nodo('inteligencia');
+    n.classList.remove('cambiando'); void n.offsetWidth; n.classList.add('cambiando');
+    setTimeout(function(){ document.getElementById('cerebro').textContent=CEREBROS[ci]; }, reduce?0:240);
+    setTimeout(function(){ n.classList.remove('cambiando'); }, 520);
+    serie.textContent=(lang==='en'?'model ':'modelo ')+String.fromCharCode(65+ci);
+    document.getElementById('veredicto').classList.add('ve'); moneda();
+  });
 
   document.getElementById('swap').addEventListener('click',function(){
     ci=(ci+1)%CEREBROS.length;
