@@ -789,13 +789,23 @@
   }
   /* el credito de las DOS piezas sorteadas — cambian en cada partida, y verlas
      escritas es la unica forma de comprobar el sorteo sin fiarse del oido */
+  /* El crédito se ARMA de la pieza sorteada, campo por campo — autor, licencia y
+     fuente incluidos. Antes esos tres iban escritos a mano y quedaban mintiendo
+     en cuanto el sorteo caía en una pieza de otro autor. Si las dos sorteadas
+     comparten autoría, se dice una vez; si no, cada una lleva la suya. */
+  function firma(p){ return p.autor+' · '+p.lic+' · '+p.via; }
   function anunciaPista(){
     var caja=document.getElementById('sorteo');
     if(!caja) return;
-    var es=(lang!=='en');
-    caja.innerHTML='<b>'+(es?'intro':'intro')+':</b> «'+elegidaIntro.titulo+'» · <b>'
-      +(es?'historia':'story')+':</b> «'+elegidaHist.titulo+'»'
-      +'<br><span class="tenue">Loyalty Freak Music · CC0 · archive.org</span>';
+    var en=(lang==='en'), r1=en?'intro':'intro', r2=en?'story':'historia';
+    var misma=(firma(elegidaIntro)===firma(elegidaHist));
+    if(misma){
+      caja.innerHTML='<b>'+r1+':</b> «'+elegidaIntro.titulo+'» · <b>'+r2+':</b> «'+elegidaHist.titulo+'»'
+        +'<br><span class="tenue">'+firma(elegidaIntro)+'</span>';
+    } else {
+      caja.innerHTML='<b>'+r1+':</b> «'+elegidaIntro.titulo+'» <span class="tenue">'+firma(elegidaIntro)+'</span>'
+        +'<br><b>'+r2+':</b> «'+elegidaHist.titulo+'» <span class="tenue">'+firma(elegidaHist)+'</span>';
+    }
   }
 
   /* reiniciar la partida: vuelve al select language y vuelve a sortear la musica */
@@ -875,25 +885,15 @@
      stingers puntuales (moneda, acorde final) siguen generados: son cortos.
      Licencias y fuentes, una fila por pieza, en audio/CREDITOS.md. ── */
   var RESPALDO='audio/a-wish-to-fulfill.ogg';   /* si el CDN falla, esta vive en el repo */
+  /* Los pools van con la pieza que ya vive en el repo. Las 16 sorteadas viajan
+     en su PROPIO PR: son 15 MB de binarios y en git eso no se puede deshacer,
+     así que no entran hasta estar decididas. El motor no cambia — sortea igual
+     sobre un pool de uno, y crece solo con añadir filas aquí. */
   var PISTAS_INTRO=[
-    {src:'audio/pistas/working-time.ogg', titulo:'Working time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:80},
-    {src:'audio/pistas/party-time.ogg', titulo:'Party time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:140},
-    {src:'audio/pistas/flirting-time.ogg', titulo:'Flirting time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:192},
-    {src:'audio/pistas/psychedelic-time.ogg', titulo:'Psychedelic time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:224},
-    {src:'audio/pistas/resting-time.ogg', titulo:'Resting time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:210},
-    {src:'audio/pistas/coffee-time.ogg', titulo:'Coffee time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:82},
-    {src:'audio/pistas/dramatic-time.ogg', titulo:'Dramatic time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:196},
-    {src:'audio/pistas/anxious-time.ogg', titulo:'Anxious time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:320}
+    {src:'audio/a-wish-to-fulfill.ogg', titulo:'A Wish to Fulfill', autor:'Centurion_of_war', lic:'CC0', via:'OpenGameArt', seg:64}
   ];
   var PISTAS_HIST=[
-    {src:'audio/pistas/once-more-with-you.ogg', titulo:'Once more with you', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:183},
-    {src:'audio/pistas/one-cool-minute.ogg', titulo:'One Cool Minute', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:193},
-    {src:'audio/pistas/old-key.ogg', titulo:'Old Key', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:157},
-    {src:'audio/pistas/static-shoes.ogg', titulo:'Static Shoes', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:233},
-    {src:'audio/pistas/waiting-tttt.ogg', titulo:'Waiting TTTT', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:175},
-    {src:'audio/pistas/lag.ogg', titulo:'Lag', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:269},
-    {src:'audio/pistas/no-cadillac.ogg', titulo:'No Cadillac', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:171},
-    {src:'audio/pistas/coexistenz.ogg', titulo:'Coexistenz', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:155}
+    {src:'audio/a-wish-to-fulfill.ogg', titulo:'A Wish to Fulfill', autor:'Centurion_of_war', lic:'CC0', via:'OpenGameArt', seg:64}
   ];
   function sortea(pool){ return pool[Math.floor(Math.random()*pool.length)]; }
   var elegidaIntro=sortea(PISTAS_INTRO), elegidaHist=sortea(PISTAS_HIST);
