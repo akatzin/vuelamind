@@ -133,6 +133,13 @@
   .mute:hover{color:var(--ambarv); filter:drop-shadow(0 0 6px #ff9d3388)}
   .mute[aria-pressed="true"]:hover{color:#b8f6ff}
   .mute:focus-visible{outline:1px dashed currentColor; outline-offset:4px}
+  .sig{top:3.1rem; color:#00e5ff77; filter:none}
+  .sig svg .tri{fill:currentColor; stroke:none}
+  .sig svg .barra{stroke:currentColor; stroke-width:1.9; stroke-linecap:round; fill:none}
+  .sig:hover{color:var(--cianv); filter:drop-shadow(0 0 6px #00e5ff99)}
+  .sig[disabled]{opacity:.35; cursor:default}
+  .sig.cargando svg{animation:girando .9s linear infinite}
+  @keyframes girando{to{transform:rotate(360deg)}}
   .volver{pointer-events:auto; color:var(--tenue); background:none; border:none; font:inherit;
     letter-spacing:.14em; text-transform:uppercase; cursor:pointer; padding:0; transition:color .2s, text-shadow .2s}
   .volver:hover,.volver:focus-visible{color:var(--cianv); text-shadow:0 0 10px #00e5ff88; outline:none}
@@ -460,6 +467,14 @@
       <path d="M17.9 6.5a7.8 7.8 0 0 1 0 11"/>
     </g>
     <path class="tache" d="M15.6 9.6l5.2 4.8M20.8 9.6l-5.2 4.8"/>
+  </svg>
+</button>
+<!-- cambiar de pieza. Solo existe si el pool del acto tiene de donde elegir:
+     con una sola pieza seria un boton que no hace nada. -->
+<button id="siguiente" class="mute sig" aria-label="Otra pieza" title="Otra pieza" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path class="tri" d="M4 6l7 6-7 6z"/><path class="tri" d="M11 6l7 6-7 6z"/>
+    <path class="barra" d="M19.5 6v12"/>
   </svg>
 </button>
 
@@ -885,12 +900,27 @@
      stingers puntuales (moneda, acorde final) siguen generados: son cortos.
      Licencias y fuentes, una fila por pieza, en audio/CREDITOS.md. ── */
   var RESPALDO='audio/a-wish-to-fulfill.ogg';   /* si el CDN falla, esta vive en el repo */
-  /* Los pools van con la pieza que ya vive en el repo. Las 16 sorteadas viajan
-     en su PROPIO PR: son 15 MB de binarios y en git eso no se puede deshacer,
-     así que no entran hasta estar decididas. El motor no cambia — sortea igual
-     sobre un pool de uno, y crece solo con añadir filas aquí. */
+  /* Dos universos de 8. Cada acto sortea el suyo al entrar, y el botón de
+     «otra pieza» se mueve dentro del universo del acto en curso. */
   var PISTAS_INTRO=[
-    {src:'audio/a-wish-to-fulfill.ogg', titulo:'A Wish to Fulfill', autor:'Centurion_of_war', lic:'CC0', via:'OpenGameArt', seg:64}
+    {src:'audio/pistas/working-time.ogg', titulo:'Working time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:80},
+    {src:'audio/pistas/party-time.ogg', titulo:'Party time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:140},
+    {src:'audio/pistas/flirting-time.ogg', titulo:'Flirting time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:192},
+    {src:'audio/pistas/psychedelic-time.ogg', titulo:'Psychedelic time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:224},
+    {src:'audio/pistas/resting-time.ogg', titulo:'Resting time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:210},
+    {src:'audio/pistas/coffee-time.ogg', titulo:'Coffee time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:82},
+    {src:'audio/pistas/dramatic-time.ogg', titulo:'Dramatic time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:196},
+    {src:'audio/pistas/anxious-time.ogg', titulo:'Anxious time', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:320}
+  ];
+  var PISTAS_HIST=[
+    {src:'audio/pistas/once-more-with-you.ogg', titulo:'Once more with you', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:183},
+    {src:'audio/pistas/one-cool-minute.ogg', titulo:'One Cool Minute', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:193},
+    {src:'audio/pistas/old-key.ogg', titulo:'Old Key', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:157},
+    {src:'audio/pistas/static-shoes.ogg', titulo:'Static Shoes', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:233},
+    {src:'audio/pistas/waiting-tttt.ogg', titulo:'Waiting TTTT', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:175},
+    {src:'audio/pistas/lag.ogg', titulo:'Lag', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:269},
+    {src:'audio/pistas/no-cadillac.ogg', titulo:'No Cadillac', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:171},
+    {src:'audio/pistas/coexistenz.ogg', titulo:'Coexistenz', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:155}
   ];
   var PISTAS_HIST=[
     {src:'audio/a-wish-to-fulfill.ogg', titulo:'A Wish to Fulfill', autor:'Centurion_of_war', lic:'CC0', via:'OpenGameArt', seg:64}
@@ -946,10 +976,37 @@
   /* el paso del intro a la historia: cruzada, no corte */
   function cruzaAHistoria(){
     actual=bgmHist;
+    revisaSiguiente();
     if(!on) return;
     calla(bgmIntro); suena(bgmHist);
   }
   mute.addEventListener('click',function(){ enciende(!on); });
+
+  /* Otra pieza del pool del acto en curso. Se descarga entera antes de cambiar
+     —igual que la precarga— para que el relevo no deje un hueco de silencio. */
+  var btnSig=document.getElementById('siguiente');
+  function poolDelActo(){ return actual===bgmIntro ? PISTAS_INTRO : PISTAS_HIST; }
+  function elegidaDelActo(){ return actual===bgmIntro ? elegidaIntro : elegidaHist; }
+  function revisaSiguiente(){ btnSig.hidden = poolDelActo().length < 2; }
+  revisaSiguiente();
+  btnSig.addEventListener('click',function(){
+    var pool=poolDelActo(), act=elegidaDelActo();
+    var otras=pool.filter(function(p){ return p.src!==act.src; });
+    if(!otras.length) return;
+    var nueva=otras[Math.floor(Math.random()*otras.length)];
+    btnSig.disabled=true; btnSig.classList.add('cargando');
+    baja(nueva,'sig').then(function(url){
+      var el=actual;
+      calla(el);
+      setTimeout(function(){
+        el.src=url;
+        if(actual===bgmIntro){ elegidaIntro=nueva; } else { elegidaHist=nueva; }
+        anunciaPista();
+        if(on) suena(el);
+        btnSig.disabled=false; btnSig.classList.remove('cargando');
+      }, 380);
+    });
+  });
 
   /* ── precarga: las dos pistas sorteadas se bajan ENTERAS antes de abrir el
      juego. Asi el cambio de acto es instantaneo (antes se descargaba al meter
