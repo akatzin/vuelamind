@@ -439,6 +439,10 @@
       <button class="opcion" data-lang="es">Español</button>
       <button class="opcion" data-lang="en">English</button>
     </div>
+  </div>
+  <div class="pantalla" id="pantCoin" hidden>
+    <div class="arcade-titulo" data-t="introListo">Sistema listo</div>
+    <button class="coin" id="coinBtn">◉ Insert coin</button>
     <p class="pista sorteo" id="sorteo"></p>
   </div>
 </div>
@@ -826,15 +830,17 @@
   /* reiniciar la partida: vuelve al select language y vuelve a sortear la musica */
   document.getElementById('reinicia').addEventListener('click',function(){ location.reload(); });
 
-  /* ── intro: una sola pantalla. Elegir idioma ES empezar — antes había un
-     segundo paso ("insert coin") que solo pedía otro clic para lo mismo. El
-     control de silencio ya vive arriba y visible, así que tampoco hace falta
-     el "continuar sin sonido" que había aquí. ── */
+  /* ── intro: dos pantallas, ambas del MOMENTO 1 (mismo universo de música).
+     Elegir idioma pinta y pasa a la moneda; la moneda es la que entra a la
+     historia y cruza al universo del momento 2. ── */
   var intro=document.getElementById('intro');
+  var pantIdioma=document.getElementById('pantIdioma'), pantCoin=document.getElementById('pantCoin');
   [].forEach.call(document.querySelectorAll('.opcion'),function(b){
     b.addEventListener('click',function(){
       pinta(b.getAttribute('data-lang'));
-      enciende(true); moneda(); cruzaAHistoria(); desbloquea();
+      enciende(true);
+      pantIdioma.hidden=true; pantCoin.hidden=false;
+      document.getElementById('coinBtn').focus();
     });
   });
   function desbloquea(){
@@ -842,6 +848,9 @@
     document.body.classList.remove('bloqueado');
     setTimeout(function(){ intro.remove(); },1000);
   }
+  document.getElementById('coinBtn').addEventListener('click',function(){
+    enciende(true); moneda(); cruzaAHistoria(); desbloquea();
+  });
 
   /* los ojos del shoggoth: nacen en sitios al azar, parpadean cada uno a su
      ritmo, y cada 7s se apagan TODOS y renacen en otro lado — cada sesión, un
