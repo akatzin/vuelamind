@@ -330,7 +330,9 @@
   /* ── anzuelo al siguiente nivel del embudo (aqui ira el video corto) ── */
   .proxima{
     display:flex; flex-direction:column; align-items:center; gap:.5rem;
-    margin:2.6rem auto 0; padding:1.2rem 1.4rem; max-width:30rem; text-align:center;
+    /* aire de verdad al cerrar: es el unico bloque que invita a IRSE de la pagina,
+       y despues la historia continua. Ese respiro es la pausa, no un margen suelto. */
+    margin:2.6rem auto clamp(3.5rem,9vw,6.5rem); padding:1.2rem 1.4rem; max-width:30rem; text-align:center;
     border:1px dashed #00e5ff33; border-radius:12px; background:#00e5ff08;
   }
   .proxima .pregunta{font-size:.95rem; color:#cfd8e0}
