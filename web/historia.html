@@ -286,6 +286,14 @@
   .lazo{stroke:#12324a; stroke-width:.45; transition:stroke .35s, stroke-width .35s, filter .35s}
   .lazo.viva{stroke:var(--cianv); stroke-width:1.1; filter:drop-shadow(0 0 1.6px #00e5ff)}
   .lazo.usada{stroke:#1d6c8c; stroke-width:.7}
+  /* el balance final: lo que NO se uso casi desaparece, y las cuatro que si
+     quedan encendidas. El "4 de 10" deja de ser un dato y se vuelve una forma. */
+  .circuito.balance .lazo{stroke:#0a1a26; stroke-width:.35}
+  .circuito.balance .lazo.usada{stroke:var(--cianv); stroke-width:1.15;
+    filter:drop-shadow(0 0 1.8px #00e5ff)}
+  .circuito.balance .nodo{opacity:.5}
+  .circuito.balance .nodo[data-id="agente"]{opacity:1; border-color:#00e5ffaa;
+    box-shadow:0 0 26px -6px #00e5ffcc}
 
   .nodo{
     position:absolute; transform:translate(-50%,-50%); width:7.6rem; text-align:center;
@@ -1201,8 +1209,8 @@
         {de:'agente',a:'master',t:'You get your answer.'}]
   };
   var CIERRE={
-    es:'<b>4 conexiones de 10.</b> Y el modelo jamás tocó tu memoria: el ejecutor es el único puente.',
-    en:'<b>4 connections out of 10.</b> And the model never touched your memory: the executor is the only bridge.'
+    es:'De las <b>diez</b> conexiones posibles, el mensaje encendió <b>cuatro</b> — y las cuatro pasan por el ejecutor. Mira las que quedaron apagadas: <b>el modelo nunca tocó tu memoria</b>.',
+    en:'Of the <b>ten</b> possible connections, the message lit <b>four</b> — and all four go through the executor. Look at the ones that stayed dark: <b>the model never touched your memory</b>.'
   };
   var corriendo=false;
   function limpia(){
@@ -1232,6 +1240,8 @@
   function paso(i){
     var F=FLUJO[lang]||FLUJO.es;
     if(i>=F.length){
+      limpia();
+      circuito.classList.add('balance');
       narra.innerHTML=CIERRE[lang]||CIERRE.es;
       document.getElementById('veredicto').classList.add('ve');
       corriendo=false; btnManda.disabled=false;
@@ -1249,6 +1259,7 @@
   btnManda.addEventListener('click',function(){
     if(corriendo) return;
     corriendo=true; btnManda.disabled=true;
+    circuito.classList.remove('balance');
     relojes.forEach(clearTimeout); relojes=[];
     [].forEach.call(circuito.querySelectorAll('.lazo'),function(l){ l.classList.remove('usada'); });
     paso(0);
