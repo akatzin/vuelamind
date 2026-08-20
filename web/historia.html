@@ -1000,20 +1000,33 @@
     document.getElementById('pantIdioma').hidden=false;
     document.querySelector('.opcion').focus();
   }
-  /* El navegador prohíbe sonar antes de un gesto del usuario. Para que la música
-     acompañe YA a la selección de idioma, la carga termina en un "press start":
-     ese clic es el gesto, enciende el audio y recién entonces abre la pantalla 1.
-     Se intenta además el arranque solo, por si la política del navegador lo
-     permite (visitante recurrente): entonces el botón solo abre. */
-  function listoParaEmpezar(){
+  /* Arranque del sonido. El navegador prohíbe reproducir audio antes de un gesto
+     del usuario — no hay forma de rodearlo desde JS. Pero SÍ permite intentarlo:
+     a quien ya tiene trato con el sitio (Chrome lo mide) se lo concede. Así que
+     primero se intenta sonar solo:
+       · si lo permite  -> entra DIRECTO al select language, ya con música y sin
+                           pedir un clic que no hace falta;
+       · si lo bloquea  -> recién entonces aparece «press start», y ese clic es
+                           el gesto que la política exige.
+     El botón es el plan B, no el peaje de todos. */
+  function abreConMusica(){
+    on=true; mute.setAttribute('aria-pressed','true');
+    if(actx&&actx.resume) actx.resume();
+    fundir(bgmIntro,TOPE,0.03);
+    abreJuego();
+  }
+  function pideStart(){
     var t=document.getElementById('cargaTitulo');
-    if(t) t.textContent = (lang==='en'?'Ready':'Sistema listo');
+    if(t) t.textContent=(lang==='en'?'Ready':'Sistema listo');
     var b=document.getElementById('startBtn');
     b.hidden=false; b.focus();
     b.addEventListener('click',function(){ enciende(true); moneda(); abreJuego(); });
-    bgmIntro.play().then(function(){
-      if(!on){ enciende(true); }
-    }).catch(function(){});
+  }
+  function listoParaEmpezar(){
+    bgmIntro.volume=0;
+    var intento=bgmIntro.play();
+    if(intento && intento.then) intento.then(abreConMusica).catch(pideStart);
+    else pideStart();
   }
   cargaPistas.textContent='';
   Promise.all([baja(elegidaIntro,'i'), baja(elegidaHist,'h')]).then(function(u){
