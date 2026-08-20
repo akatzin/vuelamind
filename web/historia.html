@@ -838,7 +838,6 @@
   [].forEach.call(document.querySelectorAll('.opcion'),function(b){
     b.addEventListener('click',function(){
       pinta(b.getAttribute('data-lang'));
-      enciende(true);
       pantIdioma.hidden=true; pantCoin.hidden=false;
       document.getElementById('coinBtn').focus();
     });
@@ -849,7 +848,7 @@
     setTimeout(function(){ intro.remove(); },1000);
   }
   document.getElementById('coinBtn').addEventListener('click',function(){
-    enciende(true); moneda(); cruzaAHistoria(); desbloquea();
+    moneda(); cruzaAHistoria(); desbloquea();
   });
 
   /* los ojos del shoggoth: nacen en sitios al azar, parpadean cada uno a su
@@ -932,6 +931,11 @@
     {src:'audio/pistas/coexistenz.ogg', titulo:'Coexistenz', autor:'Loyalty Freak Music', lic:'CC0', via:'archive.org', seg:155}
   ];
   function sortea(pool){ return pool[Math.floor(Math.random()*pool.length)]; }
+  /* Un object URL vive hasta que se le suelta a mano. Sin esto, cada cambio de
+     pieza —y cada recarga— deja uno colgando; al cabo de unas decenas el
+     navegador deja de cargar audio y la página se queda atorada en la carga.
+     Medido: pasó en esta misma sesión tras ~25 recargas. */
+  function suelta(url){ if(url && url.indexOf('blob:')===0) URL.revokeObjectURL(url); }
   var elegidaIntro=sortea(PISTAS_INTRO), elegidaHist=sortea(PISTAS_HIST);
 
   var actx=null, maestro=null, raiz=0, on=false;
@@ -952,7 +956,10 @@
   }
   function suena(el){
     if(!on) return;
-    el.volume=0; var pr=el.play(); if(pr&&pr.catch) pr.catch(function(){});
+    /* si ya está sonando, NO se toca el volumen de partida: ponerlo a cero y
+       volver a subirlo se oye como si la pieza empezara de nuevo, y eso pasaba
+       en cada cambio de pantalla del momento 1. */
+    if(el.paused){ el.volume=0; var pr=el.play(); if(pr&&pr.catch) pr.catch(function(){}); }
     fundir(el,TOPE,0.03);
   }
   function calla(el){ fundir(el,0,0.06,function(){ el.pause(); }); }
@@ -971,6 +978,7 @@
     nota(raiz+19,0.09,'square',0.06,t); nota(raiz+24,0.22,'square',0.05,t+0.09);
   }
   function enciende(si){
+    if(si===on && si){ return; }   /* ya está sonando: no reiniciar nada */
     if(si&&!actx){
       actx=new (window.AudioContext||window.webkitAudioContext)();
       maestro=actx.createGain(); maestro.gain.value=0.5; maestro.connect(actx.destination);
@@ -986,6 +994,7 @@
     if(!on) return;
     calla(bgmIntro); suena(bgmHist);
   }
+  addEventListener('pagehide',function(){ suelta(bgmIntro.src); suelta(bgmHist.src); });
   mute.addEventListener('click',function(){ enciende(!on); });
 
   /* Otra pieza del pool del acto en curso. Se descarga entera antes de cambiar
@@ -1005,7 +1014,9 @@
       var el=actual;
       calla(el);
       setTimeout(function(){
+        var anterior=el.src;
         el.src=url;
+        suelta(anterior);
         if(actual===bgmIntro){ elegidaIntro=nueva; } else { elegidaHist=nueva; }
         anunciaPista();
         if(on) suena(el);
