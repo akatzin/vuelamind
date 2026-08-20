@@ -346,20 +346,36 @@
   }
   @keyframes respira{50%{opacity:.45}}
 
-  /* ── colmena ────────────────────────────────────────────────────── */
-  .colmena{position:relative; height:14rem; margin:2rem 0; border:1px solid var(--linea);
-    border-radius:12px; background:#04070e; overflow:hidden}
-  .casa{position:absolute; bottom:1.1rem; width:2.1rem; height:2.1rem; border:1px solid #00e5ff55;
-    border-radius:4px 4px 0 0; box-shadow:0 0 14px #00e5ff22 inset}
-  .casa::after{content:""; position:absolute; inset:35% 30%; background:#ffd23f; border-radius:2px;
-    box-shadow:0 0 10px #ffd23f; animation:vela 3s ease-in-out infinite}
-  @keyframes vela{50%{opacity:.55}}
-  .faro{position:absolute; bottom:1.1rem; left:50%; translate:-50%; width:1.6rem; height:5rem;
-    background:linear-gradient(#0e2233,#050a14); border:1px solid #ff9d3355; border-radius:4px 4px 0 0}
-  .faro::after{content:""; position:absolute; top:-.65rem; left:50%; translate:-50%;
-    width:1rem; height:1rem; border-radius:50%; background:var(--ambarv); box-shadow:0 0 24px #ff9d33}
-  .avion{position:absolute; font-size:1rem; opacity:0; will-change:transform, opacity}
-  .colmena .ley{position:absolute; top:.8rem; inset-inline:0; text-align:center; font-size:.72rem;
+  /* ── colmena: personas + sus agentes sobre UNA mente ──────────────
+     El foco es la mente compartida, no el sistema de correcciones. Los envíos
+     viajan como bolitas de luz, y el núcleo devuelve: lo que uno aporta, los
+     demás lo tienen al despertar. */
+  .colmena{position:relative; height:17rem; margin:2rem 0; border:1px solid var(--linea);
+    border-radius:12px; background:radial-gradient(60% 70% at 50% 34%, #06131d, #04070e 70%);
+    overflow:hidden}
+  .persona{position:absolute; bottom:1.15rem; translate:-50%; display:flex;
+    flex-direction:column; align-items:center; gap:.28rem}
+  .persona .yo{font-size:1.35rem; line-height:1; filter:saturate(.75)}
+  .persona .agente{width:.42rem; height:.42rem; border-radius:50%; background:var(--cianv);
+    box-shadow:0 0 9px #00e5ffcc; animation:latir 2.6s ease-in-out infinite}
+  @keyframes latir{50%{opacity:.35; transform:scale(.78)}}
+
+  /* la mente compartida */
+  .nucleo{position:absolute; left:50%; top:4.6rem; translate:-50% -50%;
+    width:3.5rem; height:3.5rem; border-radius:50%;
+    background:radial-gradient(circle at 42% 36%, #cdf3ff 0 12%, #4fd3ef 30%, #0a6f8e 72%, #062a3a 100%);
+    box-shadow:0 0 34px #00e5ff88, 0 0 90px #00e5ff33;
+    animation:respiraNucleo 4.2s ease-in-out infinite}
+  @keyframes respiraNucleo{50%{transform:scale(1.07); box-shadow:0 0 46px #00e5ffaa, 0 0 110px #00e5ff44}}
+  .nucleo::after{content:""; position:absolute; inset:-.5rem; border-radius:50%;
+    border:1px solid #00e5ff33}
+
+  /* la bolita de luz que viaja */
+  .orbe{position:absolute; width:.55rem; height:.55rem; border-radius:50%;
+    background:radial-gradient(circle at 38% 34%, #eaffff 0 22%, #6fe0ff 45%, #0d8fb4 100%);
+    box-shadow:0 0 12px #00e5ffcc, 0 0 26px #00e5ff55;
+    opacity:0; pointer-events:none; will-change:transform, opacity}
+  .colmena .ley{position:absolute; top:.85rem; inset-inline:0; text-align:center; font-size:.72rem;
     color:var(--tenue); letter-spacing:.18em; text-transform:uppercase}
 
   /* ── el pago: la estrella de Henry ──────────────────────────────── */
@@ -404,9 +420,10 @@
 <!-- intro de arcade -->
 <div id="intro" role="dialog" aria-modal="true" aria-label="Select language / Insert coin">
   <div class="pantalla" id="pantCarga">
-    <div class="arcade-titulo">Loading</div>
+    <div class="arcade-titulo" id="cargaTitulo">Loading</div>
     <div class="barra"><i id="barraFill"></i></div>
     <p class="pista mono" id="cargaTxt">0%</p>
+    <button class="coin" id="startBtn" data-t="start" hidden>▸ Press start</button>
     <p class="pista" id="cargaPistas"></p>
   </div>
   <div class="pantalla" id="pantIdioma" hidden>
@@ -642,14 +659,14 @@
   <!-- NIVEL 5: la colmena -->
   <section class="cont rev" data-coin>
     <div class="nivel cian" data-t="n5">Nivel 5 · la colmena</div>
-    <p class="grande" data-t="colT">Y entonces las casas empezaron a hablar entre ellas.</p>
-    <p data-t="colP">Varias mentes, en máquinas distintas, corrigiéndose errores unas a otras — <b>errores que
-    ninguna había cometido en carne propia.</b> Funciona por la vía más aburrida del mundo: texto
-    plano. Cada casa escribe sus lecciones; una vigía las juzga; entra lo que le sirve a
-    cualquiera, <span class="cianT">con los nombres borrados</span>.</p>
+    <p class="grande" data-t="colT">Y entonces varias personas empezaron a compartir <b>una misma mente</b>.</p>
+    <p data-t="colP">Cada quien con su agente, trabajando sobre <b>el mismo vault</b>. No es un chat de
+    grupo ni una carpeta compartida: es una memoria común. Lo que una persona le enseña hoy,
+    <span class="cianT">todas lo saben mañana al despertar</span> — sin contárselo, sin repetirlo,
+    sin que nadie recuerde haberlo dicho.</p>
     <div class="colmena" id="colmena" aria-hidden="true">
-      <span class="ley" data-t="colL">viaja la lección · nunca tu vida</span>
-      <div class="faro"></div>
+      <span class="ley" data-t="colL">una mente · muchas manos</span>
+      <div class="nucleo"></div>
     </div>
   </section>
 
@@ -696,7 +713,7 @@
 
   /* ── i18n: el español vive inline; el inglés se pinta encima ────── */
   var EN = {
-    introListo:'System ready',
+    introListo:'System ready', start:'\u25b8 Press start',
     introPista:'1 credit = the story with music',
     introMudo:'or continue without sound →',
     hudMem:'Memory', reinicia:'↻ play again',
@@ -743,9 +760,9 @@
     narraIni:'Send a message and watch which connections light up.', manda:'\u25b8 send a message',
     proxQ:'Want the whole story, told in five minutes?', proxS:'Coming soon · the film',
     n5:'Level 5 · the hive',
-    colT:'And then the houses began to talk to each other.',
-    colP:'Several minds, on different machines, correcting each other’s mistakes — <b>mistakes none of them had made in their own flesh.</b> It works through the most boring channel in the world: plain text. Each house writes its lessons; a keeper judges them; what serves anyone gets in, <span class="cianT">with the names erased</span>.',
-    colL:'the lesson travels · never your life',
+    colT:'And then several people began sharing <b>one single mind</b>',
+    colP:'Each with their own agent, working on <b>the same vault</b>. Not a group chat, not a shared folder: a common memory. What one person teaches it today, <span class=\"cianT\">everyone knows tomorrow on waking</span> — without being told, without repeating it, without anyone remembering having said it.',
+    colL:'one mind · many hands',
     n6:'Final boss · the mystery pays off',
     pagoT:'Remember Henry — the man who could not remember?',
     pagoP1:'Scientists discovered something nobody expected. They asked him to draw a star <b>while looking in a mirror</b>, every day. And every day he did it better. He never remembered practicing — <b>but his hands were learning what his mind could not hold.</b>',
@@ -983,13 +1000,28 @@
     document.getElementById('pantIdioma').hidden=false;
     document.querySelector('.opcion').focus();
   }
+  /* El navegador prohíbe sonar antes de un gesto del usuario. Para que la música
+     acompañe YA a la selección de idioma, la carga termina en un "press start":
+     ese clic es el gesto, enciende el audio y recién entonces abre la pantalla 1.
+     Se intenta además el arranque solo, por si la política del navegador lo
+     permite (visitante recurrente): entonces el botón solo abre. */
+  function listoParaEmpezar(){
+    var t=document.getElementById('cargaTitulo');
+    if(t) t.textContent = (lang==='en'?'Ready':'Sistema listo');
+    var b=document.getElementById('startBtn');
+    b.hidden=false; b.focus();
+    b.addEventListener('click',function(){ enciende(true); moneda(); abreJuego(); });
+    bgmIntro.play().then(function(){
+      if(!on){ enciende(true); }
+    }).catch(function(){});
+  }
   cargaPistas.textContent='';
   Promise.all([baja(elegidaIntro,'i'), baja(elegidaHist,'h')]).then(function(u){
     bgmIntro.src=u[0]; bgmHist.src=u[1];
     if(elegidaIntro.fallo){ elegidaIntro.titulo='A Wish to Fulfill'; elegidaIntro.autor='Centurion_of_war'; elegidaIntro.via='respaldo local'; }
     if(elegidaHist.fallo){ elegidaHist.titulo='A Wish to Fulfill'; elegidaHist.autor='Centurion_of_war'; elegidaHist.via='respaldo local'; }
-    barraFill.style.width='100%'; cargaTxt.textContent='100%';
-    anunciaPista(); setTimeout(abreJuego, 260);
+    barraFill.style.width='100%'; cargaTxt.textContent='';
+    anunciaPista(); setTimeout(listoParaEmpezar, 260);
   });
 
   /* El navegador no deja sonar nada antes de un gesto. Se intenta al cargar y, si
@@ -1170,25 +1202,46 @@
     ver.classList.add('ve'); moneda();
   });
 
-  /* colmena: casas + aviones de papel hacia el faro */
+  /* colmena: personas con su agente, y bolitas de luz hacia la mente común
+     — y de vuelta, porque una mente compartida devuelve lo que recibe. */
   var col=document.getElementById('colmena');
-  var posiciones=[8,22,36,64,78,90];
-  posiciones.forEach(function(x){ var c=document.createElement('div'); c.className='casa'; c.style.left=x+'%'; col.appendChild(c); });
-  function vuelo(){
+  var GENTE=[10,30,50,70,90];
+  GENTE.forEach(function(x){
+    var d=document.createElement('div'); d.className='persona'; d.style.left=x+'%';
+    d.innerHTML='<span class="agente"></span><span class="yo">🧑</span>';
+    col.appendChild(d);
+  });
+  function orbe(desde, hacia, dur){
+    var o=document.createElement('span'); o.className='orbe';
+    var w=col.clientWidth, h=col.clientHeight;
+    o.style.left='0'; o.style.top='0';
+    col.appendChild(o);
+    var x1=desde[0]/100*w, y1=desde[1]/100*h, x2=hacia[0]/100*w, y2=hacia[1]/100*h;
+    var cx=(x1+x2)/2 + (x1<x2?18:-18), cy=Math.min(y1,y2)-26;   /* comba */
+    var t0=null;
+    (function anda(t){
+      if(t0===null) t0=t;
+      var k=Math.min(1,(t-t0)/dur), u=1-k;
+      var x=u*u*x1+2*u*k*cx+k*k*x2, y=u*u*y1+2*u*k*cy+k*k*y2;
+      o.style.transform='translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px)';
+      o.style.opacity = k<0.12 ? (k/0.12) : (k>0.86 ? (1-k)/0.14 : 1);
+      if(k<1) requestAnimationFrame(anda); else o.remove();
+    })(performance.now());
+  }
+  var NUCLEO=[50,27];
+  function pulso(){
     if(!document.body.contains(col)) return;
-    var desde=posiciones[Math.floor(Math.random()*posiciones.length)];
-    var a=document.createElement('span'); a.className='avion'; a.textContent='✈';
-    a.style.left=desde+'%'; a.style.bottom='3.2rem'; a.style.color='#7fdbff'; col.appendChild(a);
-    var px=(50-desde)/100*col.clientWidth;
-    a.animate([
-      {transform:'translate(0,0) rotate(0deg)', opacity:0},
-      {transform:'translate('+(px*0.5).toFixed(0)+'px,-3rem) rotate('+(px>0?12:-12)+'deg)', opacity:1, offset:0.5},
-      {transform:'translate('+px.toFixed(0)+'px,-1rem)', opacity:0}
-    ],{duration:2600, easing:'ease-in-out'}).onfinish=function(){ a.remove(); };
-    setTimeout(vuelo, 1400+Math.random()*1800);
+    var i=Math.floor(Math.random()*GENTE.length);
+    var pie=[GENTE[i],78];
+    if(Math.random()<0.62) orbe(pie,NUCLEO,1500+Math.random()*700);      /* aporta */
+    else {                                                               /* recibe */
+      var j=Math.floor(Math.random()*GENTE.length);
+      orbe(NUCLEO,[GENTE[j],78],1400+Math.random()*700);
+    }
+    setTimeout(pulso, 620+Math.random()*900);
   }
   if(!reduce){
-    var io4=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ vuelo(); io4.disconnect(); } }); },{threshold:0.3});
+    var io4=new IntersectionObserver(function(es){ es.forEach(function(e){ if(e.isIntersecting){ pulso(); io4.disconnect(); } }); },{threshold:0.3});
     io4.observe(col);
   }
 
