@@ -427,18 +427,12 @@
     <p class="pista" id="cargaPistas"></p>
   </div>
   <div class="pantalla" id="pantIdioma" hidden>
-    <div class="arcade-titulo">Select language</div>
+    <div class="arcade-titulo">Select language to begin</div>
     <div class="opciones">
       <button class="opcion" data-lang="es">Español</button>
       <button class="opcion" data-lang="en">English</button>
     </div>
-  </div>
-  <div class="pantalla" id="pantCoin" hidden>
-    <div class="arcade-titulo" data-t="introListo">Sistema listo</div>
-    <button class="coin" id="coinBtn">◉ Insert coin</button>
-    <p class="pista" data-t="introPista">1 crédito = la historia con música</p>
     <p class="pista sorteo" id="sorteo"></p>
-    <button class="sin-sonido" id="sinSonido" data-t="introMudo">o continúa sin sonido →</button>
   </div>
 </div>
 
@@ -714,7 +708,6 @@
   /* ── i18n: el español vive inline; el inglés se pinta encima ────── */
   var EN = {
     introListo:'System ready', start:'\u25b8 Press start',
-    introPista:'1 credit = the story with music',
     introMudo:'or continue without sound →',
     hudMem:'Memory', reinicia:'↻ play again',
     h1:'The memory they sell you<br>about AI <b>is fake</b>.',
@@ -797,25 +790,26 @@
   /* el credito de las DOS piezas sorteadas — cambian en cada partida, y verlas
      escritas es la unica forma de comprobar el sorteo sin fiarse del oido */
   function anunciaPista(){
-    var es=(lang!=='en');
-    if(pista) pista.textContent = es ? '1 crédito = la historia con música' : '1 credit = the story with music';
     var caja=document.getElementById('sorteo');
-    if(caja) caja.innerHTML =
-      '<b>'+(es?'intro':'intro')+':</b> «'+elegidaIntro.titulo+'» · <b>'+(es?'historia':'story')+':</b> «'+elegidaHist.titulo+'»'
-      + '<br><span class="tenue">Loyalty Freak Music · CC0 · archive.org</span>';
+    if(!caja) return;
+    var es=(lang!=='en');
+    caja.innerHTML='<b>'+(es?'intro':'intro')+':</b> «'+elegidaIntro.titulo+'» · <b>'
+      +(es?'historia':'story')+':</b> «'+elegidaHist.titulo+'»'
+      +'<br><span class="tenue">Loyalty Freak Music · CC0 · archive.org</span>';
   }
 
   /* reiniciar la partida: vuelve al select language y vuelve a sortear la musica */
   document.getElementById('reinicia').addEventListener('click',function(){ location.reload(); });
 
-  /* ── intro: select language → insert coin → desbloquear ─────────── */
+  /* ── intro: una sola pantalla. Elegir idioma ES empezar — antes había un
+     segundo paso ("insert coin") que solo pedía otro clic para lo mismo. El
+     control de silencio ya vive arriba y visible, así que tampoco hace falta
+     el "continuar sin sonido" que había aquí. ── */
   var intro=document.getElementById('intro');
-  var pantIdioma=document.getElementById('pantIdioma'), pantCoin=document.getElementById('pantCoin');
   [].forEach.call(document.querySelectorAll('.opcion'),function(b){
     b.addEventListener('click',function(){
       pinta(b.getAttribute('data-lang'));
-      pantIdioma.hidden=true; pantCoin.hidden=false;
-      document.getElementById('coinBtn').focus();
+      enciende(true); moneda(); cruzaAHistoria(); desbloquea();
     });
   });
   function desbloquea(){
@@ -823,10 +817,6 @@
     document.body.classList.remove('bloqueado');
     setTimeout(function(){ intro.remove(); },1000);
   }
-  document.getElementById('coinBtn').addEventListener('click',function(){
-    enciende(true); moneda(); cruzaAHistoria(); desbloquea();
-  });
-  document.getElementById('sinSonido').addEventListener('click',desbloquea);
 
   /* los ojos del shoggoth: nacen en sitios al azar, parpadean cada uno a su
      ritmo, y cada 7s se apagan TODOS y renacen en otro lado — cada sesión, un
@@ -915,7 +905,6 @@
   var TOPE=0.55, fades={};
 
   function credito(p){ return '«'+p.titulo+'» de '+p.autor+', '+p.lic+' via '+p.via; }
-  var pista=document.querySelector('[data-t="introPista"]');
 
   function fundir(el,destino,paso,alTerminar){
     clearInterval(fades[el.id]);
