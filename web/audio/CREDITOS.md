@@ -1,4 +1,4 @@
-# Créditos de audio — `web/audio/`
+# Créditos de recursos — `web/`
 
 Assets de terceros usados en el sitio público. Ninguno exige atribución por su
 licencia; se cita de todos modos, como práctica de esta casa.
@@ -76,3 +76,32 @@ y sin pérdida audible en música de fondo.
 > La consulta por género devolvió discos comerciales —Neurosis, Current 93— con etiqueta
 > CC0 puesta por quien los subió. **La etiqueta la escribe el que sube, no el titular.**
 > Solo se acepta cuando el que sube ES el autor, o la obra es de dominio público por edad.
+
+
+---
+
+## La ilustración del héroe (`historia.html`) — 2026-08-19
+
+La criatura del encabezado es **generada con Gemini a partir de un prompt de
+Akatzin**, y vive en la página como **trazo vectorial**, no como imagen.
+
+| Qué | Cómo |
+|---|---|
+| Origen | Imagen generada por Gemini · prompt de Akatzin · fuente en `borradores/mass2.png` |
+| En la página | SVG trazado del PNG: dos capas (`cuerpo`, `pliegues`), **71.6 KB** contra 711 KB del original |
+| Herramienta | Trazador propio en Python + PIL — marching squares sobre la reja de píxeles y Douglas-Peucker. No hay `potrace` ni `vtracer` en esta máquina |
+| Los ojos | **No están en la ilustración.** Se siembran por código sobre 121 sitios medidos del cuerpo —puntos donde un ojo cabe entero dentro de la masa— y renacen cada 7 s |
+| La carita | **Dibujada a mano en SVG**: un círculo, dos elipses y un arco. No es imagen |
+
+### Dos cosas que se decidieron a propósito
+
+**La insignia de procedencia se quitó del trazo, y por eso queda escrita aquí.**
+Es distinto de una marca de licencia: la imagen la generó Akatzin con su propio
+prompt y puede usarla. Pero que la obra sea generada por IA es un hecho del
+recurso, y en esta casa los hechos de un recurso viven en su registro, no en una
+esquina de la imagen.
+
+**Un smiley de stock se descartó.** Llegó un PNG de *pngtree* con sus marcas de
+agua repetidas: activo con licencia ajena, y quitarle la marca es justo lo que la
+marca impide. No hacía falta — la carita ya estaba dibujada en SVG, que además
+sale geométricamente perfecta y pesa unos bytes.
