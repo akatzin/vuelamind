@@ -224,6 +224,8 @@
     display:grid; place-items:center; color:var(--cianv); font-size:.85rem;
     box-shadow:0 0 14px -4px #00e5ffcc; font-family:'SF Mono',Menlo,monospace}
   .paso p{margin:0; padding-top:.2rem; color:#cfd8e0; font-size:.98rem}
+  .paso .opt{display:block; margin-top:.6rem}
+  .paso .opt:first-of-type{margin-top:.35rem}
   .paso a{color:var(--cian); text-decoration:none; border-bottom:1px solid #00e5ff44; padding-bottom:1px}
   .paso a:hover,.paso a:focus-visible{text-shadow:0 0 12px #00e5ffaa; border-color:var(--cianv); outline:none}
   .paso code{display:inline-block; margin-top:.45rem; padding:.3rem .6rem; border-radius:4px;
@@ -389,7 +391,12 @@
     </div>
   </section>
 
-  <div class="cierre cont rev">
+  <section class="cont rev">
+  <div class="eti ambar" data-t="sobEti"></div>
+  <p class="grande" data-t="sobP"></p>
+</section>
+
+<div class="cierre cont rev">
     <p class="frase" data-t="frase"></p>
     <div class="bin">01010011 01101000 01101111</div>
     <p class="desde" data-t="desde"></p>
