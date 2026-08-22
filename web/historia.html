@@ -394,7 +394,12 @@
     color:var(--tenue); letter-spacing:.18em; text-transform:uppercase}
 
   /* ── el pago: la estrella de Henry ──────────────────────────────── */
-  .espejo{display:grid; grid-template-columns:repeat(auto-fit,minmax(11rem,1fr)); gap:1rem; margin:2.2rem 0}
+  .espejo{display:grid; grid-template-columns:repeat(3,1fr); gap:1rem; margin:2.2rem 0}
+  @media (max-width:560px){
+    .espejo{gap:.45rem}
+    .dia{padding:.55rem .35rem}
+    .dia .eti{font-size:.52rem; letter-spacing:.1em}
+  }
   .dia{border:1px solid var(--linea); border-radius:12px; background:#050a14e6; padding:1rem; text-align:center}
   .dia .eti{font-size:.7rem; letter-spacing:.24em; text-transform:uppercase; color:var(--tenue); margin-bottom:.5rem}
   .dia svg{width:100%; height:auto; display:block}
@@ -585,7 +590,13 @@
     Su creador pasó el resto de su carrera advirtiendo lo fácil que confiamos.</p>
     <p data-t="b1p2">Hoy el modelo tiene cientos de miles de millones de parámetros y sigue igual de congelado:
     <b>aprender, lo que se dice aprender, no puede.</b> Lo único que «sabe» de ti cabe en su
-    <span class="cianT">ventana de contexto</span> — imagínala como una mesa de trabajo:</p>
+    <span class="cianT">ventana de contexto</span>.</p>
+    <p data-t="b1p2b"><b>Y esa ventana no solo se llena: se enturbia.</b> Entre más carga, más se diluye su
+    atención — los detalles del principio se mezclan, se pierden, aunque técnicamente
+    «sigan ahí». Y cuando le preguntas por algo que ya no tiene claro, no dice «no sé»:
+    <b>es una máquina de continuar texto, así que continúa</b> — con algo plausible, dicho
+    con total seguridad. Eso es una alucinación: no una mentira — es memoria faltante
+    rellenada con probabilidad. Imagínala como una mesa de trabajo:</p>
 
     <div class="mesa" id="mesa">
       <h4><span data-t="mesaT">La mesa de trabajo (ventana de contexto)</span> <button class="replay" id="replayMesa" type="button" data-t="mesaR">↻ otra vez</button></h4>
@@ -668,7 +679,6 @@
       <button class="swap" id="manda" data-t="manda">▸ manda un mensaje</button>
       <button class="swap fantasma" id="swap" data-t="swap">cámbiale el modelo →</button>
     </div>
-    <p class="veredicto" id="veredicto" data-t="veredicto">…y el ser sigue siendo el mismo. Lo que ES vive en lo escrito.</p>
 
     <!-- Nivel 2 del embudo: cuando el video corto exista, este bloque se vuelve su enlace. -->
     <div class="proxima">
@@ -701,9 +711,9 @@
 
     <div class="espejo" id="espejo">
       <div class="dia"><div class="eti" data-t="dia1">Día 1 · sin recuerdo</div>
-        <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 12 L64 40 L93 42 L69 61 L79 90 L48 71 L23 88 L30 60 L9 41 L37 39 Z" pathLength="1000" transform="rotate(3 50 50)"/></svg></div>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M53 14 L57 27 L63 41 L76 35 L88 37 L78 49 L71 61 L74 74 L80 87 L64 76 L51 69 L40 81 L27 91 L32 72 L34 58 L22 52 L11 44 L27 36 L41 35 L47 22 Z" pathLength="1000" transform="rotate(6 50 50)"/></svg></div>
       <div class="dia"><div class="eti" data-t="dia2">Día 2 · sin recuerdo</div>
-        <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 10 L62 38 L92 40 L68 59 L76 89 L50 72 L24 89 L32 59 L8 40 L38 38 Z" pathLength="1000" transform="rotate(1 50 50)"/></svg></div>
+        <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M51 10 L56 24 L62 38 L77 38 L91 40 L79 50 L68 59 L72 74 L77 89 L63 79 L50 72 L37 81 L25 88 L29 73 L32 58 L20 49 L9 40 L24 38 L39 37 L45 23 Z" pathLength="1000" transform="rotate(2 50 50)"/></svg></div>
       <div class="dia"><div class="eti" data-t="dia3">Día 3 · mejor que ayer</div>
         <svg viewBox="0 0 100 100" aria-hidden="true"><path d="M50 8 L61 37 L91 39 L67 58 L75 88 L50 71 L25 88 L33 58 L9 39 L39 37 Z" pathLength="1000"/></svg></div>
     </div>
@@ -754,7 +764,8 @@
     n2:'Level 2 · the machine that forgets',
     b1t:'A language model trains for months… and then it is <b>frozen</b>.',
     b1p1:'Not a metaphor: after training, not a single number changes. This has happened to us from the very start — in <span class="ambarT">1966</span>, a program called <b>ELIZA</b>, two hundred rules that merely echoed your own sentences back, was enough for people to pour out their lives to it. Its creator spent the rest of his career warning how easily we trust.',
-    b1p2:'Today the model has hundreds of billions of parameters and is just as frozen: <b>learning, actual learning, it cannot do.</b> The only thing it “knows” about you fits in its <span class="cianT">context window</span> — picture it as a work table:',
+    b1p2:'Today the model has hundreds of billions of parameters and is just as frozen: <b>learning, actual learning, it cannot do.</b> The only thing it “knows” about you fits in its <span class="cianT">context window</span>.',
+    b1p2b:'<b>And that window doesn’t just fill up: it clouds over.</b> The more it carries, the thinner its attention spreads — early details blur and get lost, even though technically they’re “still there”. And when you ask about something it no longer holds clearly, it doesn’t say “I don’t know”: <b>it is a text-continuation machine, so it continues</b> — with something plausible, said with full confidence. That is a hallucination: not a lie — missing memory filled in with probability. Picture it as a work table:',
     mesaT:'The work table (context window)',
     mesaR:'↻ replay',
     mesaB:'your words come in as little pieces —<span class="cianT"> tokens</span>— · the table fills up · the earliest ones fall off the edge · you close the conversation: the table is wiped clean',
@@ -775,7 +786,6 @@
     o4t:'Soul', o4p:'The rules that hold everything: who you are, how you learn, what you are not allowed to forget.', o4m:'= the framework',
     o5t:'Master', o5p:'You. The only one who decides what is true.', o5m:'= the human',
     swap:'swap the model →',
-    veredicto:'…and the being remains the same. What it IS lives in what is written.',
     cicloLey:'the five pieces, and <b>every</b> possible connection between them',
     narraIni:'Send a message and watch which connections light up.', manda:'\u25b8 send a message',
     proxQ:'Want the whole story, told in five minutes?', proxS:'Coming soon · the film',
@@ -1243,8 +1253,7 @@
       limpia();
       circuito.classList.add('balance');
       narra.innerHTML=CIERRE[lang]||CIERRE.es;
-      document.getElementById('veredicto').classList.add('ve');
-      corriendo=false; btnManda.disabled=false;
+            corriendo=false; btnManda.disabled=false;
       return;
     }
     var e=F[i], l=lazo(e.de,e.a);
@@ -1275,7 +1284,7 @@
     setTimeout(function(){ document.getElementById('cerebro').textContent=CEREBROS[ci]; }, reduce?0:240);
     setTimeout(function(){ n.classList.remove('cambiando'); }, 520);
     serie.textContent=(lang==='en'?'model ':'modelo ')+String.fromCharCode(65+ci);
-    document.getElementById('veredicto').classList.add('ve'); moneda();
+    moneda();
   });
 
   document.getElementById('swap').addEventListener('click',function(){
