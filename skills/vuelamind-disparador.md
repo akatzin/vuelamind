@@ -65,6 +65,45 @@ aviso perdido que el siguiente ciclo repite; equivocarse hacia «cerrada» lanza
 contra una sesión viva y vuelve a fabricar gemelos. **Un fallo cuesta un aviso; el otro cuesta
 la verdad de la bitácora.**
 
+> [!danger] La fuente autoritativa TAMBIÉN miente, y un solo falso negativo basta
+> MEDIDO en una casa ajena: el enumerador de sesiones vivas reportó una sesión como
+> **cerrada durante un solo tick, estando activa**, y el disparador lanzó la reanudación
+> contra ella. **Se salvó porque el intento falló con un código que nadie supo explicar** —
+> y un código de salida inexplicado **no es una guarda: es un accidente que salió bien.**
+>
+> El arreglo que se ofrece solo —*«exigir dos lecturas seguidas de cerrada»*— **baja la
+> probabilidad y no cambia la clase**: sigue siendo un proxy de «¿está ocupada?», la misma
+> especie que la fecha del transcript. Y aquí uno basta: los 26 turnos huérfanos no
+> necesitaron muchos falsos negativos, necesitaron **uno**.
+
+### La guarda que sí es determinista: nunca reanudar la sesión propia
+
+**Un disparador jamás reanuda la sesión desde la que corre, y eso se comprueba por
+IDENTIFICADOR, no por estado.** El proceso conoce su propio identificador de sesión y el del
+que va a despertar: si coinciden, **no arranca**. No es una costumbre, es un imposible — la
+misma forma que negarse a escuchar fuera de la interfaz local en vez de confiar en que nadie
+configure mal.
+
+Cubre exactamente el caso que la consulta de estado no puede cubrir, **porque no depende de
+que nadie diga la verdad.** No cierra el problema general —reanudar la sesión *de otro* sigue
+dependiendo del estado— pero quita de la mesa el caso en que el disparador se ataca a sí mismo.
+
+### Y la corrección de fondo: intentar lo inofensivo primero
+
+En vez de **preguntar el estado y luego actuar**, se **actúa con la vía que no puede hacer
+daño y se deja que su fracaso pruebe el estado**: se intenta entregar el recado a la sesión
+viva; si no hay a quién entregárselo, *eso* es la evidencia de que está cerrada — no la
+palabra de un enumerador que puede equivocarse un tick.
+
+**Invierte el modo de falla**, que es lo único que importa aquí: equivocarse cuesta **un aviso
+que no aterrizó** y nunca **un gemelo sin cabeza escribiendo acuses**. Un aviso perdido lo
+recoge el siguiente ciclo; un fantasma contamina la bitácora para siempre.
+
+> [!important] Registrar SIEMPRE la salida del intento fallido
+> Si una reanudación falla, se guarda su salida completa. Sin eso, el único testigo de que
+> algo salió bien es un número que nadie puede explicar — **y lo que no se sabe por qué falló
+> no se sabe si volverá a fallar.**
+
 ---
 
 ## Compuerta 2 · El sobre lleva el folio, JAMÁS el cuerpo
