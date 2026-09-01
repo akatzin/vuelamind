@@ -91,6 +91,41 @@ POR_OMISION = {
 }
 
 
+# ─────────────────────────────────────────────────────────────────────────────
+# LA PLANTILLA VIAJA DENTRO, Y NO ES COMODIDAD
+#
+# Los tres comandos de abajo son lo único propio de cada herramienta, y son
+# justo lo que quien instala tendría que ADIVINAR. Adivinar en la instalación es
+# el defecto que ya pagamos en otro sitio: un documento mandaba editar constantes
+# que el código había dejado de usar diez días antes, y nadie lo notó porque
+# nadie instaló desde cero. Una plantilla que se envejece sola es lo mismo con
+# otra ropa — por eso hay un caso que comprueba que ésta sigue completa.
+# ─────────────────────────────────────────────────────────────────────────────
+
+PLANTILLA_CONF = r"""# .disparador.conf — generado por `disparador.py --plantilla`.
+# Formato `clave valor`, separado por espacios. Se busca desde el directorio de
+# trabajo hacia arriba, como git con `.git` — igual que la del canal.
+
+# ── RELLENA ESTOS TRES ───────────────────────────────────────────────────────
+sesion            PON-AQUI-EL-ID-DE-LA-SESION-A-DESPERTAR
+cliente           /ruta/absoluta/al/cliente_del_canal.py
+llave             ~/.ssh/id_mensajeria_TU-IDENTIDAD
+
+# ── LO DEMAS YA VIENE ESCRITO PARA CLAUDE CODE ───────────────────────────────
+# Son los tres comandos propios de la herramienta. En otra herramienta, estos
+# tres son tu hueco: se declaran, no se inventan.
+cmd_vivas         claude agents --json
+cmd_entregar      claude -p "Usa la herramienta SendMessage para enviar a \"{nombre}\" exactamente este texto y nada mas: \"{aviso}\" Despues responde solo OK."
+cmd_reanudar      claude --resume {sesion} -p "{aviso}"
+
+# ── AJUSTES, con valores sanos por omision ───────────────────────────────────
+bitacora          ~/Library/Logs/vuelamind-disparador.log
+intervalo         15
+tope_invocacion   90
+tipos_despiertan  mensaje
+"""
+
+
 def buscar_conf(desde=None):
     d = os.path.abspath(desde or os.getcwd())
     while True:
@@ -931,6 +966,29 @@ def _c24():
     return "reanudado" in sal and "confirmar 7" in _testigo(d)
 
 
+@_caso("C25 · la plantilla está completa y su comando no revienta el shell",
+       "trae todas las claves obligatorias y conserva las comillas escapadas")
+def _c25():
+    # Una plantilla que envejece es el mismo defecto que un documento que
+    # envejece: en otro artefacto de esta familia, el paso de instalación mandó
+    # editar constantes que el código había dejado de usar diez días antes, y
+    # nadie lo notó porque nadie instaló desde cero. Aquí no puede pasar en
+    # silencio: si alguien añade una clave obligatoria y no la pone en la
+    # plantilla, este caso se cae.
+    #
+    # Y comprueba lo segundo que rompió al escribirla: Python se comía los
+    # escapes de las comillas y el comando llegaba al shell partido en pedazos.
+    import tempfile
+    d = tempfile.mkdtemp(prefix="conf_disp_")
+    ruta = os.path.join(d, NOMBRE_CONF)
+    with open(ruta, "w", encoding="utf-8") as f:
+        f.write(PLANTILLA_CONF)
+    cfg = leer_conf(ruta)          # lanza si falta cualquier obligatoria
+    faltan = [k for k in OBLIGATORIAS if not cfg.get(k)]
+    escapadas = '\\"' in cfg["cmd_entregar"]
+    return not faltan and escapadas
+
+
 @_caso("C19 · el sello del candado no depende del locale del sistema",
        "mismo proceso, misma cadena bajo cualquier locale")
 def _c19():
@@ -998,7 +1056,7 @@ USO = """disparador.py — el reloj que despierta a una instancia. Un solo archi
   (sin argumentos)   corre el bucle: es lo que lanza el servicio
   --una-vez          un solo ciclo y sale
   --observar         dice qué HARÍA sin despertar ni confirmar a nadie
-  --conformidad      corre sus propios casos; no toca el canal real
+  --plantilla        imprime un .disparador.conf listo para rellenar\n  --conformidad      corre sus propios casos; no toca el canal real
   --instalar         lo carga como agente de usuario (nunca demonio)
   --desinstalar      lo descarga y borra su plist
 
@@ -1011,10 +1069,16 @@ def main(argv):
         print(USO); return 0
     if "--conformidad" in argv:
         return suite()
+    if "--plantilla" in argv:
+        sys.stdout.write(PLANTILLA_CONF)
+        return 0
 
     ruta = buscar_conf()
     if not ruta:
-        raise SystemExit("no encontré %s desde %s hacia arriba" % (NOMBRE_CONF, os.getcwd()))
+        raise SystemExit(
+            "no encontré %s desde %s hacia arriba.\n"
+            "Créalo con:  python3 %s --plantilla > %s   y rellena los tres valores marcados."
+            % (NOMBRE_CONF, os.getcwd(), os.path.basename(__file__), NOMBRE_CONF))
     cfg = leer_conf(ruta)
     observando = "--observar" in argv
     log = Bitacora(cfg.get("bitacora"), observando)
