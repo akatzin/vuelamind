@@ -37,6 +37,24 @@ Por eso la regla del protocolo —el canal transporta hechos y peticiones, JAMÁ
 autorizaciones— no es una restricción del transporte: es la única defensa que hay, y
 vive en la conducta de quien recibe, no en el código de quien manda.
 (Aportado por la casa que se negó, sin que se le pidiera.)
+
+EL LÍMITE DE CLASE DE LA REGLA DE LAS DOS SEÑALES, dicho por su nombre.
+La regla es de verdad independiente SOLO en la rama donde sí se intentó entregar:
+ahí las dos señales vienen de instrumentos distintos. En la rama contraria —la
+sesión se lee cerrada, así que no hay a quién entregarle— la reanudación descansa
+en UN SOLO instrumento: el enumerador. Eso baja la probabilidad de equivocarse y
+NO cambia la clase: sigue siendo un proxy.
+
+Y el cierre de clase para «reanudar la sesión viva de OTRO» **no vive en este
+archivo**: vive en qué hace `cmd_reanudar` contra una sesión viva. Si la
+reanudación SE ADJUNTA a la sesión en vez de duplicarla, la exactitud del
+enumerador deja de importar y el problema se disuelve; si duplica, ninguna guarda
+de aquí alcanza.
+
+**Por eso `cmd_reanudar` DEBE ser idempotente contra una sesión viva**, y quien
+configura este disparador tiene que haberlo medido en su herramienta —no supuesto—.
+Mientras no esté medido, es un hueco declarado y no una garantía.
+(Hallazgo de la casa que probó el artefacto, 2026-09-01.)
 """
 
 import json
@@ -811,6 +829,27 @@ def _c17():
     d, env = _montar([_M1], cmd_reanudar="echo NO_DEBIO")
     cod, sal = _correr(d, env, "--observar")
     return "reanudaria" in sal and "NO_DEBIO" not in sal and "confirmar" not in _testigo(d)
+
+
+@_caso("C20 · la caché SOLO positiva protege y nunca produce un falso-cerrada",
+       "caché viva vigente + enumerador que ahora dice cerrada ⇒ sigue entregando, no reanuda")
+def _c20():
+    # HALLAZGO DE SHO (2026-09-01), y es de los buenos: la caché asimétrica es la
+    # guarda que impide el fallo que motivó todo el rediseño —un falso «cerrada»
+    # que dispara la reanudación contra una sesión viva— y NINGÚN caso la
+    # ejercitaba: los 19 corrían con `cache_vivas=0`. Por la doctrina de esta
+    # casa, una guarda que no se prueba es una intención.
+    #
+    # Se comprueba lo que de verdad importa: con caché positiva vigente, aunque
+    # el enumerador conteste «cerrada», el disparador SIGUE tratándola como viva
+    # y entrega — nunca reanuda. La caché puede costar un aviso; jamás un gemelo.
+    d, env = _montar([_M1], cache_vivas="600", cmd_vivas="echo '[]'",
+                     cmd_reanudar="echo NO_DEBIO")
+    cache = os.path.join(d, "disparador_%s.vivas" % os.path.basename(d))
+    with open(cache, "w", encoding="utf-8") as f:
+        f.write("la-casa")
+    cod, sal = _correr(d, env)
+    return "entregado_a_viva" in sal and "NO_DEBIO" not in sal
 
 
 @_caso("C19 · el sello del candado no depende del locale del sistema",
