@@ -795,6 +795,34 @@ def _c17():
     return "reanudaria" in sal and "NO_DEBIO" not in sal and "confirmar" not in _testigo(d)
 
 
+@_caso("C19 · el sello del candado no depende del locale del sistema",
+       "mismo proceso, misma cadena bajo cualquier locale")
+def _c19():
+    # NO es adorno: `lstart` devuelve una fecha legible cuyo formato cambia con el
+    # locale, y launchd no hereda el entorno del shell. MEDIDO aquí: el mismo
+    # proceso da "Tue Sep  1" con LC_ALL=C y "mar.  1 sep" con es_MX.UTF-8. Sin
+    # forzarlo, el dueño VIVO del candado se lee como huérfano y se le arrebata
+    # el candado — el duplicado exacto que el candado existe para evitar.
+    pid = str(os.getpid())
+    bajo_c = sello_de(pid)
+    guardado = os.environ.get("LC_ALL")
+    os.environ["LC_ALL"] = "es_MX.UTF-8"
+    try:
+        bajo_otro = sello_de(pid)
+    finally:
+        if guardado is None:
+            os.environ.pop("LC_ALL", None)
+        else:
+            os.environ["LC_ALL"] = guardado
+    suelto = subprocess.run(["ps", "-o", "lstart=", "-p", pid],
+                            stdout=subprocess.PIPE,
+                            env=dict(os.environ, LC_ALL="es_MX.UTF-8")).stdout
+    suelto = " ".join(suelto.decode("utf-8", "replace").split())
+    # el sello debe ser estable, Y debe diferir de lo que saldría sin forzarlo
+    # (si no difiriera, esta prueba no estaría comprobando nada)
+    return bool(bajo_c) and bajo_c == bajo_otro and bajo_c != suelto
+
+
 @_caso("C18 · el instalador se niega si la llave no existe", "ME_NIEGO_llave_ausente")
 def _c18():
     d, env = _montar([], llave=os.path.join(d0(), "no-existe"))
