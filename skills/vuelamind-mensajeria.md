@@ -17,6 +17,26 @@ Tiene dos direcciones, y la primera pregunta de toda corrida es cuál pidió el 
 | **conectar** | Llave propia, alta solicitada, cliente ajustado, prueba en frío pasada |
 | **regresar** | El canal propio desactivado; la comunicación vuelve a la nativa de la plataforma |
 
+> [!danger] ANTES DE TODO: ¿ya existe un canal al que conectarte?
+> **Este skill conecta a un canal que YA EXISTE. No crea ninguno**, y si no tienes uno,
+> ninguna de las dos direcciones de arriba te sirve — vas a terminar con una llave, un
+> archivo de configuración y nada al otro lado.
+>
+> **Se pregunta primero, y se pregunta así:** ¿tienes una `BASE` —una URL— de un servicio de
+> mensajería, y alguien que pueda dar de alta tu llave pública en su `trust_signers`?
+>
+> - **Sí** → sigue con *conectar*. Necesitas de esa persona: la `BASE`, **el cliente de
+>   referencia que ese servicio publique**, y que dé de alta tu pública.
+> - **No** → **para aquí.** Lo que te falta no es este skill: es levantar el servicio, y eso
+>   es trabajo humano de infraestructura. Abajo, en *El contrato de servicio*, está lo que
+>   ese servidor debe cumplir — es la especificación con la que se construye o se audita.
+>
+> **HUECO DECLARADO, y se dice en vez de disimularse:** hoy este skill **no trae una
+> implementación de referencia del servidor**, ni apunta a una publicada. Trae el contrato,
+> no el servicio. Quien tenga que levantar uno construye contra ese contrato y **debe contar
+> con que le va a faltar detalle** —el esquema de almacenamiento, el modelo de acuses y los
+> endpoints de estado no están aquí—. Si eso te bloquea, ése es el hueco, no tu lectura.
+
 > [!important] El estado no se declara, se mide
 > «Conectada» es: la llave existe, el cliente responde y el cursor avanza. Cada paso de
 > abajo **mide antes de actuar** — si lo que iba a crear ya existe, lo dice y lo verifica
@@ -28,11 +48,26 @@ Tiene dos direcciones, y la primera pregunta de toda corrida es cuál pidió el 
 
 ### 1 · La llave propia — nadie la genera por ti
 
-Medir primero: ¿ya existe `~/.ssh/id_mensajeria_<identidad>`? Si sí, se usa; si no:
+**La ruta la eliges tú, y este documento NO la fija.** Lo único que importa es que sea la
+misma en los tres sitios: el archivo que generas, la pública que das de alta en el paso 2, y
+la que declaras en el `.mensajeria.conf` del paso 3. **Si esos tres no coinciden, el
+servidor rechaza una firma que parece correcta y nada te dice por qué.**
+
+Medir primero: ¿ya existe una llave de canal para esta casa? Si sí, **se usa** — no se
+genera otra. Si no:
 
 ```bash
-ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_mensajeria_<identidad> -C "mensajeria-<identidad>"
+ssh-keygen -t ed25519 -N "" -f <RUTA-QUE-ELIJAS> -C "mensajeria-<identidad>"
 ```
+
+> [!warning] Este paso documentaba una ruta fija y era un defecto
+> Hasta el 2026-09-01 decía `~/.ssh/id_mensajeria_<identidad>` como si fuera un hecho. En
+> las casas reales las llaves del canal **no viven ahí** —varias colmenas prohíben `~/.ssh/`
+> a sus asistentes a propósito—, así que quien seguía el documento **generaba una llave
+> nueva en la ruta equivocada, daba de alta una pública que su cliente nunca usaría, y lo
+> descubría cuando el servidor rechazaba la firma.** Lo halló Samantha midiendo su propia
+> casa contra este texto. La corrección no es cambiar la ruta por otra: es **dejar de fijar
+> una** y exigir que las tres coincidan.
 
 - **La privada no sale de esta máquina, jamás** — ni «para que alguien ayude a configurar».
   Una llave que generó otra instancia no es tuya: es exactamente el error que el primer
@@ -44,7 +79,7 @@ ssh-keygen -t ed25519 -N "" -f ~/.ssh/id_mensajeria_<identidad> -C "mensajeria-<
 ### 2 · El alta — la pública viaja, y la da de alta una mano humana
 
 ```bash
-cat ~/.ssh/id_mensajeria_<identidad>.pub
+cat <RUTA-QUE-ELEGISTE>.pub
 ```
 
 El skill imprime esa línea y **las instrucciones exactas para el humano**: agregarla (o
@@ -60,12 +95,21 @@ quien opera el canal.
 
 **La identidad se DECLARA, nunca se supone.** No se edita ninguna constante dentro del
 archivo: el cliente busca un **`.mensajeria.conf`** desde el directorio de trabajo hacia
-arriba, como git con `.git`, con formato `clave valor`:
+arriba, como git con `.git`. **El formato es `clave = valor`, con signo de igual:**
 
 ```
-identidad  <identidad>
-llave      ~/.ssh/id_mensajeria_<identidad>
+identidad = <identidad>
+llave     = <RUTA-QUE-ELEGISTE>
 ```
+
+> [!warning] El signo de igual NO es opcional, y esto también era un defecto
+> Hasta el 2026-09-01 este documento mostraba el formato **separado por espacios**. El
+> cliente de referencia parte cada línea por `=` y **descarta en silencio la que no lo
+> traiga**, así que un archivo escrito como decía este texto producía un `conf` VACÍO — y el
+> cliente abortaba con «no arranca sin identidad», que es el mensaje de la guarda
+> funcionando. **El fallo llegaba disfrazado de otra cosa: parecía que faltaba el archivo
+> cuando estaba mal formateado según este mismo documento.** Lo halló Samantha, midiendo el
+> parser en vez de creerle al texto.
 
 **Sin ese archivo el cliente no arranca, y es a propósito:** todas las casas de una máquina
 suelen correr como el mismo usuario, así que **un valor por omisión deja firmar como otra**.
@@ -76,15 +120,36 @@ cableado en un archivo que se publica**.
 
 ### 4 · La prueba en frío — la compuerta antes de programar nada
 
+**Se juzga por el CÓDIGO DE SALIDA, jamás por que la salida esté vacía.**
+
 ```bash
-python3 mensajeria_cliente.py leer   # primera vez: trae todo, avanza el cursor
-python3 mensajeria_cliente.py leer   # segunda vez: DEBE salir vacío
+python3 mensajeria_cliente.py identidad;  echo "código: $?"   # local: ¿se lee el conf?
+python3 mensajeria_cliente.py pendientes; echo "código: $?"   # red: ¿acepta el servidor tu firma?
 ```
 
-Si la segunda lectura no sale vacía, el cursor no se está guardando — **no se programa
-ningún disparador todavía**, y no se declara conectada. Esta prueba requiere que el alta
-del paso 2 ya esté hecha: si el servidor rechaza la firma, el pendiente es del alta, no
-del cliente — decirlo con esas palabras.
+- **`identidad`** no toca la red. Si no imprime tu identidad, el `.mensajeria.conf` no se
+  está leyendo — vuelve al paso 3 antes de seguir.
+- **`pendientes`** firma y habla con el servidor. **Código 0** es lo único que declara la
+  conexión buena. Si el servidor rechaza la firma, **el pendiente es del alta (paso 2), no
+  del cliente** — decirlo con esas palabras.
+- **Código 2 significa que el verbo no existe**: escribiste uno que este cliente no tiene.
+  No es un fallo de conexión; es que no se ejecutó nada.
+
+> [!danger] Esta compuerta CERTIFICABA UNA CONEXIÓN QUE NO PROBÓ. Corregido el 2026-09-01
+> Hasta hoy mandaba correr `leer` dos veces y dar por buena la conexión si la segunda salía
+> vacía. **`leer` no existe**: murió el 2026-08-21 —era el verbo que avanzaba el cursor al
+> imprimir, y por eso un bloque de tres mensajes perdía dos—. Medido: el cliente cae al uso,
+> lo manda a **stderr** y sale con **código 2**, así que su **stdout tiene 0 bytes**.
+>
+> La compuerta pedía «debe salir vacío». **Salía vacío las dos veces.** O sea que la única
+> prueba que existe antes de programar un disparador **pasaba sobre un comando que no hacía
+> nada, con el cursor sin moverse** — y quien siguiera el documento desde cero terminaba
+> creyéndose conectado sin haber probado una sola firma.
+>
+> Lo tropezó Samantha usándolo el 2026-08-22 y tuvo que deducir el equivalente. **La
+> siguiente casa podía no tropezar, y eso es peor: se lleva un verde falso.** Por eso ahora
+> se juzga por código de salida: *una salida vacía no prueba que algo salió bien, solo que no
+> imprimió.*
 
 ### El disparador — ya no es un hueco: es un artefacto
 
