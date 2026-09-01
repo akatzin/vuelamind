@@ -747,7 +747,18 @@ class Disparador:
                      cobrado="no" if self.desde_cache else "sí",
                      nota="cursor quieto; caché invalidada; el siguiente tick resuelve")
             return 1
-        self.log("entregado_a_viva", sesion=sesion, folios=",".join(map(str, folios)))
+        # EL ACUSE VIAJA EN EL REGISTRO, y no es adorno: hallazgo de Sho en la
+        # primera prueba de campo real (2026-09-01). En el camino de ÉXITO no se
+        # registraba QUÉ contestó el agente, así que la prueba de que el acuse se
+        # evaluó era INDIRECTA —«se escribió entregado_a_viva, y en esta versión eso
+        # exige acuse»—. Correcta, pero deducida de la versión del código.
+        #
+        # Si algún día el acuse se rompiera de una forma que igual dejara pasar,
+        # esta línea no lo delataría. Es «una medición viaja con lo que la produjo,
+        # o es inauditable», aplicado al camino que sí funciona — que es donde nadie
+        # mira.
+        self.log("entregado_a_viva", sesion=sesion, folios=",".join(map(str, folios)),
+                 acuse=(lineas[-1][:60] if lineas else "(sin salida)"))
         if self.confirmar(ultimo):
             for f in folios:
                 olvidar(self.cuenta, f)
@@ -1334,6 +1345,18 @@ def _c34():
     render = PLANTILLA_PLIST.format(version="X", etiqueta="e", python="/p", script="/s",
                                     dir_conf="/d", ruta_path="/usr/bin:/bin", salida="/l")
     return hueco and "<key>PATH</key><string>/usr/bin:/bin</string>" in render
+
+
+@_caso("C35 · el registro de ÉXITO dice QUÉ contestó el agente",
+       "la prueba del acuse es directa, no deducida de la versión del código")
+def _c35():
+    # Hallazgo de Sho en la primera prueba de campo real: la línea de éxito no
+    # traía la respuesta, así que había que deducir que el acuse se evaluó a partir
+    # de saber qué versión corría. El camino que funciona es justo donde nadie
+    # mira, y por eso es donde una regla puede dejar de aplicarse sin síntoma.
+    d, env = _montar([_M1], cmd_entregar='echo "ruido antes"; echo OK')
+    cod, sal = _correr(d, env)
+    return "entregado_a_viva" in sal and "acuse=OK" in sal and "confirmar 7" in _testigo(d)
 
 
 @_caso("C25 · la plantilla está completa y su comando no revienta el shell",
