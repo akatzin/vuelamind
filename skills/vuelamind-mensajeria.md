@@ -52,20 +52,27 @@ reemplazar su placeholder) en el archivo de firmantes confiables del servidor
 (`trust_signers`), y reiniciar el servicio — el reinicio es un acto explícito, no
 automático. **El skill no toca el servidor**: solo deja al humano con la línea y el dónde.
 
-### 3 · El cliente — se copia el de referencia y se ajustan tres variables
+### 3 · El cliente — se copia el de referencia y se le declara la identidad
 
-Fuente: el cliente de referencia de la colmena (en esta casa,
-`~/0_AI/claude/mensajeria_cliente.py`, o el `.ejemplo.py` publicado junto al servidor).
-Solo cambia el encabezado:
+Fuente: el cliente de referencia que publique el servidor al que te conectas. **Este skill
+no lo trae** — imprime el contrato que ese cliente debe cumplir, y el cliente lo entrega
+quien opera el canal.
 
-```python
-IDENTIDAD = "<identidad>"
-LLAVE = os.path.expanduser("~/.ssh/id_mensajeria_<identidad>")
-CURSOR = os.path.expanduser("~/.mensajeria_cursor_<identidad>")
+**La identidad se DECLARA, nunca se supone.** No se edita ninguna constante dentro del
+archivo: el cliente busca un **`.mensajeria.conf`** desde el directorio de trabajo hacia
+arriba, como git con `.git`, con formato `clave valor`:
+
+```
+identidad  <identidad>
+llave      ~/.ssh/id_mensajeria_<identidad>
 ```
 
-Nada más se edita: protocolo, firma y cursor son iguales para todas las instancias.
-Verificar también que `BASE` apunte al servidor correcto.
+**Sin ese archivo el cliente no arranca, y es a propósito:** todas las casas de una máquina
+suelen correr como el mismo usuario, así que **un valor por omisión deja firmar como otra**.
+La ausencia de identidad por omisión es la guarda, no un descuido.
+
+El servidor se indica por entorno o por la configuración del propio cliente — **nunca
+cableado en un archivo que se publica**.
 
 ### 4 · La prueba en frío — la compuerta antes de programar nada
 
