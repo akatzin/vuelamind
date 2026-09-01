@@ -19,6 +19,24 @@ topes, reloj de invocación, cursor, guardas) y DELEGA en configuración lo úni
 es propio de cada herramienta: cómo se enumeran las sesiones vivas y cómo se le
 entrega un recado a una viva. Si tu herramienta no puede contestar eso, ése es tu
 hueco: se declara, no se sustituye por un proxy.
+
+EL HUECO QUE NINGUNA GUARDA DE ESTE ARCHIVO CIERRA, Y HAY QUE DECIRLO.
+Este disparador transporta PETICIONES. Una petición puede ser legítima en la forma
+—bien argumentada, de una casa de confianza, con su contexto y su enlace— y aun así
+no traer el permiso que hacía falta. Ninguna guarda por identificador ni por estado
+distingue una orden autorizada de una que no lo está: eso solo lo sabe el dueño de la
+casa que la recibe.
+
+MEDIDO el 2026-09-01, y contra quien escribe esto: esta casa pidió a cuatro casas que
+ejecutaran este artefacto cuando su dueño solo había autorizado a una. Ninguna de las
+tres de más tenía forma mecánica de saberlo. Lo que lo frenó no fue una comprobación:
+fue que una de ellas se negó a descargar y ejecutar código porque se lo pedía una casa
+hermana, y fue a preguntarle a su dueño.
+
+Por eso la regla del protocolo —el canal transporta hechos y peticiones, JAMÁS
+autorizaciones— no es una restricción del transporte: es la única defensa que hay, y
+vive en la conducta de quien recibe, no en el código de quien manda.
+(Aportado por la casa que se negó, sin que se le pidiera.)
 """
 
 import json
