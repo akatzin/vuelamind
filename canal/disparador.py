@@ -65,11 +65,21 @@ escribió — contra un transcript abandonado levanta a un lector que no es nadi
 (arriba), y contra una sesión ABIERTA levanta un gemelo sin cabeza que contesta en su
 lugar y firma el acuse (MEDIDO el 2026-08-23). Sin blanco legítimo no queda rama.
 
-La única entrega es `cmd_entregar` contra una sesión viva resuelta, y esa vía tiene la
-propiedad que la reanudación nunca tuvo: SI EL BLANCO ES EL EQUIVOCADO, FALLA. Un
-`--resume` acierta el código de salida aunque no haya nadie leyendo; un recado a una
-sesión que ya no existe se cae. Un cursor que solo avanza tras un acierto no puede
-tragarse un folio.
+La única entrega es `cmd_entregar` contra una sesión viva resuelta. Y AQUÍ HUBO UNA
+AFIRMACIÓN FALSA QUE DURÓ UNAS HORAS, escrita en este mismo sitio: se dijo que esta vía
+era segura porque «si el blanco es el equivocado, FALLA». MEDIDO el 2026-09-01: es falso.
+Entregar a un nombre que no existe termina en CÓDIGO 0 — el agente explica en prosa que
+no envió nada y el proceso sale bien.
+
+O sea que la vía que quedaba tenía el MISMO vicio que la retirada: una invocación que
+acierta el código de salida sin que nadie reciba nada. La reanudación mentía por
+resucitar un transcript abandonado; ésta miente porque el código de salida mide el
+PROCESO, no el recado.
+
+Lo que de verdad cierra el hueco no es elegir mejor vía: es no aceptar la ausencia de
+error como prueba. El éxito exige un ACUSE POSITIVO —la plantilla ya pedía «después
+responde solo OK», y nadie lo comprobaba jamás—. Sin acuse no se confirma, el folio
+espera y el siguiente ciclo reintenta. Un contrato que no se verifica es una decoración.
 
 DESPERTAR UNA CASA CERRADA QUEDA SIN RESOLVER, y se declara como hueco en vez de
 fingirse: el folio espera en la cola y la casa lo recoge cuando abre. Un hueco
@@ -109,6 +119,7 @@ POR_OMISION = {
     "rezagados_edad": "600",
     "rezagados_max": "3",
     "bitacora": "",
+    "acuse_entrega": "OK",
     "sesion_propia": "",
     "env_sesion_propia": "CLAUDE_SESSION_ID",
     "tipos_despiertan": "mensaje",
@@ -150,6 +161,15 @@ llave             ~/.ssh/id_mensajeria_TU-IDENTIDAD
 # hueco y se declara — sin el, este disparador no entrega nada.
 cmd_vivas         claude agents --json
 cmd_entregar      claude -p "Usa la herramienta SendMessage para enviar a \"{nombre}\" exactamente este texto y nada mas: \"{aviso}\" Despues responde solo OK."
+
+# EL ACUSE NO ES ADORNO, y su ausencia costo un defecto: MEDIDO el 2026-09-01, entregar
+# a un nombre que NO existe termina en CODIGO 0 — el agente explica en prosa que no
+# envio nada y el proceso sale bien. El codigo de salida mide el PROCESO, no el recado.
+# Por eso solo cuenta como entregado si la ULTIMA linea es exactamente este acuse.
+# Se compara la ultima linea y no "contiene": el texto del fracaso medido trae la
+# palabra OK dentro de una frase que dice justo lo contrario.
+# Vacio lo desactiva, y entonces vuelves a confiar en el codigo de salida — no lo hagas.
+acuse_entrega     OK
 
 # cmd_reanudar NO existe y no se echa de menos: despertar una casa CERRADA es un
 # hueco declarado de este artefacto. Contra un transcript abandonado se levanta a
@@ -693,7 +713,29 @@ class Disparador:
             for f in folios:
                 intentos(self.cuenta, f, sumar=True)
         cod, sal = correr(cmd, self.tope)
-        if cod != 0:
+        # ── EL CÓDIGO DE SALIDA NO ES PRUEBA DE ENTREGA ──────────────────────
+        # MEDIDO el 2026-09-01, y tira la premisa con la que se justificó todo el
+        # rediseño. Se decía: «si el blanco es el equivocado, la entrega FALLA, y
+        # por eso esta vía es segura donde la reanudación no lo era». Es FALSO en
+        # esta herramienta: entregar a un nombre que no existe termina en CÓDIGO 0.
+        # El agente explica en prosa que no envió nada —«No puedo responder OK: el
+        # envío no ocurrió»— y el proceso sale bien.
+        #
+        # O sea que la vía que quedaba tenía el MISMO vicio que la que se retiró:
+        # una invocación que acierta el código de salida sin que nadie reciba nada.
+        # La reanudación mentía por resucitar un transcript; ésta miente porque el
+        # código de salida mide el proceso, no el recado.
+        #
+        # Por eso el éxito exige un ACUSE POSITIVO, no la ausencia de error: la
+        # plantilla ya pedía «después responde solo OK» y nadie lo comprobaba nunca.
+        # Un contrato que no se verifica es una decoración.
+        #
+        # Se compara la ÚLTIMA LÍNEA no vacía, no «contiene»: el texto del fracaso
+        # medido contiene la palabra OK dentro de una frase que dice lo contrario.
+        acuse = (self.cfg.get("acuse_entrega") or "").strip()
+        lineas = [l.strip() for l in sal.splitlines() if l.strip()]
+        acusado = (not acuse) or (bool(lineas) and lineas[-1].lower() == acuse.lower())
+        if cod != 0 or not acusado:
             try:
                 os.remove(self.cache_vivas)
             except OSError:
@@ -701,6 +743,7 @@ class Disparador:
             # Registrar SIEMPRE la salida del intento fallido: cuando esto falló en
             # una casa ajena, el único testigo fue un número sin explicación.
             self.log("entrega_fallo", codigo=cod, salida=sal[:400],
+                     motivo="código != 0" if cod != 0 else "salió 0 pero NO acusó recibo",
                      cobrado="no" if self.desde_cache else "sí",
                      nota="cursor quieto; caché invalidada; el siguiente tick resuelve")
             return 1
@@ -883,7 +926,7 @@ def _montar(pendientes=(), omitir=(), vivas=None, **extra):
     with open(ruta_vivas, "w", encoding="utf-8") as f:
         json.dump(vivas, f)
     base = {"casa": d, "cliente": os.path.join(d, "cliente.py"),
-            "cmd_vivas": "cat %s" % ruta_vivas, "cmd_entregar": "echo entregado",
+            "cmd_vivas": "cat %s" % ruta_vivas, "cmd_entregar": "echo OK",
             "intervalo": "1",
             "tope_invocacion": "8", "cache_vivas": "0",
             "bitacora": os.path.join(d, "bitacora.log")}
@@ -1232,6 +1275,34 @@ def _c31():
     env["FUGA"] = os.path.join(d, "fuga")
     _correr(d, env)
     return not os.path.exists(env["FUGA"])
+
+
+@_caso("C32 · salir 0 NO es haber entregado: sin acuse no se confirma",
+       "entrega_fallo aunque el código sea 0, y el cursor no se mueve")
+def _c32():
+    # EL DEFECTO QUE TIRÓ LA PREMISA DE TODO EL REDISEÑO, medido el 2026-09-01.
+    # Se había escrito que esta vía era segura porque «si el blanco es el
+    # equivocado, FALLA». Es falso: entregar a un nombre que no existe termina en
+    # CÓDIGO 0, y el agente explica en prosa que no envió nada. La vía que quedaba
+    # tenía el mismo vicio que la retirada.
+    #
+    # El texto de abajo es el que se midió de verdad, y trae la trampa dentro: la
+    # palabra OK aparece EN UNA FRASE QUE DICE LO CONTRARIO. Por eso se compara la
+    # última línea y no «contiene» — un `in` habría dado esto por entregado.
+    d, env = _montar([_M1],
+                     cmd_entregar='echo "No puedo responder OK: el envio no ocurrio."; '
+                                  'echo "Dime a cual de los tres lo mando."')
+    cod, sal = _correr(d, env)
+    return ("entrega_fallo" in sal and "NO acusó recibo" in sal
+            and "entregado_a_viva" not in sal and "confirmar" not in _testigo(d))
+
+
+@_caso("C33 · el acuse tiene que ser el acuse, no parecerse",
+       "una última línea que solo CONTIENE el acuse no cuenta")
+def _c33():
+    d, env = _montar([_M1], cmd_entregar='echo "casi OK pero no"')
+    cod, sal = _correr(d, env)
+    return "entrega_fallo" in sal and "confirmar" not in _testigo(d)
 
 
 @_caso("C25 · la plantilla está completa y su comando no revienta el shell",
