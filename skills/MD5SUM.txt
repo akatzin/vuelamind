@@ -4,7 +4,7 @@
 74ca47c43cafe9aed039669418ebddd1  vuelamind-help.md
 36f6874240e4c10318753ec419ac1ff8  vuelamind-join.md
 bc89e95dd37683dea5d2fa24dddc90fa  vuelamind-load.md
-233314419d78ed0655ece2b3f243cdf5  vuelamind-mensajeria.md
+9b8ade60d5b4a1cac6231d64a49fd620  vuelamind-mensajeria.md
 0be5d6bac742f8c2b962735f98ed87cc  vuelamind-skills.md
 749de85d2bb99897f186dfe9f5f2d571  vuelamind-soul.md
 93cdbf481db22dbfc63a45d4f0785cb5  vuelamind-upgrade.md

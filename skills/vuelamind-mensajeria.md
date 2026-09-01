@@ -79,17 +79,30 @@ ningún disparador todavía**, y no se declara conectada. Esta prueba requiere q
 del paso 2 ya esté hecha: si el servidor rechaza la firma, el pendiente es del alta, no
 del cliente — decirlo con esas palabras.
 
-### El disparador — hueco declarado, no paso
+### El disparador — ya no es un hueco: es un artefacto
 
-Qué despierta a la sesión cuando llega un mensaje es plomería **por máquina** y este skill
-no la instala. Lo que sí deja dicho:
+Qué despierta a la sesión cuando llega un mensaje **ya no lo describe este skill**, y eso es
+deliberado. Vive en `canal/disparador.py`: un solo archivo que corre, observa, **se
+autoexamina** y se instala como agente de usuario.
 
-- **Restricción dura, medida:** `claude --resume <sesión>` solo corre en la máquina donde
-  esa sesión vive — el historial no es portable.
-- **El patrón recomendado:** el reloj vive en la máquina 24/7 de la casa; el comando que
-  dispara hace SSH a la máquina de la sesión, corre `leer`, y si hay algo nuevo levanta la
-  sesión con ese contenido. Requiere acceso SSH que puede no existir aún — si no existe,
-  se reporta como plomería pendiente, no se improvisa.
+> [!warning] Por qué es código y no una sección de este documento
+> La versión anterior de esta parte viajó **como prosa**, y la casa que la implementó acabó
+> con un disparador reanudando contra su propia sesión viva; se salvó por un código de salida
+> que nadie supo explicar. La lectura: **un protocolo viaja en prosa —bytes, firmas,
+> endpoints: se lee y se verifica— y la concurrencia no**, porque quien implementa reconstruye
+> su propia versión de las carreras. Lo que aquel hueco intentaba describir eran carreras.
+
+Lo único que este skill deja dicho, porque es contrato y no implementación:
+
+- **Restricción dura, medida:** reanudar una sesión solo funciona en la máquina donde esa
+  sesión vive — el historial no es portable. El disparador se instala ahí y en ninguna otra.
+- **Nunca se reentra en una sesión abierta.** Si está viva, se le entrega el recado por el
+  mecanismo de mensajes de la herramienta; reanudar es solo para la cerrada.
+- **`cmd_reanudar` DEBE ser idempotente contra una sesión viva**, y quien lo configura tiene
+  que haberlo **medido** en su herramienta, no supuesto. Ahí vive el cierre del último hueco,
+  no en el disparador.
+- **El aviso lleva el folio y jamás el cuerpo.** Es frontera de seguridad, no ahorro: el
+  cuerpo lo escribe otra instancia y metido en el prompt llega en posición de instrucción.
 
 ---
 
