@@ -38,23 +38,42 @@ autorizaciones— no es una restricción del transporte: es la única defensa qu
 vive en la conducta de quien recibe, no en el código de quien manda.
 (Aportado por la casa que se negó, sin que se le pidiera.)
 
-EL LÍMITE DE CLASE DE LA REGLA DE LAS DOS SEÑALES, dicho por su nombre.
-La regla es de verdad independiente SOLO en la rama donde sí se intentó entregar:
-ahí las dos señales vienen de instrumentos distintos. En la rama contraria —la
-sesión se lee cerrada, así que no hay a quién entregarle— la reanudación descansa
-en UN SOLO instrumento: el enumerador. Eso baja la probabilidad de equivocarse y
-NO cambia la clase: sigue siendo un proxy.
+LA SESIÓN NO SE CONFIGURA: SE RESUELVE. Corrección del 2026-09-01.
+La versión anterior pedía el identificador de la sesión a despertar como un valor
+de configuración. Era un puntero estático a un blanco móvil: la sesión de una casa
+cambia sin emitir señal —un `/clear` basta— y desde ahí el enumerador ya no la
+encuentra. El disparador leía esa ausencia como «la casa está cerrada», reanudaba
+el transcript ABANDONADO, la invocación salía 0, y CONFIRMABA. El cursor avanzaba
+sobre una entrega que nadie recibió: sin error, sin registro, todo verde.
 
-Y el cierre de clase para «reanudar la sesión viva de OTRO» **no vive en este
-archivo**: vive en qué hace `cmd_reanudar` contra una sesión viva. Si la
-reanudación SE ADJUNTA a la sesión en vez de duplicarla, la exactitud del
-enumerador deja de importar y el problema se disuelve; si duplica, ninguna guarda
-de aquí alcanza.
+Lo que estaba mal no era la guarda: era LA PREGUNTA. Se preguntaba «¿vive la sesión
+X?» cuando lo que hay que saber es «¿CUÁL es la sesión de esta casa, ahora?». Una
+casa es un DIRECTORIO —el de su configuración— y eso no se mueve; la sesión sí. Por
+eso se resuelve en cada ciclo contra el enumerador, exigiendo EXACTAMENTE UNA: cero
+es una casa cerrada, dos es una casa ambigua, y en ninguno de los dos casos se
+entrega ni se confirma.
 
-**Por eso `cmd_reanudar` DEBE ser idempotente contra una sesión viva**, y quien
-configura este disparador tiene que haberlo medido en su herramienta —no supuesto—.
-Mientras no esté medido, es un hueco declarado y no una garantía.
-(Hallazgo de la casa que probó el artefacto, 2026-09-01.)
+MEDIDO en esta casa, y es el caso que lo destapó: el 2026-09-01 se perdió así el
+folio 874 — que era, precisamente, otra casa avisando de este mismo defecto. Lo halló
+Sho LEYENDO este archivo, no ejecutándolo: la batería pasaba en verde CON el defecto
+dentro, porque certificaba «reanudar y confirmar» como la conducta correcta. Un caso
+que consagra el defecto es peor que no tener casos.
+
+Y LA CONSECUENCIA, ENTERA: `cmd_reanudar` SALIÓ DEL CAMINO DE ENTREGA. Sus dos únicos
+blancos posibles están medidos como rotos en la herramienta para la que esto se
+escribió — contra un transcript abandonado levanta a un lector que no es nadie
+(arriba), y contra una sesión ABIERTA levanta un gemelo sin cabeza que contesta en su
+lugar y firma el acuse (MEDIDO el 2026-08-23). Sin blanco legítimo no queda rama.
+
+La única entrega es `cmd_entregar` contra una sesión viva resuelta, y esa vía tiene la
+propiedad que la reanudación nunca tuvo: SI EL BLANCO ES EL EQUIVOCADO, FALLA. Un
+`--resume` acierta el código de salida aunque no haya nadie leyendo; un recado a una
+sesión que ya no existe se cae. Un cursor que solo avanza tras un acierto no puede
+tragarse un folio.
+
+DESPERTAR UNA CASA CERRADA QUEDA SIN RESOLVER, y se declara como hueco en vez de
+fingirse: el folio espera en la cola y la casa lo recoge cuando abre. Un hueco
+declarado se puede cerrar; una entrega falsa no se nota.
 """
 
 import json
@@ -74,9 +93,14 @@ NOMBRE_CONF = ".disparador.conf"
 # de configuración para el mismo mecanismo es el defecto de las dos fuentes.
 # ─────────────────────────────────────────────────────────────────────────────
 
-OBLIGATORIAS = ("sesion", "cliente", "cmd_vivas", "cmd_entregar", "cmd_reanudar")
+# `sesion` YA NO EXISTE como clave, y su ausencia es el arreglo: un identificador
+# de sesión escrito a mano es un puntero estático a un blanco móvil. Lo que se
+# declara ahora es `casa` —un directorio, que no se mueve— y por omisión es el
+# directorio de esta misma configuración, así que no hay nada que rellenar.
+OBLIGATORIAS = ("cliente", "cmd_vivas", "cmd_entregar")
 
 POR_OMISION = {
+    "casa": "",
     "intervalo": "15",
     "tope_invocacion": "90",
     "max_intentos": "3",
@@ -106,17 +130,31 @@ PLANTILLA_CONF = r"""# .disparador.conf — generado por `disparador.py --planti
 # Formato `clave valor`, separado por espacios. Se busca desde el directorio de
 # trabajo hacia arriba, como git con `.git` — igual que la del canal.
 
-# ── RELLENA ESTOS TRES ───────────────────────────────────────────────────────
-sesion            PON-AQUI-EL-ID-DE-LA-SESION-A-DESPERTAR
+# ── RELLENA ESTOS DOS ────────────────────────────────────────────────────────
 cliente           /ruta/absoluta/al/cliente_del_canal.py
 llave             ~/.ssh/id_mensajeria_TU-IDENTIDAD
 
+# NO hay que poner ningun identificador de sesion, y eso es a proposito: la
+# sesion de una casa cambia sola —un /clear basta— y un id escrito aqui apunta
+# a un blanco que se movio. La casa es su DIRECTORIO, y por omision es el de
+# este archivo. Solo se declara si la conf no vive en la casa:
+# casa            /ruta/absoluta/a/la/casa
+
 # ── LO DEMAS YA VIENE ESCRITO PARA CLAUDE CODE ───────────────────────────────
-# Son los tres comandos propios de la herramienta. En otra herramienta, estos
-# tres son tu hueco: se declaran, no se inventan.
+# Son los dos comandos propios de la herramienta. En otra herramienta, estos dos
+# son tu hueco: se declaran, no se inventan.
+#
+# CONTRATO DE cmd_vivas: JSON, una lista de sesiones vivas, y cada una con
+# `cwd`, `sessionId` y `name`. El `cwd` NO es opcional: es como se sabe cual de
+# las sesiones vivas es esta casa. Si tu herramienta no lo reporta, ese es tu
+# hueco y se declara — sin el, este disparador no entrega nada.
 cmd_vivas         claude agents --json
 cmd_entregar      claude -p "Usa la herramienta SendMessage para enviar a \"{nombre}\" exactamente este texto y nada mas: \"{aviso}\" Despues responde solo OK."
-cmd_reanudar      claude --resume {sesion} -p "{aviso}"
+
+# cmd_reanudar NO existe y no se echa de menos: despertar una casa CERRADA es un
+# hueco declarado de este artefacto. Contra un transcript abandonado se levanta a
+# nadie, y contra una sesion abierta se levanta un gemelo que firma el acuse — las
+# dos cosas MEDIDAS. El folio espera en la cola y la casa lo recoge al abrir.
 
 # ── AJUSTES, con valores sanos por omision ───────────────────────────────────
 bitacora          ~/Library/Logs/vuelamind-disparador.log
@@ -152,6 +190,20 @@ def leer_conf(ruta):
     faltan = [k for k in OBLIGATORIAS if not cfg.get(k)]
     if faltan:
         raise SystemExit("falta(n) en %s: %s" % (ruta, ", ".join(faltan)))
+    # La casa es el directorio de su propia configuración salvo que se diga otra
+    # cosa. Que el valor por omisión sea una ruta y no un identificador es la
+    # corrección entera: un directorio no cambia cuando la sesión cambia.
+    if not cfg.get("casa"):
+        cfg["casa"] = os.path.dirname(os.path.abspath(ruta))
+    cfg["casa"] = os.path.abspath(os.path.expanduser(cfg["casa"]))
+    # Una clave retirada que se ignora en silencio es una configuración que
+    # miente: quien la escribió cree que sigue mandando. Se nombra.
+    obsoletas = [k for k in ("sesion", "cmd_reanudar") if cfg.get(k)]
+    if obsoletas:
+        sys.stderr.write(
+            "AVISO: %s ya no se usa(n) y se ignora(n) en %s — la sesión se resuelve\n"
+            "sola por `casa` (%s). Bórralas para que la conf no diga lo que no hace.\n"
+            % (", ".join(obsoletas), ruta, cfg["casa"]))
     return cfg
 
 
@@ -338,7 +390,7 @@ class Disparador:
         self.cfg, self.log, self.observando = cfg, log, observando
         self.tmp = os.environ.get("TMPDIR", "/tmp")
         self.cliente = cfg["cliente"]
-        self.sesion = cfg["sesion"]
+        self.casa = cfg["casa"]
         self.tope = int(cfg["tope_invocacion"])
         self.ident = self._identidad()
         base = os.path.join(self.tmp, "disparador_%s" % self.ident)
@@ -357,16 +409,18 @@ class Disparador:
         return sal.strip().splitlines()[-1].strip()
 
     # ── GUARDA DETERMINISTA ──────────────────────────────────────────────────
-    # Un disparador JAMÁS reanuda la sesión desde la que corre, y se comprueba por
-    # IDENTIFICADOR, no por estado. No es una costumbre, es un imposible: no
-    # depende de que ninguna fuente diga la verdad. Cubre el caso en que el
-    # disparador se ataca a sí mismo; NO cierra el caso general de reanudar la
-    # sesión de otro, que sigue dependiendo del estado.
-    def guarda_autoataque(self):
+    # Un disparador JAMÁS se entrega a la sesión desde la que corre, y se comprueba
+    # por IDENTIFICADOR, no por estado. No es una costumbre, es un imposible: no
+    # depende de que ninguna fuente diga la verdad.
+    #
+    # Ahora se compara contra la sesión RESUELTA y no contra una escrita en la
+    # configuración, así que la guarda dejó de depender de que alguien copiara bien
+    # un identificador. Cuesta lo mismo: la resolución ya se hizo.
+    def guarda_autoataque(self, sesion):
         propia = self.cfg.get("sesion_propia") or os.environ.get(
             self.cfg.get("env_sesion_propia") or "", "")
-        if propia and propia.strip() == self.sesion.strip():
-            self.log("ME_NIEGO_autoataque", sesion=self.sesion)
+        if propia and propia.strip() == str(sesion).strip():
+            self.log("ME_NIEGO_autoataque", sesion=sesion)
             return False
         return True
 
@@ -390,22 +444,30 @@ class Disparador:
                 continue
         return out
 
-    def nombre_si_viva(self):
-        """Consulta la fuente autoritativa. Devuelve el nombre de la sesión si la
-        reporta viva, None si la reporta cerrada, y False si NO SE PUDO SABER.
-        Tres estados, no dos: 'no pude preguntar' no es 'está cerrada'."""
+    def resolver_casa(self, usar_cache=True):
+        """¿CUÁL es la sesión de esta casa, ahora? Devuelve `(sesión, nombre)` si
+        hay EXACTAMENTE una viva en este directorio, None si no hay ninguna, y
+        False si NO SE PUDO SABER. Tres estados, no dos: 'no pude preguntar' no es
+        'está cerrada'.
+
+        Dos vivas en la misma casa tampoco es una respuesta: es una casa ambigua,
+        y elegir una de las dos sería adivinar con cara de dato. También devuelve
+        None — con su propio motivo en la bitácora, que no es lo mismo."""
         # Se cachea SOLO el resultado POSITIVO, y no es pereza: equivocarse hacia
         # "está viva" cuesta un aviso que el siguiente ciclo repite; equivocarse
         # hacia "cerrada" lanza una reanudación contra una sesión viva y fabrica
         # gemelos sin cabeza. Un fallo cuesta un aviso; el otro cuesta la verdad
         # de la bitácora.
+        # La caché guarda EL PAR sesión+nombre, nunca el nombre suelto: un nombre
+        # sin su identificador se puede volver a emparejar con la sesión
+        # equivocada, que es en pequeño el mismo defecto que este rediseño quita.
         vida = int(self.cfg["cache_vivas"])
-        if os.path.exists(self.cache_vivas):
+        if usar_cache and os.path.exists(self.cache_vivas):
             if time.time() - os.path.getmtime(self.cache_vivas) < vida:
                 with open(self.cache_vivas, encoding="utf-8") as f:
-                    n = f.read().strip()
-                if n:
-                    return n
+                    guardado = f.read().strip().split("\t")
+                if len(guardado) == 2 and guardado[0]:
+                    return (guardado[0], guardado[1])
         cod, sal = correr(self.cfg["cmd_vivas"], 60)
         if cod != 0:
             self.log("vivas_incontestable", codigo=cod, salida=sal[:200])
@@ -415,17 +477,31 @@ class Disparador:
         except ValueError:
             self.log("vivas_ilegible", salida=sal[:200])
             return False
+        # realpath en los dos lados: en macOS /tmp es un enlace a /private/tmp, y
+        # dos rutas que nombran el mismo directorio no se pueden comparar como
+        # texto sin resolverlas antes.
+        casa = os.path.realpath(self.casa)
+        mias = []
         for a in datos if isinstance(datos, list) else []:
-            if str(a.get("sessionId", "")) == self.sesion:
-                nombre = a.get("name") or ""
-                if nombre:
-                    with open(self.cache_vivas, "w", encoding="utf-8") as f:
-                        f.write(nombre)
-                return nombre or True
+            cwd = a.get("cwd") or ""
+            sid = str(a.get("sessionId", ""))
+            if not cwd or not sid:
+                continue
+            if os.path.realpath(os.path.expanduser(cwd)) == casa:
+                mias.append((sid, a.get("name") or ""))
+        if len(mias) == 1:
+            sid, nombre = mias[0]
+            with open(self.cache_vivas, "w", encoding="utf-8") as f:
+                f.write("%s\t%s" % (sid, nombre))
+            return (sid, nombre)
         try:
             os.remove(self.cache_vivas)
         except OSError:
             pass
+        if len(mias) > 1:
+            self.log("casa_ambigua", casa=self.casa,
+                     sesiones=",".join(s for s, _ in mias),
+                     motivo="varias sesiones vivas aquí; elegir una sería adivinar")
         return None
 
     # ── EL SOBRE: folio y cómo leerlo, JAMÁS el cuerpo ───────────────────────
@@ -450,8 +526,9 @@ class Disparador:
         return cod == 0
 
     def ciclo(self):
-        if not self.guarda_autoataque():
-            return 2
+        # La guarda de autoataque ya no vive aquí: necesita saber CONTRA QUIÉN se
+        # iba a actuar, y eso solo se sabe después de resolver la casa. Corre
+        # dentro de `_entregar`, antes de cualquier invocación.
         msgs = self.pendientes()
         if not msgs:
             return 0
@@ -463,22 +540,22 @@ class Disparador:
         finally:
             self.candado.soltar()
 
-    # ── EL ORDEN INVERTIDO, Y LA REGLA DE LAS DOS SEÑALES ────────────────────
-    # Antes se preguntaba el estado y LUEGO se actuaba, lo cual obliga a que la
-    # respuesta sea verdad. Una casa ajena midió que no lo es: el enumerador
-    # reportó cerrada una sesión activa durante un solo tick. Y "exigir dos
-    # lecturas seguidas" baja la probabilidad sin cambiar la clase — sigue siendo
-    # un proxy, la misma especie que la fecha del transcript.
+    # ── UNA SOLA VÍA, Y ES LA QUE FALLA CUANDO SE EQUIVOCA ───────────────────
+    # Antes había dos: entregar a la viva, o —si el enumerador la daba por
+    # cerrada— reanudarla. La segunda era el defecto, y no por su guarda sino por
+    # su blanco: el único objetivo posible de una reanudación era un transcript
+    # abandonado, que se deja resucitar siempre y sale 0 siempre.
     #
-    # Aquí se actúa primero con la vía QUE NO PUEDE HACER DAÑO: se intenta
-    # entregar el recado a la sesión viva. Si entra, listo — y nunca hizo falta
-    # saber el estado.
+    # Queda una vía: el recado a la sesión viva de esta casa, RESUELTA en este
+    # mismo ciclo. Y su virtud no es la guarda, es la forma de fallar — si el
+    # blanco ya no existe, la entrega se cae y el cursor no se mueve. La
+    # reanudación acertaba el código de salida aunque no hubiera nadie leyendo;
+    # ésta no puede.
     #
-    # Y para reanudar se exigen DOS SEÑALES INDEPENDIENTES DE ACUERDO: que la
-    # entrega haya fallado Y que el enumerador diga que no está viva. Si
-    # discrepan —o si no se pudo preguntar— NO se reanuda: se reintenta al
-    # siguiente tick. El modo de falla queda invertido: equivocarse cuesta un
-    # aviso que llega tarde, nunca un gemelo firmando acuses.
+    # Cuando no hay a quién entregar —casa cerrada, casa ambigua, enumerador
+    # mudo— no se hace NADA y no se confirma NADA. El folio se queda en la cola.
+    # Equivocarse cuesta un aviso que llega tarde; nunca un folio que se perdió
+    # constando como entregado.
     # ── EL TIPO DECIDE SI SE DESPIERTA, Y LO DESCONOCIDO NO SE TRAGA ─────────
     # El canal etiqueta cada sobre con un tipo. Hoy casi todo es `mensaje`, pero
     # el diseño del master ya define otro —`propuesta`— cuyo contrato dice que
@@ -523,58 +600,37 @@ class Disparador:
                 return 1
         aviso = self.sobre(msgs)
 
-        nombre = self.nombre_si_viva()
-        if nombre not in (None, False):
-            cmd = self.cfg["cmd_entregar"].format(
-                nombre="" if nombre is True else nombre, aviso=aviso, sesion=self.sesion)
-            if self.observando:
-                self.log("entregaria_a_viva", folios=",".join(map(str, folios)))
-                return 0
+        quien = self.resolver_casa()
+        if quien is False:
+            self.log("no_entrego_incontestable", folios=",".join(map(str, folios)),
+                     motivo="no se pudo enumerar; no se entrega ni se confirma a ciegas")
+            return 1
+        if quien is None:
+            self.log("no_entrego_casa_sin_sesion", casa=self.casa,
+                     folios=",".join(map(str, folios)),
+                     motivo="ninguna sesión viva aquí; el folio espera en la cola, NO se confirma")
+            return 1
+        sesion, nombre = quien
+        if not self.guarda_autoataque(sesion):
+            return 2
+
+        if self.observando:
+            self.log("entregaria_a_viva", sesion=sesion, nombre=nombre,
+                     folios=",".join(map(str, folios)))
+            return 0
+        cmd = self.cfg["cmd_entregar"].format(nombre=nombre, aviso=aviso, sesion=sesion)
+        for f in folios:
+            intentos(self.cuenta, f, sumar=True)
+        cod, sal = correr(cmd, self.tope)
+        if cod != 0:
+            # Registrar SIEMPRE la salida del intento fallido: cuando esto falló en
+            # una casa ajena, el único testigo fue un número sin explicación.
+            self.log("entrega_fallo", codigo=cod, salida=sal[:400],
+                     nota="cursor quieto; el siguiente tick lo reintenta")
+            return 1
+        self.log("entregado_a_viva", sesion=sesion, folios=",".join(map(str, folios)))
+        if self.confirmar(ultimo):
             for f in folios:
-                intentos(self.cuenta, f, sumar=True)
-            cod, sal = correr(cmd, self.tope)
-            if cod == 0:
-                self.log("entregado_a_viva", folios=",".join(map(str, folios)))
-                if self.confirmar(ultimo):
-                    for f in folios:
-                        olvidar(self.cuenta, f)
-                return 0
-            # Registrar SIEMPRE la salida del intento fallido.
-            self.log("entrega_fallo", codigo=cod, salida=sal[:400])
-        else:
-            cod = None
-
-        # Segunda señal antes de reanudar.
-        estado = self.nombre_si_viva()
-        if estado is not False and estado is not None:
-            self.log("no_reanudo_discrepan", motivo="la entrega falló pero sigue viva")
-            return 1
-        if estado is False:
-            self.log("no_reanudo_incontestable",
-                     motivo="no se pudo saber el estado; no se reanuda a ciegas")
-            return 1
-
-        # Ambas señales de acuerdo: cerrada. Un turno por mensaje.
-        for m in msgs:
-            f, de = m["folio"], m["de"]
-            n = intentos(self.cuenta, f, sumar=True)
-            if n > int(self.cfg["max_intentos"]):
-                self.log("folio_agotado", folio=f)
-                return 1
-            uno = ("[CANAL] Tienes un mensaje: folio %s, de %s.\n"
-                   "Léelo con:  python3 %s ver %s\n"
-                   "Si vas a responder:  python3 %s mandar %s \"...\""
-                   % (f, de, self.cliente, f, self.cliente, de))
-            if self.observando:
-                self.log("reanudaria", folio=f)
-                continue
-            cmd = self.cfg["cmd_reanudar"].format(sesion=self.sesion, aviso=uno, nombre="")
-            cod, sal = correr(cmd, self.tope)
-            if cod != 0:
-                self.log("reanudar_fallo", folio=f, codigo=cod, salida=sal[:400])
-                return 1
-            self.log("reanudado", folio=f)
-            if self.confirmar(f, de):
                 olvidar(self.cuenta, f)
         return 0
 
@@ -724,7 +780,7 @@ raise SystemExit(9)
 
 _M1 = {"folio": 7, "de": "otra"}
 _M2 = {"folio": 8, "de": "otra"}
-_VIVA = """python3 -c "print('[{\\"sessionId\\": \\"SES-A\\", \\"name\\": \\"la-casa\\"}]')" """
+_OTRA_CASA = "/tmp/otra-casa-que-no-es-esta"
 _CASOS = []
 
 
@@ -735,15 +791,24 @@ def _caso(nombre, espera):
     return deco
 
 
-def _montar(pendientes=(), omitir=(), **extra):
+def _montar(pendientes=(), omitir=(), vivas=None, **extra):
     import tempfile
     d = tempfile.mkdtemp(prefix="conf_disp_")
     with open(os.path.join(d, "cliente.py"), "w", encoding="utf-8") as f:
         f.write(_CLIENTE_FALSO)
     open(os.path.join(d, "testigo"), "w").close()
-    base = {"sesion": "SES-A", "cliente": os.path.join(d, "cliente.py"),
-            "cmd_vivas": "echo '[]'", "cmd_entregar": "echo entregado",
-            "cmd_reanudar": "echo reanudado", "intervalo": "1",
+    # El enumerador falso contesta desde un ARCHIVO, no desde un `echo` con
+    # comillas escapadas: el transporte por comillas es una clase de fallo que
+    # esta casa ya pagó, y un banco de pruebas no debe apostar contra el shell.
+    # Por omisión reporta UNA sesión viva en esta casa, que es el caso sano.
+    if vivas is None:
+        vivas = [{"sessionId": "SES-A", "cwd": d, "name": "la-casa"}]
+    ruta_vivas = os.path.join(d, "vivas.json")
+    with open(ruta_vivas, "w", encoding="utf-8") as f:
+        json.dump(vivas, f)
+    base = {"casa": d, "cliente": os.path.join(d, "cliente.py"),
+            "cmd_vivas": "cat %s" % ruta_vivas, "cmd_entregar": "echo entregado",
+            "intervalo": "1",
             "tope_invocacion": "8", "cache_vivas": "0",
             "bitacora": os.path.join(d, "bitacora.log")}
     base.update(extra)
@@ -787,18 +852,21 @@ def _c2():
     return cod != 0 and "cmd_vivas" in sal
 
 
-@_caso("C3 · GUARDA: no reanuda la sesión desde la que corre", "ME_NIEGO y CERO invocaciones")
+@_caso("C3 · GUARDA: no se entrega a la sesión desde la que corre", "ME_NIEGO y CERO entregas")
 def _c3():
-    d, env = _montar([_M1], sesion_propia="SES-A", cmd_vivas="echo NO_DEBIO",
-                     cmd_reanudar="echo NO_DEBIO")
+    # La guarda se comprueba ahora contra la sesión RESUELTA, así que el
+    # enumerador sí corre — lo que no puede correr es la entrega.
+    d, env = _montar([_M1], sesion_propia="SES-A", cmd_entregar="echo NO_DEBIO")
     cod, sal = _correr(d, env)
     return "ME_NIEGO_autoataque" in sal and "NO_DEBIO" not in sal
 
 
 @_caso("C4 · la guarda lee la variable de entorno de la herramienta", "ME_NIEGO por entorno")
 def _c4():
-    d, env = _montar([_M1]); env["CLAUDE_SESSION_ID"] = "SES-A"
-    return "ME_NIEGO_autoataque" in _correr(d, env)[1]
+    d, env = _montar([_M1], cmd_entregar="echo NO_DEBIO")
+    env["CLAUDE_SESSION_ID"] = "SES-A"
+    cod, sal = _correr(d, env)
+    return "ME_NIEGO_autoataque" in sal and "NO_DEBIO" not in sal
 
 
 @_caso("C5 · cola vacía: no levanta ni un proceso", "cmd_vivas nunca corre")
@@ -808,58 +876,72 @@ def _c5():
     return cod == 0 and "NO_DEBIO" not in sal
 
 
-@_caso("C6 · viva y la entrega entra: confirma y NUNCA reanuda", "entregado · confirmar 8")
+@_caso("C6 · casa viva y la entrega entra: confirma una sola vez", "entregado · confirmar 8")
 def _c6():
-    d, env = _montar([_M1, _M2], cmd_vivas=_VIVA, cmd_reanudar="echo NO_DEBIO")
-    cod, sal = _correr(d, env)
-    return "entregado_a_viva" in sal and "NO_DEBIO" not in sal and "confirmar 8" in _testigo(d)
-
-
-@_caso("C7 · entrega falla pero sigue viva: NO reanuda", "señales discrepan")
-def _c7():
-    d, env = _montar([_M1], cmd_vivas=_VIVA, cmd_entregar="exit 3", cmd_reanudar="echo NO_DEBIO")
-    cod, sal = _correr(d, env)
-    return "no_reanudo_discrepan" in sal and "NO_DEBIO" not in sal
-
-
-@_caso("C8 · el enumerador no contesta: NO reanuda a ciegas", "incontestable")
-def _c8():
-    d, env = _montar([_M1], cmd_vivas="exit 4", cmd_reanudar="echo NO_DEBIO")
-    cod, sal = _correr(d, env)
-    return "no_reanudo_incontestable" in sal and "NO_DEBIO" not in sal
-
-
-@_caso("C9 · el enumerador devuelve basura: incontestable", "ilegible, cero reanudaciones")
-def _c9():
-    d, env = _montar([_M1], cmd_vivas="echo no-es-json", cmd_reanudar="echo NO_DEBIO")
-    cod, sal = _correr(d, env)
-    return "vivas_ilegible" in sal and "NO_DEBIO" not in sal
-
-
-@_caso("C10 · ambas señales en CERRADA: un turno por mensaje", "dos turnos, dos confirmaciones")
-def _c10():
     d, env = _montar([_M1, _M2])
-    cod, sal = _correr(d, env); t = _testigo(d)
-    return sal.count("reanudado ") == 2 and "confirmar 7" in t and "confirmar 8" in t
-
-
-@_caso("C11 · si la reanudación falla NO confirma", "registra la salida, cursor quieto")
-def _c11():
-    d, env = _montar([_M1], cmd_reanudar="echo 'razon del fallo'; exit 1")
     cod, sal = _correr(d, env)
-    return "reanudar_fallo" in sal and "razon del fallo" in sal and "confirmar" not in _testigo(d)
+    return "entregado_a_viva" in sal and "confirmar 8" in _testigo(d)
+
+
+@_caso("C7 · la entrega falla: el cursor NO se mueve", "entrega_fallo, cero confirmaciones")
+def _c7():
+    d, env = _montar([_M1], cmd_entregar="exit 3")
+    cod, sal = _correr(d, env)
+    return "entrega_fallo" in sal and "confirmar" not in _testigo(d)
+
+
+@_caso("C8 · el enumerador no contesta: no se entrega a ciegas", "incontestable, cursor quieto")
+def _c8():
+    d, env = _montar([_M1], cmd_vivas="exit 4", cmd_entregar="echo NO_DEBIO")
+    cod, sal = _correr(d, env)
+    return ("no_entrego_incontestable" in sal and "NO_DEBIO" not in sal
+            and "confirmar" not in _testigo(d))
+
+
+@_caso("C9 · el enumerador devuelve basura: incontestable", "ilegible, cero entregas")
+def _c9():
+    d, env = _montar([_M1], cmd_vivas="echo no-es-json", cmd_entregar="echo NO_DEBIO")
+    cod, sal = _correr(d, env)
+    return ("vivas_ilegible" in sal and "NO_DEBIO" not in sal
+            and "confirmar" not in _testigo(d))
+
+
+@_caso("C10 · una `cmd_reanudar` heredada NO se ejecuta, y se avisa de que se ignora",
+       "cero reanudaciones y la conf obsoleta se nombra")
+def _c10():
+    # ESTE CASO CERTIFICABA EL DEFECTO. Decía «ambas señales en CERRADA: un turno
+    # por mensaje» y comprobaba que se reanudaba Y se confirmaba — o sea, exigía
+    # como correcta la conducta que perdía folios. Sho lo cazó LEYENDO el archivo,
+    # con los 24 casos en verde. Un caso que consagra el defecto es peor que no
+    # tenerlo: convierte la revisión en una firma.
+    #
+    # Ahora comprueba lo contrario, y además que una conf vieja no reviva la vía
+    # por la puerta de atrás: la clave se ignora y se dice en voz alta.
+    d, env = _montar([_M1, _M2], sesion="SES-VIEJA", cmd_reanudar="echo NO_DEBIO")
+    cod, sal = _correr(d, env)
+    return ("NO_DEBIO" not in sal and "entregado_a_viva" in sal
+            and "cmd_reanudar" in sal and "sesion" in sal)
+
+
+@_caso("C11 · la salida del intento fallido se registra entera", "razón visible, cursor quieto")
+def _c11():
+    # Cuando esto falló en una casa ajena, el único testigo fue un número sin
+    # explicación: lo que no se sabe por qué falló no se sabe si volverá a fallar.
+    d, env = _montar([_M1], cmd_entregar="echo 'razon del fallo'; exit 1")
+    cod, sal = _correr(d, env)
+    return "entrega_fallo" in sal and "razon del fallo" in sal and "confirmar" not in _testigo(d)
 
 
 @_caso("C12 · invocación colgada: se corta y se registra", "código 124")
 def _c12():
-    d, env = _montar([_M1], tope_invocacion="3", cmd_reanudar="sleep 60")
+    d, env = _montar([_M1], tope_invocacion="3", cmd_entregar="sleep 60")
     cod, sal = _correr(d, env)
-    return "reanudar_fallo" in sal and "codigo=124" in sal
+    return "entrega_fallo" in sal and "codigo=124" in sal
 
 
-@_caso("C13 · candado de otro ciclo vivo: se salta el turno", "ocupado, cero reanudaciones")
+@_caso("C13 · candado de otro ciclo vivo: se salta el turno", "ocupado, cero entregas")
 def _c13():
-    d, env = _montar([_M1], cmd_reanudar="echo NO_DEBIO")
+    d, env = _montar([_M1], cmd_entregar="echo NO_DEBIO")
     lock = os.path.join(d, "disparador_%s.lock" % os.path.basename(d))
     os.mkdir(lock); pid = str(os.getpid())
     open(os.path.join(lock, "pid"), "w").write(pid)
@@ -876,12 +958,12 @@ def _c14():
     open(os.path.join(lock, "pid"), "w").write("999999")
     open(os.path.join(lock, "sello"), "w").write("un sello que ya no existe")
     cod, sal = _correr(d, env)
-    return "candado_huerfano" in sal and "reanudado" in sal
+    return "candado_huerfano" in sal and "entregado_a_viva" in sal
 
 
 @_caso("C15 · tope de repetición: para y grita", "folio_agotado")
 def _c15():
-    d, env = _montar([_M1], cmd_reanudar="exit 1", max_intentos="2")
+    d, env = _montar([_M1], cmd_entregar="exit 1", max_intentos="2")
     for _ in range(3):
         cod, sal = _correr(d, env)
     return "folio_agotado" in sal
@@ -889,17 +971,27 @@ def _c15():
 
 @_caso("C16 · el sobre lleva folio, JAMÁS el cuerpo", "el cuerpo no aparece")
 def _c16():
+    # ESTE CASO PASABA POR ACCIDENTE, y se descubrió al rehacerlo (2026-09-01).
+    # Comprobaba el texto contra la SALIDA DEL DISPARADOR, y ahí solo aparecía
+    # porque el `echo` sin comillas se partía en el shell y el fragmento acababa
+    # dentro de un registro de error. O sea: medía un fallo del shell, y si la
+    # invocación hubiera funcionado, el caso no habría comprobado nada.
+    #
+    # Ahora se mide lo único que importa: QUÉ RECIBIÓ LA INVOCACIÓN. El comando
+    # escribe el aviso en un archivo y el caso lo lee de ahí.
     d, env = _montar([{"folio": 7, "de": "otra", "cuerpo": "TEXTO-SECRETO"}],
-                     cmd_reanudar="echo AVISO:{aviso}")
+                     cmd_entregar='printf %s "{aviso}" > "$RECADO"')
+    env["RECADO"] = os.path.join(d, "recado.txt")
     cod, sal = _correr(d, env)
-    return "TEXTO-SECRETO" not in sal and "folio 7" in sal
+    recado = open(env["RECADO"], encoding="utf-8").read()
+    return "TEXTO-SECRETO" not in recado and "folio 7" in recado
 
 
 @_caso("C17 · observación: dice qué haría y no invoca ni confirma", "cero efectos")
 def _c17():
-    d, env = _montar([_M1], cmd_reanudar="echo NO_DEBIO")
+    d, env = _montar([_M1], cmd_entregar="echo NO_DEBIO")
     cod, sal = _correr(d, env, "--observar")
-    return "reanudaria" in sal and "NO_DEBIO" not in sal and "confirmar" not in _testigo(d)
+    return "entregaria_a_viva" in sal and "NO_DEBIO" not in sal and "confirmar" not in _testigo(d)
 
 
 @_caso("C20 · la caché SOLO positiva protege y nunca produce un falso-cerrada",
@@ -912,15 +1004,19 @@ def _c20():
     # casa, una guarda que no se prueba es una intención.
     #
     # Se comprueba lo que de verdad importa: con caché positiva vigente, aunque
-    # el enumerador conteste «cerrada», el disparador SIGUE tratándola como viva
-    # y entrega — nunca reanuda. La caché puede costar un aviso; jamás un gemelo.
-    d, env = _montar([_M1], cache_vivas="600", cmd_vivas="echo '[]'",
-                     cmd_reanudar="echo NO_DEBIO")
+    # el enumerador conteste «aquí no vive nadie», el disparador SIGUE tratando a
+    # la casa como viva y entrega. Equivocarse hacia «viva» cuesta una entrega que
+    # se cae sola; equivocarse hacia «cerrada» deja el aviso sin salir.
+    #
+    # Y la caché guarda EL PAR sesión+nombre desde el 2026-09-01: un nombre suelto
+    # se puede reemparejar con la sesión equivocada, que es el mismo defecto del
+    # puntero congelado en versión pequeña.
+    d, env = _montar([_M1], cache_vivas="600", vivas=[])
     cache = os.path.join(d, "disparador_%s.vivas" % os.path.basename(d))
     with open(cache, "w", encoding="utf-8") as f:
-        f.write("la-casa")
+        f.write("SES-A\tla-casa")
     cod, sal = _correr(d, env)
-    return "entregado_a_viva" in sal and "NO_DEBIO" not in sal
+    return "entregado_a_viva" in sal and "confirmar 7" in _testigo(d)
 
 
 @_caso("C21 · un tipo que no sé atender NO despierta y NO se confirma",
@@ -929,7 +1025,7 @@ def _c21():
     # Confirmar avanzaría el cursor y el folio desaparecería de la cola sin que
     # nadie lo hubiera visto: invisible, sin error y sin síntoma.
     d, env = _montar([{"folio": 7, "de": "otra", "tipo": "propuesta"}],
-                     cmd_reanudar="echo NO_DEBIO", cmd_entregar="echo NO_DEBIO")
+                     cmd_entregar="echo NO_DEBIO")
     cod, sal = _correr(d, env)
     return ("tipo_no_despierta" in sal and "NO_DEBIO" not in sal
             and "confirmar" not in _testigo(d))
@@ -953,7 +1049,7 @@ def _c23():
     d, env = _montar([{"folio": 7, "de": "otra", "tipo": "mensaje"},
                       {"folio": 8, "de": "otra", "tipo": "propuesta"}])
     cod, sal = _correr(d, env)
-    return ("tipo_no_despierta" in sal and "reanudado" in sal
+    return ("tipo_no_despierta" in sal and "entregado_a_viva" in sal
             and "confirmar 7" in _testigo(d) and "confirmar 8" not in _testigo(d))
 
 
@@ -963,7 +1059,51 @@ def _c24():
     d, env = _montar([{"folio": 7, "de": "otra", "tipo": "propuesta"}],
                      tipos_despiertan="mensaje,propuesta")
     cod, sal = _correr(d, env)
-    return "reanudado" in sal and "confirmar 7" in _testigo(d)
+    return "entregado_a_viva" in sal and "confirmar 7" in _testigo(d)
+
+
+@_caso("C26 · la casa sin sesión viva: NO entrega y NO confirma",
+       "el folio espera en la cola, el cursor no se mueve")
+def _c26():
+    # EL CASO QUE FALTABA, y el que habría cazado el defecto. Antes, «ninguna
+    # sesión viva» se leía como «está cerrada, la reanudo», la reanudación salía 0
+    # contra un transcript abandonado y el cursor avanzaba sobre un folio que
+    # nadie leyó. Ahora no hay a quién entregar, así que no se hace nada — y no
+    # hacer nada deja el folio en la cola, que es el modo de falla correcto.
+    d, env = _montar([_M1], vivas=[], cmd_entregar="echo NO_DEBIO")
+    cod, sal = _correr(d, env)
+    return ("no_entrego_casa_sin_sesion" in sal and "NO_DEBIO" not in sal
+            and "confirmar" not in _testigo(d))
+
+
+@_caso("C27 · una sesión viva de OTRA casa no es esta casa",
+       "no se entrega al vecino aunque sea el único vivo")
+def _c27():
+    # LA REGRESIÓN DEL DEFECTO DEL 2026-09-01, dicha con precisión: lo que se
+    # resuelve es el DIRECTORIO, no un identificador. Aquí el enumerador contesta
+    # con una sesión viva —pero de otra casa— y encima con el identificador que
+    # una configuración vieja habría tenido congelado. Las dos trampas a la vez:
+    # ni el id manda, ni «hay alguien vivo» basta.
+    d, env = _montar([_M1], cmd_entregar="echo NO_DEBIO",
+                     vivas=[{"sessionId": "SES-A", "cwd": _OTRA_CASA, "name": "el-vecino"}])
+    cod, sal = _correr(d, env)
+    return ("no_entrego_casa_sin_sesion" in sal and "NO_DEBIO" not in sal
+            and "el-vecino" not in sal and "confirmar" not in _testigo(d))
+
+
+@_caso("C28 · dos sesiones vivas en la misma casa: ambigua, no se adivina",
+       "casa_ambigua, cero entregas, cursor quieto")
+def _c28():
+    # Elegir una de las dos sería adivinar con cara de dato. Y es un estado real:
+    # dos terminales abiertas en el mismo directorio bastan.
+    d, env = _montar([_M1], cmd_entregar="echo NO_DEBIO", vivas=None)
+    ruta = os.path.join(d, "vivas.json")
+    with open(ruta, "w", encoding="utf-8") as f:
+        json.dump([{"sessionId": "SES-A", "cwd": d, "name": "una"},
+                   {"sessionId": "SES-B", "cwd": d, "name": "otra"}], f)
+    cod, sal = _correr(d, env)
+    return ("casa_ambigua" in sal and "NO_DEBIO" not in sal
+            and "confirmar" not in _testigo(d))
 
 
 @_caso("C25 · la plantilla está completa y su comando no revienta el shell",
@@ -1088,7 +1228,11 @@ def main(argv):
     if "--desinstalar" in argv:
         return desinstalar(cfg, log)
 
-    log("arranca", version=VERSION, conf=ruta, modo="observa" if observando else "vivo")
+    # `casa` se registra en cada arranque a propósito: es el valor del que ahora
+    # depende toda la entrega, y un valor por omisión que nadie ve es un supuesto.
+    # Si apunta al sitio equivocado, esta línea es donde se nota.
+    log("arranca", version=VERSION, conf=ruta, casa=cfg["casa"],
+        modo="observa" if observando else "vivo")
     d = Disparador(cfg, log, observando)
     if observando or "--una-vez" in argv:
         return d.ciclo()
