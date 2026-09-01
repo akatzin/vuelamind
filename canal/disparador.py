@@ -87,6 +87,7 @@ POR_OMISION = {
     "bitacora": "",
     "sesion_propia": "",
     "env_sesion_propia": "CLAUDE_SESSION_ID",
+    "tipos_despiertan": "mensaje",
 }
 
 
@@ -443,7 +444,42 @@ class Disparador:
     # discrepan —o si no se pudo preguntar— NO se reanuda: se reintenta al
     # siguiente tick. El modo de falla queda invertido: equivocarse cuesta un
     # aviso que llega tarde, nunca un gemelo firmando acuses.
+    # ── EL TIPO DECIDE SI SE DESPIERTA, Y LO DESCONOCIDO NO SE TRAGA ─────────
+    # El canal etiqueta cada sobre con un tipo. Hoy casi todo es `mensaje`, pero
+    # el diseño del master ya define otro —`propuesta`— cuyo contrato dice que
+    # NO la resuelve un agente: la lee un humano. Despertar una sesión sin cabeza
+    # para atender una propuesta contradice el rol que la propuesta tiene.
+    #
+    # Y la regla de fondo, que vale para cualquier tipo que se invente después:
+    # UN TIPO QUE NO SÉ ATENDER NO SE DESPIERTA Y NO SE CONFIRMA. Confirmar
+    # avanzaría el cursor y el folio desaparecería de la cola sin que nadie lo
+    # hubiera visto — invisible, sin error y sin síntoma. Se reporta y se deja.
+    #
+    # EL CURSOR ES LO DELICADO: avanza por número, así que confirmar un folio
+    # ALTO se traga cualquier folio MÁS BAJO que no se haya atendido. Por eso el
+    # cursor no pasa nunca por encima del primer folio que no se atendió.
+    def _repartir(self, msgs):
+        despiertan = set(t.strip() for t in self.cfg["tipos_despiertan"].split(",") if t.strip())
+        atiendo, dejo = [], []
+        for m in msgs:
+            (atiendo if m.get("tipo", "mensaje") in despiertan else dejo).append(m)
+        for m in dejo:
+            self.log("tipo_no_despierta", folio=m["folio"], tipo=m.get("tipo", "mensaje"),
+                     nota="no se confirma; queda en cola para quien sepa atenderlo")
+        if dejo:
+            tope = min(m["folio"] for m in dejo)
+            retenidos = [m for m in atiendo if m["folio"] > tope]
+            if retenidos:
+                self.log("cursor_retenido", desde=tope,
+                         folios=",".join(str(m["folio"]) for m in retenidos),
+                         nota="no se avanza por encima de un folio sin atender")
+            atiendo = [m for m in atiendo if m["folio"] < tope]
+        return atiendo
+
     def _entregar(self, msgs):
+        msgs = self._repartir(msgs)
+        if not msgs:
+            return 0
         folios = [m["folio"] for m in msgs]
         ultimo = max(folios)
         for f in folios:
@@ -850,6 +886,49 @@ def _c20():
         f.write("la-casa")
     cod, sal = _correr(d, env)
     return "entregado_a_viva" in sal and "NO_DEBIO" not in sal
+
+
+@_caso("C21 · un tipo que no sé atender NO despierta y NO se confirma",
+       "tipo_no_despierta, cero invocaciones, cursor quieto")
+def _c21():
+    # Confirmar avanzaría el cursor y el folio desaparecería de la cola sin que
+    # nadie lo hubiera visto: invisible, sin error y sin síntoma.
+    d, env = _montar([{"folio": 7, "de": "otra", "tipo": "propuesta"}],
+                     cmd_reanudar="echo NO_DEBIO", cmd_entregar="echo NO_DEBIO")
+    cod, sal = _correr(d, env)
+    return ("tipo_no_despierta" in sal and "NO_DEBIO" not in sal
+            and "confirmar" not in _testigo(d))
+
+
+@_caso("C22 · un tipo sin atender RETIENE el cursor de los folios más altos",
+       "el mensaje alto no se confirma porque hay una propuesta por debajo")
+def _c22():
+    # El cursor avanza por número: confirmar el 8 se tragaría el 7. Por eso el
+    # cursor no pasa nunca por encima del primer folio que no se atendió.
+    d, env = _montar([{"folio": 7, "de": "otra", "tipo": "propuesta"},
+                      {"folio": 8, "de": "otra", "tipo": "mensaje"}])
+    cod, sal = _correr(d, env)
+    return ("cursor_retenido" in sal and "confirmar 8" not in _testigo(d)
+            and "confirmar 7" not in _testigo(d))
+
+
+@_caso("C23 · un tipo por debajo del atendido no lo bloquea al revés",
+       "la propuesta alta no impide entregar el mensaje bajo")
+def _c23():
+    d, env = _montar([{"folio": 7, "de": "otra", "tipo": "mensaje"},
+                      {"folio": 8, "de": "otra", "tipo": "propuesta"}])
+    cod, sal = _correr(d, env)
+    return ("tipo_no_despierta" in sal and "reanudado" in sal
+            and "confirmar 7" in _testigo(d) and "confirmar 8" not in _testigo(d))
+
+
+@_caso("C24 · qué tipos despiertan es configurable, no está cableado",
+       "añadir propuesta a tipos_despiertan la hace despertar")
+def _c24():
+    d, env = _montar([{"folio": 7, "de": "otra", "tipo": "propuesta"}],
+                     tipos_despiertan="mensaje,propuesta")
+    cod, sal = _correr(d, env)
+    return "reanudado" in sal and "confirmar 7" in _testigo(d)
 
 
 @_caso("C19 · el sello del candado no depende del locale del sistema",
