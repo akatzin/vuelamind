@@ -787,6 +787,19 @@ PLANTILLA_PLIST = """<?xml version="1.0" encoding="UTF-8"?>
     <string>{script}</string>
   </array>
   <key>WorkingDirectory</key><string>{dir_conf}</string>
+
+  <!--
+    PATH EXPLICITO, y no es adorno: launchd NO hereda el entorno del shell, asi que
+    `claude` a secas no se encuentra. DATO DE CAMPO de la primera instalacion real
+    (Sho, 2026-09-01): la enumeracion dio 127 y el disparador quedo mudo. Fallo del
+    lado correcto —vivas_incontestable, sin entregar y sin confirmar— pero una casa
+    recien instalada no entrega nada hasta que alguien diagnostica un 127.
+    Se graba el PATH de quien instala, que es el unico que se sabe bueno en esta maquina.
+  -->
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>PATH</key><string>{ruta_path}</string>
+  </dict>
   <key>KeepAlive</key><true/>
   <key>RunAtLoad</key><true/>
   <key>StandardOutPath</key><string>{salida}</string>
@@ -846,10 +859,14 @@ def instalar(cfg, ruta_conf, log):
     ident = Disparador(cfg, log, True).ident
     destino = _ruta_plist(ident)
     os.makedirs(os.path.dirname(destino), exist_ok=True)
+    def _xml(v):
+        return str(v).replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
     texto = PLANTILLA_PLIST.format(
-        version=VERSION, etiqueta=_etiqueta(ident), python=sys.executable,
-        script=os.path.abspath(__file__), dir_conf=os.path.dirname(os.path.abspath(ruta_conf)),
-        salida=os.path.expanduser("~/Library/Logs/%s.log" % _etiqueta(ident)))
+        version=VERSION, etiqueta=_etiqueta(ident), python=_xml(sys.executable),
+        script=_xml(os.path.abspath(__file__)),
+        dir_conf=_xml(os.path.dirname(os.path.abspath(ruta_conf))),
+        ruta_path=_xml(os.environ.get("PATH") or "/usr/local/bin:/usr/bin:/bin"),
+        salida=_xml(os.path.expanduser("~/Library/Logs/%s.log" % _etiqueta(ident))))
     with open(destino, "w", encoding="utf-8") as f:
         f.write(texto)
     correr("launchctl bootout gui/%s/%s" % (os.getuid(), _etiqueta(ident)), 30)
@@ -1303,6 +1320,20 @@ def _c33():
     d, env = _montar([_M1], cmd_entregar='echo "casi OK pero no"')
     cod, sal = _correr(d, env)
     return "entrega_fallo" in sal and "confirmar" not in _testigo(d)
+
+
+@_caso("C34 · el plist que genera el instalador declara PATH",
+       "launchd no hereda el entorno; sin esto la casa nace muda")
+def _c34():
+    # DATO DE CAMPO de la primera instalación real, en casa ajena (Sho, 2026-09-01):
+    # `claude` a secas dio 127 bajo launchd. Falló del lado correcto —incontestable,
+    # sin entregar ni confirmar— pero una casa recién instalada no entrega nada
+    # hasta que alguien sabe leer un 127. La plantilla del plist se puede envejecer
+    # igual que la de la conf, así que se comprueba, no se recuerda.
+    hueco = "{ruta_path}" in PLANTILLA_PLIST and "EnvironmentVariables" in PLANTILLA_PLIST
+    render = PLANTILLA_PLIST.format(version="X", etiqueta="e", python="/p", script="/s",
+                                    dir_conf="/d", ruta_path="/usr/bin:/bin", salida="/l")
+    return hueco and "<key>PATH</key><string>/usr/bin:/bin</string>" in render
 
 
 @_caso("C25 · la plantilla está completa y su comando no revienta el shell",
