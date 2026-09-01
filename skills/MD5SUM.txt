@@ -1,7 +1,6 @@
-774068ed405de232d8a706edc36cfb8f  README.md
+35d28a4e51a8300524ea9c47d33e88a5  README.md
 4b0336c11c3b58ea28e0cf0ac7ccb988  vuelamind-accidente.md
 4897fdaf8ba4845fdbe392d0880ffb1a  vuelamind-commit.md
-ebd60b151e6c001f551bba20bd8362c8  vuelamind-disparador.md
 74ca47c43cafe9aed039669418ebddd1  vuelamind-help.md
 36f6874240e4c10318753ec419ac1ff8  vuelamind-join.md
 bc89e95dd37683dea5d2fa24dddc90fa  vuelamind-load.md
