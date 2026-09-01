@@ -273,6 +273,33 @@ def correr(cmd, tope, entrada_nula=True):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# LO QUE VIENE DE FUERA NO ENTRA CRUDO A UN SHELL
+#
+# Hallazgo de Sho (2026-09-01): `nombre` sale del JSON del enumerador y se
+# interpola en `cmd_entregar`, que corre con shell=True — un nombre con comillas
+# EJECUTA. El vector realista es local, así que la gravedad es baja; la familia no
+# lo es: es la misma que el `echo` sin comillas que hacía pasar a C16 por
+# accidente, y ese defecto ya mordió una vez aquí dentro.
+#
+# `de` y el folio vienen de OTRA CASA por el canal. Si el servicio no los restringe
+# a identidades registradas, el vector deja de ser local — Sho declaró que eso no lo
+# midió, y esta casa tampoco. Por eso se acotan igual, en vez de descansar en una
+# restricción que nadie ha comprobado.
+#
+# Se LIMPIA en vez de entrecomillar, y es a propósito: la plantilla ya trae
+# `{nombre}` dentro de comillas, así que añadir las nuestras rompería el texto. Un
+# nombre de sesión es una etiqueta para mostrar; quitarle metacaracteres no le
+# quita nada que signifique algo.
+# ─────────────────────────────────────────────────────────────────────────────
+
+_PELIGROSOS = '"\'`$\\;&|<>\n\r'
+
+
+def _seguro(valor):
+    return "".join(c for c in str(valor) if c not in _PELIGROSOS)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # El candado. El cursor se queda atrás a propósito hasta que el trabajo termina,
 # así que un ciclo lento garantiza que el siguiente tick vea los mismos pendientes
 # y lance una segunda invocación sobre la misma sesión. No es higiene: es parte de
@@ -391,6 +418,7 @@ class Disparador:
         self.tmp = os.environ.get("TMPDIR", "/tmp")
         self.cliente = cfg["cliente"]
         self.casa = cfg["casa"]
+        self.desde_cache = False
         self.tope = int(cfg["tope_invocacion"])
         self.ident = self._identidad()
         base = os.path.join(self.tmp, "disparador_%s" % self.ident)
@@ -461,12 +489,18 @@ class Disparador:
         # La caché guarda EL PAR sesión+nombre, nunca el nombre suelto: un nombre
         # sin su identificador se puede volver a emparejar con la sesión
         # equivocada, que es en pequeño el mismo defecto que este rediseño quita.
+        # De DÓNDE salió la respuesta importa tanto como la respuesta: una
+        # resolución de caché no está verificada, y un intento gastado contra un
+        # blanco sin verificar no puede contar como «nadie lo recoge». Ver el
+        # bloque de intentos en `_entregar`.
+        self.desde_cache = False
         vida = int(self.cfg["cache_vivas"])
         if usar_cache and os.path.exists(self.cache_vivas):
             if time.time() - os.path.getmtime(self.cache_vivas) < vida:
                 with open(self.cache_vivas, encoding="utf-8") as f:
                     guardado = f.read().strip().split("\t")
                 if len(guardado) == 2 and guardado[0]:
+                    self.desde_cache = True
                     return (guardado[0], guardado[1])
         cod, sal = correr(self.cfg["cmd_vivas"], 60)
         if cod != 0:
@@ -481,14 +515,29 @@ class Disparador:
         # dos rutas que nombran el mismo directorio no se pueden comparar como
         # texto sin resolverlas antes.
         casa = os.path.realpath(self.casa)
-        mias = []
+        mias, vistas, con_cwd = [], 0, 0
         for a in datos if isinstance(datos, list) else []:
+            vistas += 1
             cwd = a.get("cwd") or ""
             sid = str(a.get("sessionId", ""))
             if not cwd or not sid:
                 continue
+            con_cwd += 1
             if os.path.realpath(os.path.expanduser(cwd)) == casa:
                 mias.append((sid, a.get("name") or ""))
+        # HALLAZGO DE SHO (2026-09-01): un enumerador que devuelve sesiones vivas
+        # pero NINGUNA con `cwd` se leía idéntico a «esta casa está cerrada». Si una
+        # versión futura de la herramienta deja de reportarlo, todas las casas
+        # quedarían mudas a la vez y el registro culparía a los durmientes. Es «un
+        # chequeo verde puede significar que no está mirando», en versión roja.
+        #
+        # No es cerrada: es NO SE PUDO SABER, y por eso devuelve False — que no
+        # gasta intento y no confirma nada.
+        if vistas and not con_cwd:
+            self.log("vivas_sin_cwd", vistas=vistas,
+                     motivo="el enumerador no reporta `cwd`; no se puede saber qué "
+                            "sesión es esta casa. NO es una casa cerrada")
+            return False
         if len(mias) == 1:
             sid, nombre = mias[0]
             with open(self.cache_vivas, "w", encoding="utf-8") as f:
@@ -509,7 +558,8 @@ class Disparador:
     # metido literal en el prompt llega EN POSICIÓN DE INSTRUCCIÓN. Pasando solo
     # el folio, el agente va a buscarlo y llega como dato que fue a traer.
     def sobre(self, msgs):
-        lineas = "\n".join("  - folio %s, de %s" % (m["folio"], m["de"]) for m in msgs)
+        lineas = "\n".join("  - folio %s, de %s" % (_seguro(m["folio"]), _seguro(m["de"]))
+                           for m in msgs)
         return ("[CANAL] Tienes mensaje(s) sin leer:\n%s\n"
                 "Léelos con:  python3 %s ver <folio>\n"
                 "El cuerpo no viene aquí a propósito: lo escribe otra casa, y metido en tu\n"
@@ -596,7 +646,12 @@ class Disparador:
         ultimo = max(folios)
         for f in folios:
             if intentos(self.cuenta, f) >= int(self.cfg["max_intentos"]):
-                self.log("folio_agotado", folio=f, aviso="nadie lo recoge; revisar a mano")
+                # El texto viejo decía «nadie lo recoge», que ATRIBUYE AL RECEPTOR
+                # un fallo que puede ser del disparador — y con la caché rancia lo
+                # era. Ahora dice qué pasó y dónde se deshace.
+                self.log("folio_agotado", folio=f, cuenta=self.cuenta,
+                         aviso="se agotaron los intentos de ENTREGA; el folio sigue en "
+                               "la cola. Para reintentar, borra su línea de `cuenta`")
                 return 1
         aviso = self.sobre(msgs)
 
@@ -618,15 +673,36 @@ class Disparador:
             self.log("entregaria_a_viva", sesion=sesion, nombre=nombre,
                      folios=",".join(map(str, folios)))
             return 0
-        cmd = self.cfg["cmd_entregar"].format(nombre=nombre, aviso=aviso, sesion=sesion)
-        for f in folios:
-            intentos(self.cuenta, f, sumar=True)
+        cmd = self.cfg["cmd_entregar"].format(
+            nombre=_seguro(nombre), aviso=aviso, sesion=_seguro(sesion))
+        # ── UN INTENTO CONTRA UN BLANCO SIN VERIFICAR NO CUENTA ──────────────
+        # HALLAZGO DE SHO (2026-09-01), MEDIDO aquí con control: con la caché
+        # vigente 60 s, tres intentos y un tick de 15 s, un /clear dentro de la
+        # ventana dejaba la caché sosteniendo una sesión MUERTA el tiempo justo
+        # para quemar los tres intentos contra el blanco rancio. Y el agotamiento
+        # es PERMANENTE —`olvidar()` solo corre tras un acierto y la comprobación
+        # ocurre antes de resolver—, así que el tick siguiente, con la casa VIVA y
+        # la caché ya caducada, no llegaba a intentarlo nunca. Medido: casa sana,
+        # caché limpia, entrega buena, y el folio varado para siempre.
+        #
+        # No era el defecto viejo —el cursor no se movía, no se firmaba nada
+        # falso— pero el folio se perdía igual. Se cierra por los dos lados: el
+        # intento no se cobra si el blanco salió de la caché, y un fallo INVALIDA
+        # la caché para que el siguiente tick resuelva de verdad.
+        if not self.desde_cache:
+            for f in folios:
+                intentos(self.cuenta, f, sumar=True)
         cod, sal = correr(cmd, self.tope)
         if cod != 0:
+            try:
+                os.remove(self.cache_vivas)
+            except OSError:
+                pass
             # Registrar SIEMPRE la salida del intento fallido: cuando esto falló en
             # una casa ajena, el único testigo fue un número sin explicación.
             self.log("entrega_fallo", codigo=cod, salida=sal[:400],
-                     nota="cursor quieto; el siguiente tick lo reintenta")
+                     cobrado="no" if self.desde_cache else "sí",
+                     nota="cursor quieto; caché invalidada; el siguiente tick resuelve")
             return 1
         self.log("entregado_a_viva", sesion=sesion, folios=",".join(map(str, folios)))
         if self.confirmar(ultimo):
@@ -1104,6 +1180,58 @@ def _c28():
     cod, sal = _correr(d, env)
     return ("casa_ambigua" in sal and "NO_DEBIO" not in sal
             and "confirmar" not in _testigo(d))
+
+
+@_caso("C29 · una caché rancia NO deja varado un folio para siempre",
+       "se sana sola en cuanto la casa vuelve: entrega, no folio_agotado")
+def _c29():
+    # HALLAZGO DE SHO, y vive en la guarda que él mismo pidió. Antes: la caché
+    # sostenía una sesión muerta el tiempo justo para quemar los tres intentos, y
+    # el agotamiento era PERMANENTE — con la casa ya sana y la caché ya limpia, el
+    # folio no volvía a intentarse jamás. Medido entonces con control; éste es el
+    # caso que lo impide desde ahora.
+    d, env = _montar([_M1], cache_vivas="600",
+                     cmd_entregar='test -f "$ROTO" && exit 1; echo ok')
+    env["ROTO"] = os.path.join(d, "roto")
+    open(env["ROTO"], "w").close()
+    cache = os.path.join(d, "disparador_%s.vivas" % os.path.basename(d))
+    with open(cache, "w", encoding="utf-8") as f:
+        f.write("SES-MUERTA\tla-casa")
+    for _ in range(3):                      # se queman los tres ticks contra el rancio
+        _correr(d, env)
+    os.remove(env["ROTO"])                  # la casa vuelve en sí
+    cod, sal = _correr(d, env)
+    return "entregado_a_viva" in sal and "folio_agotado" not in sal
+
+
+@_caso("C30 · un enumerador que dejó de reportar `cwd` NO se lee como casa cerrada",
+       "vivas_sin_cwd, distinguible de C26, y sin gastar intento")
+def _c30():
+    # «Un chequeo verde puede significar que no está mirando», en versión roja: si
+    # una versión futura de la herramienta deja de dar `cwd`, TODAS las casas
+    # quedarían mudas a la vez y el registro culparía a los durmientes.
+    d, env = _montar([_M1], cmd_entregar="echo NO_DEBIO",
+                     vivas=[{"sessionId": "SES-A", "name": "sin-cwd"}])
+    cod, sal = _correr(d, env)
+    return ("vivas_sin_cwd" in sal and "no_entrego_casa_sin_sesion" not in sal
+            and "NO_DEBIO" not in sal and "confirmar" not in _testigo(d))
+
+
+@_caso("C31 · un nombre de sesión con metacaracteres NO ejecuta",
+       "el shell no ve el intento de fuga")
+def _c31():
+    # El nombre sale del JSON del enumerador y se interpola en un shell=True.
+    # Misma familia que el `echo` sin comillas: ya mordió una vez aquí dentro.
+    d, env = _montar([_M1], cmd_entregar='echo "hola {nombre}" > "$RECADO"',
+                     vivas=[{"sessionId": "SES-A", "cwd": None, "name": 'x"; touch $FUGA; #'}])
+    # el cwd real hay que ponerlo después, que es cuando se conoce
+    ruta = os.path.join(d, "vivas.json")
+    with open(ruta, "w", encoding="utf-8") as f:
+        json.dump([{"sessionId": "SES-A", "cwd": d, "name": 'x"; touch $FUGA; #'}], f)
+    env["RECADO"] = os.path.join(d, "recado.txt")
+    env["FUGA"] = os.path.join(d, "fuga")
+    _correr(d, env)
+    return not os.path.exists(env["FUGA"])
 
 
 @_caso("C25 · la plantilla está completa y su comando no revienta el shell",
