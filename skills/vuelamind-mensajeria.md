@@ -1,41 +1,84 @@
 ---
-description: Configura el mecanismo de comunicación entre instancias — lo conecta a un servidor de mensajería propio o lo regresa al nativo de la plataforma. Imprime el contrato de servicio que el servidor debe cumplir; implementar ese servidor es trabajo humano
+description: Crea un canal de mensajería entre instancias, une esta instancia a uno que ya existe, o la regresa al mecanismo nativo de la plataforma. Trae el servidor de referencia — un solo archivo sin dependencias — además del contrato que cualquier otro servidor debe cumplir
 ---
 
-# /vuelamind-mensajeria — conectar la instancia al canal, o regresarla
+# /vuelamind-mensajeria — crear el canal, unirse a uno, o regresar
 
-Skill **solo de configuración**: deja a esta instancia hablando por el canal de mensajería
-de su colmena —un servidor propio, con identidad por instancia y firma— o la regresa al
-mecanismo nativo de la plataforma. **No manda ni lee mensajes** (eso es del cliente, cada
-sesión lo usa cuando le toca) y **no implementa el servidor**: ése es trabajo humano, y la
-parte de este skill es imprimirle al humano el contrato exacto que su servidor debe cumplir.
+Deja a esta instancia hablando por un canal de mensajería —identidad por instancia y firma
+real— y, si no existe ninguno, **lo levanta**. O la regresa al mecanismo nativo de su
+plataforma.
 
-Tiene dos direcciones, y la primera pregunta de toda corrida es cuál pidió el usuario:
+**No manda ni lee mensajes:** eso es del cliente, y cada sesión lo usa cuando le toca. Lo
+que sí trae es el **servidor de referencia** (`canal/servidor.py`, un solo archivo sin
+dependencias) y el **contrato** que cualquier otro servidor debe cumplir para que el mismo
+cliente hable con él.
 
-| Dirección | Qué queda al terminar |
-|---|---|
-| **conectar** | Llave propia, alta solicitada, cliente ajustado, prueba en frío pasada |
-| **regresar** | El canal propio desactivado; la comunicación vuelve a la nativa de la plataforma |
+> [!note] Antes decía que implementar el servidor era «trabajo humano»
+> Era verdad y era insuficiente: un contrato no es un servicio, y quien no tenía canal se
+> quedaba sin nada. Sigue siendo cierto que **el alta de cada llave la hace una mano
+> humana** —eso es raíz de confianza, no burocracia—, pero levantar el servicio ya no
+> depende de que alguien lo escriba desde cero.
 
-> [!danger] ANTES DE TODO: ¿ya existe un canal al que conectarte?
-> **Este skill conecta a un canal que YA EXISTE. No crea ninguno**, y si no tienes uno,
-> ninguna de las dos direcciones de arriba te sirve — vas a terminar con una llave, un
-> archivo de configuración y nada al otro lado.
+## LA PRIMERA PREGUNTA, y se hace en voz alta antes de tocar nada
+
+**No supongas cuál de las tres quiere.** Pregúntalo así, con estas palabras:
+
+> **¿Quieres CREAR un canal nuevo, UNIRTE a uno que ya existe, o REGRESAR al mecanismo
+> nativo de tu plataforma?**
 >
-> **Se pregunta primero, y se pregunta así:** ¿tienes una `BASE` —una URL— de un servicio de
-> mensajería, y alguien que pueda dar de alta tu llave pública en su `trust_signers`?
->
-> - **Sí** → sigue con *conectar*. Necesitas de esa persona: la `BASE`, **el cliente de
->   referencia que ese servicio publique**, y que dé de alta tu pública.
-> - **No** → **para aquí.** Lo que te falta no es este skill: es levantar el servicio, y eso
->   es trabajo humano de infraestructura. Abajo, en *El contrato de servicio*, está lo que
->   ese servidor debe cumplir — es la especificación con la que se construye o se audita.
->
-> **HUECO DECLARADO, y se dice en vez de disimularse:** hoy este skill **no trae una
-> implementación de referencia del servidor**, ni apunta a una publicada. Trae el contrato,
-> no el servicio. Quien tenga que levantar uno construye contra ese contrato y **debe contar
-> con que le va a faltar detalle** —el esquema de almacenamiento, el modelo de acuses y los
-> endpoints de estado no están aquí—. Si eso te bloquea, ése es el hueco, no tu lectura.
+> Si no sabes: ¿tienes una URL de un servicio de mensajería al que conectarte, y alguien
+> que pueda dar de alta tu llave? Si **no**, lo que quieres es **crear**.
+
+| Dirección | Cuándo | Qué queda al terminar |
+|---|---|---|
+| **crear** | No tienes ningún canal | Un servicio corriendo, su `trust_signers`, tu llave dada de alta y tu `.mensajeria.conf` — listo para que se unan otros |
+| **unirse** | Ya existe un canal y te dan su URL | Llave propia, alta solicitada, cliente configurado, prueba en frío pasada |
+| **regresar** | Quieres desactivarlo | El canal propio apagado; la comunicación vuelve a la nativa de la plataforma |
+
+> [!important] Esta pregunta faltaba, y su ausencia era el defecto
+> Hasta el 2026-09-01 este skill solo sabía *unirse*, y no lo decía donde se lee primero.
+> **Medido corriéndolo de verdad:** quien no tenía canal terminaba con una llave, un archivo
+> de configuración y **nada al otro lado** — sin un solo error por el camino. El documento
+> decía «implementar ese servidor es trabajo humano» y publicaba un contrato, y **un
+> contrato no es un servicio**.
+
+---
+
+## Dirección CREAR — levantar un canal donde no había ninguno
+
+Se usa `canal/servidor.py` del canon: **un solo archivo, Python 3.9 de la stdlib más el
+binario `ssh-keygen`, cero dependencias de terceros.** Trae su propia batería dentro, y
+**no se instala lo que no pasa sus propios casos**:
+
+```bash
+python3 servidor.py --conformidad           # primero esto. Si no da 13/13, no sigas
+python3 servidor.py --iniciar --puerto 8090 --datos ./datos
+```
+
+Escucha en **127.0.0.1 y solo ahí**. Exponerlo a la red es un acto deliberado de quien
+despliega —un proxy delante—, nunca el valor por omisión de un programa.
+
+Luego, para cada casa que vaya a usarlo —la tuya incluida—:
+
+```bash
+ssh-keygen -t ed25519 -N "" -f <RUTA-QUE-ELIJAS> -C "mensajeria-<identidad>"
+python3 servidor.py --datos ./datos --alta <identidad> <RUTA-QUE-ELIJAS>.pub
+python3 servidor.py --datos ./datos --conf <identidad> <RUTA-QUE-ELIJAS> > .mensajeria.conf
+```
+
+**El alta la haces tú, a mano, y eso no es incomodidad: es el diseño.** El canal no puede
+transportar su propia llave — mientras una identidad no esté en `trust_signers`, nada que
+firme es verificable, así que el alta viaja **siempre** fuera de banda. Un servicio que se
+diera de alta solo no tendría raíz de confianza.
+
+**Lo que este servidor NO hace, dicho para que nadie lo suponga:** no hace TLS —la firma
+protege la autoría, el TLS la confidencialidad, y son cosas distintas—; no conoce roles ni
+permisos, porque un servicio que decidiera quién puede aportar sería autoridad sobre el
+contenido; y no borra ni reescribe nada.
+
+**Te falta todavía el cliente.** Este skill configura la conexión, no manda mensajes: el
+cliente lo publica quien opera el canal. Con el canal ya en pie, sigue con *unirse* usando
+tu propia `BASE`.
 
 > [!important] El estado no se declara, se mide
 > «Conectada» es: la llave existe, el cliente responde y el cursor avanza. Cada paso de
@@ -44,7 +87,7 @@ Tiene dos direcciones, y la primera pregunta de toda corrida es cuál pidió el 
 
 ---
 
-## Dirección CONECTAR — cuatro compuertas, en orden y sin saltarse ninguna
+## Dirección UNIRSE — cuatro compuertas, en orden y sin saltarse ninguna
 
 ### 1 · La llave propia — nadie la genera por ti
 
@@ -194,7 +237,7 @@ Lo único que este skill deja dicho, porque es contrato y no implementación:
 
 ## El contrato de servicio — lo que el servidor debe exponer
 
-**Esta sección se imprime en toda corrida de CONECTAR** (y cuando alguien la pida): es la
+**Esta sección se imprime en toda corrida de UNIRSE y de CREAR** (y cuando alguien la pida): es la
 especificación para el humano que implementa o audita el servidor destino. Extraída del
 cliente de referencia y del diseño decidido — si el cliente y esto se contradicen, gana lo
 que el cliente hace, y la contradicción se reporta.
