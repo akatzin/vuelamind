@@ -695,7 +695,10 @@ def suite(silencio=False):
 
 USO = """servidor.py — el canal de mensajería firmado. Un solo archivo, sin dependencias.
 
-  --iniciar [--puerto N] [--datos DIR]   levanta el servicio (por omisión 8090, ./datos)
+  --iniciar [--puerto N] [--datos DIR] [--escuchar HOST]
+                                         levanta el servicio (8090, ./datos, solo loopback).
+                                         --escuchar 0.0.0.0 lo expone a la red: acto deliberado,
+                                         y dice en voz alta qué queda expuesto.
   --alta IDENTIDAD RUTA.pub              da de alta una llave en trust_signers
   --conf IDENTIDAD RUTA_LLAVE            imprime un .mensajeria.conf listo para esa casa
   --conformidad                          corre sus propios casos; no toca ningún dato real
@@ -729,12 +732,28 @@ def main(argv):
             raise SystemExit("uso: --conf IDENTIDAD RUTA_LLAVE")
     if "--iniciar" in argv:
         puerto = int(argv[argv.index("--puerto") + 1] if "--puerto" in argv else 8090)
-        handler = type("H", (Canal,), {"datos": datos})
         # 127.0.0.1 por omisión y a propósito: exponer un servicio a la red es un acto
-        # deliberado de quien despliega, nunca el valor por omisión de un programa.
-        srv = ThreadingHTTPServer(("127.0.0.1", puerto), handler)
-        print("canal en http://127.0.0.1:%d  ·  datos en %s" % (puerto, datos))
-        print("firmantes: %s" % os.path.join(datos, NOMBRE_FIRMANTES))
+        # deliberado de quien despliega, nunca el valor por omisión de un programa. Por
+        # eso hay una bandera y no una variable de entorno: se escribe en la línea que
+        # arranca el servicio, donde se lee.
+        host = argv[argv.index("--escuchar") + 1] if "--escuchar" in argv else "127.0.0.1"
+        handler = type("H", (Canal,), {"datos": datos})
+        srv = ThreadingHTTPServer((host, puerto), handler)
+        if host not in ("127.0.0.1", "localhost", "::1"):
+            # No se impide: se dice. Quien expone tiene derecho a hacerlo y deber de
+            # saber qué expone.
+            # A stderr y CON FLUSH: al redirigir la salida a un archivo —que es como se
+            # corre un servicio— Python la deja en el búfer y el aviso no aparece hasta
+            # que el proceso muere. Un aviso que no llega no es un aviso.
+            print("EXPUESTO EN %s:%d — no solo a esta máquina.\n"
+                  "  · Sin TLS: el cuerpo viaja en claro por la red. La firma protege la\n"
+                  "    AUTORÍA, no la confidencialidad — son cosas distintas.\n"
+                  "  · La portada GET / no pide firma: cualquiera en la red ve el tráfico\n"
+                  "    reciente (quién escribió a quién y cuándo), nunca los cuerpos.\n"
+                  "  · Escribir y leer buzones SIGUEN exigiendo firma de trust_signers."
+                  % (host, puerto), file=sys.stderr, flush=True)
+        print("canal en http://%s:%d  ·  datos en %s" % (host, puerto, datos), flush=True)
+        print("firmantes: %s" % os.path.join(datos, NOMBRE_FIRMANTES), flush=True)
         try:
             srv.serve_forever()
         except KeyboardInterrupt:
