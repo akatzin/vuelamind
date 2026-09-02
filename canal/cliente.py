@@ -132,12 +132,55 @@ def firmar(obj):
         return open(msg + ".sig", encoding="utf-8").read()
 
 
+# ── EL CURSOR HEREDADO: SE DETECTA, SE DICE, Y NO SE ADOPTA SOLO ─────────────
+# HALLAZGO DE SAMANTHA (2026-09-01), sobre este mismo archivo y el mismo día que
+# nació: un cliente que guarda el cursor por identidad+canal **no puede leer el que
+# dejó uno que lo guardaba solo por identidad**, así que una casa que cambie a éste
+# en un canal ya andado AMANECE EN CERO y se reofrece todo lo que ya leyó.
+#
+# Y NO SE ARREGLA ADOPTÁNDOLO SOLO, aunque sea lo cómodo: el cursor heredado **no
+# dice a qué canal pertenece** —ése es el defecto que lo obligó a nacer—, así que
+# adoptarlo contra un canal DISTINTO haría saltar folios que nadie leyó. Reofrecer
+# de más cuesta ruido; saltar de menos cuesta silencio, y el silencio es el que no
+# se nota. Se detecta, se dice con el mandato exacto, y decide una persona.
+_LEGADO = os.path.expanduser("~/.mensajeria_cursor_" + IDENTIDAD)
+
+
+def _valor_legado():
+    try:
+        with open(_LEGADO, encoding="utf-8") as f:
+            return int(f.read().strip() or 0)
+    except (OSError, ValueError):
+        return None
+
+
 def leer_cursor():
     try:
         with open(CURSOR, encoding="utf-8") as f:
             return int(f.read().strip() or 0)
     except (OSError, ValueError):
-        return 0
+        pass
+    heredado = _valor_legado()
+    if heredado:
+        sys.stderr.write(
+            "AVISO: esta casa no tiene cursor para ESTE canal, y hay uno heredado.\n"
+            "  heredado: %s = %s   (no dice de qué canal es — por eso no se adopta solo)\n"
+            "  canal:    %s\n"
+            "Si es el mismo canal:   este_cliente adoptar\n"
+            "Si es otro canal:       ignóralo; empezar en cero es lo correcto.\n"
+            % (_LEGADO, heredado, BASE))
+    return 0
+
+
+def adoptar():
+    """Toma el cursor heredado para ESTE canal. Es un acto humano y por eso existe
+    como verbo: quien lo corre está afirmando que el canal es el mismo. No borra el
+    heredado — el estado de otro cliente no se toca."""
+    heredado = _valor_legado()
+    if heredado is None:
+        return {"ok": 0, "error": "no hay cursor heredado en %s" % _LEGADO}
+    poner_cursor(heredado)
+    return {"ok": 1, "adoptado_de": _LEGADO, "cursor": leer_cursor(), "canal": BASE}
 
 
 def poner_cursor(n):
@@ -252,6 +295,7 @@ USO = """cliente.py — habla con el canal. Configuración en %s (`clave = valor
   ver FOLIO             trae uno Y firma su acuse de recogida
   confirmar FOLIO       mueve el cursor, y nada más
   mandar PARA "texto"   manda un mensaje firmado
+  adoptar               toma el cursor heredado PARA ESTE canal (acto humano)
   estado [DESDE]        de lo que mandé, qué me acusaron
   recibidos [DESDE]     qué acusé yo, de lo que me ofrecieron
   identidad · cursor · version
@@ -272,6 +316,8 @@ def main(argv):
         print(VERSION); return 0
     if accion == "cursor":
         print(leer_cursor()); return 0
+    if accion == "adoptar":
+        r = adoptar(); print(json.dumps(r, ensure_ascii=False)); return 0 if r["ok"] else 1
     if accion == "ver":
         m = ver(argv[1])
         if m is None:

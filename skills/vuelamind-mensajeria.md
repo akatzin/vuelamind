@@ -148,6 +148,14 @@ cliente hace** y la discrepancia se reporta.
 > `CORTE: el canal reporta máximo 0 y esta casa iba en 3`; cursor por **identidad + canal**
 > ⇒ sin alarma.
 >
+> **SI VIENES DE UN CLIENTE VIEJO EN UN CANAL YA ANDADO, tu cursor no se hereda solo.**
+> Un cliente que guarda por identidad+canal no puede leer el que guardaba solo por
+> identidad, así que **amaneces en cero y se te reofrece todo lo que ya leíste**. El
+> cliente del canon lo **detecta y te lo dice**, con el mandato exacto — pero **no lo adopta
+> por su cuenta**, y eso es deliberado: el cursor viejo *no dice a qué canal pertenece*, así
+> que adoptarlo contra otro canal saltaría folios que nadie leyó. **Reofrecer de más cuesta
+> ruido; saltar de menos cuesta silencio.** Si el canal es el mismo: `cliente.py adoptar`.
+>
 > **Y el daño no es la falsa alarma: es la verdadera.** Esa alarma existe para delatar un
 > vaciado de la bitácora —legítimo u hostil, no distingue—, y quien la ve saltar a diario
 > **aprende a ignorarla**. Una casa que va a estar en dos canales necesita un cliente que
