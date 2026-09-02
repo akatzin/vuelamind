@@ -156,50 +156,57 @@ def reto_fresco(t):
 _PAGINA = """<!doctype html><html lang=es><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <meta http-equiv=refresh content=60><title>bitacora del canal</title><style>
-:root{color-scheme:dark;--f:#06090f;--p:#0d131f;--b:#1b2434;--x:#c6d2e6;--d:#7688a3;
---m:#63d7c8;--a:#d59a55}
-*{box-sizing:border-box}body{margin:0;background:var(--f);color:var(--x);
-font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
-.w{max-width:1000px;margin:0 auto;padding:28px 18px 60px}
-h1{font-size:17px;margin:0 0 2px;letter-spacing:.04em;font-weight:600}
-.s{color:var(--d);font-size:12px;margin:0 0 20px}
-.c{display:flex;gap:26px;margin:0 0 22px;flex-wrap:wrap}
-.c div{background:var(--p);border:1px solid var(--b);border-radius:6px;padding:9px 14px}
-.c b{display:block;font-size:20px;font-weight:600}
-.c span{color:var(--d);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
-.g{overflow-x:auto;border:1px solid var(--b);border-radius:6px;background:var(--p)}
-table{border-collapse:collapse;width:100%%;min-width:640px}
-th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
-color:var(--d);font-weight:500;padding:9px 12px;border-bottom:1px solid var(--b)}
-td{padding:7px 12px;border-bottom:1px solid rgba(27,36,52,.55)}
-tr:last-child td{border-bottom:0}
-.n{color:var(--d);text-align:right;font-variant-numeric:tabular-nums}
-.a{color:var(--x)}.t{color:var(--d);font-variant-numeric:tabular-nums}
-.k{font-size:12px}.ack .k{color:var(--a)}.msg .k{color:var(--m)}
-.v{color:var(--d);text-align:center;padding:22px}
-tr.c td{padding:0 12px 10px;border-bottom:1px solid rgba(27,36,52,.55)}
-tr.c pre{margin:0;white-space:pre-wrap;word-break:break-word;color:var(--x);
-font:13px/1.55 ui-monospace,Menlo,monospace;background:rgba(0,0,0,.25);
-border-left:2px solid var(--b);padding:8px 10px;border-radius:4px;max-height:16em;
-overflow:auto}
-.nota{margin:18px 0 0;color:var(--d);font-size:12px;line-height:1.7;
-border-left:2px solid var(--b);padding-left:12px}
+:root{color-scheme:dark;--f:#050a0c;--p:#08121a;--b:#123040;--x:#bcd8e0;--d:#5d8496;
+--m:#3fe0c8;--a:#e0b23f;--g:#1a3a44}
+*{box-sizing:border-box}
+body{margin:0;background:var(--f);color:var(--x);
+background-image:linear-gradient(rgba(18,48,64,.35) 1px,transparent 1px),
+linear-gradient(90deg,rgba(18,48,64,.35) 1px,transparent 1px);background-size:44px 44px;
+font:14px/1.6 ui-monospace,SFMono-Regular,Menlo,monospace}
+.w{max-width:1180px;margin:0 auto;padding:34px 20px 70px}
+.top{border:1px solid var(--g);border-left:3px solid var(--m);background:rgba(8,18,26,.85);
+padding:20px 24px;margin:0 0 26px}
+h1{margin:0;font-size:23px;letter-spacing:.22em;font-weight:600;color:#dff5f0}
+h1 i{color:var(--m);font-style:normal;animation:b 1.1s steps(2) infinite}
+@keyframes b{50%%{opacity:0}}
+.sub{margin:7px 0 0;color:var(--d);font-size:11.5px;letter-spacing:.2em;text-transform:uppercase}
+.c{display:flex;gap:12px;margin:18px 0 0;flex-wrap:wrap}
+.c div{border:1px solid var(--g);padding:7px 15px;font-size:11.5px;letter-spacing:.16em;
+text-transform:uppercase;color:var(--d)}
+.c b{color:var(--m);font-size:15px;margin-left:9px;letter-spacing:0}
+.c div.w2{border-color:var(--a)}.c div.w2 b{color:var(--a)}
+.m{border:1px solid var(--g);border-left:3px solid var(--m);background:rgba(8,18,26,.72);
+padding:15px 20px 16px;margin:0 0 13px}
+.m header{display:flex;align-items:center;gap:13px;flex-wrap:wrap;margin:0 0 9px}
+.f{color:var(--m);font-weight:600}
+.h{color:var(--d);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.r{color:var(--x);font-size:13px}.r i{color:var(--m);font-style:normal;margin:0 3px}
+.s{margin-left:auto;font-size:11px;letter-spacing:.13em;text-transform:uppercase;
+padding:3px 10px;border:1px solid currentColor}
+.s.ok{color:var(--m)}.s.no{color:var(--a)}
+.m pre{margin:0;white-space:pre-wrap;word-break:break-word;color:var(--x);
+font:13.5px/1.62 ui-monospace,Menlo,monospace;max-height:22em;overflow:auto}
+.v{color:var(--d);text-align:center;padding:44px;border:1px dashed var(--g)}
+.nota{margin:26px 0 0;color:var(--d);font-size:11.5px;line-height:1.8;
+border-left:2px solid var(--a);padding-left:13px}
+.nota b{color:var(--a)}
 </style></head><body><div class=w>
-<h1>bitacora del canal</h1>
-<p class=s>vuelamind-canal %(version)s &middot; solo lectura &middot; se refresca sola cada 60 s</p>
+<div class=top>
+<h1>BITACORA DEL CANAL<i>_</i></h1>
+<p class=sub>canal firmado :: ssh-ed25519 :: solo lectura%(cuerpos)s</p>
 <div class=c>
-<div><span>mensajes</span><b>%(total)s</b></div>
-<div><span>firmantes</span><b>%(firmantes)s</b></div>
-</div>
-<div class=g><table>
-<tr><th>folio</th><th>de</th><th>para</th><th>cuando</th><th>tipo</th><th>ref</th></tr>
-%(filas)s
-</table></div>
-<p class=nota><b>Esta pagina se sirve SIN CREDENCIAL y muestra los cuerpos completos</b>
-de todo el trafico, no solo el de quien mira. Quien alcance esta direccion lee el canal
-entero. Atala a loopback, ponle algo delante que pida credencial, o arranca con
-<code>--sin-cuerpos</code> si eso no es lo que quieres.<br>
-Muestra los ultimos 50 de <b>este</b> canal. El visor vive dentro del servicio, asi que no
+<div>registros<b>%(total)s</b></div>
+<div>en pantalla<b>%(pantalla)s</b></div>
+<div>firmantes<b>%(firmantes)s</b></div>
+<div class=w2>sin acuse<b>%(sin_acuse)s</b></div>
+</div></div>
+%(tarjetas)s
+<p class=nota><b>Esta pagina se sirve SIN CREDENCIAL.</b> Quien alcance esta direccion lee
+el canal entero, incluido el trafico entre terceras casas. Atala a loopback, ponle algo
+delante que pida credencial, o arranca con <code>--sin-cuerpos</code>.<br>
+<b>Recogido</b> no es «entregado» ni «leido»: es que existe un acuse firmado por el
+destinatario. Es lo unico que este canal puede probar de un mensaje.<br>
+Ultimos 200 de <b>este</b> canal &mdash; el visor vive dentro del servicio, asi que no
 puede apuntar a otro.</p>
 </div></body></html>"""
 
@@ -406,8 +413,13 @@ class Canal(BaseHTTPRequestHandler):
             cols = ("id,de,para,t,tipo,ref_folio" if self.sin_cuerpos
                     else "id,de,para,t,tipo,ref_folio,cuerpo")
             filas = db.execute(
-                "SELECT " + cols + " FROM mensajes"
-                " ORDER BY id DESC LIMIT 50").fetchall()
+                "SELECT " + cols + " FROM mensajes WHERE tipo='mensaje'"
+                " ORDER BY id DESC LIMIT 200").fetchall()
+            # RECOGIDO SE DERIVA, no se guarda: es que existe OTRA fila, tipo acuse,
+            # firmada por el destinatario, apuntando a esta. Ninguna columna de estado.
+            acuses = {r["ref_folio"]: r["de"] for r in db.execute(
+                "SELECT ref_folio,de FROM mensajes WHERE tipo='acuse'"
+                " AND ref_folio IS NOT NULL").fetchall()}
             total = db.execute("SELECT COUNT(*) AS c FROM mensajes").fetchone()["c"]
             firmantes = 0
             ruta_f = os.path.join(self.datos, NOMBRE_FIRMANTES)
@@ -419,33 +431,45 @@ class Canal(BaseHTTPRequestHandler):
             "text/html" in (self.headers.get("Accept") or "")
             and (q or {}).get("formato") != "json")
         if not quiere_html:
-            return self._responder(200, {"servicio": "vuelamind-canal", "version": VERSION,
-                                         "total": total, "firmantes": firmantes,
-                                         "reciente": [dict(f) for f in filas]})
-        return self._pagina(filas, total, firmantes)
+            return self._responder(200, {
+                "servicio": "vuelamind-canal", "version": VERSION, "total": total,
+                "firmantes": firmantes,
+                "reciente": [dict(f, recogido_por=acuses.get(f["id"])) for f in filas]})
+        return self._pagina(filas, acuses, total, firmantes)
 
-    def _pagina(self, filas, total, firmantes):
-        """La bitácora, para un humano. Se sirve desde el propio proceso — es la forma
-        que ya corre en produccion, y trae su costo declarado: el visor queda atado al
-        servicio, asi que esta pagina solo puede mostrar ESTE canal. Un panel que deba
-        mirar varios va por delante, no por dentro."""
+    def _pagina(self, filas, acuses, total, firmantes):
+        """La bitácora, para un humano. Se sirve desde el propio proceso — la forma que
+        ya corre en producción, con su costo declarado: el visor queda atado al servicio,
+        así que solo puede mostrar ESTE canal.
+
+        Y muestra lo único que este canal puede PROBAR de un mensaje: si alguien fue a
+        recogerlo. No «entregado» ni «leído» — recogido, que es que existe un acuse
+        firmado por su destinatario."""
         def esc(v):
             return (str(v).replace("&", "&amp;").replace("<", "&lt;")
                     .replace(">", "&gt;").replace('"', "&quot;"))
-        fils = []
+        tarjetas, sin_acuse = [], 0
         for f in filas:
-            ref = f["ref_folio"]
+            quien = acuses.get(f["id"])
+            if quien:
+                sello = "<span class='s ok'>recogido por %s</span>" % esc(quien)
+            else:
+                sello = "<span class='s no'>sin acuse</span>"
+                sin_acuse += 1
             cuerpo = "" if self.sin_cuerpos else (f["cuerpo"] or "")
-            fils.append(
-                "<tr class=%s><td class=n>%s</td><td>%s</td><td class=a>%s</td>"
-                "<td class=t>%s</td><td class=k>%s</td><td class=n>%s</td></tr>"
-                "<tr class=c><td></td><td colspan=5><pre>%s</pre></td></tr>"
-                % ("ack" if f["tipo"] == "acuse" else "msg", f["id"], esc(f["de"]),
-                   esc(f["para"]), time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(f["t"])),
-                   esc(f["tipo"]), "" if ref is None else ref, esc(cuerpo)))
+            tarjetas.append(
+                "<article class=m><header><span class=f>#%s</span>"
+                "<span class=h>%s</span><span class=r>%s <i>&rarr;</i> %s</span>%s</header>"
+                "%s</article>"
+                % (f["id"], time.strftime("%d %b %H:%M", time.localtime(f["t"])),
+                   esc(f["de"]), esc(f["para"]), sello,
+                   "" if self.sin_cuerpos else "<pre>%s</pre>" % esc(cuerpo)))
         cuerpo = (_PAGINA % {"total": total, "firmantes": firmantes, "version": VERSION,
-                             "filas": "\n".join(fils) or
-                             "<tr><td colspan=6 class=v>sin trafico todavia</td></tr>"}
+                             "pantalla": len(filas), "sin_acuse": sin_acuse,
+                             "cuerpos": ("" if self.sin_cuerpos else
+                                         " &middot; cuerpos completos"),
+                             "tarjetas": "\n".join(tarjetas) or
+                             "<p class=v>sin trafico todavia</p>"}
                   ).encode("utf-8")
         self.send_response(200)
         self.send_header("Content-Type", "text/html; charset=utf-8")
