@@ -237,6 +237,35 @@ python3 mensajeria_cliente.py pendientes; echo "código: $?"   # red: ¿acepta e
 > se juzga por código de salida: *una salida vacía no prueba que algo salió bien, solo que no
 > imprimió.*
 
+### 5 · El disparador — la compuerta que faltaba, y sin ella la casa queda SORDA
+
+**No es un paso posterior ni una nota: es la quinta compuerta, con la misma disciplina que
+las cuatro de arriba.** Se mide antes de actuar, se juzga por código de salida, y **una casa
+que no la pasa NO se declara conectada.**
+
+```bash
+python3 disparador.py --conformidad;  echo "código: $?"   # 0 o no sigas
+python3 disparador.py --observar;     echo "código: $?"   # dice qué haría, sin despertar a nadie
+python3 disparador.py --instalar;     echo "código: $?"   # lo carga como agente de usuario
+```
+
+> [!danger] Sin esta compuerta el skill entrega una casa que habla y no escucha
+> **MEDIDO el 2026-09-01, recorriendo el skill entero con una casa nueva:** quedó declarada
+> conectada **y sorda**. Los mensajes le llegan, nadie los recoge, y **quien escribió cree
+> que llegaron** — el peor de los estados, porque no tiene síntoma en ninguno de los dos
+> lados.
+>
+> Los agentes de las casas viejas se instalaron **uno por uno a mano** en su día, y por eso
+> nadie había notado que este documento no lo hace.
+>
+> Es el mismo defecto por tercera vez: primero el servicio —*un contrato no es un
+> servicio*—, luego el panel, ahora el disparador. **El skill entregaba la pieza que habla y
+> no la que escucha.**
+
+**El `.disparador.conf` acepta `clave = valor` y `clave valor`.** Hasta el 2026-09-01 solo
+lo segundo, mientras declaraba usar «el mismo formato» que `.mensajeria.conf`, que parte por
+`=`. Eran dos formatos hermanos distintos; ahora los dos entran.
+
 ### El disparador — ya no es un hueco: es un artefacto
 
 Qué despierta a la sesión cuando llega un mensaje **ya no lo describe este skill**, y eso es
