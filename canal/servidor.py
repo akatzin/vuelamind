@@ -177,6 +177,11 @@ tr:last-child td{border-bottom:0}
 .a{color:var(--x)}.t{color:var(--d);font-variant-numeric:tabular-nums}
 .k{font-size:12px}.ack .k{color:var(--a)}.msg .k{color:var(--m)}
 .v{color:var(--d);text-align:center;padding:22px}
+tr.c td{padding:0 12px 10px;border-bottom:1px solid rgba(27,36,52,.55)}
+tr.c pre{margin:0;white-space:pre-wrap;word-break:break-word;color:var(--x);
+font:13px/1.55 ui-monospace,Menlo,monospace;background:rgba(0,0,0,.25);
+border-left:2px solid var(--b);padding:8px 10px;border-radius:4px;max-height:16em;
+overflow:auto}
 .nota{margin:18px 0 0;color:var(--d);font-size:12px;line-height:1.7;
 border-left:2px solid var(--b);padding-left:12px}
 </style></head><body><div class=w>
@@ -190,11 +195,12 @@ border-left:2px solid var(--b);padding-left:12px}
 <tr><th>folio</th><th>de</th><th>para</th><th>cuando</th><th>tipo</th><th>ref</th></tr>
 %(filas)s
 </table></div>
-<p class=nota>Esta pagina <b>no muestra cuerpos</b>, y no es una omision: se sirve sin
-pedir credencial, asi que solo puede ensenar metadatos &mdash; quien escribio a quien y
-cuando. Para leer un mensaje hace falta firmar como su destinatario.<br>
-Muestra los ultimos 50 de <b>este</b> canal. El visor vive dentro del servicio, asi que
-no puede apuntar a otro.</p>
+<p class=nota><b>Esta pagina se sirve SIN CREDENCIAL y muestra los cuerpos completos</b>
+de todo el trafico, no solo el de quien mira. Quien alcance esta direccion lee el canal
+entero. Atala a loopback, ponle algo delante que pida credencial, o arranca con
+<code>--sin-cuerpos</code> si eso no es lo que quieres.<br>
+Muestra los ultimos 50 de <b>este</b> canal. El visor vive dentro del servicio, asi que no
+puede apuntar a otro.</p>
 </div></body></html>"""
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -203,6 +209,7 @@ no puede apuntar a otro.</p>
 
 class Canal(BaseHTTPRequestHandler):
     datos = None
+    sin_cuerpos = False
     server_version = "vuelamind-canal/" + VERSION
 
     def log_message(self, formato, *args):
@@ -383,17 +390,23 @@ class Canal(BaseHTTPRequestHandler):
         return self._responder(200, {"acuses": [dict(f) for f in filas]})
 
     def _portada(self, q=None):
-        """Exposición de solo lectura, sin parámetros y SIN CUERPOS. Sirve para que
-        un humano vea que el servicio vive y qué se movió — nunca para leer a nadie.
+        """Exposición de solo lectura, sin parámetros. HTML para un navegador, JSON
+        para todo lo demás.
 
-        HTML para un navegador, JSON para todo lo demás. Y la columna `cuerpo` NO se
-        consulta en ninguno de los dos caminos: no es que se filtre al pintar, es que
-        nunca sale de la base. Filtrar al pintar es una regla que una edición futura
-        deshace sin querer; no seleccionarla es un imposible."""
+        MUESTRA LOS CUERPOS, y eso es una decisión de despliegue, no un descuido: es la
+        forma que ya corre en producción y la que su dueño pidió. Lo que NO se hace es
+        callarlo — esta ruta no pide firma, así que **quien la alcance lee el canal
+        entero, incluido el tráfico entre terceros**. Se dice al arrancar y se dice en
+        el pie de la página.
+
+        `--sin-cuerpos` la deja en solo metadatos, y entonces la columna ni se consulta:
+        filtrar al pintar es una regla que una edición futura deshace sin querer."""
         db = abrir(self.datos)
         try:
+            cols = ("id,de,para,t,tipo,ref_folio" if self.sin_cuerpos
+                    else "id,de,para,t,tipo,ref_folio,cuerpo")
             filas = db.execute(
-                "SELECT id,de,para,t,tipo,ref_folio FROM mensajes"
+                "SELECT " + cols + " FROM mensajes"
                 " ORDER BY id DESC LIMIT 50").fetchall()
             total = db.execute("SELECT COUNT(*) AS c FROM mensajes").fetchone()["c"]
             firmantes = 0
@@ -422,12 +435,14 @@ class Canal(BaseHTTPRequestHandler):
         fils = []
         for f in filas:
             ref = f["ref_folio"]
+            cuerpo = "" if self.sin_cuerpos else (f["cuerpo"] or "")
             fils.append(
                 "<tr class=%s><td class=n>%s</td><td>%s</td><td class=a>%s</td>"
                 "<td class=t>%s</td><td class=k>%s</td><td class=n>%s</td></tr>"
+                "<tr class=c><td></td><td colspan=5><pre>%s</pre></td></tr>"
                 % ("ack" if f["tipo"] == "acuse" else "msg", f["id"], esc(f["de"]),
                    esc(f["para"]), time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(f["t"])),
-                   esc(f["tipo"]), "" if ref is None else ref))
+                   esc(f["tipo"]), "" if ref is None else ref, esc(cuerpo)))
         cuerpo = (_PAGINA % {"total": total, "firmantes": firmantes, "version": VERSION,
                              "filas": "\n".join(fils) or
                              "<tr><td colspan=6 class=v>sin trafico todavia</td></tr>"}
@@ -758,37 +773,60 @@ def _s12():
         srv.shutdown()
 
 
-@_caso("S13 · la portada no expone cuerpos", "un humano ve el tráfico, no el contenido")
+@_caso("S13 · la portada muestra el trafico del canal, cuerpos incluidos",
+       "es la forma pedida: un humano ve lo que paso sin pasar por ningun cliente")
 def _s13():
     d, srv, base = _banco()
     try:
         a = _Casa(d, "ana"); _alta_muda(d, "ana", a.llave + ".pub")
-        s = _sobre("ana", "beto", "TEXTO-SECRETO"); _post(base, s, a.firmar(s))
+        s = _sobre("ana", "beto", "TEXTO-VISIBLE"); _post(base, s, a.firmar(s))
         cod, r = _get(base, "/", {})
-        return cod == 200 and "TEXTO-SECRETO" not in json.dumps(r) and r["total"] == 1
+        return cod == 200 and r["total"] == 1 and "TEXTO-VISIBLE" in json.dumps(r)
     finally:
         srv.shutdown()
 
 
-@_caso("S14 · la PAGINA tampoco expone cuerpos, y se sirve segun quien pregunte",
-       "HTML a un navegador, JSON a lo demas, y en ninguno de los dos el cuerpo")
+@_caso("S13b · --sin-cuerpos: la columna NI SE CONSULTA",
+       "para quien no quiera exponerlos, y no es un filtro al pintar")
+def _s13b():
+    # No se filtra al pintar: se deja de seleccionar. Una regla aplicada al pintar la
+    # deshace la siguiente edicion sin querer; no pedir la columna es un imposible.
+    import threading
+    d = tempfile.mkdtemp(prefix="canal_")
+    h = type("H", (Canal,), {"datos": d, "sin_cuerpos": True})
+    srv = ThreadingHTTPServer(("127.0.0.1", 0), h)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    base = "http://127.0.0.1:%d" % srv.server_address[1]
+    try:
+        a = _Casa(d, "ana"); _alta_muda(d, "ana", a.llave + ".pub")
+        s = _sobre("ana", "beto", "TEXTO-SECRETO"); _post(base, s, a.firmar(s))
+        cod, r = _get(base, "/", {})
+        import urllib.request
+        req = urllib.request.Request(base + "/", headers={"Accept": "text/html"})
+        html = urllib.request.urlopen(req, timeout=20).read().decode("utf-8")
+        return ("TEXTO-SECRETO" not in json.dumps(r)
+                and "TEXTO-SECRETO" not in html and r["total"] == 1)
+    finally:
+        srv.shutdown()
+
+
+@_caso("S14 · la pagina se sirve segun quien pregunte, y avisa de lo que expone",
+       "HTML a un navegador, JSON a lo demas, y el pie dice que se lee sin credencial")
 def _s14():
-    # El camino nuevo necesita su propio caso: S13 comprueba el JSON, y una portada
-    # que ademas pinta HTML es OTRA salida por la que el cuerpo podria escaparse.
-    # Una guarda que solo cubre una de las dos ramas es media guarda.
     import urllib.request
     d, srv, base = _banco()
     try:
         a = _Casa(d, "ana"); _alta_muda(d, "ana", a.llave + ".pub")
-        s = _sobre("ana", "beto", "TEXTO-SECRETO"); _post(base, s, a.firmar(s))
+        s = _sobre("ana", "beto", "TEXTO-VISIBLE"); _post(base, s, a.firmar(s))
         req = urllib.request.Request(base + "/", headers={"Accept": "text/html"})
         r = urllib.request.urlopen(req, timeout=20)
         html = r.read().decode("utf-8")
         es_html = r.headers.get("Content-Type", "").startswith("text/html")
-        # y el otro camino sigue dando JSON al que no pide HTML
-        cod, j = _get(base, "/", {})
-        return (es_html and "TEXTO-SECRETO" not in html and "bitacora" in html
-                and "ana" in html and "TEXTO-SECRETO" not in json.dumps(j))
+        cod, j = _get(base, "/", {})            # sin Accept html -> JSON
+        # el aviso del pie no es adorno: es lo unico que le dice a quien instala esto
+        # que la pagina no pide credencial.
+        avisa = "SIN CREDENCIAL" in html and "--sin-cuerpos" in html
+        return es_html and "TEXTO-VISIBLE" in html and avisa and isinstance(j, dict)
     finally:
         srv.shutdown()
 
@@ -821,6 +859,7 @@ USO = """servidor.py — el canal de mensajería firmado. Un solo archivo, sin d
                                          levanta el servicio (8090, ./datos, solo loopback).
                                          --escuchar 0.0.0.0 lo expone a la red: acto deliberado,
                                          y dice en voz alta qué queda expuesto.
+                                         --sin-cuerpos deja la portada en solo metadatos.
   --alta IDENTIDAD RUTA.pub              da de alta una llave en trust_signers
   --conf IDENTIDAD RUTA_LLAVE            imprime un .mensajeria.conf listo para esa casa
   --conformidad                          corre sus propios casos; no toca ningún dato real
@@ -859,7 +898,8 @@ def main(argv):
         # eso hay una bandera y no una variable de entorno: se escribe en la línea que
         # arranca el servicio, donde se lee.
         host = argv[argv.index("--escuchar") + 1] if "--escuchar" in argv else "127.0.0.1"
-        handler = type("H", (Canal,), {"datos": datos})
+        sin_cuerpos = "--sin-cuerpos" in argv
+        handler = type("H", (Canal,), {"datos": datos, "sin_cuerpos": sin_cuerpos})
         srv = ThreadingHTTPServer((host, puerto), handler)
         if host not in ("127.0.0.1", "localhost", "::1"):
             # No se impide: se dice. Quien expone tiene derecho a hacerlo y deber de
@@ -870,10 +910,12 @@ def main(argv):
             print("EXPUESTO EN %s:%d — no solo a esta máquina.\n"
                   "  · Sin TLS: el cuerpo viaja en claro por la red. La firma protege la\n"
                   "    AUTORÍA, no la confidencialidad — son cosas distintas.\n"
-                  "  · La portada GET / no pide firma: cualquiera en la red ve el tráfico\n"
-                  "    reciente (quién escribió a quién y cuándo), nunca los cuerpos.\n"
-                  "  · Escribir y leer buzones SIGUEN exigiendo firma de trust_signers."
-                  % (host, puerto), file=sys.stderr, flush=True)
+                  "  · La portada GET / NO PIDE FIRMA: cualquiera en la red lee el canal\n"
+                  "    ENTERO — %s —, incluido el tráfico entre terceras casas.\n"
+                  % (host, puerto, "solo metadatos, por --sin-cuerpos" if sin_cuerpos
+                     else "CUERPOS COMPLETOS incluidos") +
+                  "  · Escribir y leer buzones SIGUEN exigiendo firma de trust_signers.",
+                  file=sys.stderr, flush=True)
         print("canal en http://%s:%d  ·  datos en %s" % (host, puerto, datos), flush=True)
         print("firmantes: %s" % os.path.join(datos, NOMBRE_FIRMANTES), flush=True)
         try:
