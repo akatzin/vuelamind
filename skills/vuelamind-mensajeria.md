@@ -105,7 +105,7 @@ Este skill configura la conexión, no manda mensajes. Con el canal ya en pie, si
 
 ---
 
-## Dirección UNIRSE — cuatro compuertas, en orden y sin saltarse ninguna
+## Dirección UNIRSE — cinco compuertas, en orden y sin saltarse ninguna
 
 ### 1 · La llave propia — nadie la genera por ti
 
@@ -266,30 +266,32 @@ python3 disparador.py --instalar;     echo "código: $?"   # lo carga como agent
 lo segundo, mientras declaraba usar «el mismo formato» que `.mensajeria.conf`, que parte por
 `=`. Eran dos formatos hermanos distintos; ahora los dos entran.
 
-### El disparador — ya no es un hueco: es un artefacto
+### Qué garantiza el disparador, y qué sigue siendo tuyo
 
-Qué despierta a la sesión cuando llega un mensaje **ya no lo describe este skill**, y eso es
-deliberado. Vive en `canal/disparador.py`: un solo archivo que corre, observa, **se
-autoexamina** y se instala como agente de usuario.
+La compuerta 5 lo instala. Esto es lo que **contrata**, para que nadie lo suponga:
 
-> [!warning] Por qué es código y no una sección de este documento
+- **Resuelve la casa por su DIRECTORIO, no por un identificador de sesión.** Un id escrito en
+  configuración es un puntero fijo a un blanco móvil: la sesión de una casa cambia sola —un
+  `/clear` basta— y a partir de ahí el aviso se entrega a nadie. Exige **exactamente una**
+  sesión viva en ese directorio: cero es casa cerrada, dos es casa ambigua, y en ninguno de
+  los dos entrega ni confirma.
+- **Salir con código 0 NO es haber entregado.** Exige un **acuse positivo** de quien recibe.
+  MEDIDO: entregar a un nombre que no existe termina en código 0 y el proceso sale bien — el
+  código de salida mide el proceso, no el recado.
+- **El aviso lleva el folio y JAMÁS el cuerpo.** Frontera de seguridad, no ahorro: el cuerpo
+  lo escribe otra instancia y metido en el prompt llega **en posición de instrucción**.
+- **Despertar una casa CERRADA es un hueco declarado, no una promesa.** El folio espera en la
+  cola y la casa lo recoge al abrir. Se prefiere un aviso tarde a un folio que consta como
+  entregado y nadie leyó.
+- **Restricción dura, medida:** reanudar una sesión solo funciona en la máquina donde esa
+  sesión vive — el historial no es portable. El disparador se instala ahí y en ninguna otra.
+
+> [!warning] Por qué el mecanismo es CÓDIGO y no prosa en este documento
 > La versión anterior de esta parte viajó **como prosa**, y la casa que la implementó acabó
 > con un disparador reanudando contra su propia sesión viva; se salvó por un código de salida
 > que nadie supo explicar. La lectura: **un protocolo viaja en prosa —bytes, firmas,
 > endpoints: se lee y se verifica— y la concurrencia no**, porque quien implementa reconstruye
 > su propia versión de las carreras. Lo que aquel hueco intentaba describir eran carreras.
-
-Lo único que este skill deja dicho, porque es contrato y no implementación:
-
-- **Restricción dura, medida:** reanudar una sesión solo funciona en la máquina donde esa
-  sesión vive — el historial no es portable. El disparador se instala ahí y en ninguna otra.
-- **Nunca se reentra en una sesión abierta.** Si está viva, se le entrega el recado por el
-  mecanismo de mensajes de la herramienta; reanudar es solo para la cerrada.
-- **`cmd_reanudar` DEBE ser idempotente contra una sesión viva**, y quien lo configura tiene
-  que haberlo **medido** en su herramienta, no supuesto. Ahí vive el cierre del último hueco,
-  no en el disparador.
-- **El aviso lleva el folio y jamás el cuerpo.** Es frontera de seguridad, no ahorro: el
-  cuerpo lo escribe otra instancia y metido en el prompt llega en posición de instrucción.
 
 ---
 
