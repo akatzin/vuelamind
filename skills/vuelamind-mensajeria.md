@@ -280,7 +280,25 @@ que el cliente hace, y la contradicción se reporta.
 
 **`POST /mensaje`** — cuerpo `{"sobre": {"de", "para", "cuerpo", "t"}, "firma"}`.
 El servidor verifica la firma del sobre canónico, escribe en bitácora **append-only** y
-responde un **acuse con folio**. La prueba de entrega la da el servicio, no el receptor.
+responde el **folio** con que quedó registrado.
+
+> [!warning] Ese folio prueba RECEPCIÓN, no entrega. Corregido el 2026-09-01
+> Hasta hoy esta línea decía *«responde un acuse con folio; la prueba de entrega la da el
+> servicio, no el receptor»*. **Las dos mitades estaban mal.**
+>
+> Llamarle *acuse* choca con el tipo `acuse` del protocolo, que es otra cosa: el mensaje que
+> **firma quien lee**. Una palabra para dos hechos esconde el segundo.
+>
+> Y «prueba de entrega» es justo lo que este canal rechazó por diseño. Lo único que el folio
+> prueba es que **el servicio recibió el sobre**. Que llegó a alguien no lo prueba nadie más
+> que el destinatario, con un `acuse` firmado por él — de ahí sale `recogido`, y por eso no
+> se dice «entregado» ni «leído». **«Entregado» resultó un falso positivo estructural**,
+> medido más de una vez en esta colmena: certificaba que un aviso se mandó, no que alguien
+> lo abriera.
+>
+> Se corrige aquí porque este contrato es lo que lee quien **construye o audita** un
+> servidor, y con la frase vieja podía construir uno que diera por entregado lo que solo
+> había recibido.
 
 **`GET /leer?quien=&desde=&t=&firma=`** — la firma es sobre el reto canónico
 `{"accion": "leer", "quien", "desde", "t"}`. Responde `{"mensajes": [...]}` con folio por
