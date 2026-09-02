@@ -80,6 +80,40 @@ CREATE TABLE IF NOT EXISTS mensajes(
 );
 CREATE UNIQUE INDEX IF NOT EXISTS mensajes_firma ON mensajes(firma);
 CREATE INDEX IF NOT EXISTS mensajes_buzon ON mensajes(para, tipo, id);
+
+-- I3 e I4, y no estaban. Un despliegue anterior las cumplia y SE PERDIERON al
+-- cambiar de servidor, que es como se pierde una garantia sin que nada falle.
+--
+-- I4 · declarar es condicion de existir: `declaracion` es NOT NULL y se comprueba
+-- que no venga vacia. Y no basta guardarla — hay que ENSEÑARLA antes de que nadie
+-- ceda nada, asi que el alta la imprime y exige confirmacion explicita.
+-- I3 · el alta es bilateral: sin fila del DESTINATARIO la insercion falla. Es
+-- estructura, no cortesia — un mensaje a alguien que no existe se guardaba y
+-- devolvia folio.
+CREATE TABLE IF NOT EXISTS identidades(
+    nombre       TEXT PRIMARY KEY,
+    llave        TEXT NOT NULL,
+    declaracion  TEXT NOT NULL,
+    alta         INTEGER NOT NULL
+);
+"""
+
+NOMBRE_DECLARACION = "declaracion.txt"
+
+DECLARACION_EJEMPLO = """# declaracion.txt — lo que este despliegue le dice a quien entra, ANTES de que ceda
+# nada. Es obligatorio y no puede estar vacio (invariante I4).
+#
+# Se enseña en cada alta y se guarda con la identidad: si manana cambian los
+# terminos, se ve contra cuales entro cada quien.
+#
+# Escribe la VERDAD DE ESTE DESPLIEGUE, no una plantilla. Lo que hay que decir:
+#  · quien puede leer el trafico (¿la portada pide credencial? ¿que muestra?)
+#  · donde escucha (loopback protege de la red; NO de otra cuenta del mismo equipo)
+#  · si hay TLS, y quien opera la maquina
+#  · quien mas ve lo que mandas
+
+Este canal guarda todo lo que se manda, para siempre y sin borrar.
+CAMBIA ESTE TEXTO ANTES DE DAR DE ALTA A NADIE.
 """
 
 
@@ -266,6 +300,20 @@ class Canal(BaseHTTPRequestHandler):
 
         db = abrir(self.datos)
         try:
+            # ── I3 · EL ALTA ES BILATERAL ────────────────────────────────────
+            # Sin fila del DESTINATARIO la insercion falla. No es cortesia: un
+            # mensaje a alguien que no existe se guardaba y devolvia folio, asi que
+            # quien se equivocaba de nombre recibia un acuse de exito y su mensaje
+            # se quedaba en un buzon que nadie iba a abrir jamas.
+            for quien, papel in ((str(sobre["de"]), "remitente"),
+                                 (str(sobre["para"]), "destinatario")):
+                hay = db.execute("SELECT 1 FROM identidades WHERE nombre = ?",
+                                 (quien,)).fetchone()
+                if not hay:
+                    return self._rechazo(
+                        404, "«%s» no esta dado de alta en este canal (%s). El alta es "
+                             "bilateral: sin la fila del destinatario no se guarda."
+                             % (quien, papel))
             # EL REINTENTO DEVUELVE EL FOLIO QUE YA EXISTÍA, no un error genérico.
             # «Lo mandé y no llegó» y «lo mandé dos veces» tienen que distinguirse:
             # si el sistema contesta lo mismo a las dos, manda a diagnosticar lo que
@@ -483,35 +531,78 @@ class Canal(BaseHTTPRequestHandler):
 # ALTA — fuera de banda, siempre
 # ─────────────────────────────────────────────────────────────────────────────
 
-def alta(datos, identidad, ruta_pub):
-    """Añade una identidad a `trust_signers`. Se hace a mano y a propósito: el canal
-    no puede transportar su propia llave."""
+def declaracion(datos, crear=False):
+    """El texto que este despliegue le enseña a quien entra. I4: obligatorio y no
+    vacio. Si no existe, se escribe un ejemplo y SE PARA — un despliegue sin
+    declaracion no puede dar de alta a nadie, y poner una por omision seria peor
+    que no tenerla: nadie lee lo que no tuvo que escribir."""
+    ruta = os.path.join(datos, NOMBRE_DECLARACION)
+    if not os.path.isfile(ruta):
+        if crear:
+            with open(ruta, "w", encoding="utf-8") as f:
+                f.write(DECLARACION_EJEMPLO)
+            raise SystemExit(
+                "NO HAY DECLARACION, y sin ella no se da de alta a nadie (invariante I4).\n"
+                "Escribi un borrador en %s — ABRELO, di la verdad de ESTE despliegue,\n"
+                "y vuelve a correr el alta." % ruta)
+        raise SystemExit("falta %s (invariante I4)" % ruta)
+    texto = "\n".join(l for l in open(ruta, encoding="utf-8").read().splitlines()
+                      if not l.strip().startswith("#")).strip()
+    if not texto:
+        raise SystemExit("%s esta vacia. I4: declarar es condicion de existir." % ruta)
+    return texto
+
+
+def alta(datos, identidad, ruta_pub, acepto=False):
+    """Añade una identidad. Se hace a mano y a proposito: el canal no puede
+    transportar su propia llave.
+
+    Y ENSEÑA LA DECLARACION ANTES, que es la mitad de I4 que se olvida — guardarla
+    no es enseñarla. Sin `--acepto` imprime los terminos y no da de alta a nadie."""
     if any(c.isspace() for c in identidad):
         raise SystemExit("una identidad no puede llevar espacios: %r" % identidad)
+    texto = declaracion(datos, crear=True)
     pub = open(os.path.expanduser(ruta_pub), encoding="utf-8").read().strip()
     if not pub.startswith(("ssh-ed25519", "ssh-rsa", "ecdsa-", "sk-")):
-        raise SystemExit("eso no parece una llave pública: %s" % ruta_pub)
-    # La pública trae un comentario al final que no forma parte de la llave.
+        raise SystemExit("eso no parece una llave publica: %s" % ruta_pub)
     campos = pub.split()
     linea = "%s %s %s\n" % (identidad, campos[0], campos[1])
-    firmantes = os.path.join(datos, NOMBRE_FIRMANTES)
-    ya = ""
-    if os.path.isfile(firmantes):
-        ya = open(firmantes, encoding="utf-8").read()
-    if linea in ya:
-        print("ya estaba dada de alta: %s" % identidad)
-        return 0
-    for l in ya.splitlines():
-        if l.split(" ")[0:1] == [identidad]:
+    if not acepto:
+        print("=" * 72)
+        print("TERMINOS DE ESTE CANAL — se los tiene que haber leido «%s»" % identidad)
+        print("=" * 72)
+        print(texto)
+        print("=" * 72)
+        print("I4: hay que ENSEÑARLOS antes de que nadie ceda nada. Guardarlos no basta.")
+        print("Si «%s» los conoce y los acepta, repite con --acepto:" % identidad)
+        print("\n    python3 servidor.py --datos %s --alta %s %s --acepto\n"
+              % (datos, identidad, ruta_pub))
+        return 2
+
+    db = abrir(datos)
+    try:
+        ya = db.execute("SELECT llave FROM identidades WHERE nombre = ?",
+                        (identidad,)).fetchone()
+        if ya and ya["llave"] != linea.strip():
             print("AVISO: «%s» ya existe con OTRA llave. No se toca nada: revocar es\n"
-                  "un acto explícito, y sobrescribir en silencio cambia quién puede\n"
-                  "firmar sin que nadie lo note. Edita %s a mano." % (identidad, firmantes),
-                  file=sys.stderr)
+                  "un acto explicito, y sobrescribir en silencio cambia quien puede\n"
+                  "firmar sin que nadie lo note." % identidad, file=sys.stderr)
             return 1
-    with open(firmantes, "a", encoding="utf-8") as f:
-        f.write(linea)
-    os.chmod(firmantes, 0o600)
-    print("dada de alta: %s" % identidad)
+        if ya:
+            print("ya estaba dada de alta: %s" % identidad)
+            return 0
+        db.execute("INSERT INTO identidades(nombre,llave,declaracion,alta)"
+                   " VALUES(?,?,?,?)", (identidad, linea.strip(), texto, int(time.time())))
+        db.commit()
+    finally:
+        db.close()
+    firmantes = os.path.join(datos, NOMBRE_FIRMANTES)
+    ya_texto = open(firmantes, encoding="utf-8").read() if os.path.isfile(firmantes) else ""
+    if linea not in ya_texto:
+        with open(firmantes, "a", encoding="utf-8") as f:
+            f.write(linea)
+        os.chmod(firmantes, 0o600)
+    print("dada de alta: %s  (con los terminos que acepto, guardados con ella)" % identidad)
     return 0
 
 
@@ -522,6 +613,7 @@ PLANTILLA_CONF = """# .mensajeria.conf — identidad de ESTA casa en el canal.
 # falla diciendo "no arranca sin identidad" — el mensaje de la guarda, no del formato.
 identidad = {identidad}
 llave     = {llave}
+base      = {base}
 """
 
 
@@ -548,6 +640,12 @@ class _Casa:
 
     def __init__(self, dir_base, nombre):
         self.nombre = nombre
+        # Si esta identidad YA se dio de alta con una publica, se reusa su privada.
+        # Generarle otra la deja firmando como nadie — que es exactamente el defecto
+        # que `unirse.py` evita en las casas reales, y el arnes lo cometia.
+        if nombre in _PUBS:
+            self.llave = _PUBS[nombre][:-4]
+            return
         self.llave = os.path.join(dir_base, "k_" + nombre)
         subprocess.run(["ssh-keygen", "-t", "ed25519", "-N", "", "-q",
                         "-f", self.llave, "-C", nombre], check=True)
@@ -565,8 +663,29 @@ class _Casa:
 def _alta_muda(datos, ident, pub):
     """El alta habla, y en la suite eso tapa los resultados. Se calla solo aquí."""
     import io, contextlib
+    ruta = os.path.join(datos, NOMBRE_DECLARACION)
+    if not os.path.isfile(ruta):
+        with open(ruta, "w", encoding="utf-8") as f:
+            f.write("Canal de pruebas. Todo se guarda para siempre.\n")
     with contextlib.redirect_stdout(io.StringIO()):
-        return alta(datos, ident, pub)
+        return alta(datos, ident, pub, acepto=True)
+
+
+_PUBS = {}
+
+
+def _pub_de(nombre):
+    """Las publicas de los destinatarios de prueba se generan UNA VEZ y se reusan.
+    Generarlas por caso metia treinta `ssh-keygen` de mas y ponia la bateria por
+    encima de los diez minutos — una bateria que tarda tanto que nadie la corre es
+    una bateria que no existe."""
+    if nombre not in _PUBS:
+        d = tempfile.mkdtemp(prefix="canal_pub_")
+        k = os.path.join(d, nombre)
+        subprocess.run(["ssh-keygen", "-t", "ed25519", "-N", "", "-q", "-f", k,
+                        "-C", nombre], check=True)
+        _PUBS[nombre] = k + ".pub"
+    return _PUBS[nombre]
 
 
 def _banco():
@@ -578,6 +697,11 @@ def _banco():
     hilo = threading.Thread(target=srv.serve_forever, daemon=True)
     hilo.start()
     base = "http://127.0.0.1:%d" % srv.server_address[1]
+    # DESTINATARIOS DADOS DE ALTA. Desde el 2026-09-02 el alta es BILATERAL (I3): un
+    # mensaje a alguien que no existe se rechaza. Los casos que mandan a `beto` o a
+    # `carla` necesitan que existan — antes se guardaban igual, que era el defecto.
+    for quien in ("beto", "carla"):
+        _alta_muda(d, quien, _pub_de(quien))
     return d, srv, base
 
 
@@ -792,7 +916,8 @@ def _s12():
         _alta_muda(d, "ana", a1.llave + ".pub")
         codigo = _alta_muda(d, "ana", a2.llave + ".pub")     # misma identidad, otra llave
         texto = open(os.path.join(d, NOMBRE_FIRMANTES), encoding="utf-8").read()
-        return codigo == 1 and texto.count("\n") == 1
+        suyas = [l for l in texto.splitlines() if l.split(" ")[0:1] == ["ana"]]
+        return codigo == 1 and len(suyas) == 1
     finally:
         srv.shutdown()
 
@@ -823,6 +948,7 @@ def _s13b():
     base = "http://127.0.0.1:%d" % srv.server_address[1]
     try:
         a = _Casa(d, "ana"); _alta_muda(d, "ana", a.llave + ".pub")
+        _alta_muda(d, "beto", _pub_de("beto"))
         s = _sobre("ana", "beto", "TEXTO-SECRETO"); _post(base, s, a.firmar(s))
         cod, r = _get(base, "/", {})
         import urllib.request
@@ -872,7 +998,7 @@ def suite(silencio=False):
     if not silencio:
         print("\n%d/%d" % (len(_CASOS) - fallos, len(_CASOS)))
     for p in os.listdir(tempfile.gettempdir()):
-        if p.startswith("canal_"):
+        if p.startswith("canal_") or p.startswith("canal_pub_"):
             shutil.rmtree(os.path.join(tempfile.gettempdir(), p), ignore_errors=True)
     return 1 if fallos else 0
 
@@ -885,7 +1011,8 @@ USO = """servidor.py — el canal de mensajería firmado. Un solo archivo, sin d
                                          y dice en voz alta qué queda expuesto.
                                          --sin-cuerpos deja la portada en solo metadatos.
   --alta IDENTIDAD RUTA.pub              da de alta una llave en trust_signers
-  --conf IDENTIDAD RUTA_LLAVE            imprime un .mensajeria.conf listo para esa casa
+  --conf IDENT LLAVE --base URL          imprime un .mensajeria.conf listo para esa casa
+  --alta IDENT RUTA.pub [--acepto]       ensena los terminos; con --acepto da de alta
   --conformidad                          corre sus propios casos; no toca ningún dato real
   --ayuda
 
@@ -905,16 +1032,24 @@ def main(argv):
     if "--alta" in argv:
         i = argv.index("--alta")
         try:
-            return alta(datos, argv[i + 1], argv[i + 2])
+            return alta(datos, argv[i + 1], argv[i + 2], "--acepto" in argv)
         except IndexError:
             raise SystemExit("uso: --alta IDENTIDAD RUTA.pub")
     if "--conf" in argv:
         i = argv.index("--conf")
         try:
-            print(PLANTILLA_CONF.format(identidad=argv[i + 1], llave=argv[i + 2]), end="")
+            base = argv[argv.index("--base") + 1] if "--base" in argv else None
+            if not base:
+                raise SystemExit(
+                    "uso: --conf IDENTIDAD RUTA_LLAVE --base URL\n"
+                    "  La URL NO es opcional: sin ella el cliente no arranca, y este\n"
+                    "  generador llego a producir una conf que su propio cliente\n"
+                    "  rechazaba (hallado por ZeroPani, 2026-09-02).")
+            print(PLANTILLA_CONF.format(identidad=argv[i + 1], llave=argv[i + 2],
+                                        base=base.rstrip("/")), end="")
             return 0
         except IndexError:
-            raise SystemExit("uso: --conf IDENTIDAD RUTA_LLAVE")
+            raise SystemExit("uso: --conf IDENTIDAD RUTA_LLAVE --base URL")
     if "--iniciar" in argv:
         puerto = int(argv[argv.index("--puerto") + 1] if "--puerto" in argv else 8090)
         # 127.0.0.1 por omisión y a propósito: exponer un servicio a la red es un acto

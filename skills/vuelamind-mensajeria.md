@@ -99,9 +99,15 @@ binario `ssh-keygen`, cero dependencias de terceros.** Trae su propia batería d
 **no se instala lo que no pasa sus propios casos**:
 
 ```bash
-python3 servidor.py --conformidad           # primero esto. Si no da 13/13, no sigas
+python3 servidor.py --conformidad           # primero esto. Si sale ROJO, no sigas
 python3 servidor.py --iniciar --puerto 8090 --datos ./datos
 ```
+
+> [!warning] No compares contra el número que diga este documento
+> Decía «si no da 13/13, no sigas» y el artefacto da **15/15** — las baterías crecen cada
+> vez que alguien encuentra algo, y **el documento envejece más despacio que el código**.
+> Lo halló ZeroPani midiendo, y con razón: *quien siga los números del texto va a creer que
+> midió otra cosa.* **Lo que se juzga es el código de salida, no el conteo.**
 
 Escucha en **127.0.0.1 y solo ahí**. Exponerlo a la red es un acto deliberado de quien
 despliega —un proxy delante—, nunca el valor por omisión de un programa.

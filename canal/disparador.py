@@ -657,6 +657,21 @@ class Disparador:
     # EL CURSOR ES LO DELICADO: avanza por número, así que confirmar un folio
     # ALTO se traga cualquier folio MÁS BAJO que no se haya atendido. Por eso el
     # cursor no pasa nunca por encima del primer folio que no se atendió.
+    def _primera_vez(self, folio):
+        """True solo la primera vez que se reporta ESTE folio como taponado. El
+        estado vive en disco y no en memoria: el disparador se reinicia, y un aviso
+        que se repite en cada arranque es el mismo ruido con otra excusa."""
+        marca = self.cuenta + ".taponado"
+        try:
+            with open(marca, encoding="utf-8") as f:
+                if f.read().strip() == str(folio):
+                    return False
+        except OSError:
+            pass
+        with open(marca, "w", encoding="utf-8") as f:
+            f.write(str(folio))
+        return True
+
     def _repartir(self, msgs):
         despiertan = set(t.strip() for t in self.cfg["tipos_despiertan"].split(",") if t.strip())
         atiendo, dejo = [], []
@@ -686,9 +701,31 @@ class Disparador:
                 # El texto viejo decía «nadie lo recoge», que ATRIBUYE AL RECEPTOR
                 # un fallo que puede ser del disparador — y con la caché rancia lo
                 # era. Ahora dice qué pasó y dónde se deshace.
-                self.log("folio_agotado", folio=f, cuenta=self.cuenta,
-                         aviso="se agotaron los intentos de ENTREGA; el folio sigue en "
-                               "la cola. Para reintentar, borra su línea de `cuenta`")
+                # ── EL CANAL QUEDA TAPONADO, Y SE DICE UNA VEZ ──────────────
+                # HALLAZGO DE ZEROPANI (2026-09-02): esta línea salía cada 15 s
+                # para el mismo folio, indefinidamente, y el disparador nunca
+                # llegaba a los folios más nuevos.
+                #
+                # Que NO llegue es correcto y no se toca: el cursor avanza por
+                # número, así que entregar el 3 y confirmarlo se tragaría el 1 sin
+                # que nadie lo hubiera visto. Bloquear es la conducta buena.
+                #
+                # Lo que estaba mal era el AVISO. Un aviso que se repite para
+                # siempre se vuelve paisaje —la misma regla del hueco que esta
+                # casa aplica a sus folios—, y encima escondía la gravedad: no es
+                # «un folio no se entregó», es **el canal de esta identidad está
+                # parado detrás de él**. Ahora se dice UNA VEZ por folio, con su
+                # nombre y con la salida.
+                cuantos = len(msgs)
+                if self._primera_vez(f):
+                    self.log("CANAL_TAPONADO", folio=f, detras=cuantos - 1,
+                             cuenta=self.cuenta,
+                             aviso="se agotaron los intentos de ENTREGA de este folio. "
+                                   "NADA de lo que llegue despues se entrega hasta que "
+                                   "se resuelva: el cursor avanza por numero y "
+                                   "confirmar uno mas alto se tragaria este. Salida: "
+                                   "recogerlo a mano con `ver`, o borrar su linea de "
+                                   "`cuenta` para reintentar")
                 return 1
         aviso = self.sobre(msgs)
 
@@ -779,6 +816,10 @@ class Disparador:
         if self.confirmar(ultimo):
             for f in folios:
                 olvidar(self.cuenta, f)
+            try:
+                os.remove(self.cuenta + ".taponado")   # destaponado: se puede volver a avisar
+            except OSError:
+                pass
         return 0
 
 
@@ -1125,12 +1166,44 @@ def _c14():
     return "candado_huerfano" in sal and "entregado_a_viva" in sal
 
 
-@_caso("C15 · tope de repetición: para y grita", "folio_agotado")
+@_caso("C15 · tope de repetición: para y grita UNA VEZ, no cada tick",
+       "CANAL_TAPONADO al llegar al tope, y silencio despues")
 def _c15():
+    # HALLAZGO DE ZEROPANI (2026-09-02): la linea salia cada 15 s para el mismo
+    # folio, indefinidamente. Bloquear es correcto —confirmar uno mas alto se
+    # tragaria este—; repetirlo para siempre no: un aviso que se repite se vuelve
+    # paisaje, y encima escondia que lo parado es el CANAL, no un folio.
     d, env = _montar([_M1], cmd_entregar="exit 1", max_intentos="2")
-    for _ in range(3):
+    vistos = []
+    for _ in range(4):
         cod, sal = _correr(d, env)
-    return "folio_agotado" in sal
+        vistos.append(sal.count("CANAL_TAPONADO"))
+    # exactamente uno en toda la corrida, y no uno por tick
+    return sum(vistos) == 1
+
+
+@_caso("C36 · destaponar y volver a taponar se vuelve a avisar",
+       "el silencio es por folio, no para siempre")
+def _c36():
+    # Si el aviso se callara para siempre, el segundo taponamiento seria invisible.
+    # Se calla por FOLIO, y una entrega buena limpia la marca.
+    d, env = _montar([_M1], cmd_entregar='test -f "$ROTO" && exit 1; echo OK',
+                     max_intentos="2")
+    env["ROTO"] = os.path.join(d, "roto")
+    open(env["ROTO"], "w").close()
+    for _ in range(3):
+        _correr(d, env)                       # se tapona y avisa una vez
+    os.remove(env["ROTO"])
+    for f in ("7",):                          # se destapona a mano, como dice el aviso
+        olvidar(os.path.join(d, "disparador_%s.intentos" % os.path.basename(d)), f)
+    cod, sal = _correr(d, env)                # entrega buena: limpia la marca
+    entregado = "entregado_a_viva" in sal
+    open(env["ROTO"], "w").close()            # se vuelve a romper con otro folio
+    d2, env2 = d, env
+    env2["FALSOS_PENDIENTES"] = json.dumps({"folio": 9, "de": "otra"}) + "\n"
+    for _ in range(3):
+        cod, sal = _correr(d2, env2)
+    return entregado and "CANAL_TAPONADO" in sal
 
 
 @_caso("C16 · el sobre lleva folio, JAMÁS el cuerpo", "el cuerpo no aparece")
