@@ -77,9 +77,22 @@ resucitar un transcript abandonado; ésta miente porque el código de salida mid
 PROCESO, no el recado.
 
 Lo que de verdad cierra el hueco no es elegir mejor vía: es no aceptar la ausencia de
-error como prueba. El éxito exige un ACUSE POSITIVO —la plantilla ya pedía «después
-responde solo OK», y nadie lo comprobaba jamás—. Sin acuse no se confirma, el folio
-espera y el siguiente ciclo reintenta. Un contrato que no se verifica es una decoración.
+error como prueba. Se exige un ACUSE POSITIVO —la plantilla ya pedía «después responde
+solo OK», y nadie lo comprobaba jamás—. Sin acuse no se confirma, el folio espera y el
+siguiente ciclo reintenta. Un contrato que no se verifica es una decoración.
+
+PERO EL ACUSE **NO PRUEBA LA ENTREGA**, Y HAY QUE DECIRLO AQUÍ ARRIBA. MEDIDO por Sho el
+2026-09-02 y reproducido aquí, tres de tres: pedirle a la herramienta que entregue a un
+nombre que NO EXISTE devuelve código 0 **y última línea OK**. La razón es estructural y es
+la que importa: **el acuse lo produce la misma entidad que falla.** Es un auto-reporte, y
+un auto-reporte no puede ser la prueba del acto — a veces obedece la instrucción literal
+(«responde solo OK») en vez de describir el mundo.
+
+Así que esta guarda **baja la tasa de fallo y no cierra el agujero**. Lo que sí prueba que
+alguien recibió un mensaje es `recogido`: el acuse que firma QUIEN LEE, del lado del canal
+y no de la prosa del que manda. Este archivo no puede verlo —es asíncrono, el destinatario
+lee cuando abre— así que aquí queda **declarado como hueco**: el cursor avanza sobre
+«ofrecido», nunca sobre «recibido», y quien quiera saber lo segundo lo pregunta al canal.
 
 DESPERTAR UNA CASA CERRADA QUEDA SIN RESOLVER, y se declara como hueco en vez de
 fingirse: el folio espera en la cola y la casa lo recoge cuando abre. Un hueco
@@ -88,6 +101,7 @@ declarado se puede cerrar; una entrega falsa no se nota.
 
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -233,19 +247,24 @@ def leer_conf(ruta):
             linea = linea.strip()
             if not linea or linea.startswith("#"):
                 continue
-            # ACEPTA LOS DOS FORMATOS, y es una correccion: este archivo declaraba
-            # usar "el mismo formato que la del canal" y era FALSO — `.mensajeria.conf`
-            # parte por `=` y esta partia por espacios. Dos archivos hermanos con dos
-            # formatos, que es exactamente el defecto de las dos fuentes que el
-            # comentario de arriba decia evitar. Hallado por Samantha el 2026-09-01
-            # midiendo el parser en vez de creerle al texto.
-            if "=" in linea.split("#", 1)[0]:
-                k, v = linea.split("=", 1)
-            else:
-                partes = linea.split(None, 1)
-                if len(partes) != 2:
-                    continue
-                k, v = partes
+            # ACEPTA LOS DOS FORMATOS, Y SE DECIDE POR LA CLAVE, NO POR "CONTIENE ="
+            #
+            # La primera version preguntaba `if "=" in linea` sobre la LINEA ENTERA, y
+            # partia por el primer `=` viniera de donde viniera. REGRESION MEDIDA por
+            # Sho el 2026-09-02, con control: un valor que lleve `=` dentro
+            # —`sh -c '[ "$x" = "y" ]'`, un curl con `?a=b`, un `VAR=1 comando`— se
+            # partia por dentro. En una clave obligatoria abortaba; en una OPCIONAL
+            # era peor: la clave real nunca se asignaba, entraba el valor por omision
+            # EN SILENCIO, y se creaba una clave basura que nadie mira.
+            #
+            # Ahora se lee primero la CLAVE —que es un identificador— y solo entonces
+            # se mira que la sigue: si el primer caracter no blanco es `=`, el valor
+            # es lo que venga despues; si no, el valor es el resto. Asi el separador
+            # se decide por su POSICION y no por su existencia.
+            m = re.match(r"([A-Za-z_][A-Za-z0-9_]*)\s*(=?)\s*(.*)$", linea)
+            if not m or not m.group(3).strip():
+                continue
+            k, v = m.group(1), m.group(3)
             cfg[k.strip().lower()] = v.strip()
     faltan = [k for k in OBLIGATORIAS if not cfg.get(k)]
     if faltan:
@@ -817,6 +836,13 @@ class Disparador:
         # La reanudación mentía por resucitar un transcript; ésta miente porque el
         # código de salida mide el proceso, no el recado.
         #
+        # ⚠ Y NO ALCANZA. MEDIDO 3/3 el 2026-09-02 (Sho, reproducido aquí): entregar a
+        # un nombre que no existe devuelve código 0 Y última línea OK. El acuse lo
+        # produce la misma entidad que falla — es un AUTO-REPORTE, y un auto-reporte no
+        # puede ser la prueba del acto. Esto baja la tasa de fallo; no la anula. Lo
+        # único que prueba recepción es `recogido`, que firma quien LEE, y eso vive en
+        # el canal y no aquí.
+        #
         # Por eso el éxito exige un ACUSE POSITIVO, no la ausencia de error: la
         # plantilla ya pedía «después responde solo OK» y nadie lo comprobaba nunca.
         # Un contrato que no se verifica es una decoración.
@@ -862,8 +888,12 @@ class Disparador:
         # esta línea no lo delataría. Es «una medición viaja con lo que la produjo,
         # o es inauditable», aplicado al camino que sí funciona — que es donde nadie
         # mira.
+        # `acuse` es lo que CONTESTÓ el emisor, no una prueba de recepción. Se registra
+        # para que la comprobación sea directa y no deducida de la versión — y se llama
+        # así, no «entregado», porque quien firma que recibió es el destinatario.
         self.log("entregado_a_viva", sesion=sesion, folios=",".join(map(str, folios)),
-                 acuse=(lineas[-1][:60] if lineas else "(sin salida)"))
+                 acuse=(lineas[-1][:60] if lineas else "(sin salida)"),
+                 nota="acuse = lo que dijo el EMISOR; recepcion la prueba `recogido`")
         if self.confirmar(ultimo):
             for f in folios:
                 olvidar(self.cuenta, f)
@@ -1585,6 +1615,28 @@ def _c38():
     cod, sal = _correr(d, env)
     return ("entrega_fallo" in sal and "no compartir espacio de nombres" in sal
             and "nombre=la-casa" in sal and "confirmar" not in _testigo(d))
+
+
+@_caso("C39 · un valor que lleva `=` dentro NO se parte por dentro",
+       "el separador se decide por su POSICION, no por su existencia")
+def _c39():
+    # REGRESION MEDIDA POR SHO (2026-09-02), y la introduje yo ese mismo dia al
+    # aceptar los dos formatos con un `if "=" in linea`. Con formato de ESPACIOS
+    # —que es el que trae la plantilla— cualquier valor con `=` dentro se partia.
+    # En una clave obligatoria abortaba; en una opcional entraba el valor por
+    # omision EN SILENCIO, que es peor.
+    import tempfile
+    d = tempfile.mkdtemp(prefix="conf_disp_")
+    with open(os.path.join(d, NOMBRE_CONF), "w", encoding="utf-8") as f:
+        f.write("cliente = /x\n"
+                "cmd_vivas      echo hola\n"
+                "cmd_entregar   sh -c '[ \"{nombre}\" = \"x\" ] && echo OK'\n"
+                "intervalo      15\n")
+    cfg = leer_conf(os.path.join(d, NOMBRE_CONF))
+    # el valor entero, sin partir — y la clave opcional con SU valor, no el de omision
+    return (cfg["cmd_entregar"].endswith("&& echo OK'")
+            and '= \"x\"' in cfg["cmd_entregar"]
+            and cfg["intervalo"] == "15")
 
 
 def suite(silencio=False):

@@ -395,7 +395,13 @@ La compuerta 5 lo instala. Esto es lo que **contrata**, para que nadie lo supong
   `/clear` basta— y a partir de ahí el aviso se entrega a nadie. Exige **exactamente una**
   sesión viva en ese directorio: cero es casa cerrada, dos es casa ambigua, y en ninguno de
   los dos entrega ni confirma.
-- **Salir con código 0 NO es haber entregado.** Exige un **acuse positivo** de quien recibe.
+- **Salir con código 0 NO es haber entregado.** Exige un **acuse positivo**.
+  MEDIDO: entregar a un nombre que no existe termina en código 0 y el proceso sale bien.
+  **Y ese acuse tampoco prueba la entrega** — medido 3/3 el 2026-09-02: la herramienta
+  contesta `OK` aunque el destino no exista, porque **el acuse lo produce la misma entidad
+  que falla**. Un auto-reporte no puede ser la prueba del acto: baja la tasa de fallo, no
+  cierra el agujero. **Lo único que prueba recepción es `recogido`**, el acuse que firma
+  QUIEN LEE — pregúntaselo al canal, no al que mandó.
   MEDIDO: entregar a un nombre que no existe termina en código 0 y el proceso sale bien — el
   código de salida mide el proceso, no el recado.
 - **El aviso lleva el folio y JAMÁS el cuerpo.** Frontera de seguridad, no ahorro: el cuerpo
