@@ -142,6 +142,62 @@ def reto_fresco(t):
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# LA PÁGINA — todo dentro, sin una sola peticion a la red
+#
+# Ni fuentes, ni hojas de estilo, ni scripts de fuera: un visor que pide recursos a
+# terceros le cuenta a terceros que este canal existe y quien lo mira. Se refresca
+# sola con `meta refresh` y no con JavaScript, para que funcione igual en cualquier
+# cosa que sepa leer HTML.
+#
+# Y NO TRAE CUERPOS. No porque se filtren aqui: porque la consulta no los pide. Una
+# regla que se aplica al pintar la deshace la siguiente edicion sin querer.
+# ─────────────────────────────────────────────────────────────────────────────
+
+_PAGINA = """<!doctype html><html lang=es><head><meta charset=utf-8>
+<meta name=viewport content="width=device-width,initial-scale=1">
+<meta http-equiv=refresh content=60><title>bitacora del canal</title><style>
+:root{color-scheme:dark;--f:#06090f;--p:#0d131f;--b:#1b2434;--x:#c6d2e6;--d:#7688a3;
+--m:#63d7c8;--a:#d59a55}
+*{box-sizing:border-box}body{margin:0;background:var(--f);color:var(--x);
+font:14px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}
+.w{max-width:1000px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:17px;margin:0 0 2px;letter-spacing:.04em;font-weight:600}
+.s{color:var(--d);font-size:12px;margin:0 0 20px}
+.c{display:flex;gap:26px;margin:0 0 22px;flex-wrap:wrap}
+.c div{background:var(--p);border:1px solid var(--b);border-radius:6px;padding:9px 14px}
+.c b{display:block;font-size:20px;font-weight:600}
+.c span{color:var(--d);font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.g{overflow-x:auto;border:1px solid var(--b);border-radius:6px;background:var(--p)}
+table{border-collapse:collapse;width:100%%;min-width:640px}
+th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;
+color:var(--d);font-weight:500;padding:9px 12px;border-bottom:1px solid var(--b)}
+td{padding:7px 12px;border-bottom:1px solid rgba(27,36,52,.55)}
+tr:last-child td{border-bottom:0}
+.n{color:var(--d);text-align:right;font-variant-numeric:tabular-nums}
+.a{color:var(--x)}.t{color:var(--d);font-variant-numeric:tabular-nums}
+.k{font-size:12px}.ack .k{color:var(--a)}.msg .k{color:var(--m)}
+.v{color:var(--d);text-align:center;padding:22px}
+.nota{margin:18px 0 0;color:var(--d);font-size:12px;line-height:1.7;
+border-left:2px solid var(--b);padding-left:12px}
+</style></head><body><div class=w>
+<h1>bitacora del canal</h1>
+<p class=s>vuelamind-canal %(version)s &middot; solo lectura &middot; se refresca sola cada 60 s</p>
+<div class=c>
+<div><span>mensajes</span><b>%(total)s</b></div>
+<div><span>firmantes</span><b>%(firmantes)s</b></div>
+</div>
+<div class=g><table>
+<tr><th>folio</th><th>de</th><th>para</th><th>cuando</th><th>tipo</th><th>ref</th></tr>
+%(filas)s
+</table></div>
+<p class=nota>Esta pagina <b>no muestra cuerpos</b>, y no es una omision: se sirve sin
+pedir credencial, asi que solo puede ensenar metadatos &mdash; quien escribio a quien y
+cuando. Para leer un mensaje hace falta firmar como su destinatario.<br>
+Muestra los ultimos 50 de <b>este</b> canal. El visor vive dentro del servicio, asi que
+no puede apuntar a otro.</p>
+</div></body></html>"""
+
+# ─────────────────────────────────────────────────────────────────────────────
 # EL SERVICIO
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -224,7 +280,7 @@ class Canal(BaseHTTPRequestHandler):
         if partes.path == "/estado":
             return self._estado(q)
         if partes.path == "/":
-            return self._portada()
+            return self._portada(q)
         return self._rechazo(404, "ruta desconocida: %s" % partes.path)
 
     def _autenticar(self, q, accion):
@@ -326,19 +382,62 @@ class Canal(BaseHTTPRequestHandler):
             db.close()
         return self._responder(200, {"acuses": [dict(f) for f in filas]})
 
-    def _portada(self):
+    def _portada(self, q=None):
         """Exposición de solo lectura, sin parámetros y SIN CUERPOS. Sirve para que
-        un humano vea que el servicio vive y qué se movió — nunca para leer a nadie."""
+        un humano vea que el servicio vive y qué se movió — nunca para leer a nadie.
+
+        HTML para un navegador, JSON para todo lo demás. Y la columna `cuerpo` NO se
+        consulta en ninguno de los dos caminos: no es que se filtre al pintar, es que
+        nunca sale de la base. Filtrar al pintar es una regla que una edición futura
+        deshace sin querer; no seleccionarla es un imposible."""
         db = abrir(self.datos)
         try:
             filas = db.execute(
                 "SELECT id,de,para,t,tipo,ref_folio FROM mensajes"
                 " ORDER BY id DESC LIMIT 50").fetchall()
             total = db.execute("SELECT COUNT(*) AS c FROM mensajes").fetchone()["c"]
+            firmantes = 0
+            ruta_f = os.path.join(self.datos, NOMBRE_FIRMANTES)
+            if os.path.isfile(ruta_f):
+                firmantes = sum(1 for l in open(ruta_f, encoding="utf-8") if l.strip())
         finally:
             db.close()
-        return self._responder(200, {"servicio": "vuelamind-canal", "version": VERSION,
-                                     "total": total, "reciente": [dict(f) for f in filas]})
+        quiere_html = (q or {}).get("formato") == "html" or (
+            "text/html" in (self.headers.get("Accept") or "")
+            and (q or {}).get("formato") != "json")
+        if not quiere_html:
+            return self._responder(200, {"servicio": "vuelamind-canal", "version": VERSION,
+                                         "total": total, "firmantes": firmantes,
+                                         "reciente": [dict(f) for f in filas]})
+        return self._pagina(filas, total, firmantes)
+
+    def _pagina(self, filas, total, firmantes):
+        """La bitácora, para un humano. Se sirve desde el propio proceso — es la forma
+        que ya corre en produccion, y trae su costo declarado: el visor queda atado al
+        servicio, asi que esta pagina solo puede mostrar ESTE canal. Un panel que deba
+        mirar varios va por delante, no por dentro."""
+        def esc(v):
+            return (str(v).replace("&", "&amp;").replace("<", "&lt;")
+                    .replace(">", "&gt;").replace('"', "&quot;"))
+        fils = []
+        for f in filas:
+            ref = f["ref_folio"]
+            fils.append(
+                "<tr class=%s><td class=n>%s</td><td>%s</td><td class=a>%s</td>"
+                "<td class=t>%s</td><td class=k>%s</td><td class=n>%s</td></tr>"
+                % ("ack" if f["tipo"] == "acuse" else "msg", f["id"], esc(f["de"]),
+                   esc(f["para"]), time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(f["t"])),
+                   esc(f["tipo"]), "" if ref is None else ref))
+        cuerpo = (_PAGINA % {"total": total, "firmantes": firmantes, "version": VERSION,
+                             "filas": "\n".join(fils) or
+                             "<tr><td colspan=6 class=v>sin trafico todavia</td></tr>"}
+                  ).encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Content-Length", str(len(cuerpo)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(cuerpo)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -667,6 +766,29 @@ def _s13():
         s = _sobre("ana", "beto", "TEXTO-SECRETO"); _post(base, s, a.firmar(s))
         cod, r = _get(base, "/", {})
         return cod == 200 and "TEXTO-SECRETO" not in json.dumps(r) and r["total"] == 1
+    finally:
+        srv.shutdown()
+
+
+@_caso("S14 · la PAGINA tampoco expone cuerpos, y se sirve segun quien pregunte",
+       "HTML a un navegador, JSON a lo demas, y en ninguno de los dos el cuerpo")
+def _s14():
+    # El camino nuevo necesita su propio caso: S13 comprueba el JSON, y una portada
+    # que ademas pinta HTML es OTRA salida por la que el cuerpo podria escaparse.
+    # Una guarda que solo cubre una de las dos ramas es media guarda.
+    import urllib.request
+    d, srv, base = _banco()
+    try:
+        a = _Casa(d, "ana"); _alta_muda(d, "ana", a.llave + ".pub")
+        s = _sobre("ana", "beto", "TEXTO-SECRETO"); _post(base, s, a.firmar(s))
+        req = urllib.request.Request(base + "/", headers={"Accept": "text/html"})
+        r = urllib.request.urlopen(req, timeout=20)
+        html = r.read().decode("utf-8")
+        es_html = r.headers.get("Content-Type", "").startswith("text/html")
+        # y el otro camino sigue dando JSON al que no pide HTML
+        cod, j = _get(base, "/", {})
+        return (es_html and "TEXTO-SECRETO" not in html and "bitacora" in html
+                and "ana" in html and "TEXTO-SECRETO" not in json.dumps(j))
     finally:
         srv.shutdown()
 
