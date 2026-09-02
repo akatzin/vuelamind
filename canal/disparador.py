@@ -594,7 +594,7 @@ class Disparador:
         # dos rutas que nombran el mismo directorio no se pueden comparar como
         # texto sin resolverlas antes.
         casa = os.path.realpath(self.casa)
-        mias, vistas, con_cwd = [], 0, 0
+        mias, vistas, con_cwd, vivas_crudas = [], 0, 0, []
         for a in datos if isinstance(datos, list) else []:
             vistas += 1
             cwd = a.get("cwd") or ""
@@ -602,6 +602,7 @@ class Disparador:
             if not cwd or not sid:
                 continue
             con_cwd += 1
+            vivas_crudas.append((cwd, sid, a.get("name") or ""))
             if os.path.realpath(os.path.expanduser(cwd)) == casa:
                 mias.append((sid, a.get("name") or ""))
         # HALLAZGO DE SHO (2026-09-01): un enumerador que devuelve sesiones vivas
@@ -630,6 +631,33 @@ class Disparador:
             self.log("casa_ambigua", casa=self.casa,
                      sesiones=",".join(s for s, _ in mias),
                      motivo="varias sesiones vivas aquí; elegir una sería adivinar")
+            return None
+        # ── ¿SE PASÓ DE NIVEL LA CASA? SE DICE, NO SE DEDUCE ─────────────────
+        # HALLAZGO DE ATLAS (2026-09-02): su conf vivía en `…/algo/.claude/` y su
+        # sesión reporta el `cwd` UN NIVEL ARRIBA. Con `casa` por omisión —el
+        # directorio de la conf— no se resolvía nada, y el disparador solo decía
+        # «ninguna sesión viva aquí», que manda a mirar las sesiones cuando lo que
+        # está mal es la ruta.
+        #
+        # La trampa es fina y por eso hay que nombrarla: **poner la conf en un
+        # `.claude/` es lo natural**, y justo ahí el valor por omisión apunta un
+        # nivel por debajo de la casa. La plantilla ya avisaba, y aun así se pisó —
+        # quien la lee no piensa que `.claude/` sea «otra casa».
+        #
+        # Que exista un pariente NO se usa para adivinar: se dice y se para. Elegirlo
+        # solo sería exactamente lo que `casa_ambigua` se niega a hacer un renglón
+        # más arriba.
+        for cwd_txt, sid, nom in vivas_crudas:
+            r = os.path.realpath(os.path.expanduser(cwd_txt))
+            if r == casa:
+                continue
+            if casa.startswith(r + os.sep) or r.startswith(casa + os.sep):
+                self.log("casa_de_nivel_equivocado", casa=self.casa, pariente=cwd_txt,
+                         sesion=sid,
+                         motivo="ninguna sesión vive en `casa`, pero SÍ una en un "
+                                "directorio padre o hijo. Si esa es tu casa, declara "
+                                "`casa` con ESA ruta — no se adivina")
+                return None
         return None
 
     # ── EL SOBRE: folio y cómo leerlo, JAMÁS el cuerpo ───────────────────────
@@ -1637,6 +1665,29 @@ def _c39():
     return (cfg["cmd_entregar"].endswith("&& echo OK'")
             and '= \"x\"' in cfg["cmd_entregar"]
             and cfg["intervalo"] == "15")
+
+
+@_caso("C40 · la conf un nivel por debajo de la casa: lo DICE, no lo adivina",
+       "casa_de_nivel_equivocado, y no elige el pariente por su cuenta")
+def _c40():
+    # HALLAZGO DE ATLAS (2026-09-02): conf en `…/algo/.claude/` y la sesion reporta
+    # el cwd un nivel arriba. Antes solo decia "ninguna sesion viva aqui", que manda
+    # a mirar las sesiones cuando lo que esta mal es la ruta.
+    d, env = _montar([_M1], cmd_entregar="echo NO_DEBIO")
+    sub = os.path.join(d, ".claude")
+    os.makedirs(sub, exist_ok=True)
+    import shutil
+    shutil.move(os.path.join(d, NOMBRE_CONF), os.path.join(sub, NOMBRE_CONF))
+    # la conf ahora vive un nivel abajo; la sesion viva sigue reportando `d`
+    txt = open(os.path.join(sub, NOMBRE_CONF), encoding="utf-8").read()
+    open(os.path.join(sub, NOMBRE_CONF), "w", encoding="utf-8").write(
+        "\n".join(l for l in txt.splitlines() if not l.startswith("casa ")) + "\n")
+    p = subprocess.run([sys.executable, os.path.abspath(__file__), "--una-vez"],
+                       cwd=sub, env=env, stdout=subprocess.PIPE,
+                       stderr=subprocess.STDOUT, timeout=180)
+    sal = p.stdout.decode("utf-8", "replace")
+    return ("casa_de_nivel_equivocado" in sal and "NO_DEBIO" not in sal
+            and "confirmar" not in _testigo(d))
 
 
 def suite(silencio=False):

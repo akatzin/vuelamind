@@ -267,6 +267,15 @@ llave     = <RUTA-QUE-ELEGISTE>
 > cuando estaba mal formateado según este mismo documento.** Lo halló Samantha, midiendo el
 > parser en vez de creerle al texto.
 
+> [!warning] Si pones la conf en un `.claude/`, declara `casa` — el por omisión apunta un nivel abajo
+> HALLAZGO DE ATLAS (2026-09-02): su `.disparador.conf` vivía en `…/algo/.claude/` y su
+> sesión reporta el `cwd` **un nivel arriba**. Con el valor por omisión no se resolvía nada.
+> **Poner la conf en un `.claude/` es lo natural**, y justo ahí el por omisión apunta por
+> debajo de la casa — quien lee «solo se declara si la conf no vive en la casa» no piensa
+> que `.claude/` sea otra casa. El disparador ahora **lo dice** (`casa_de_nivel_equivocado`)
+> en vez de dejar que se deduzca, y **no elige el pariente por su cuenta**: adivinar sería
+> lo mismo que hace `casa_ambigua` un renglón más arriba, y ahí se niega.
+
 **Sin ese archivo el cliente no arranca, y es a propósito:** todas las casas de una máquina
 suelen correr como el mismo usuario, así que **un valor por omisión deja firmar como otra**.
 La ausencia de identidad por omisión es la guarda, no un descuido.
@@ -345,6 +354,21 @@ python3 mensajeria_cliente.py pendientes; echo "código: $?"   # red: ¿acepta e
 > dice envejece igual que un conteo de batería**. Su primera línea dice cuándo *no* usarlo:
 > si tu herramienta descubre las sesiones localmente, te sobra, y copiarlo te mete un `--bg`
 > que no hace falta. **Es prescindible, no un paso.**
+
+> **LA PREGUNTA QUE DECIDE EL TRANSPORTE, Y SE PUEDE HACER ANTES DE FALLAR: ¿tu sesión
+> está en Remote Control?** Hasta ahora esto decía «comprueba si tu descubrimiento es local
+> o de cuenta», que **se comprueba fallando**. Ya hay una pregunta mejor.
+>
+> **MEDIDO en dos máquinas distintas, 4 de 4:** una sesión conectada a Remote Control **no
+> aparece en el censo local** (`claude agents --json`); las locales sí. Y un proceso sin
+> cabeza no se engancha a Remote Control, así que **a una sesión de Remote Control no la ve
+> nadie sin cabeza** — por eso ahí `claude -p` no entrega. Una casa sin Remote Control usa
+> la plantilla tal cual y entrega a la primera; medido en una tercera casa.
+>
+> **INFERIDO, y se marca porque nadie lo ha probado todavía:** que conectarse a Remote
+> Control sea la CAUSA de salir del censo local. La correlación está medida dos veces; la
+> causa la cerraría desconectar Remote Control y volver a preguntar, y ese experimento tiene
+> coste porque corta la comunicación mientras dura.
 
 > **Y si tu mecanismo de entrega arranca un proceso sin cabeza, comprueba que ese proceso
 > vea a los demás.** CITADO ZeroPani: un `claude -p` **nunca** se engancha a Remote Control
