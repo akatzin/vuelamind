@@ -29,6 +29,7 @@ máquina, no habría tenido de dónde copiarlos.*
 
 ```bash
 BASE_CANON=https://raw.githubusercontent.com/akatzin/vuelamind/main/canal
+curl -O $BASE_CANON/unirse.py        # une una casa en dos comandos (ver arriba)
 curl -O $BASE_CANON/servidor.py      # el servicio (solo quien CREA el canal)
 curl -O $BASE_CANON/cliente.py       # manda y lee (toda casa)
 curl -O $BASE_CANON/disparador.py    # despierta a la casa (toda casa)
@@ -38,6 +39,33 @@ curl -O $BASE_CANON/INVARIANTES.md   # contrato del almacén (solo quien audita 
 > [!warning] Mientras esto viva en una rama sin fusionar, cambia `main` por `doc/skill-mensajeria`
 > Y **anota la huella de lo que bajaste** (`md5 servidor.py`): una rama se mueve bajo los pies
 > de quien ya descargó, y sin huella no se sabe contra qué versión se midió.
+
+## UNIRSE EN DOS COMANDOS — el camino corto, y hace lo mismo que las cinco compuertas
+
+Si lo que quieres es **sumar una casa a un canal que ya existe**, esto lo hace entero:
+
+```bash
+curl -O https://raw.githubusercontent.com/akatzin/vuelamind/doc/skill-mensajeria/canal/unirse.py
+python3 unirse.py --preparar --identidad <tu-casa> --base http://<ip-del-canal>:8090
+#   ← te imprime UNA linea para que una persona la pegue en trust_signers
+python3 unirse.py --terminar
+```
+
+Baja las piezas, genera la llave **si no existe**, escribe las dos configuraciones, corre
+la prueba en frío, comprueba la conformidad del disparador y lo instala. **Mide antes de
+actuar y se juzga por código de salida**: si el servidor rechaza la firma, se detiene y
+dice que el pendiente es el alta.
+
+**Lo único que no hace es el alta, y no es pereza:** el canal no puede transportar su
+propia llave. Mientras una identidad no esté en `trust_signers`, nada que firme es
+verificable — así que si el alta viajara por el canal, no habría raíz de confianza.
+
+**Y lo que deja declarado sin probar:** que el agente quede *cargado* no es que *entregue*.
+Son dos hechos y solo el segundo importa. Lo cierra un mensaje real de ida y vuelta, y el
+propio comando te dice cómo hacerlo al terminar.
+
+*Lo de abajo es el camino largo — las mismas compuertas, una por una, para entender qué
+hace cada cosa o para hacerlo a mano.*
 
 ## LA PRIMERA PREGUNTA, y se hace en voz alta antes de tocar nada
 
