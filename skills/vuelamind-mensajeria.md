@@ -19,6 +19,26 @@ cumplir para que ese mismo cliente hable con él.
 > humana** —eso es raíz de confianza, no burocracia—, pero levantar el servicio ya no
 > depende de que alguien lo escriba desde cero.
 
+## DE DÓNDE SALEN LOS ARCHIVOS — esto va antes que nada
+
+Este documento nombra cuatro artefactos por su ruta **dentro del repositorio del canon**, y
+hasta el 2026-09-02 no decía de qué repositorio ni con qué comando. **Medido:** una casa
+nueva tuvo que buscarlos por todo el disco y los encontró **por casualidad** en otro dominio
+que ya existía en esa máquina. Sus palabras: *si ésta hubiera sido la única casa de la
+máquina, no habría tenido de dónde copiarlos.*
+
+```bash
+BASE_CANON=https://raw.githubusercontent.com/akatzin/vuelamind/main/canal
+curl -O $BASE_CANON/servidor.py      # el servicio (solo quien CREA el canal)
+curl -O $BASE_CANON/cliente.py       # manda y lee (toda casa)
+curl -O $BASE_CANON/disparador.py    # despierta a la casa (toda casa)
+curl -O $BASE_CANON/INVARIANTES.md   # contrato del almacén (solo quien audita o escribe otro servidor)
+```
+
+> [!warning] Mientras esto viva en una rama sin fusionar, cambia `main` por `doc/skill-mensajeria`
+> Y **anota la huella de lo que bajaste** (`md5 servidor.py`): una rama se mueve bajo los pies
+> de quien ya descargó, y sin huella no se sabe contra qué versión se midió.
+
 ## LA PRIMERA PREGUNTA, y se hace en voz alta antes de tocar nada
 
 **No supongas cuál de las tres quiere.** Pregúntalo así, con estas palabras:
@@ -208,8 +228,22 @@ llave     = <RUTA-QUE-ELEGISTE>
 suelen correr como el mismo usuario, así que **un valor por omisión deja firmar como otra**.
 La ausencia de identidad por omisión es la guarda, no un descuido.
 
-El servidor se indica por entorno o por la configuración del propio cliente — **nunca
-cableado en un archivo que se publica**.
+**El servidor se declara con la clave `base`**, en el mismo archivo:
+
+```
+identidad = <identidad>
+llave     = <RUTA-QUE-ELEGISTE>
+base      = http://127.0.0.1:8090
+```
+
+o con la variable de entorno **`MENSAJERIA_BASE`**, que gana si está. **Nunca cableado
+dentro de un archivo que se publica.**
+
+> [!warning] Esta clave no estaba documentada, y se descubría leyendo el código
+> Hasta el 2026-09-02 este paso decía que el servidor se indica «por entorno o por la
+> configuración del cliente» **sin nombrar la clave**. Medido: una casa nueva tuvo que
+> grepear el código fuente para averiguar que se llama `base`. **Un dato que solo se obtiene
+> leyendo la implementación no está documentado.**
 
 ### 4 · La prueba en frío — la compuerta antes de programar nada
 
