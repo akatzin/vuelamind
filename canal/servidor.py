@@ -90,6 +90,18 @@ CREATE INDEX IF NOT EXISTS mensajes_buzon ON mensajes(para, tipo, id);
 -- I3 · el alta es bilateral: sin fila del DESTINATARIO la insercion falla. Es
 -- estructura, no cortesia — un mensaje a alguien que no existe se guardaba y
 -- devolvia folio.
+-- QUIEN ES ESTE CANAL, y no es su URL. HALLAZGO DE ZEROPANI (2026-09-02): un canal
+-- borrado y vuelto a levantar en el MISMO puerto es OTRO canal, y el cliente no
+-- tenia como saberlo — heredaba el cursor del muerto y gritaba un corte que no
+-- existia. La URL es donde escucha, no quien es.
+--
+-- Nace con la base, es aleatorio, y NO se puede reconstruir: dos canales distintos
+-- no pueden colisionar ni aunque los levante la misma persona en el mismo segundo.
+CREATE TABLE IF NOT EXISTS canal(
+    clave  TEXT PRIMARY KEY,
+    valor  TEXT NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS identidades(
     nombre       TEXT PRIMARY KEY,
     llave        TEXT NOT NULL,
@@ -128,7 +140,21 @@ def abrir(datos):
     db = sqlite3.connect(os.path.join(datos, NOMBRE_DB), timeout=20)
     db.row_factory = sqlite3.Row
     db.executescript(ESQUEMA)
+    if not db.execute("SELECT 1 FROM canal WHERE clave='id'").fetchone():
+        import secrets
+        db.execute("INSERT INTO canal(clave,valor) VALUES('id',?)", (secrets.token_hex(8),))
+        db.execute("INSERT OR IGNORE INTO canal(clave,valor) VALUES('nacio',?)",
+                   (str(int(time.time())),))
+        db.commit()
     return db
+
+
+def canal_id(datos):
+    db = abrir(datos)
+    try:
+        return db.execute("SELECT valor FROM canal WHERE clave='id'").fetchone()["valor"]
+    finally:
+        db.close()
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -481,7 +507,7 @@ class Canal(BaseHTTPRequestHandler):
         if not quiere_html:
             return self._responder(200, {
                 "servicio": "vuelamind-canal", "version": VERSION, "total": total,
-                "firmantes": firmantes,
+                "canal_id": canal_id(self.datos), "firmantes": firmantes,
                 "reciente": [dict(f, recogido_por=acuses.get(f["id"])) for f in filas]})
         return self._pagina(filas, acuses, total, firmantes)
 
@@ -979,6 +1005,28 @@ def _s14():
         return es_html and "TEXTO-VISIBLE" in html and avisa and isinstance(j, dict)
     finally:
         srv.shutdown()
+
+
+@_caso("S15 · el canal se identifica a si mismo, y recrearlo da OTRO id",
+       "la identidad no la da su URL — dos canales en el mismo puerto son dos")
+def _s15():
+    # HALLAZGO DE ZEROPANI (2026-09-02): borrar un canal y levantar otro en el mismo
+    # puerto dejaba al cliente heredando el cursor del muerto, gritando un CORTE que
+    # no existia — y saliendo con codigo 0, asi que la compuerta pasaba en verde con
+    # la falsa alarma puesta. La URL es donde escucha, no quien es.
+    d1, s1, b1 = _banco()
+    try:
+        _, r1 = _get(b1, "/", {})
+        cid1 = r1.get("canal_id")
+    finally:
+        s1.shutdown()
+    d2, s2, b2 = _banco()
+    try:
+        _, r2 = _get(b2, "/", {})
+        cid2 = r2.get("canal_id")
+    finally:
+        s2.shutdown()
+    return bool(cid1) and bool(cid2) and cid1 != cid2
 
 
 def suite(silencio=False):

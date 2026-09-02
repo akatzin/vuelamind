@@ -108,13 +108,62 @@ if not IDENTIDAD or not _LLAVE or not BASE:
 
 LLAVE = os.path.expanduser(_LLAVE)
 
-# ── EL CURSOR, POR IDENTIDAD **Y** CANAL ─────────────────────────────────────
-# La huella de la BASE va en el nombre y no la BASE cruda: una URL trae `/` y `:`,
-# y un nombre de archivo armado con ellos falla distinto en cada sistema. Ocho
-# hexadecimales bastan para no chocar entre los canales de una casa, y el nombre
-# sigue trayendo la identidad legible para que un humano sepa de quién es.
-_HUELLA = hashlib.sha256(BASE.encode()).hexdigest()[:8]
+# ── EL CURSOR, POR IDENTIDAD **Y** CANAL — Y EL CANAL NO ES SU URL ───────────
+# HALLAZGO DE ZEROPANI (2026-09-02): la primera version usaba la huella de la BASE,
+# y eso deja fuera el caso que más ocurre mientras se prueba — **borrar un canal y
+# levantar otro en el mismo puerto**. Es OTRO canal, con la misma dirección, y el
+# cursor del muerto sobrevivía en el home y gritaba un corte que no existía.
+#
+# Peor: salía con CÓDIGO 0. El skill manda juzgar por código de salida, así que una
+# casa nueva marcaba la compuerta en verde **y se llevaba la falsa alarma puesta**.
+# Es exactamente el daño que este mismo archivo describe unas líneas más arriba: el
+# problema no es la falsa alarma, es que enseña a no creerle a la verdadera.
+#
+# Ahora la huella la da EL CANAL: un identificador que nace con su base de datos, es
+# aleatorio y no se puede reconstruir. Recrear en el mismo puerto da huella distinta,
+# el cursor viejo deja de aplicar solo, y no hay nada que borrar a mano.
 _DIR_ESTADO = os.path.expanduser("~/.vuelamind-canal")
+
+
+def _huella_canal():
+    """La identidad del canal, preguntada a él. Se cachea porque no cambia mientras
+    el canal viva; si no contesta o es un servicio viejo que no la trae, se cae a la
+    huella de la URL — **con su límite declarado**: ahí vuelve el caso de recrear en
+    el mismo puerto, y no hay forma de distinguirlo desde el cliente."""
+    # SE PREGUNTA SIEMPRE, NO SE RECUERDA. La primera version de esta función
+    # cacheaba el identificador POR LA URL — o sea que cometía el mismo defecto que
+    # viene a arreglar, un piso más abajo: al recrear el canal en el mismo puerto
+    # devolvía el id del muerto y la falsa alarma volvía intacta. Medido aquí antes
+    # de publicarlo.
+    #
+    # La identidad de algo se pregunta. Recordarla por su dirección es suponer que
+    # la dirección la determina, y es justo lo que no hace.
+    cache = os.path.join(_DIR_ESTADO, "canal_" + hashlib.sha256(BASE.encode()).hexdigest()[:12])
+    try:
+        with urllib.request.urlopen(BASE + "/?formato=json", timeout=20) as r:
+            cid = (json.loads(r.read()) or {}).get("canal_id")
+    except Exception:
+        cid = None
+    if cid:
+        os.makedirs(_DIR_ESTADO, exist_ok=True)
+        with open(cache, "w", encoding="utf-8") as f:
+            f.write(cid)
+        return cid
+    # El canal no contesta. Se usa lo último que dijo — para no perder el cursor por
+    # un corte de red— y si nunca dijo nada, la huella de la URL, que es el
+    # comportamiento viejo CON SU LÍMITE: ahí vuelve el caso de recrear en el mismo
+    # puerto, y desde el cliente no hay forma de distinguirlo.
+    try:
+        with open(cache, encoding="utf-8") as f:
+            v = f.read().strip()
+        if v:
+            return v
+    except OSError:
+        pass
+    return "url" + hashlib.sha256(BASE.encode()).hexdigest()[:8]
+
+
+_HUELLA = _huella_canal()
 CURSOR = os.path.join(_DIR_ESTADO, "cursor_%s_%s" % (IDENTIDAD, _HUELLA))
 
 

@@ -227,6 +227,15 @@ cliente hace** y la discrepancia se reporta.
 > `CORTE: el canal reporta máximo 0 y esta casa iba en 3`; cursor por **identidad + canal**
 > ⇒ sin alarma.
 >
+> **RECREAR UN CANAL EN EL MISMO PUERTO ES OTRO CANAL, y el cliente lo sabe.** El cursor
+> cuelga de un identificador que **nace con la base de datos del canal**, no de su URL. Así
+> que borrar el canal y levantar otro en la misma dirección **no hereda el cursor del
+> muerto** ni grita un corte que no existe. MEDIDO por ZeroPani: antes sí lo hacía, y
+> **salía con código 0** — la compuerta pasaba en verde con la falsa alarma puesta.
+>
+> Si el canal no contesta, el cliente usa lo último que dijo; y si nunca dijo nada, cae a la
+> huella de la URL — **con su límite: ahí vuelve el caso de recrear en el mismo puerto**.
+>
 > **SI VIENES DE UN CLIENTE VIEJO EN UN CANAL YA ANDADO, tu cursor no se hereda solo.**
 > Un cliente que guarda por identidad+canal no puede leer el que guardaba solo por
 > identidad, así que **amaneces en cero y se te reofrece todo lo que ya leíste**. El

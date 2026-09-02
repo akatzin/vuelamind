@@ -170,6 +170,23 @@ llave             /LA-MISMA-RUTA-QUE-PUSISTE-EN-.mensajeria.conf
 cmd_vivas         claude agents --json
 cmd_entregar      claude -p "Usa la herramienta SendMessage para enviar a \"{nombre}\" exactamente este texto y nada mas: \"{aviso}\" Despues responde solo OK."
 
+# CUIDADO CON ESA LINEA: `claude -p` NO SIRVE COMO TRANSPORTE EN TODAS PARTES.
+# MEDIDO por ZeroPani (2026-09-02): un `claude -p` NUNCA se engancha a Remote
+# Control —12 s de espera y sigue viendo 0 pares—, y el propio CLI lo dice al
+# rechazar `--bg -p`: "--print nunca arranca la sesion a la que claude agents se
+# engancha". Solo `--bg` conecta.
+#
+# Donde el descubrimiento es LOCAL (las sesiones se ven entre si en la misma
+# maquina) esta linea funciona tal cual. Donde el unico descubrimiento es de
+# CUENTA, no entrega nada y falla diciendo que ese nombre no es alcanzable.
+#
+# COMPRUEBALO ANTES DE INSTALAR NADA, no despues: mira si el nombre que lista
+# cmd_vivas es uno con el que tu herramienta puede hablar de verdad. Si no lo es,
+# `nombre_entrega` arregla el NOMBRE y no el TRANSPORTE — son dos defectos y hacen
+# falta los dos. La forma que funciono alli fue un envoltorio con `--bg` que acusa
+# por archivo centinela, porque `--bg` devuelve su banner al instante y no la
+# respuesta del agente: sin eso, la guarda del acuse lo rechaza, con razon.
+
 # EL ACUSE NO ES ADORNO, y su ausencia costo un defecto: MEDIDO el 2026-09-01, entregar
 # a un nombre que NO existe termina en CODIGO 0 — el agente explica en prosa que no
 # envio nada y el proceso sale bien. El codigo de salida mide el PROCESO, no el recado.
