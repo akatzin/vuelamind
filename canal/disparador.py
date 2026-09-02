@@ -145,8 +145,12 @@ PLANTILLA_CONF = r"""# .disparador.conf — generado por `disparador.py --planti
 # trabajo hacia arriba, como git con `.git` — igual que la del canal.
 
 # ── RELLENA ESTOS DOS ────────────────────────────────────────────────────────
+# La LLAVE es la MISMA que declara tu .mensajeria.conf. No la copies de aqui: copiala
+# de alli. Fijar una ruta en una plantilla ya costo un defecto —el skill mandaba usar
+# ~/.ssh y las casas reales no guardan ahi su llave del canal, asi que quien seguia el
+# documento daba de alta una publica que su cliente nunca iba a usar.
 cliente           /ruta/absoluta/al/cliente_del_canal.py
-llave             ~/.ssh/id_mensajeria_TU-IDENTIDAD
+llave             /LA-MISMA-RUTA-QUE-PUSISTE-EN-.mensajeria.conf
 
 # NO hay que poner ningun identificador de sesion, y eso es a proposito: la
 # sesion de una casa cambia sola —un /clear basta— y un id escrito aqui apunta

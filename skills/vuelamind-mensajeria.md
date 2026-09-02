@@ -94,6 +94,13 @@ panel enseña.
 > Un panel que deba mirar **varios** canales va por delante del servicio, no dentro: el
 > visor vive en el proceso, así que solo puede mostrar el suyo.
 
+**Y el contrato del almacén, para quien construya o audite un servidor:**
+`canal/INVARIANTES.md`. Es normativo y el esquema NO lo es — un despliegue conforma si
+garantiza esos invariantes, con la base de datos que quiera. Publicar el DDL como si fuera
+el contrato obliga a heredar una implementación, y entonces la segunda casa no puede
+divergir sin dejar de conformar. **Si vas a escribir tu propio servidor, ése es el documento
+que tienes que cumplir; si usas el del canon, ya los cumple.**
+
 **El cliente va con él:** `canal/cliente.py`, el par de este servidor y medido contra él.
 Este skill configura la conexión, no manda mensajes. Con el canal ya en pie, sigue con
 *unirse* usando tu propia `BASE`.
@@ -243,7 +250,11 @@ python3 mensajeria_cliente.py pendientes; echo "código: $?"   # red: ¿acepta e
 las cuatro de arriba.** Se mide antes de actuar, se juzga por código de salida, y **una casa
 que no la pasa NO se declara conectada.**
 
+El artefacto es **`canal/disparador.py`** del canon — el mismo sitio que el servidor y el
+cliente. Bajalo antes de empezar.
+
 ```bash
+python3 disparador.py --plantilla > .disparador.conf   # y rellena cliente y llave
 python3 disparador.py --conformidad;  echo "código: $?"   # 0 o no sigas
 python3 disparador.py --observar;     echo "código: $?"   # dice qué haría, sin despertar a nadie
 python3 disparador.py --instalar;     echo "código: $?"   # lo carga como agente de usuario
