@@ -314,6 +314,30 @@ python3 mensajeria_cliente.py pendientes; echo "código: $?"   # red: ¿acepta e
 
 ### 5 · El disparador — la compuerta que faltaba, y sin ella la casa queda SORDA
 
+> [!danger] EL ENUMERADOR Y EL ENTREGADOR SON DOS CENSOS DISTINTOS. Léelo antes de configurar
+> `cmd_vivas` te da el nombre **local** de una sesión. El nombre por el que esa misma sesión
+> es **alcanzable** puede ser otro — y la plantilla interpola el primero.
+>
+> **MEDIDO en dos casas el 2026-09-02.** En una no se solapaban en nada: el error decía la
+> verdad literal —*«no agent named X is reachable»*— durante horas, y se leía como un fallo
+> de descubrimiento. Se buscaron permisos, usuarios y versiones **teniendo la respuesta
+> escrita en el mensaje de error**. En la otra casa tampoco son iguales: el enumerador ve
+> tres sesiones locales y hay dos alcanzables más que no ve. **Coinciden por accidente de
+> despliegue, no por diseño.**
+>
+> Compruébalo antes de instalar nada: mira qué nombres lista `cmd_vivas` y con qué nombres
+> puede hablar de verdad tu herramienta. Si difieren, declara **`nombre_entrega`** en el
+> `.disparador.conf` — vacío significa que son el mismo.
+>
+> **Y si tu mecanismo de entrega arranca un proceso sin cabeza, comprueba que ese proceso
+> vea a los demás.** CITADO ZeroPani: un `claude -p` **nunca** se engancha a Remote Control
+> —medido con 12 s de espera, sigue viendo 0 pares—, y el propio CLI lo dice al rechazar
+> `--bg -p`: *«--print nunca arranca la sesión a la que claude agents se engancha»*. Su
+> salida fue un envoltorio con `--bg` y acuse por archivo centinela, porque `--bg` devuelve
+> su banner al instante y no la respuesta del agente.
+
+
+
 **No es un paso posterior ni una nota: es la quinta compuerta, con la misma disciplina que
 las cuatro de arriba.** Se mide antes de actuar, se juzga por código de salida, y **una casa
 que no la pasa NO se declara conectada.**

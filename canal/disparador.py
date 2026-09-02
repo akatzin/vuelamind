@@ -123,6 +123,7 @@ POR_OMISION = {
     "rezagados_max": "3",
     "bitacora": "",
     "acuse_entrega": "OK",
+    "nombre_entrega": "",
     "sesion_propia": "",
     "env_sesion_propia": "CLAUDE_SESSION_ID",
     "tipos_despiertan": "mensaje",
@@ -177,6 +178,11 @@ cmd_entregar      claude -p "Usa la herramienta SendMessage para enviar a \"{nom
 # palabra OK dentro de una frase que dice justo lo contrario.
 # Vacio lo desactiva, y entonces vuelves a confiar en el codigo de salida — no lo hagas.
 acuse_entrega     OK
+
+# Si el nombre con el que se ENTREGA no es el que reporta cmd_vivas, declaralo aqui.
+# Son dos censos distintos y coinciden por accidente de despliegue, no por diseño:
+# medido el 2026-09-02 en dos casas, en una no se solapaban en nada.
+# nombre_entrega   <el-nombre-alcanzable>
 
 # cmd_reanudar NO existe y no se echa de menos: despertar una casa CERRADA es un
 # hueco declarado de este artefacto. Contra un transcript abandonado se levanta a
@@ -747,8 +753,22 @@ class Disparador:
             self.log("entregaria_a_viva", sesion=sesion, nombre=nombre,
                      folios=",".join(map(str, folios)))
             return 0
+        # ── DOS CENSOS, NO UNO ───────────────────────────────────────────────
+        # HALLAZGO DE ZEROPANI (2026-09-02), y costó un día entero de buscar en el
+        # sitio equivocado: **el enumerador y el entregador no comparten espacio de
+        # nombres**. `cmd_vivas` reporta el nombre LOCAL de una sesión; el nombre por
+        # el que esa misma sesión es ALCANZABLE puede ser otro. En su casa no se
+        # solapaban en nada, y el error decía la verdad literal —«no agent named X is
+        # reachable»— mientras nosotros lo leíamos como un fallo de descubrimiento.
+        #
+        # Y no es cosa de su casa: MEDIDO aquí el mismo día, los dos censos tampoco
+        # son iguales — el enumerador ve tres sesiones locales y hay dos alcanzables
+        # más que no ve. **Coinciden por accidente de despliegue, no por diseño.**
+        #
+        # `nombre_entrega` deja declararlo cuando difieren. Vacío = son el mismo.
+        destino = self.cfg.get("nombre_entrega") or nombre
         cmd = self.cfg["cmd_entregar"].format(
-            nombre=_seguro(nombre), aviso=aviso, sesion=_seguro(sesion))
+            nombre=_seguro(destino), aviso=aviso, sesion=_seguro(sesion))
         # ── UN INTENTO CONTRA UN BLANCO SIN VERIFICAR NO CUENTA ──────────────
         # HALLAZGO DE SHO (2026-09-01), MEDIDO aquí con control: con la caché
         # vigente 60 s, tres intentos y un tick de 15 s, un /clear dentro de la
@@ -796,8 +816,22 @@ class Disparador:
                 pass
             # Registrar SIEMPRE la salida del intento fallido: cuando esto falló en
             # una casa ajena, el único testigo fue un número sin explicación.
+            # ── «NO EXISTE ESE NOMBRE» NO ES «NO HAY A QUIÉN ENTREGAR» ────────
+            # Los dos salían igual, y eso costó un día de buscar permisos, usuarios y
+            # versiones teniendo la respuesta escrita en el mensaje de error. Es una
+            # PISTA y no una garantía —depende del texto que devuelva la herramienta—,
+            # así que se dice como pista y siempre se registra CON QUÉ NOMBRE se
+            # intentó, que es el dato que faltaba.
+            bajo = sal.lower()
+            pista = any(t in bajo for t in ("no agent named", "is reachable",
+                                            "not reachable", "no está accesible",
+                                            "no esta accesible"))
             self.log("entrega_fallo", codigo=cod, salida=sal[:400],
-                     motivo="código != 0" if cod != 0 else "salió 0 pero NO acusó recibo",
+                     nombre=destino,
+                     motivo=("el destino NO es alcanzable con ESE NOMBRE — el enumerador "
+                             "y el entregador pueden no compartir espacio de nombres; "
+                             "declara `nombre_entrega` en la conf" if pista else
+                             ("código != 0" if cod != 0 else "salió 0 pero NO acusó recibo")),
                      cobrado="no" if self.desde_cache else "sí",
                      nota="cursor quieto; caché invalidada; el siguiente tick resuelve")
             return 1
@@ -1510,6 +1544,30 @@ def _c18():
 def d0():
     import tempfile
     return tempfile.gettempdir()
+
+
+@_caso("C37 · `nombre_entrega` manda sobre el nombre del enumerador",
+       "se entrega al nombre declarado, no al reportado")
+def _c37():
+    # HALLAZGO DE ZEROPANI: el enumerador reporta el nombre LOCAL y el alcanzable
+    # puede ser otro. Sin esta clave no habia forma de decirlo.
+    d, env = _montar([_M1], nombre_entrega="EL-ALCANZABLE",
+                     cmd_entregar='echo "{nombre}" > "$RECADO"; echo OK')
+    env["RECADO"] = os.path.join(d, "recado.txt")
+    _correr(d, env)
+    return open(env["RECADO"], encoding="utf-8").read().strip() == "EL-ALCANZABLE"
+
+
+@_caso("C38 · «ese nombre no es alcanzable» NO se reporta igual que «no hay nadie»",
+       "el registro dice con QUE NOMBRE se intento y lo distingue")
+def _c38():
+    # Los dos salian igual, y eso costo un dia de buscar permisos, usuarios y
+    # versiones teniendo la respuesta escrita en el mensaje de error.
+    d, env = _montar([_M1],
+                     cmd_entregar='echo No agent named la-casa is reachable; echo fin')
+    cod, sal = _correr(d, env)
+    return ("entrega_fallo" in sal and "no compartir espacio de nombres" in sal
+            and "nombre=la-casa" in sal and "confirmar" not in _testigo(d))
 
 
 def suite(silencio=False):
