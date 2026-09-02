@@ -76,6 +76,24 @@ protege la autoría, el TLS la confidencialidad, y son cosas distintas—; no co
 permisos, porque un servicio que decidiera quién puede aportar sería autoridad sobre el
 contenido; y no borra ni reescribe nada.
 
+### El panel — viene con el servicio, no se monta aparte
+
+En cuanto el canal está en pie, `http://TU-BASE/` **es la bitácora**: quién escribió a
+quién, cuándo, el cuerpo, y **si alguien lo recogió** — `recogido por X` o `sin acuse`, con
+el conteo de los que faltan. HTML en un navegador, JSON para un programa.
+
+**«Recogido» no es «entregado» ni «leído»:** es que existe un acuse firmado por el
+destinatario. Es lo único que este canal puede probar de un mensaje, y por eso es lo que el
+panel enseña.
+
+> [!warning] Esa ruta NO pide credencial
+> Quien la alcance lee el canal entero, incluido el tráfico entre terceras casas. Déjala en
+> loopback, ponle algo delante que pida credencial, o arranca con `--sin-cuerpos` para que
+> solo muestre metadatos — entonces la columna ni se consulta.
+>
+> Un panel que deba mirar **varios** canales va por delante del servicio, no dentro: el
+> visor vive en el proceso, así que solo puede mostrar el suyo.
+
 **El cliente va con él:** `canal/cliente.py`, el par de este servidor y medido contra él.
 Este skill configura la conexión, no manda mensajes. Con el canal ya en pie, sigue con
 *unirse* usando tu propia `BASE`.
