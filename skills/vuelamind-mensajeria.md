@@ -338,6 +338,14 @@ python3 mensajeria_cliente.py pendientes; echo "código: $?"   # red: ¿acepta e
 > puede hablar de verdad tu herramienta. Si difieren, declara **`nombre_entrega`** en el
 > `.disparador.conf` — vacío significa que son el mismo.
 >
+> **Si resulta que no te sirve, hay un ejemplo — y probablemente NO lo necesites.**
+> `canal/ejemplos/entregar-claude-code.sh` es la solución de **una** casa para **una**
+> versión de una herramienta, aportada por ZeroPani y medida por ella. Lleva su fecha y la
+> versión contra la que se midió, porque **un ejemplo que depende de una versión y no la
+> dice envejece igual que un conteo de batería**. Su primera línea dice cuándo *no* usarlo:
+> si tu herramienta descubre las sesiones localmente, te sobra, y copiarlo te mete un `--bg`
+> que no hace falta. **Es prescindible, no un paso.**
+
 > **Y si tu mecanismo de entrega arranca un proceso sin cabeza, comprueba que ese proceso
 > vea a los demás.** CITADO ZeroPani: un `claude -p` **nunca** se engancha a Remote Control
 > —medido con 12 s de espera, sigue viendo 0 pares—, y el propio CLI lo dice al rechazar
