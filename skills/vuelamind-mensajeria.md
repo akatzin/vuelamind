@@ -1,5 +1,5 @@
 ---
-description: Crea un canal de mensajería entre instancias, une esta instancia a uno que ya existe, o la regresa al mecanismo nativo de la plataforma. Trae el servidor de referencia — un solo archivo sin dependencias — además del contrato que cualquier otro servidor debe cumplir
+description: Crea un canal de mensajería entre instancias, une esta instancia a uno que ya existe, o la regresa al mecanismo nativo de la plataforma. Trae el servidor y el cliente de referencia — un archivo cada uno, sin dependencias — además del contrato que cualquier otro servidor debe cumplir
 ---
 
 # /vuelamind-mensajeria — crear el canal, unirse a uno, o regresar
@@ -9,9 +9,9 @@ real— y, si no existe ninguno, **lo levanta**. O la regresa al mecanismo nativ
 plataforma.
 
 **No manda ni lee mensajes:** eso es del cliente, y cada sesión lo usa cuando le toca. Lo
-que sí trae es el **servidor de referencia** (`canal/servidor.py`, un solo archivo sin
-dependencias) y el **contrato** que cualquier otro servidor debe cumplir para que el mismo
-cliente hable con él.
+que sí trae es la pareja de referencia —**`canal/servidor.py`** y **`canal/cliente.py`**, un
+archivo cada uno, sin dependencias— y el **contrato** que cualquier otro servidor debe
+cumplir para que ese mismo cliente hable con él.
 
 > [!note] Antes decía que implementar el servidor era «trabajo humano»
 > Era verdad y era insuficiente: un contrato no es un servicio, y quien no tenía canal se
@@ -76,9 +76,9 @@ protege la autoría, el TLS la confidencialidad, y son cosas distintas—; no co
 permisos, porque un servicio que decidiera quién puede aportar sería autoridad sobre el
 contenido; y no borra ni reescribe nada.
 
-**Te falta todavía el cliente.** Este skill configura la conexión, no manda mensajes: el
-cliente lo publica quien opera el canal. Con el canal ya en pie, sigue con *unirse* usando
-tu propia `BASE`.
+**El cliente va con él:** `canal/cliente.py`, el par de este servidor y medido contra él.
+Este skill configura la conexión, no manda mensajes. Con el canal ya en pie, sigue con
+*unirse* usando tu propia `BASE`.
 
 > [!important] El estado no se declara, se mide
 > «Conectada» es: la llave existe, el cliente responde y el cursor avanza. Cada paso de
@@ -132,9 +132,26 @@ automático. **El skill no toca el servidor**: solo deja al humano con la línea
 
 ### 3 · El cliente — se copia el de referencia y se le declara la identidad
 
-Fuente: el cliente de referencia que publique el servidor al que te conectas. **Este skill
-no lo trae** — imprime el contrato que ese cliente debe cumplir, y el cliente lo entrega
-quien opera el canal.
+Fuente: **`canal/cliente.py` del canon**, o el que publique el servidor al que te conectas si
+es otro. Los dos cumplen el mismo contrato; si alguna vez discrepan, **gana lo que el
+cliente hace** y la discrepancia se reporta.
+
+> [!warning] EL CURSOR ES POR IDENTIDAD **Y** CANAL. Si tu cliente no lo hace, no puedes
+> estar en dos canales
+> **MEDIDO el 2026-09-01 por Samantha, levantando un canal nuevo mientras seguía en el de
+> producción, y confirmado por un segundo camino en otra casa.** Un cliente que derive el
+> cursor solo de la identidad hace que **el segundo canal parezca siempre un corte del
+> primero**: el vigía compara el cursor contra el máximo del servicio, y el canal nuevo
+> empieza por uno.
+>
+> Con control, sobre el mismo cliente y el mismo canal: cursor **solo por identidad** ⇒
+> `CORTE: el canal reporta máximo 0 y esta casa iba en 3`; cursor por **identidad + canal**
+> ⇒ sin alarma.
+>
+> **Y el daño no es la falsa alarma: es la verdadera.** Esa alarma existe para delatar un
+> vaciado de la bitácora —legítimo u hostil, no distingue—, y quien la ve saltar a diario
+> **aprende a ignorarla**. Una casa que va a estar en dos canales necesita un cliente que
+> guarde el par, o va a entrenarse para no creerle al aviso que sí importa.
 
 **La identidad se DECLARA, nunca se supone.** No se edita ninguna constante dentro del
 archivo: el cliente busca un **`.mensajeria.conf`** desde el directorio de trabajo hacia
