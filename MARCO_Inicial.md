@@ -1,7 +1,21 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.0
+version: 3.4
+
+> [!note] v3.4 (2026-09-05) — el canal entre instancias, y lo que NO trae
+> Entra la comunicación entre instancias: servicio, cliente, disparador e instalador, más el
+> skill que los pone en pie. Cada casa tiene identidad propia con su llave, y el alta viaja
+> **fuera de banda** — el canal no puede transportar su propia llave.
+>
+> **NO levanta el congelamiento**, y conviene leerlo con cuidado porque el salto de versión
+> invita a suponerlo: la v3.4 es **transporte**. El buzón que la v3.5 promete —donde las
+> casas mandan su libro de errores y el vigía hace la ceremonia— **todavía no existe**, y es
+> otra pieza: abierta, sin llaves y sin relación con este canal. Hasta que exista, **el
+> ciclo de parches sigue suspendido**.
+>
+> *Probado antes de entrar por tres casas ajenas que lo recorrieron desde cero, cada una con
+> defectos distintos. Ninguno de los que se corrigieron lo encontró quien escribió el código.*
 
 > [!important] CONGELAMIENTO — el ciclo de parches está suspendido hasta la v3.5 (2026-08-18)
 > Un dominio que nazca de esta plantilla **nace con la lógica de parches apagada**: no
