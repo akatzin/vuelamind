@@ -31,7 +31,7 @@ reporta, no se rellena:
 | Dato | De dónde | Si falta |
 |---|---|---|
 | **folio y título** | el encabezado del folio | sin folio no hay nodo |
-| **fecha de aparición** | lo que el folio DECLARA — «Abierto el / Encontrado el / Se abrió el AAAA-MM-DD» | **ver abajo: es el que más falta** |
+| **fecha de aparición** | lo que el folio DECLARA **EN PROSA**, dentro del cuerpo: «Abierto el / Encontrado el / Se abrió el AAAA-MM-DD». **No es un campo `::`** — en el dominio de origen `abierto::` no existe, y quien busque un campo declarado encuentra cero | **ver abajo: es el que más falta** |
 | **severidad** | campo de severidad del dominio | nodo sin color de estado, y se dice |
 | **área** | primer enlace del campo de área; si no hay enlace, el texto antes del primer separador | nodo sin ancla, al centro |
 
@@ -43,9 +43,14 @@ Dos tipos de arista, y **no son la misma cosa**:
 **Cuenta y cuadra antes de dibujar nada.** Reporta los conteos que salgan.
 
 > [!danger] LA FECHA DEL SISTEMA DE ARCHIVOS MIENTE. No la uses jamás
-> **MEDIDO por Zero: falsa en el 75% de las notas de su vault** — cada guardado atómico
-> reinicia el nacimiento del archivo, así que la nota que existe desde el primer día figura
-> como creada hoy. La única fecha buena es **la que el folio declara en su texto**.
+> Cada guardado atómico reinicia el nacimiento del archivo, así que **la nota que existe
+> desde el primer día del dominio figura como creada hoy** — medido por Zero sobre su propia
+> cola. La única fecha buena es **la que el folio declara en su texto**.
+>
+> *Este aviso llegó a decir «falsa en el 75% de las notas». **Ese número no se pudo
+> reproducir**: remedido por su propio autor sobre 80 notas dio **58%**, y como cota
+> inferior. Se quita en vez de corregirse — el mecanismo es la razón de la prohibición, y
+> **un dato preciso y falso hace más daño que uno ausente**.*
 
 > [!warning] Y comprueba cuántos folios la declaran ANTES de prometer una animación
 > **MEDIDO en un segundo dominio (vuelamind-watcher, 2026-09-03): 3 de 27.** Con eso **no
@@ -60,6 +65,32 @@ Dos tipos de arista, y **no son la misma cosa**:
 > **sobre ese dominio**, no un fallo del dibujo, y conviene decirlo en vez de disimularlo.
 
 ---
+
+### La compuerta de cobertura — obligatoria, y nació de un defecto real
+
+**Cuenta los fechados contra el TOTAL, y reporta la razón SIEMPRE**, tenga el valor que
+tenga. Bajo un umbral razonable —**80%**— no se anima: se dibuja el estado asentado.
+
+**Y todo folio sin fecha sale LISTADO con su número.** Si un folio desaparece del grafo, eso
+es un hallazgo, no ruido.
+
+> [!danger] NUNCA un `continue` callado. Esto pasó, y es el motivo de esta sección
+> **MEDIDO por Zero en su propia implementación, 2026-09-05**, al correr este skill por
+> primera vez: su extractor hacía `if not fecha: continue`. Los folios sin fecha **no se
+> degradaban: desaparecían del grafo sin decirlo**. De 131 folios se dibujaron 116 y
+> **catorce se cayeron en silencio** — entre ellos el único riesgo aceptado de su dominio y
+> un defecto de cobro cerrado *as-is*.
+>
+> **Nadie lo nota porque un grafo incompleto se ve idéntico a uno completo.** Y el prompt ya
+> mandaba «reporta los conteos y cuádralos»: se reportó 116 y **nunca se cuadró contra 131**.
+> *Un conteo reportado y uno cuadrado se leen igual.*
+
+### Y la degradación YA ESTÁ CONSTRUIDA: conéctala, no la reinventes
+
+El código que dibuja el estado asentado **ya existe** — es el que atiende
+`prefers-reduced-motion`. Lo único que falta es **conectarlo con la falta de fechas**. Sin
+ese renglón, quien corra el skill lo escribe otra vez a mano, que es lo que pasó la primera
+vez que se ejecutó.
 
 ## 2 · La forma
 
