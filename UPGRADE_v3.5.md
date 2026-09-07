@@ -95,8 +95,31 @@ del vigía y hoy no vuelve. Si tu lección entra al canon, la verás en el canon
    - **Si la comprobación falla, no es que fallara el paso**: es que estás mirando una rama
      que todavía no la tiene. Mira la de la propuesta.
 
-2. **Instala `vuelamind-learn`** desde `skills/` del canon, en el nivel donde vivan tus otros
-   skills del marco.
+2. **Reinstala los TRES skills que esta versión modificó**, desde `skills/` del canon, en el
+   nivel donde vivan tus otros skills del marco:
+
+   | skill | qué le cambió la v3.5 |
+   |---|---|
+   | **`vuelamind-learn`** | **es nuevo**: es la vía de aportar |
+   | **`vuelamind-commit`** | aprende `learning_en_cierre` y deja de mandar parches por pull request |
+   | **`vuelamind-load`** | **se le quitó el bloque del congelamiento** |
+
+   > [!danger] El tercero es el que se salta, y es el que más ruido hace
+   > `vuelamind-load` **corre en cada arranque de sesión**. El anterior a la v3.5 lleva un
+   > bloque que anuncia *«el ciclo de parches está suspendido, omite esos pasos»* — y eso
+   > **ya es falso**. Si no lo reinstalas, tu casa va a leer esa frase cada día sin que nada
+   > falle, y va a seguir omitiendo pasos que la v3.5 devolvió.
+   >
+   > **No es opcional como el `commit`**: aquél solo hace falta si activas el encadenado;
+   > éste hace falta siempre, porque el bloque miente en todos los casos.
+   >
+   > **Compruébalo así:** tu `vuelamind-load` instalado **no debe mencionar** el
+   > congelamiento. Si lo menciona, es el viejo.
+
+   **La lista sale de comparar la versión con la anterior, no de recordar qué se tocó.** La
+   primera redacción de este documento nombraba **uno** de los tres, porque su autor listó lo
+   que recordaba haber escrito. Los otros dos no dan error: siguen funcionando y dicen cosas
+   que dejaron de ser ciertas.
 
    > [!important] La FORMA del archivo la manda tu máquina, no el canon
    > El canon lo publica como un archivo suelto, `vuelamind-learn.md`. **Algunos entornos lo
@@ -146,6 +169,29 @@ del vigía y hoy no vuelve. Si tu lección entra al canon, la verás en el canon
    el flujo nuevo»*. Ya existe. **El gesto es tuyo y este documento no puede hacerlo por ti**,
    porque no sabe dónde lo escribiste — pero si no lo haces, tu casa sigue leyendo cada
    cierre que el aprendizaje está suspendido.
+
+> [!warning] ¿SALTASTE DESDE LA RAMA antes de que se fusionara? Cuatro cosas, y ninguna avisa
+> Mientras esta versión vivió en una propuesta sin fusionar, saltar era posible y algunas
+> casas lo hicieron. **Lo que instalaste entonces pudo cambiar bajo tus pies** —una propuesta
+> se corrige hasta el último día— y **nada de eso produce un error**:
+>
+> 1. **Vuelve a comparar TODOS tus skills del marco contra `skills/MD5SUM.txt` de la rama
+>    principal**, no solo los que instalaste. En el caso real medido, **dos habían cambiado**
+>    entre el salto y la fusión.
+> 2. **Si reutilizaste `aportar_a` para el buzón, deshazlo**: mueve el valor a
+>    `buzon_aprendizaje` y **restaura el que `aportar_a` tenía antes**. La primera redacción
+>    de este documento mandaba reutilizarla, y en la casa que lo siguió eso **degradó a
+>    historia una decisión fechada de su libro de decisiones** — tomada con su responsable
+>    delante.
+> 3. **Corrige tu registro de envíos** si anotó la clave equivocada.
+> 4. **Comprueba tu versión otra vez.** Si consumes el canon por referencia, mientras la
+>    propuesta no estuvo fusionada tu dominio quedó **partido** —skills nuevos sobre master
+>    viejo— y **eso se resolvió solo al fusionar**, sin que hicieras nada.
+>
+> **Y la lección de orden que deja, para quien publique la próxima versión:** para un dominio
+> en modo referencia, **fusionar no es el último paso del salto: es una precondición**. Un
+> salto que vive en una rama es ininstalable de forma coherente para ellos, por bueno que sea
+> su documento.
 
 ## 5 · La primera corrida — la lanza este salto, no tú
 
