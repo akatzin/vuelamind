@@ -17,6 +17,23 @@ nada y no manda nada a ningun sitio.
 
 SALIDAS: 0 si todo cuadra, 1 si algo difiere. Las dos probadas — un chequeo
 probado solo en verde no esta probado.
+
+SI TU DOMINIO NO EJECUTA COSAS BAJADAS DE INTERNET, no lo bajes: el canon YA
+publica skills/MD5SUM.txt, que es todo lo que hace falta. La receta cabe en
+seis lineas y no ejecuta nada ajeno —
+
+    curl -s https://raw.githubusercontent.com/akatzin/vuelamind/main/skills/MD5SUM.txt > /tmp/inv
+    while read h n; do
+      [ "$n" = README.md ] && continue
+      f=~/.claude/commands/$n; [ -f "$f" ] || f=~/.claude/skills/${n%.md}/SKILL.md
+      [ -f "$f" ] || { echo "no instalado: $n"; continue; }
+      m=$(md5 -q "$f" 2>/dev/null || md5sum "$f" | cut -d" " -f1)
+      [ "$m" = "$h" ] || echo "DESALINEADO: $n  $m -> $h"
+    done < /tmp/inv
+
+— y es preferible: no hay que confiar en un script para comprobar que confias
+en los otros. Lo unico que la receta NO hace es avisarte de los skills que
+tienes instalados y el inventario no lista, que es la mitad ciega del problema.
 """
 
 import hashlib, os, sys, urllib.request
@@ -45,8 +62,33 @@ for h, nombre in filas:
     else:
         viejos.append((nombre, mio[:8], h[:8], ruta))
 
+# Lo que el inventario NO cubre. Sin esto, un skill instalado que el canon no
+# lista es INVISIBLE para este comprobador: no tiene huella contra la que medir,
+# asi que sale verde sin haberse comprobado nada. Un inventario incompleto y uno
+# completo se ven igual desde el lado del que compara — hallazgo de otra casa,
+# que tenia dos skills fuera del inventario y este script no los mencionaba.
+conocidos = {n.strip() for _, n in filas}
+sin_huella = []
+for d, patron in ((os.path.join(BASE, "commands"), None),
+                  (os.path.join(BASE, "skills"), "SKILL.md")):
+    if not os.path.isdir(d):
+        continue
+    for e in sorted(os.listdir(d)):
+        if not e.startswith("vuelamind"):
+            continue
+        nombre = e if e.endswith(".md") else e + ".md"
+        ruta = os.path.join(d, e) if patron is None else os.path.join(d, e, patron)
+        if nombre not in conocidos and os.path.exists(ruta):
+            sin_huella.append((nombre, ruta))
+
 print("AL DIA:    %d" % ok)
 print("NO INSTALADOS: %s" % (", ".join(ausentes) if ausentes else "ninguno"))
+if sin_huella:
+    print("\nSIN HUELLA EN EL CANON  (instalados que el inventario NO lista):")
+    for n, r in sin_huella:
+        print("  %-28s %s" % (n, r))
+    print("  Sobre estos NO se comprobo nada. Pueden ser locales a proposito —")
+    print("  compruebalo tu— pero este script no puede decir si estan al dia.")
 if viejos:
     print("\nDESALINEADOS  (el tuyo -> el del canon):")
     for n, m, c, r in viejos:
