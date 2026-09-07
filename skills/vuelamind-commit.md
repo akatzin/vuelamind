@@ -4,11 +4,6 @@ description: Motor genérico de reconciliación — lee el manifiesto del domini
 
 # /vuelamind-commit — reconciliar el dominio actual con la realidad
 
-> [!important] CONGELADO (2026-08-18): el ciclo de parches está suspendido hasta la v3.5
-> Omite los pasos de parches de este comando (comprobarlos, presentarlos, proponerlos).
-> El aprendizaje local —errores, decisiones, lecciones— sigue entero y es lo que se cuida.
-
-
 Reconciliar el vault con la realidad. **No es escribir documentación nueva: es detectar y corregir lo que envejeció.**
 
 Este comando es el **motor**: trae el método completo y **no nombra ningún dominio**. Lo del dominio —rutas, nombres de nota, validador, acceso— vive en su **manifiesto**, que es datos y no comando.
@@ -134,16 +129,28 @@ En los **tres** sitios: el registro de decisiones, la nota del componente y **el
 
 **Se recorren los hallazgos de la sesión uno por uno**, no en bloque ni de memoria: cada corrección, cada error propio, cada regla que se descubrió a medio trabajar. La prueba: reescribe el hallazgo sustituyendo **todos** los nombres propios por genéricos. ¿Sigue siendo cierto y útil? Si sí, es del método → **es un parche**. Ante la duda, se escribe: uno de más cuesta un archivo; uno de menos cuesta que otra instancia repita el error meses después.
 
-**Y entonces mira el manifiesto, que dice qué hacer con él:**
+**Y entonces mira el manifiesto, que dice adónde se aporta:**
 
 | `aportar_a` | Qué se hace con el parche |
 |---|---|
-| Un repositorio | Se escribe el archivo y **se propone allí como pull request** — no se empuja directo a un canon ajeno. Con su frontmatter, sus cuatro secciones, y **anonimizado como conjunto** antes de abrirlo |
+| Un buzón de aprendizaje | Se escribe el archivo y **se aporta con `/vuelamind-learn`**, que lo criba, lo anonimiza, te lo enseña y lo manda. Es la vía del marco desde la v3.5 |
 | `ninguno` | Se escribe igual y se queda en casa. **No se omite**: un dominio aislado también necesita su libro de errores, y si algún día se conecta, ya lo tiene |
-| Un repositorio, **pero sin cuenta para proponer** | Igual que el anterior en la práctica: se escribe y se guarda. **La diferencia es la salida** — al reportar, decir que quedó *pendiente de proponer*, no *descartado*. Siguen jalándose las correcciones del canon con normalidad; lo único que falta es el viaje de vuelta, y ese se puede hacer más tarde sin que el parche pierda validez |
 | Sin declarar | **Es un hueco, no un permiso.** Se escribe el parche, se reporta que no hay destino declarado y se pregunta una vez — no se asume ni que sí ni que no |
 
 **Lo que no cambia según el destino:** el parche se escribe siempre. Adónde va es una decisión de transporte; **escribirlo es una decisión de honestidad**.
+
+> [!important] Desde la v3.5 tu casa NO propone parches al canon: los aporta al buzón
+> El ciclo anterior pedía a cada dominio abrir un pull request con su parche: escribirlo con
+> el frontmatter correcto, anonimizarlo como conjunto, tener cuenta en el repositorio y
+> seguir el hilo de la revisión. **Costaba más de lo que devolvía**, y el precio lo pagaba
+> entero la casa que había cometido el error.
+>
+> Ahora el reparto es otro: **tú escribes tus lecciones y las mandas; el vigía del canon
+> hace la ceremonia** — juzgar, armonizar contra el master, publicar. **No hace falta cuenta,
+> ni llaves, ni saber la forma de un parche.** Baja tanto la barrera que un dominio que nunca
+> pudo aportar ahora puede, y por eso el marco cambió de vía y no solo de herramienta.
+>
+> **Lo que llega al canon sigue pasando por una persona.** El buzón recibe; no publica nada.
 
 > [!danger] Aplicar un parche no termina en la instancia
 > Termina cuando la plantilla del master es coherente con él **y eso está publicado**. Es un solo acto y no se escala al usuario. Cuatro movimientos: corregir la instancia; mapear a qué sección de la plantilla toca; **traer el master fresco justo antes de editarlo** —otro dominio pudo publicarlo en medio, y pisar su versión no dispara ninguna alarma—, respaldar, publicar y **verificar por huella del otro lado**; y anotar la fila con su versión. Añadir también la fila al índice del README de parches, **comparando por nombre y no por conteo**.
@@ -193,7 +200,7 @@ Que el vault local y su réplica coincidan — **por huella, no por fe**. El có
 
 Si no había nada que corregir, decir eso: es un resultado válido y significa que el marco se está manteniendo solo.
 
-## 7. Presentar los parches por proponer
+## 7. Presentar los parches sin aportar
 
 **El último acto, después de reportar.** Un dominio que delegó la publicación en su responsable necesita un **momento** en que la decisión se le ponga enfrente; sin él, la decisión no se rechaza — **no se toma nunca**, y los borradores se acumulan sin que nada falle ni nadie los vea. Ese momento es éste, y por eso vive en el orden y no en una clave del manifiesto: si fuera declarable, el dominio que no lo declarara volvería a quedarse sin ninguno.
 
@@ -201,7 +208,7 @@ Lo gobierna la clave que ya existe:
 
 | `aportar_a` | Qué se hace al final |
 |---|---|
-| Un repositorio (con cuenta o sin ella) | **Presentar uno a uno los parches pendientes de proponer** —qué corrige cada uno y qué costaría publicarlo— y **pedir confirmación de publicarlos**. Sin cuenta la confirmación sigue teniendo sentido: decide el responsable, y el transporte puede ser otra máquina u otro día |
+| Un buzón de aprendizaje | **Presentar uno a uno los parches sin aportar** —qué corrige cada uno— y **pedir confirmación de mandarlos**. Que mandar sea barato no lo vuelve automático: **lo que sale del dominio sale para siempre**, y esa decisión es del responsable |
 | `ninguno` | **No se presenta nada.** No hay decisión que pedir: el parche se queda en casa por diseño, y preguntarlo cada cierre es ruido que enseña a contestar que no sin mirar |
 | Sin declarar | Se pregunta **una vez** por el destino — no se asume ni que sí ni que no |
 
