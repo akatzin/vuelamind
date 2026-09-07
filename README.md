@@ -190,7 +190,8 @@ it says so explicitly rather than quietly correcting it.
 ## How it improves
 
 The method learns through **patches**: lessons with a real case, a date, and a way to
-verify them. They are proposed as pull requests — see `CONTRIBUTING.md`.
+verify them. Since v3.5 you **send** them to an open inbox — no account, no keys, no
+sign-up — and a watcher does the ceremony. See `CONTRIBUTING.md`.
 
 The only admission test is genericity: *rewrite your lesson with every proper noun removed
 — does it survive?* Whoever reviews **does not judge whether your case is true** (they

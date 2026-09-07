@@ -1,17 +1,28 @@
-> [!important] FROZEN until v3.5 (2026-08-18) · CONGELADO hasta la v3.5
-> The patch cycle is suspended: do not open patch PRs for now. Keep writing your error
-> book locally — v3.5 replaces this flow with a central inbox where a watcher does all
-> the ceremony. / El ciclo de parches está suspendido: no abras PRs de parches por ahora.
-> Sigue escribiendo tu libro de errores en tu casa — la v3.5 reemplaza este flujo con un
-> buzón central donde el vigía hace toda la ceremonia.
+> [!important] v3.5 (2026-09-06) · The inbox is open · El buzón está abierto
+> **Do not open patch PRs.** Since v3.5 you send your lessons to
+> **https://learning.vuelamind.ai** — an open `POST`, no keys, no account, no sign-up. Run
+> `/vuelamind-learn`: it keeps only what generalises, anonymises it, **shows you the exact
+> text**, and sends it once you approve. A watcher reads, judges and harmonises. **Nothing
+> reaches the canon without a human.**
+>
+> **No abras PRs de parches.** Desde la v3.5 mandas tus lecciones a
+> **https://learning.vuelamind.ai** — un `POST` abierto, sin llaves, sin cuenta y sin
+> registro. Corre `/vuelamind-learn`: se queda con lo que sirve a cualquier casa, lo
+> anonimiza, **te enseña el texto exacto**, y lo manda cuando lo apruebas. Un vigía lee,
+> juzga y armoniza. **Nada sube al canon sin palabra humana.**
+>
+> *Why the change / Por qué cambió:* the old cycle made the house that made the mistake pay
+> for the whole ceremony — write the patch, anonymise it, hold an account, follow the review.
+> It cost more than it returned. / El ciclo viejo hacía que la casa que se equivocó pagara la
+> ceremonia entera. Costaba más de lo que devolvía.
 
 # Contributing to vuelamind
 
 *Español abajo.*
 
 The method improves through **patches**: corrections discovered by using it, with a real
-case and a way to verify them. This repository is the canon; patches are proposed here as
-pull requests.
+case and a way to verify them. This repository is the canon — but since v3.5 patches are
+**not proposed here**: you send them to the learning inbox and a watcher brings them in.
 
 **Where "here" is, exactly, is declared in [`config.yml`](config.yml)** — repository, branch
 and site, written once so nothing else has to repeat them. That file also holds the two
@@ -62,9 +73,9 @@ is irreversible: the review happens before the push, not after the first report.
 **Consuming the method is free and anonymous.** Anyone can clone the canon and receive every
 correction without registering anywhere. **Reading does not require an account.**
 
-**Proposing does**, because a pull request needs an identity on the platform. If you do not
-have one — or do not want one — you are not out of the method, only out of the return
-channel:
+**And since v3.5, contributing does not either.** It used to: a pull request needs an
+identity on the platform, and whoever lacked one was out of the return channel. The inbox
+removes that. If you still prefer to send nothing, you are not out of the method:
 
 - You keep **pulling** every published correction, like everyone else.
 - You **write your patches anyway**, in your own `parches/` folder, with their frontmatter
@@ -142,7 +153,9 @@ irreversible: la revisión va antes del push, no después del primer reporte.
 **Consumir el método es libre y anónimo.** Cualquiera puede clonar el canon y recibir cada
 corrección sin registrarse en ningún sitio. **Leer no requiere cuenta.**
 
-**Proponer sí**, porque un pull request necesita una identidad en la plataforma. Quien no la
+**Y desde la v3.5 aportar tampoco.** Antes sí: un pull request necesita una identidad en la
+plataforma, y quien no la tenía quedaba fuera del canal de vuelta. El buzón lo quita. Quien
+aun así prefiera no mandar nada no queda fuera del método. Quien no la
 tenga —o no la quiera— no queda fuera del método, solo del canal de vuelta:
 
 - Sigue **jalando** todas las correcciones publicadas, igual que el resto.
