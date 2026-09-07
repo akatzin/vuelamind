@@ -208,9 +208,30 @@ Lo gobierna la clave que ya existe:
 
 | `aportar_a` | Qué se hace al final |
 |---|---|
-| Un buzón de aprendizaje | **Presentar uno a uno los parches sin aportar** —qué corrige cada uno— y **pedir confirmación de mandarlos**. Que mandar sea barato no lo vuelve automático: **lo que sale del dominio sale para siempre**, y esa decisión es del responsable |
+| Un buzón de aprendizaje | **Presentar uno a uno los parches sin aportar** —qué corrige cada uno— y **pedir confirmación de mandarlos**. Que mandar sea barato no lo vuelve automático: **lo que sale del dominio sale para siempre**, y esa decisión es del responsable. Si el manifiesto declara `learning_en_cierre: si`, aquí se encadena `/vuelamind-learn` (ver abajo) |
 | `ninguno` | **No se presenta nada.** No hay decisión que pedir: el parche se queda en casa por diseño, y preguntarlo cada cierre es ruido que enseña a contestar que no sin mirar |
 | Sin declarar | Se pregunta **una vez** por el destino — no se asume ni que sí ni que no |
+
+### Si el dominio lo pidió, el cierre encadena el envío
+
+El manifiesto puede declarar **`learning_en_cierre: si`**. Entonces este paso no solo
+presenta: **invoca `/vuelamind-learn`** con lo que salió de la sesión, y el ciclo termina con
+la lección aportada en vez de anotada.
+
+**Por qué existe la opción.** Un parche que espera a que alguien se acuerde de correr un
+comando **espera para siempre** — es el mismo defecto que este método ya documentó con las
+decisiones delegadas: sin un momento definido de ponerlas enfrente, no se rechazan, **no se
+toman nunca**. Encadenarlo aquí le da ese momento.
+
+> [!important] Encadenar NO es automatizar, y la diferencia es toda
+> `learning_en_cierre` decide **cuándo se te pregunta**, no **si** se te pregunta. El skill
+> sigue cribando por generalidad, sigue enseñando el texto final y **sigue exigiendo un sí
+> antes de mandar**. Quien quita las preguntas es `learning_modo`, que es otra clave, otra
+> decisión y otro riesgo.
+>
+> **Y si no está declarada, es `no`.** Un cierre que empieza a mandar cosas fuera porque
+> nadie dijo lo contrario es exactamente el tipo de permiso que este método no concede por
+> omisión.
 
 **Dos estados, porque en un listado se ven idénticos:**
 

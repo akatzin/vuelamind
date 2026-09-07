@@ -25,8 +25,8 @@ debe salir**, te enseña exactamente qué va a mandar, y **solo entonces lo mand
 | **otro** | para un ecosistema separado que corra su propio buzón |
 
 **Se pregunta cuál** — salvo que el dominio haya declarado su modo (ver abajo). Si el
-manifiesto declara `buzon_aprendizaje`, ése es el valor **propuesto**, y propuesto sigue
-siendo una pregunta.
+manifiesto declara **`aportar_a`** —la misma clave que ya usa el motor del cierre, no una
+nueva—, ése es el valor **propuesto**, y propuesto sigue siendo una pregunta.
 
 > [!warning] Decir a dónde vas NO es dejar elegir, y confundirlo es fácil
 > Anunciar *«mando a tal sitio»* y seguir adelante cumple la letra de *«se dice en voz alta»*

@@ -87,12 +87,65 @@ del vigía y hoy no vuelve. Si tu lección entra al canon, la verás en el canon
 4. **Opcional: declara `learning_modo`.** Si no lo haces, queda en `preguntar`, que es lo
    correcto hasta que hayas visto un par de corridas.
 
-**Cómo sabes que funcionó:** corre `/vuelamind-learn` y llega hasta que te enseñe el texto
-—sin mandar nada— o manda una lección de verdad y **comprueba que el identificador que
-devuelve coincide con el hash que calculaste**. Las dos son verificaciones reales; la segunda
-no se puede deshacer.
+## 5 · La primera corrida — la lanza este salto, no tú
 
-## Si venías de la v3.4
+**Al terminar los cuatro pasos, corre `/vuelamind-learn` inmediatamente.** No es una
+sugerencia para después: es **el único paso que comprueba que lo instalado sirve**, y si se
+deja para otro día no se hace.
+
+Un archivo copiado en su sitio con la huella correcta demuestra que el archivo llegó. **No
+demuestra que el skill funcione en esta casa** — que encuentre el libro de errores, que la
+criba tenga algo con qué trabajar, que el manifiesto declare lo que hace falta. Eso solo se
+ve corriéndolo.
+
+**Llega hasta que te enseñe el texto que mandaría, y ahí ya sabes que funciona.** Mandar es
+tuyo y es aparte: el skill se detiene solo y te lo pregunta.
+
+**Qué esperar en la primera, para que no parezca un fallo:**
+
+- **No hay registro de envíos previos**, así que el skill lo dice y **pregunta desde dónde**
+  en vez de mandar todo por omisión. Es la conducta correcta, no un error.
+- **La criba puede dejar fuera mucho.** Un libro de errores joven suele ser casi todo
+  conducta propia del dominio, y eso no viaja. **Que salgan pocas lecciones o ninguna es un
+  resultado válido**, y el skill te dice por qué falló la prueba cada descarte.
+- **Si tu manifiesto no declara `aportar_a`**, el skill se detiene y lo pide. También
+  correcto: sin declarar no es un permiso, es un hueco.
+
+**Y la verificación dura, si decides mandar:** el identificador que devuelve el buzón es el
+hash del contenido. **Compáralo con el que calculaste antes de mandar.** Si coinciden, tienes
+prueba de que llegó completo y sin truncar. Es gratis y es la única verificación real que
+existe de este lado.
+
+## 6 · ¿Quieres que el cierre lo haga solo? — la pregunta con la que termina este salto
+
+**Este salto no termina instalando: termina preguntándote esto**, porque si no se pregunta
+aquí no se pregunta nunca — y una integración que nadie decide queda sin decidir, no
+rechazada.
+
+`/vuelamind-commit` ya detecta, en cada cierre, si de la sesión salió algo del método. Lo que
+puedes decidir ahora es **qué hace con ello**:
+
+| `learning_en_cierre` | Qué pasa al cerrar |
+|---|---|
+| `no` (por omisión) | El cierre **presenta** los parches sin aportar y ahí acaba. Tú corres `/vuelamind-learn` cuando quieras |
+| `si` | El cierre **encadena** `/vuelamind-learn` con lo que salió, en su último paso. Sigue enseñándote el texto y sigue pidiendo tu sí antes de mandar |
+
+**Lo que gana el `si`:** que la lección se aporte **el día que se aprendió**. Un parche que
+espera a que alguien se acuerde de correr un comando espera para siempre — es el mismo
+defecto que este método ya documentó con las decisiones delegadas: *sin un momento definido,
+no se rechazan, no se toman nunca*.
+
+**Lo que cuesta:** un paso más en cada cierre, aunque no haya nada que mandar.
+
+> [!warning] El `si` NO convierte el envío en automático
+> Encadena **cuándo se te pregunta**, no **si** se te pregunta. El texto se sigue enseñando y
+> el envío se sigue pidiendo. Lo que quita las preguntas es `learning_modo`, que es otra
+> clave y otra decisión — **y ésa no la tomes hoy**, tómala cuando hayas visto varias corridas.
+
+**Se declara en el manifiesto del dominio.** Si no lo declaras, queda en `no`, que es lo
+correcto mientras no sepas cuánto material te va a salir por cierre.
+
+## 7 · Si venías de la v3.4
 
 **No hay conflicto: son piezas distintas y ninguna depende de la otra.** El canal de la v3.4
 es transporte firmado entre casas que se conocen; el buzón es abierto, anónimo y para
