@@ -71,21 +71,81 @@ del vigía y hoy no vuelve. Si tu lección entra al canon, la verás en el canon
 
 ## Cómo saltar
 
-**Cuatro pasos, y solo el primero es obligatorio.**
+> [!warning] Mientras este salto viva en una rama sin fusionar, LEE ESTO PRIMERO
+> El master con `version: 3.5` **solo existe en la rama de la propuesta**, no en la rama
+> principal del canon — que sigue diciendo `3.4` hasta que se fusione. **Es la misma rama
+> donde vive este documento.**
+>
+> Consecuencia para quien adhiere **por referencia** (`modo_marco: referencia`, sin copia
+> propia del master): **tu dominio queda partido** — skills de 3.5 sobre un master de 3.4, y
+> tu versión deja de tener un solo valor. **No es un defecto tuyo y no lo puedes arreglar
+> desde tu casa**: se resuelve solo cuando la rama entre a la principal.
+>
+> Si eso no te sirve, **espera a la fusión**. Si saltas igual —para probar—, **anótalo**: es
+> un estado transitorio y conviene que quede escrito por qué tu versión no cuadra.
 
-1. **Trae el master fresco y comprueba que dice `version: 3.5`.** Si tu copia está
-   modificada, respáldala antes: el salto reemplaza el bloque del congelamiento.
+**Cinco pasos. Los tres primeros son obligatorios.**
+
+1. **Trae el master y comprueba la versión.**
+   - Si consumes por **copia**: trae el archivo del canon y comprueba que diga
+     `version: 3.5`. **Respalda tu copia antes** si la tienes modificada — el salto reemplaza
+     el bloque del congelamiento.
+   - Si consumes por **referencia**: no tienes copia que traer. **Comprueba en el canon** qué
+     versión sirve tu rama configurada, y si dice `3.4` estás en el caso del aviso de arriba.
+   - **Si la comprobación falla, no es que fallara el paso**: es que estás mirando una rama
+     que todavía no la tiene. Mira la de la propuesta.
 
 2. **Instala `vuelamind-learn`** desde `skills/` del canon, en el nivel donde vivan tus otros
-   skills del marco. **Comprueba su huella contra `skills/MD5SUM.txt`** — una copia que
-   difiere del canon es un canon mentiroso, y no avisa.
+   skills del marco.
 
-3. **Declara `aportar_a` en tu manifiesto** con el buzón (`https://learning.vuelamind.ai`, o
-   el de tu ecosistema). Si prefieres no aportar, declara `ninguno` **explícitamente**: sin
-   declarar no es un permiso, es un hueco, y el motor te lo va a preguntar cada cierre.
+   > [!important] La FORMA del archivo la manda tu máquina, no el canon
+   > El canon lo publica como un archivo suelto, `vuelamind-learn.md`. **Algunos entornos lo
+   > quieren como una carpeta con el archivo dentro** (`vuelamind-learn/SKILL.md`). **Mira
+   > cómo están instalados tus otros skills del marco y copia esa forma** — no la inventes.
+   >
+   > Y si es tu **primer** skill del marco y no tienes contra qué comparar: instálalo del
+   > modo que documente tu entorno, y **comprueba que aparece invocable antes de seguir**. Un
+   > skill con la forma equivocada no da error: simplemente no existe.
 
-4. **Opcional: declara `learning_modo`.** Si no lo haces, queda en `preguntar`, que es lo
-   correcto hasta que hayas visto un par de corridas.
+   **Comprueba su huella contra `skills/MD5SUM.txt` del canon.** Una copia que difiere del
+   canon es un canon mentiroso, y no avisa.
+
+3. **Declara en tu manifiesto**, y son tres claves, no una:
+
+   | clave | qué es | si falta |
+   |---|---|---|
+   | `buzon_aprendizaje` | **el endpoint del buzón** — `https://learning.vuelamind.ai`, o el de tu ecosistema. Es una URL HTTP | el skill te la pregunta cada vez |
+   | `learning_procedencia` | si tus aportaciones **se identifican** o van anónimas | **la corrida se detiene y la pide** |
+   | `learning_terceros` | si se **tachan los nombres** de otras casas y personas | **la corrida se detiene y la pide** |
+
+   > [!warning] `buzon_aprendizaje` es NUEVA — no reutilices `aportar_a`
+   > `aportar_a` ya existe y nombra **un repositorio git** al que proponer parches. El buzón
+   > es **un endpoint HTTP** y es otra cosa. Si tu dominio ya declaró `aportar_a`, **déjala
+   > como está**: puede ser una decisión fechada en tu libro, y este salto no pisa decisiones
+   > de nadie.
+   >
+   > Las dos últimas **no son opcionales aunque lo parezcan**: deciden qué se publica de ti y
+   > de terceros, y **ningún valor por omisión es seguro** — ni tachar de más, que destruye la
+   > lección, ni tachar de menos, que publica a quien no dio su palabra.
+
+   Si prefieres **no aportar nada**, declara `buzon_aprendizaje: ninguno` **explícitamente**.
+   Sin declarar no es un permiso: es un hueco, y se te va a preguntar cada cierre.
+
+4. **Comprueba que el buzón responde, ANTES de tener nada que mandar.**
+
+   Un `GET` a la raíz del endpoint devuelve un JSON con el conteo de aportaciones y cómo
+   aportar. **Hazlo ahora**, cuando no cuesta nada.
+
+   > [!important] Por qué este paso existe y no es paranoia
+   > Sin él, **la primera señal de que el buzón no responde llega en el momento más caro**:
+   > con el texto ya cribado, ya anonimizado, ya revisado y ya aprobado, a punto de salir. Un
+   > endpoint mal escrito en el manifiesto no se distingue de uno caído hasta que lo tocas.
+
+5. **Si tu dominio traía el bloque del congelamiento en su propio manifiesto o en su
+   arranque, retíralo con fecha.** Muchos lo escribieron diciendo *«se retira cuando exista
+   el flujo nuevo»*. Ya existe. **El gesto es tuyo y este documento no puede hacerlo por ti**,
+   porque no sabe dónde lo escribiste — pero si no lo haces, tu casa sigue leyendo cada
+   cierre que el aprendizaje está suspendido.
 
 ## 5 · La primera corrida — la lanza este salto, no tú
 
@@ -144,6 +204,20 @@ no se rechazan, no se toman nunca*.
 
 **Se declara en el manifiesto del dominio.** Si no lo declaras, queda en `no`, que es lo
 correcto mientras no sepas cuánto material te va a salir por cierre.
+
+> [!danger] Si eliges `si`, tienes que actualizar `vuelamind-commit` TAMBIÉN
+> El paso 2 instaló `vuelamind-learn`, que es el que aporta. **Pero quien encadena es
+> `vuelamind-commit`**, y el tuyo es de antes de la v3.5: **no sabe qué es
+> `learning_en_cierre` y la va a ignorar en silencio.** Declararías `si`, no se encadenaría
+> nada, y **nada te lo diría** — es la lección 63 del propio canon, *una clave que se ignora
+> en silencio se lee como vigente*.
+>
+> **Instálalo desde `skills/` del canon**, igual que el otro y con su huella comprobada.
+> **Compruébalo así:** tu `vuelamind-commit` instalado tiene que mencionar `learning_en_cierre`.
+> Si no lo menciona, es el viejo.
+>
+> **Y si eliges `no`, no toques `vuelamind-commit`.** No hace falta, y un salto que te hace
+> reinstalar lo que no cambió es un salto que la gente se salta.
 
 ## 7 · Si venías de la v3.4
 

@@ -129,9 +129,11 @@ En los **tres** sitios: el registro de decisiones, la nota del componente y **el
 
 **Se recorren los hallazgos de la sesión uno por uno**, no en bloque ni de memoria: cada corrección, cada error propio, cada regla que se descubrió a medio trabajar. La prueba: reescribe el hallazgo sustituyendo **todos** los nombres propios por genéricos. ¿Sigue siendo cierto y útil? Si sí, es del método → **es un parche**. Ante la duda, se escribe: uno de más cuesta un archivo; uno de menos cuesta que otra instancia repita el error meses después.
 
-**Y entonces mira el manifiesto, que dice adónde se aporta:**
+**Y entonces mira el manifiesto, que dice adónde se aporta** — la clave es
+**`buzon_aprendizaje`**, y **no es `aportar_a`**: aquélla nombra un repositorio git y ésta un
+endpoint HTTP. Un dominio puede tener las dos declaradas y no se pisan.
 
-| `aportar_a` | Qué se hace con el parche |
+| `buzon_aprendizaje` | Qué se hace con el parche |
 |---|---|
 | Un buzón de aprendizaje | Se escribe el archivo y **se aporta con `/vuelamind-learn`**, que lo criba, lo anonimiza, te lo enseña y lo manda. Es la vía del marco desde la v3.5 |
 | `ninguno` | Se escribe igual y se queda en casa. **No se omite**: un dominio aislado también necesita su libro de errores, y si algún día se conecta, ya lo tiene |
@@ -206,7 +208,7 @@ Si no había nada que corregir, decir eso: es un resultado válido y significa q
 
 Lo gobierna la clave que ya existe:
 
-| `aportar_a` | Qué se hace al final |
+| `buzon_aprendizaje` | Qué se hace al final |
 |---|---|
 | Un buzón de aprendizaje | **Presentar uno a uno los parches sin aportar** —qué corrige cada uno— y **pedir confirmación de mandarlos**. Que mandar sea barato no lo vuelve automático: **lo que sale del dominio sale para siempre**, y esa decisión es del responsable. Si el manifiesto declara `learning_en_cierre: si`, aquí se encadena `/vuelamind-learn` (ver abajo) |
 | `ninguno` | **No se presenta nada.** No hay decisión que pedir: el parche se queda en casa por diseño, y preguntarlo cada cierre es ruido que enseña a contestar que no sin mirar |

@@ -25,8 +25,18 @@ debe salir**, te enseña exactamente qué va a mandar, y **solo entonces lo mand
 | **otro** | para un ecosistema separado que corra su propio buzón |
 
 **Se pregunta cuál** — salvo que el dominio haya declarado su modo (ver abajo). Si el
-manifiesto declara **`aportar_a`** —la misma clave que ya usa el motor del cierre, no una
-nueva—, ése es el valor **propuesto**, y propuesto sigue siendo una pregunta.
+manifiesto declara **`buzon_aprendizaje`**, ése es el valor **propuesto**, y propuesto sigue
+siendo una pregunta.
+
+> [!warning] `buzon_aprendizaje` NO es `aportar_a`, y confundirlas pisa decisiones ajenas
+> `aportar_a` existe desde antes y nombra **un repositorio git**. Ésta nombra **un endpoint
+> HTTP**. Se parecen en que las dos dicen «adónde va lo que aprendo», y por eso invitan a
+> unificarse — **pero un dominio puede tener declarado un repositorio con fecha y motivo en
+> su libro de decisiones**, y reutilizar la clave lo sobrescribe sin que nada avise.
+>
+> Medido: la unificación se intentó y una casa la cazó al saltar, porque su `aportar_a`
+> apuntaba a un repositorio decidido semanas antes. **Dos nombres para dos cosas distintas no
+> es incoherencia: es precisión.**
 
 > [!warning] Decir a dónde vas NO es dejar elegir, y confundirlo es fácil
 > Anunciar *«mando a tal sitio»* y seguir adelante cumple la letra de *«se dice en voz alta»*
@@ -96,6 +106,15 @@ un dominio no tiene por qué ocupar la atención de quien lee.
   *«familia del parche tal»*, el marco ya lo sabe: mandarla otra vez, envuelta en un caso
   nuevo, es superficie de lectura sin regla nueva. **Se comprueba en el canon antes de
   mandar, no se supone.**
+
+  > [!important] El corpus está en DOS sitios y ninguno es obvio
+  > **Las reglas numeradas viven dentro de `MARCO_Inicial.md`**, en su sección del libro de
+  > errores — no en un archivo aparte, que es donde todo el mundo las busca primero. **Y los
+  > parches son archivos sueltos en `parches/`.**
+  >
+  > Hay que mirar **los dos**: una lección puede estar como regla numerada y no tener parche,
+  > o al revés. Y si tu dominio consume por referencia y no tiene copia local, se mira en el
+  > canon configurado.
 - **Lo que es de una herramienta y no del método** — a menos que la lección sobreviva a
   cambiar la herramienta.
 
@@ -111,6 +130,24 @@ posterior:
   manda todo por omisión.
 - **El registro es una ayuda, no una verdad.** Puede divergir; por eso la lista se enseña
   entera y no se confía en él a ciegas.
+
+> [!danger] El registro TIENE domicilio, y si no se crea la primera vez no existe nunca
+> Vive en **`.learning-enviados`**, en la raíz del dominio — o donde diga
+> `learning_registro` en el manifiesto, si el dominio prefiere otro sitio.
+>
+> **Se crea en la primera corrida que mande algo.** Si no se crea, la segunda corrida tampoco
+> lo encuentra, vuelve a preguntar desde cero, y **eso se repite para siempre** sin que nada
+> falle — cada corrida parece la primera.
+>
+> Una fila por envío, y **solo se escribe la fila cuando el servicio confirmó**:
+>
+> ```
+> # fecha       endpoint                        id (sha256 del cuerpo)   qué se mandó
+> 2026-09-06    https://learning.vuelamind.ai   4db16313aa7c…            22 lecciones del método
+> ```
+>
+> El identificador es el que devolvió el buzón, no el que calculaste: **son iguales cuando
+> todo fue bien, y anotar el suyo es lo que hace que la fila valga como prueba.**
 
 **El buzón deduplica por contenido**, así que mandar dos veces lo mismo no ensucia nada. El
 miedo debe estar en mandar de más **contenido**, no de más **veces**.
