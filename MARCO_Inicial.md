@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.5
+version: 3.6
 
 > [!note] v3.4 (2026-09-05) — el canal entre instancias, y lo que NO trae
 > Entra la comunicación entre instancias: servicio, cliente, disparador e instalador, más el
@@ -299,68 +299,131 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 
 ### Bloque D — Confidencialidad
 
-12. **¿Qué no puede salir en el chat ni escribirse en el vault?** Haz un **inventario nombrado**, no una regla vaga. Ejemplos según dominio: credenciales, datos personales, cifras no públicas, temas de personal, información bajo acuerdo de confidencialidad, nombres de terceros.
-13. **¿Dónde vive cada cosa sensible?** Saber el archivo o el sistema exacto permite filtrar salidas antes de imprimirlas, en vez de descubrirlo tarde.
-14. **¿Qué comandos o consultas exponen datos sensibles como efecto colateral?** Los volcados completos son el riesgo real: casi siempre se filtra algo al imprimir *de más*, no al imprimir lo prohibido. La regla que se deriva: **usa patrones acotados o imprime solo nombres de campo, nunca el volcado entero.**
+12. **¿Qué no debe escribirse aquí, ni en el chat ni en el vault?** Haz un **inventario
+    nombrado**, no una regla vaga. Ejemplos según dominio: credenciales, datos personales,
+    cifras no públicas, cosas bajo acuerdo de confidencialidad, **y lo que se dice de otras
+    personas** — nombres de compañeros en incidentes, temas de personal, valoraciones.
 
-### Bloque E — Dónde vive todo *(el bloque que más se subestima)*
+    > **Tu vault es tuyo y vive en tu máquina — pero la máquina puede no serlo.**
 
-Hay **dos planos** que se sincronizan, y confundirlos es el error de arquitectura más caro de este marco, porque no duele el primer día: duele cuando llega el segundo dominio.
+    > [!important] «Lo que se dice de otras personas» va nombrado, y no al final
+    > La lista empieza por *credenciales* y **la gente contesta lo primero que oye**. Medido
+    > sobre cinco actas reales: las cinco nombraron secretos técnicos; **una sola nombró a
+    > personas, y porque reformuló la pregunta por su cuenta** — *«temas de personal de tu
+    > equipo, nombres de mi equipo en incidentes»*. En un dominio personal los secretos
+    > técnicos casi no existen; lo que sí existe es lo que escribes de tus compañeros.
 
-| Plano | Qué es | Alcance correcto |
-|---|---|---|
-| **Conocimiento** | El vault: panorama, pendientes, decisiones, errores, entidades | **Por dominio, siempre** |
-| **Andamiaje** | Lo que el asistente usa para trabajar: su memoria, sus comandos, sus scripts | **Por dominio salvo decisión explícita en contra** |
+13. **SOLO SI en la pregunta 10 dijo que el asistente toca sistemas reales:** ¿dónde vive lo
+    sensible y qué comandos o consultas lo sacan sin querer? Los volcados completos son el
+    riesgo real: casi siempre se filtra algo al imprimir **de más**, no al imprimir lo
+    prohibido.
 
-> [!note] Por qué "andamiaje" y no "aparato"
-> El término se cambió el 2026-08-03 porque en español "aparato" significa
-> *dispositivo* — y en una conversación sobre en qué máquina vive cada cosa,
-> las dos acepciones chocan justo donde más confunde. Vale la pena elegir el
-> vocabulario del marco pensando en la conversación que va a generar.
-
-15. **¿Dónde vive el vault del conocimiento?** Y si hay una ruta que **no** se debe editar —una copia vieja, un montaje de red, un espejo de solo lectura—, nómbrala ahora.
-16. **¿Dónde vive el andamiaje del asistente?** Los tres pedazos —memoria, comandos, scripts— tienden a quedar regados en las rutas que la herramienta impone por defecto. Júntalos a propósito en **una sola carpeta por dominio**, o vas a terminar administrando una carpeta sincronizada por pedazo y por dominio.
-17. **¿Qué se comparte entre dominios y qué se aísla?** Contéstalo **antes** de que exista el segundo dominio, no después. Y ojo con el default de la herramienta: si los comandos viven en una ruta global, **compartir es lo que pasa solo** y aislar requiere un acto deliberado. Un comando de reconciliación escrito para un dominio casi nunca sirve tal cual en otro, porque trae adentro sus rutas y sus nombres de archivo.
-18. **¿Alguna carpeta sincronizada vive dentro de un directorio que administre otro programa?** Si la herramienta hace limpieza automática ahí, tu configuración de sincronización está a merced de una decisión ajena. Preferible: la carpeta sincronizada es tuya y la herramienta apunta a ella, no al revés.
-19. **¿La ruta del proyecto forma parte de algún identificador?** Muchas herramientas derivan un identificador interno del directorio de trabajo. Si es el caso, mover o renombrar el proyecto rompe la sincronización en silencio — y cada dominio nuevo genera un identificador nuevo.
-
-20. **¿De dónde se trae el método?** El repositorio oficial, un derivado de alguien más, o ninguno. **El default es el oficial** — de ahí acaba de llegar este archivo, y traerse los parches es un acto de solo lectura: adoptar mejoras no expone nada del dominio. Quien quiera un derivado lo nombra; quien quiera vivir aislado con su copia lo dice, y es legítimo — pero el aislamiento se **elige**, no se cae en él por no contestar.
-21. **¿Quieres proponer lo que este dominio aprenda, y a dónde?** Son dos decisiones anidadas. **Proponer es opt-in**: nadie manda nada sin haber dicho que sí, porque un parche lleva su caso y el caso cuenta algo del dominio. Pero **si la respuesta es sí, el destino por default es el repositorio oficial** — otro destino (un derivado propio, el de una organización) se nombra explícito. Y *ninguno* —lo aprendido se queda en casa— sigue siendo respuesta completa.
-
-> [!danger] Esta pregunta se saltaba, y estaba escrita
-> Iba aquí mismo, sin número, como párrafo de cierre del bloque — con un **«no se asume»** en
-> negrita y ningún mecanismo detrás. En la primera prueba con un usuario real **nunca se le
-> preguntó**, y él lo notó: *«jamás me preguntó si quería publicar parches»*. El texto era
-> enfático y el mecanismo no existía: **el ítem 39 de este mismo libro**, cometido por el libro.
+> [!note] Esta condicional NO es un atajo: es la dependencia que este documento ya declaraba
+> La pregunta 10 dice, sobre el acceso a sistemas reales, que *«exige resolver el Bloque D
+> antes»*. Estaba escrita la dependencia y no se usaba: se preguntaba entero a todos.
 >
-> Por eso ahora **están numeradas** y por eso el cierre de la Fase 1 **exige las dos
-> respuestas**. Que se pueda contestar `ninguno` no vuelve la pregunta opcional: lo que no se
-> vale es no hacerla.
+> **Medido:** quien no toca sistemas no tiene comandos que expongan de más, y contestarlo
+> produce el hueco que aparece en las actas — *«no se preguntó en detalle»*. Y dos de cinco
+> actas **fusionaron las tres preguntas por su cuenta**; una las tituló literalmente
+> *«12-14. Inventario, dónde vive, qué expone»*.
 
-> [!important] Y hay que decir qué implica, porque es una decisión sobre datos
-> **Mandar un parche significa mandar una lección a un repositorio de alguien más — y una
-> lección lleva su caso.** El método exige que cada regla venga con el error concreto que la
-> pagó, porque sin el caso la regla se revierte; eso significa que el parche cuenta algo de tu
-> dominio.
+---
+
+### Bloque E — no existe: el marco lo resuelve
+
+Estas decisiones **ya no se preguntan**. Las trae el método por omisión, y quien las necesite
+distintas las declara en su manifiesto, que gana siempre sobre la convención.
+
+| Qué | Convención |
+|---|---|
+| El vault del conocimiento | **`<proyecto>/vault/`** |
+| El andamiaje del asistente | **`<proyecto>/.claude/`** |
+| Carpetas de otros programas | no se pregunta; si algo choca, se descubre y se declara |
+| La ruta como identificador | no se pregunta |
+| De dónde se trae el método | **el canon oficial** |
+| Qué se comparte entre dominios | **nada: los vaults son personales, siempre** |
+| Proponer lo aprendido | **apagado.** Lo enciende correr `/vuelamind-learn`, no la entrevista |
+
+> [!important] Por qué se fue el bloque que este documento llamaba «el que más se subestima»
+> No porque no importe: **porque no es del usuario**. Sus siete preguntas eran el 28% de la
+> entrevista, la mayor concentración de fricción medida, y lo que producían era estructura
+> para el motor — no foco ni tiempo para quien contesta. Preguntar dónde poner una carpeta es
+> pedirle al usuario que resuelva un problema del marco.
 >
-> Se anonimiza al escribirlo —nombres propios fuera, la situación dentro—, pero **quien decide
-> tiene que saber que eso viaja**, no enterarse después. Un dominio con material sensible
-> puede querer `ninguno` y tiene toda la razón.
+> **Los dos planos siguen sin poder confundirse** —conocimiento y andamiaje— y por eso la
+> convención los separa desde el primer día. Lo que cambia es quién decide: antes el usuario,
+> ahora el método.
 >
-> **No se asume en ninguna dirección, y los fallbacks son asimétricos a propósito.** Aportar a
-> un canon distinto del que se consume es perfectamente válido — así funciona cualquier
-> derivado. Si quien funda no lo tiene claro todavía, se anota como **hueco declarado con su
-> fecha** y se decide después — y mientras tanto: **la adopción queda apuntada al oficial**
-> (solo lectura, no expone nada) y **la proposición queda en `ninguno`** (mandar sí expone, y
-> lo que expone no se puede des-mandar). El hueco barato se rellena con el default seguro de
-> cada dirección, no con el mismo para las dos.
+> **La convención es por omisión, no obligatoria.** Un manifiesto que declare `vault` gana, y
+> los dominios que nacieron antes siguen exactamente igual: ninguno se rompe.
 
-### Bloque F — Operación
+---
 
-22. **¿Quién más lo lee?** Cambia el tono. Un vault personal puede nombrar los errores propios con fecha; uno compartido necesita decidir antes cuánto de eso se escribe.
-23. **¿Con qué ritmo se trabaja?** Cuándo se corre la reconciliación (ver Fase 3), cada cuánto se re-audita.
-24. **¿Qué puede hacer el asistente por su cuenta y qué requiere autorización explícita?** Traza la línea entre leer, proponer y aplicar. Escríbela: es la regla que más fricción evita después.
-25. **Antes de decir "encontré", búscalo.** El método tiene reglas para escribir bien y **ninguna para leer antes de hablar**. La regla de *consultar el registro antes de escalar una decisión* cubre el caso de pedir permiso; falta el más frecuente: **presentar un hecho**. Antes de reportar un hallazgo, búscalo en los tres sitios —el registro de decisiones, la nota del componente y **el archivo de lo cerrado**, que es el que nadie abre—. Un hallazgo redundante **no falla**: es cierto, y por eso pasa sin fricción; lo que cuesta es que, dicho con tono de descubrimiento, **hace dudar de documentación que estaba correcta**, y pierde el contexto ya escrito —como que una ausencia fuera deliberada y no un defecto—. La forma correcta cuando sí estaba escrito: *"el registro ya lo dice desde `<fecha>`; lo re-medí y sigue siendo cierto"*. **Y rige en las dos direcciones: también antes de decir "no lo tienes"** — una ausencia se afirma con el vault consultado y un inventario medido, nunca con una sonda a un nombre supuesto (lección 42). Recomendar algo al dominio —comprar, cambiar, montar— **eleva la exigencia, no la relaja**: toda recomendación hereda las dos fuentes. *(En el dominio de origen ocurrió tres veces en un solo día; en uno de los casos la lección estaba promovida en los tres sitios que el método exige, lo que prueba que ninguna mejora del lado de la escritura lo habría evitado.)*
+### Bloque F — El punto de control
+
+**No se declara el ritmo: se comprueba que esto entra en el día.** Si no entra, se sabe aquí y
+no tres semanas después. Las tres se contestan **en frío**; el cierre viene al final.
+
+14. **El momento — SE PROPONE, no se pregunta** *(igual que el nombre en la 4).*
+
+    Con lo contestado en 1, 5 y 6 ya se puede derivar por dónde entra su trabajo:
+
+    > *«Por lo que me contaste, la mayor parte de tu día son **tickets de producción**. Lo que
+    > te propongo es que el próximo lo resuelvas **hablando aquí** en vez de en la terminal y
+    > el chat — no para documentarlo después, sino para resolverlo. ¿Eso te encaja, o tu día
+    > entra por otro lado?»*
+
+    **Se registra cuál de las tres pasó**, y es el dato del punto de control:
+
+    | Reacción | Señal |
+    |---|---|
+    | **La corrigió** | fuerte — tiene pensado dónde encaja esto en su día |
+    | **La aceptó y la hizo suya** (añadió matiz, hora, ejemplo) | buena |
+    | **La aceptó tal cual, sin tocarla** | **débil, y se anota como débil** |
+
+    > [!danger] La propuesta TIENE que poder estar equivocada
+    > Si es tan genérica que siempre encaja —*«cuando empieces tu jornada»*, *«en tu trabajo
+    > diario»*— nadie la corrige nunca y el control pasa siempre. **Nombra la tarea, no la
+    > categoría:** *«tickets de producción»* es corregible; *«tu trabajo»* no lo es jamás.
+    >
+    > Y si con lo que te contaron **no puedes proponer nada específico, eso ya es el
+    > resultado**: no entendiste el dominio, y hay que volver al Bloque A antes de seguir.
+
+15. **Dime algo que hiciste ayer que habrías hecho con esto.** Un caso **real y pasado**, no
+    hipotético. Es lo que distingue *«suena útil»* de *«esto es mi chamba»*. Si lo que nombra
+    ocurre una vez al mes, el marco le sobra hoy — y decirlo es más honesto que instalarlo.
+
+16. **¿Qué puede hacer el asistente por su cuenta y qué requiere que le digas?** Traza la
+    línea entre leer, proponer y aplicar. Escríbela: **es la regla que más fricción evita
+    después**, y con el bloque E fuera es la única que fija la autonomía.
+
+> [!important] Una regla que salió de aquí y NO se pierde: antes de decir «encontré», búscalo
+> Hasta la v3.5 esto era la pregunta 25, y **no era una pregunta**: nadie la contesta. Es una
+> regla de cómo debe comportarse el asistente, y por eso ahora vive donde le toca — en su
+> doctrina, no en la entrevista al usuario.
+>
+> **El método tiene reglas para escribir bien y ninguna para leer antes de hablar.** Antes de
+> anunciar un hallazgo hay que buscarlo en los tres sitios: el registro de decisiones, la nota
+> del componente, y el archivo de cerrados —que es el que nadie abre—. Un hallazgo redundante
+> no falla, y con tono de descubrimiento **hace dudar de documentación que estaba bien**.
+
+#### Y entonces el cierre, en voz alta — nunca antes de la 15
+
+> *«Esto no es un sitio donde documentar aparte de tu trabajo: es la puerta por la que pasa tu
+> trabajo. Eso que resolviste ayer — si lo hubieras resuelto hablando aquí, hoy estaría
+> escrito sin que hicieras nada extra, y mañana lo tendrías cuando vuelva a pasar.*
+>
+> *Y funciona en un solo sentido: lo que no pase por aquí, aquí no existe. No hay que
+> alimentarlo — hay que usarlo.»*
+
+> [!warning] El cierre va DESPUÉS de tomar el dato, y el orden no es negociable
+> Es la parte persuasiva de la entrevista, y persuadir a alguien de que va a usar algo a
+> diario es lo contrario de medir si lo va a usar. **Si el cierre llega antes de la 14,
+> cualquiera aceptará la propuesta** y el punto de control deja de discriminar.
+>
+> Y lo que promete es comprobable a propósito: no *«mientras más le des, más te devuelve»* —
+> que suena a garantía y no se puede medir— sino **«lo que pase por aquí, queda»**, que el
+> usuario ve al día siguiente o no lo ve.
 
 ---
 
@@ -963,7 +1026,7 @@ Y dos corolarios que ya se cobraron caro:
 
 | Clave | Qué es |
 |---|---|
-| `vault` | dónde vive el conocimiento en esta máquina |
+| `vault` | dónde vive el conocimiento en esta máquina. **Opcional desde la v3.6**: si no se declara, `<proyecto>/vault/`. Declararla gana sobre la convención, y por eso ningún dominio anterior se rompe |
 | `validador` | el script de comprobaciones mecánicas — o `—`, y los chequeos se hacen a mano y se dice |
 | `acceso_vivo` | cómo se llega a los sistemas que hay que verificar |
 | `notas:` `cola` · `archivo` · `panorama` · `decisiones` · `bitacora` · `arranque` | los nombres reales de las seis notas del ciclo |
