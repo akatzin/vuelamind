@@ -328,7 +328,14 @@ def confirmar(folio):
 def mandar(para, texto):
     sobre = {"de": IDENTIDAD, "para": para, "cuerpo": texto,
              "t": int(time.time()), "tipo": "mensaje", "version": VERSION}
-    return _pedir("/mensaje", cuerpo={"sobre": sobre, "firma": firmar(sobre)})
+    r = _pedir("/mensaje", cuerpo={"sobre": sobre, "firma": firmar(sobre)})
+    # La salida NOMBRA AL REMITENTE, y no es adorno: un envío con la identidad
+    # equivocada no falla —la firma es válida, la llave existe— así que `{"ok":1,
+    # "folio":N}` a secas se lee como éxito. Con el `de` delante, quien mandó ve
+    # en el acto a nombre de quién salió, en vez de enterarse por la otra casa.
+    if isinstance(r, dict):
+        r.setdefault("de", IDENTIDAD)
+    return r
 
 
 def estado(desde=0, modo="enviados"):
@@ -340,6 +347,8 @@ def estado(desde=0, modo="enviados"):
 
 USO = """cliente.py — habla con el canal. Configuración en %s (`clave = valor`).
 
+  --como CASA           comprueba a nombre de quien vas a firmar y ABORTA si no
+                        coincide. Vale en cualquier posicion, o MENSAJERIA_COMO
   pendientes            lo que hay desde el cursor, sin avanzarlo y sin cuerpos
   ver FOLIO             trae uno Y firma su acuse de recogida
   confirmar FOLIO       mueve el cursor, y nada más
@@ -353,7 +362,48 @@ El cursor es por IDENTIDAD Y CANAL: esta casa puede estar en varios canales sin 
 uno parezca un corte del otro.""" % NOMBRE_CONF
 
 
+def _exigir_identidad(argv):
+    """`--como <casa>` — la guarda contra firmar por otra casa.
+
+    LA QUE YA HABÍA cubre el OLVIDO: sin conf, el cliente no arranca. No cubre la
+    CONFUSIÓN: un `.mensajeria.conf` que existe pero **no es el tuyo**. Y como el
+    conf se busca hacia arriba desde el directorio actual, basta invocar el cliente
+    desde el directorio de otra casa —el reflejo de ir a donde vive la herramienta—
+    para tomar su identidad Y su llave. Cuando los dominios corren bajo el mismo
+    usuario del sistema, esa llave se puede leer: la firma sale **válida** y la
+    autoría queda cambiada para siempre en un registro cuyo propósito es
+    exactamente que la procedencia sea comprobable.
+
+    Se declara y se compara. Es la misma doctrina que ya rige el conf —la identidad
+    se declara, nunca se supone— aplicada al sitio donde el error de verdad ocurre:
+    la invocación. Opcional para no romper a quien ya llama al cliente; obligatoria
+    en cuanto algo automático mande en nombre de una casa.
+    """
+    quien, resto = os.environ.get("MENSAJERIA_COMO"), []
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        if a == "--como" and i + 1 < len(argv):
+            quien = argv[i + 1]; i += 2; continue
+        if a.startswith("--como="):
+            quien = a.split("=", 1)[1]; i += 1; continue
+        resto.append(a); i += 1
+    if quien and quien != IDENTIDAD:
+        sys.stderr.write(
+            "ABORTADO, y es la guarda funcionando.\n"
+            "Dijiste firmar como '%s' y este cliente resuelve '%s'.\n"
+            "Lo que firmaras saldria a nombre de otra casa, CON FIRMA VALIDA:\n"
+            "no fallaria, y el registro lo atribuiria a quien no lo escribio.\n\n"
+            "La identidad sale del conf que gana desde el DIRECTORIO ACTUAL.\n"
+            "Conf en uso: %s\n"
+            "Invoca desde la raiz de TU dominio, con la ruta larga al script.\n"
+            % (quien, IDENTIDAD, _RUTA_CONF or "ninguna"))
+        raise SystemExit(4)
+    return resto
+
+
 def main(argv):
+    argv = _exigir_identidad(argv)
     accion = argv[0] if argv else "pendientes"
     if accion in ("--ayuda", "-h", "ayuda"):
         print(USO); return 0
