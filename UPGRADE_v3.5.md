@@ -71,7 +71,19 @@ del vigía y hoy no vuelve. Si tu lección entra al canon, la verás en el canon
 
 ## Cómo saltar
 
-> [!warning] Mientras este salto viva en una rama sin fusionar, LEE ESTO PRIMERO
+> [!note] CADUCADO el 2026-09-07 — se conserva porque la rama vieja aún lo necesita
+> El aviso de abajo aplicaba **mientras esta versión vivía en una propuesta sin fusionar**.
+> **Ya está en la rama principal**, que declara `version: 3.5`, así que **ningún dominio queda
+> partido por saltar hoy** y no hay nada que esperar.
+>
+> **No se borra a propósito.** Quien lea este documento desde la rama de la propuesta —o desde
+> una copia hecha antes de la fusión— sigue necesitando lo de abajo, y un aviso desaparecido
+> no deja rastro de que existió. Se le pone fecha y se sigue.
+>
+> *Lo encontró una casa que saltó siguiendo el documento: es el primer texto que lee
+> cualquiera, y mandaba esperar a algo que ya había pasado.*
+
+> [!warning] (CADUCADO) Mientras este salto viva en una rama sin fusionar, LEE ESTO PRIMERO
 > El master con `version: 3.5` **solo existe en la rama de la propuesta**, no en la rama
 > principal del canon — que sigue diciendo `3.4` hasta que se fusione. **Es la misma rama
 > donde vive este documento.**
@@ -133,13 +145,25 @@ del vigía y hoy no vuelve. Si tu lección entra al canon, la verás en el canon
    **Comprueba su huella contra `skills/MD5SUM.txt` del canon.** Una copia que difiere del
    canon es un canon mentiroso, y no avisa.
 
-3. **Declara en tu manifiesto**, y son tres claves, no una:
+3. **Declara en tu manifiesto.** Tres hacen falta para saltar; **hay dos más, opcionales**:
 
    | clave | qué es | si falta |
    |---|---|---|
    | `buzon_aprendizaje` | **el endpoint del buzón** — `https://learning.vuelamind.ai`, o el de tu ecosistema. Es una URL HTTP | el skill te la pregunta cada vez |
    | `learning_procedencia` | si tus aportaciones **se identifican** o van anónimas | **la corrida se detiene y la pide** |
    | `learning_terceros` | si se **tachan los nombres** de otras casas y personas | **la corrida se detiene y la pide** |
+
+   **Y estas dos son opcionales, pero conviene saber que existen:**
+
+   | clave | qué es | si falta |
+   |---|---|---|
+   | `learning_modo` | si se te pregunta el destino cada vez (`preguntar`), solo el texto (`recordar-destino`) o nada (`automatico`) | queda en `preguntar`, **sin que nadie te diga que había opción** |
+   | `learning_registro` | dónde vive el registro de lo aportado | `.learning-enviados` en la raíz del dominio |
+
+   > [!important] Este documento decía «son tres claves» y el skill usa cinco
+   > Un número cerrado **invita a no buscar más**, y las dos que faltaban no son adorno: una
+   > gobierna si te preguntan cada vez, y la otra dónde queda la memoria de lo que mandaste.
+   > Ninguna es obligatoria; ambas cambian cómo se comporta el skill contigo.
 
    > [!warning] `buzon_aprendizaje` es NUEVA — no reutilices `aportar_a`
    > `aportar_a` ya existe y nombra **un repositorio git** al que proponer parches. El buzón
