@@ -1,8 +1,15 @@
 ---
 title: Salto menor a v3.7 — la regla dura de fechas
 tipo: plantilla ejecutable
-para: cualquier dominio en la línea base v3
+para: dominios en v3.5 o posterior — el master que trae nombra piezas de la v3.5
 ---
+
+> [!danger] De dónde tienes que venir: REQUIERE la v3.5
+> La regla de fechas no depende de nada, **pero el master es un solo archivo acumulativo**: el
+> que trae este salto también nombra `/vuelamind-learn`, el artefacto de la v3.5. Si saltas
+> desde más atrás, el documento promete una pieza que no tienes.
+>
+> *El mapa completo de saltos vive en `UPGRADE.md`, que no muere con ninguna versión.*
 
 # UPGRADE a v3.7 — las fechas dejan de ser costumbre y pasan a ser regla
 

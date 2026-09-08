@@ -1,8 +1,14 @@
 ---
 title: Salto menor a v3.5 — el buzón de aprendizaje, y el ciclo de parches que se retira
 tipo: plantilla ejecutable
-para: dominios ya en la línea base v3 que quieran aportar lo que aprenden
+para: dominios en la línea base v3 — NO requiere la v3.4
 ---
+
+> [!note] De dónde tienes que venir
+> **De cualquier dominio en la línea base v3.** En particular **NO requiere la v3.4**: el
+> canal y el buzón son piezas distintas y ninguna depende de la otra.
+>
+> *El mapa completo de saltos vive en `UPGRADE.md`, que no muere con ninguna versión.*
 
 # UPGRADE a v3.5 — el buzón de aprendizaje
 

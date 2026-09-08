@@ -1,8 +1,15 @@
 ---
 title: Salto menor a v3.6 — la entrevista de 25 preguntas pasa a 15
 tipo: plantilla ejecutable
-para: dominios en v3 que vayan a hacer nacer a alguien más
+para: dominios en v3.5 o posterior — REQUIERE los artefactos de la v3.5
 ---
+
+> [!danger] De dónde tienes que venir: REQUIERE la v3.5
+> **El master que trae este salto nombra `/vuelamind-learn`**, que es el artefacto que
+> instala la v3.5. Si saltas desde más atrás, quedas con un documento que **promete una pieza
+> que no tienes** — haz antes la v3.5.
+>
+> *El mapa completo de saltos vive en `UPGRADE.md`, que no muere con ninguna versión.*
 
 # UPGRADE a v3.6 — la entrevista adelgaza y gana un punto de control
 

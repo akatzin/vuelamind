@@ -1,8 +1,14 @@
 ---
 title: Salto menor a v3.4 — el canal entre instancias
 tipo: plantilla ejecutable
-para: dominios ya en la línea base v3 que quieran hablar con otras instancias
+para: dominios en la línea base v3 — NO depende de ningún otro salto, y ninguno depende de él
 ---
+
+> [!note] De dónde tienes que venir
+> **De cualquier dominio en la línea base v3.** Este salto **no requiere ningún otro**, y
+> ningún otro lo requiere a él: añade una capacidad que vive en sus propios archivos.
+>
+> *El mapa completo de saltos vive en `UPGRADE.md`, que no muere con ninguna versión.*
 
 # UPGRADE a v3.4 — el canal entre instancias
 
@@ -14,14 +20,17 @@ para: dominios ya en la línea base v3 que quieran hablar con otras instancias
 > Si tu dominio trabaja solo, **no saltes**. Un salto que no se necesita solo añade piezas
 > que mantener.
 
-> [!danger] LA v3.4 NO LEVANTA EL CONGELAMIENTO
-> El ciclo de parches **sigue suspendido**, exactamente igual que antes de este salto. La
-> v3.4 es **transporte entre casas**; el buzón que la v3.5 promete —donde las casas mandan su
-> libro de errores y el vigía hace la ceremonia— **todavía no existe**, y es otra pieza:
-> abierta, sin llaves, sin relación con este canal.
+> [!note] CADUCADO — hablaba de algo que aún no existía, y ya existe
+> Este salto se publicó mientras el ciclo de parches estaba suspendido, y avisaba de que **no
+> lo levantaba**. Cierto entonces; **irrelevante ahora**: el congelamiento se levantó, y este
+> salto sigue sin tener nada que ver con ello.
 >
-> Se dice aquí porque **un salto de versión invita a suponer lo contrario**. Sigue
-> escribiendo tus lecciones en tu casa y no las cargues a ninguna parte.
+> **Lo que queda en pie es lo único que era sobre este salto:** la v3.4 es **transporte entre
+> casas**, y no toca el ciclo de aprendizaje en ninguna dirección.
+>
+> *Se conserva con lápida en vez de borrarse: quien lea una copia vieja de este documento
+> sigue necesitando saber qué decía. Y queda como el caso de por qué **un upgrader no habla
+> de versiones futuras** — este bloque envejeció solo, sin que nadie lo tocara.*
 
 > [!note] Es un salto MENOR, y por eso no trae las tres piezas de una mayor
 > `UPGRADE.md` pide, para una versión **mayor**, tres cosas junto al master: el documento
