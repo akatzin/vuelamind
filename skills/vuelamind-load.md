@@ -37,6 +37,47 @@ Si el validador reporta parches **sin mirar** o **pospuestos**, léelos y **pres
 
 Los estados y su registro están en el marco del dominio. Recordar que **descartado** no vuelve a ofrecerse: para verlos hay que pedir el inventario completo al validador.
 
+### 4b. Comprobar si el canon avanzó — y solo decirlo si avanzó
+
+**Dos cosas, las dos baratas y las dos calladas cuando no hay nada:**
+
+**La versión del marco.** Lee la versión publicada en el canon que declare el dominio y
+compárala con la del master local. Si hay una más nueva **y su `UPGRADE_v<N>.md` está
+publicado junto al master**, dilo en una línea:
+
+> *«El canon está en v3.7 y este dominio en v3.6. Su guía de salto está publicada — corre
+> `/vuelamind-upgrade` cuando quieras.»*
+
+**Los skills instalados.** El canon trae `herramientas/comprobar_skills.py`, que compara lo
+instalado contra `skills/MD5SUM.txt` mirando las dos formas de instalación. Si reporta
+deriva, nómbrala. Si no, no se dice nada.
+
+> [!important] Por qué esto vive aquí y no en el comando de escalar
+> Porque **el de escalar es circular**: solo te dice que hay versión nueva **si ya sospechabas
+> y lo corriste**. Para decidir saltar hay que saber que hay algo que saltar, y ese aviso
+> tiene que llegar sin que nadie lo pida.
+>
+> **Medido en tres casas la misma semana**, todas enteradas por accidente: una estuvo
+> **diecinueve días** con un skill del canon atrasado y lo descubrió discutiendo otra cosa;
+> otra —el vigía del propio canon— se enteró por un rojo de su validador; la tercera, porque
+> corrió la comprobación a propósito. **Ninguna recibió un aviso, porque no existía.**
+
+**Tres condiciones, y sin ellas esto se vuelve paisaje:**
+
+1. **No bloquea nunca.** Sin red, sin credencial o sin alcanzar el canon: **una línea diciendo
+   que no se pudo comprobar, y seguir**. Un arranque que falla porque no pudo consultar un
+   servidor remoto es peor que no avisar.
+2. **Silencio cuando estás al día.** Ni una línea. **Lo sano no se reporta** — un aviso que
+   sale todos los días deja de leerse, y entonces tampoco se lee el día que importa.
+3. **Avisa, no actúa.** No propone saltar, no pregunta si quieres, no toca nada. La decisión
+   es del responsable y la ejecución es del comando de escalar, que es donde vive el preflight.
+
+> [!warning] Leer la versión publicada NO es hacer `fetch` sobre el clon del usuario
+> Un `fetch` **escribe en su repositorio y mueve referencias sin tocar el árbol de trabajo** —
+> y eso ya produjo un chequeo verde que mentía: *«el clon está al día»* comparando referencias
+> mientras los archivos iban trece commits atrás. **Este paso lee lo publicado y no modifica
+> nada local**, que es más barato y no tiene ese efecto.
+
 ### 5. Presentar el estado, no un resumen del archivo
 
 Cerrar con lo que el usuario necesita para decidir en qué trabajar:
@@ -91,6 +132,7 @@ Y entonces **preguntar por dónde seguir**. No empezar a trabajar por cuenta pro
 - **No escribe nada.** Es de lectura. Lo que corrige documentación es el checkpoint.
 - **No inicializa un dominio.** Eso es pegar el master y contestar la entrevista. Y para sumar una máquina a un dominio que ya existe, `/vuelamind-join`.
 - **No aplica parches solo.** Los presenta; la decisión es del usuario.
+- **No escala el dominio ni toca el clon.** Del salto de versión solo trae **el aviso**; ejecutarlo es de `/vuelamind-upgrade`, y ahí vive el preflight que puede abortar.
 
 ## Por qué está en el nivel personal
 
