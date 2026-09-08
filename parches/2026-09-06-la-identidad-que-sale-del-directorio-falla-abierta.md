@@ -1,7 +1,7 @@
 ---
 version: 1
 origen: velaAkatzin
-estado: propuesto el 2026-09-06 — nace de un error medido, no de una revisión
+estado: armonizado al master el 2026-09-08 (regla 65 del libro de errores) — nació de un error medido, no de una revisión
 ---
 
 # 2026-09-06 · La identidad que sale del directorio falla abierta — y firma válido
