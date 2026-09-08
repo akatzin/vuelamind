@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.6
+version: 3.7
 
 > [!note] v3.4 (2026-09-05) — el canal entre instancias, y lo que NO trae
 > Entra la comunicación entre instancias: servicio, cliente, disparador e instalador, más el
@@ -473,7 +473,7 @@ que falta es conectar **esta máquina**, y eso es un acto propio con su comando 
 >
 > Esta sección cubre **exactamente el tramo donde el comando todavía no existe** —llegar al
 > conocimiento y traer el ciclo— y ahí se detiene. **No repite los pasos del comando**: dos
-> descripciones del mismo acto divergen en silencio, y la Fase 2 §6 de este mismo archivo dice
+> descripciones del mismo acto divergen en silencio, y la Fase 2 §7 de este mismo archivo dice
 > por qué eso es peor que un rodeo.
 
 **1 · Llegar al vault, y comprobar que llegó ENTERO.** El transporte lo decide el dominio —una
@@ -1089,7 +1089,7 @@ Sin esta fase, un dominio nuevo nace con manifiesto (1.4) **y sin nada que lo le
 >
 > **La condición va en la misma frase, siempre.** No *"el linaje lo lleva el control de
 > versiones"* sino *"si el canon está versionado, lo lleva él; si no, se lleva a mano"* — la
-> disciplina de la Fase 2 §6 aplicada al propio método.
+> disciplina de la Fase 2 §7 aplicada al propio método.
 >
 > **Y el piso no se sube:** el marco tiene que seguir funcionando para quien solo pega esta
 > plantilla en un contexto nuevo. **El caso sin herramienta no desaparece** —la máquina que no
@@ -1434,7 +1434,75 @@ Las **adoptadas** y **descartadas** se mueven a `Decisiones.md` con su razonamie
 - **Filtra las salidas antes de imprimirlas.** El riesgo real no es imprimir lo prohibido, es imprimir de más: los volcados completos exponen cosas que nadie pensó revisar.
 - **Usa patrones acotados o imprime solo nombres de campo**, nunca el volcado entero.
 
-### 6. Separación entre actuar y documentar
+### 6. Las fechas — regla dura
+
+> **Toda fecha que sea DATO se escribe `YYYY-MM-DD` (ISO 8601). Sin excepciones.**
+
+`2026-09-08`. No `08/09/2026`, no `09/08/2026`, no *«8 de septiembre»* cuando la fecha es el
+dato y no el relato.
+
+**Por qué ese formato y no otro, y las tres razones son mecánicas:**
+
+- **Ordena solo.** Alfabético = cronológico. Los archivos que empiezan por fecha se ordenan sin
+  que nadie los ordene, y no hace falta mantener un índice — que sería un inventario a mano,
+  y los inventarios a mano se desincronizan en silencio.
+- **No es ambiguo entre países.** `03/04` es marzo o abril según quién lo lea. Un método que se
+  reparte en varios idiomas no puede permitirse esa ambigüedad.
+- **Se encuentra con una sola expresión.** Un validador puede cuadrar fechas con un patrón
+  único; con formatos mezclados, cada búsqueda es un caso distinto y ninguno los cubre todos.
+
+> [!warning] `YYYY-MM-DD` es **ISO 8601**, no ANSI
+> El estándar ANSI de fecha es `MM/DD/YYYY` — el formato estadounidense, que es justo el
+> ambiguo. Se dice aquí porque los dos nombres se confunden y pedir «el formato ANSI» produce
+> exactamente lo contrario de lo que esta regla quiere.
+
+#### La zona SE DECLARA, o las fechas del vault parecen un error
+
+**Un vault que fecha en una zona distinta a la del sistema tiene que decirlo en su documento
+de arranque.** Mientras no lo diga, durante las horas de solapamiento **sus entradas llevan
+un día distinto al que devuelve el reloj de la máquina**, y son indistinguibles de un error de
+fechado.
+
+> **Medido:** una casa cuyo vault fechaba en UTC leyó sus propias entradas como adelantadas
+> —el sistema daba hora local, seis horas atrás— y **llevó doce fechas correctas a una lista
+> de correcciones**. Lo evitó pedir la hora a dos servicios externos antes de escribir. Si la
+> propia casa que las escribió las leyó como error, cualquiera lo hará.
+
+**Y el corolario, que vale más allá de las fechas:** antes de corregir en masa algo que parece
+un error sistemático, **busca una fuente fuera de la máquina que lo dirima**. Una corrección
+masiva sobre una premisa falsa destruye más de lo que arregla y no deja rastro de haberlo
+destruido.
+
+#### Las fechas relativas: solo con ancla
+
+**«Hoy», «ayer», «la semana pasada» y «hace tres días» valen SOLO si la nota que las contiene
+lleva su propia fecha absoluta** — una entrada de bitácora encabezada por su día, una sección
+fechada. Ahí son resolubles y se leen mejor que la fecha.
+
+**Fuera de eso no se escriben.** En la cola, en el registro de decisiones o en el panorama no
+tienen contra qué resolverse, y **envejecen sin que nadie las toque**.
+
+> **Medido en un vault real:** 136 fechas relativas contra 411 absolutas, y una de ellas ya
+> era falsa — *«cualquiera que clone hoy nace con los parches apagados»*, cierta el día que se
+> escribió y falsa tres días después. **Nadie la editó: envejeció sola.**
+
+#### Y la prosa no se prohíbe: se ubica
+
+**El dato va en ISO; el relato va en prosa.** Un encabezado `## 2026-09-08 — El día que se
+levantó el congelamiento` tiene las dos cosas: la fecha se ordena y se busca, y el título se
+lee en voz alta, que es como manda escribirse la bitácora.
+
+Lo que no se vale es **prosa donde el dato tiene que compararse**: un folio, un registro, una
+huella, un frontmatter.
+
+> [!note] Esta regla se escribió cuando ya se cumplía, y por eso mismo
+> **Medido antes de escribirla:** 411 fechas en ISO y **cero** en cualquier otro formato de
+> dato. La convención ya existía en la práctica y **no estaba en ninguna parte del canon** —
+> así que el próximo dominio no tenía de dónde heredarla, y la habría reinventado o no.
+>
+> Una convención que solo vive en la costumbre se pierde en el primer relevo.
+
+### 7. Separación entre actuar y documentar
 
 > **Si aplicas algo en un sistema, dilo explícitamente y por separado de los
 > cambios a documentación.**
@@ -1443,7 +1511,7 @@ Son dos tipos de acto con consecuencias distintas: uno se revierte editando un a
 
 Y por la misma razón: **no cambies de pendiente sin autorización explícita.** Encontrar algo más interesante a la mitad de una tarea es normal; abandonarla por eso no. Se anota el hallazgo, se termina lo empezado, y se pregunta.
 
-### 7. Lo que NO se debe copiar del vault de origen
+### 8. Lo que NO se debe copiar del vault de origen
 
 Un marco honesto también documenta sus propios defectos:
 
