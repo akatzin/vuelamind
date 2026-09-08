@@ -60,6 +60,48 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 
 ## Estado de los saltos
 
+> [!important] Este mapa vive AQUÍ y no en los upgraders, y la razón es una regla
+> **Un `UPGRADE_v<N>.md` es de su versión y muere con su salto**: sella la huella de SU
+> plantilla y no debe hablar de lo que vino después. Si cada uno llevara el mapa completo,
+> **cada versión nueva dejaría obsoletos a todos los anteriores**, y nadie vuelve a abrirlos
+> para corregirlos.
+>
+> Medido en este mismo canon: el documento de la v3.4 avisaba de que *«el buzón que la v3.5
+> promete todavía no existe»*. Era cierto al publicarlo y **envejeció solo**, sin que nadie lo
+> tocara. Lleva lápida.
+>
+> **Cada upgrader declara solo SU precondición** —de dónde tienes que venir, que es un hecho
+> sobre sí mismo— y **el mapa hacia adelante se mantiene en este documento**, que no muere con
+> ninguna versión.
+
+### La cadena de los saltos menores de la línea base v3
+
+```
+  v3.0 ──┬── v3.4  el canal        ORTOGONAL: no requiere ningún salto,
+         │                          y ningún salto lo requiere a él
+         │
+         └── v3.5 ──▶ v3.6 ──▶ v3.7
+```
+
+**Por qué la v3.4 cuelga suelta:** los masters de la v3.6 y la v3.7 **no nombran el canal ni
+una vez**. Es una capacidad que vive en sus propios archivos.
+
+**Por qué de la v3.5 en adelante hay orden:** los masters de la v3.6 y la v3.7 **nombran
+`/vuelamind-learn`**, que es el artefacto que instala la v3.5. Saltar desde más atrás deja un
+documento que promete una pieza que no está instalada.
+
+> [!warning] EL MASTER ES ACUMULATIVO Y LOS ARTEFACTOS NO
+> Traer el master de la versión más alta te da **todo el texto** de las anteriores — es un
+> solo archivo. **No te da los skills, ni el código, ni las claves del manifiesto**, que viven
+> fuera y se instalan salto a salto.
+>
+> **De ahí la ruta corta desde la v3.0: haz la v3.5, luego trae el master de la más alta.**
+> Dos pasos y quedas al día en la rama principal. El canal, aparte y solo si lo necesitas.
+
 | Salto | Documento | Estado |
 |---|---|---|
 | v2 → v3 | `UPGRADE_v3.md` | **Liberado y EJECUTADO** (2026-08-16). El primer salto real lo corrió el caso duro —huella huérfana derivada de un borrador nunca liberado— y pagó su deuda en la moneda prometida: tres defectos de instrumento encontrados corriéndolo, ninguno leyéndolo, los tres corregidos en la misma jornada. El preflight abortó dos veces y las dos tuvo razón |
+| v3.0 → v3.4 | `UPGRADE_v3.4.md` | **Liberado** — el canal entre instancias. Menor, opcional y **ortogonal**: no requiere ningún salto, y ninguno lo requiere a él |
+| v3.0 → v3.5 | `UPGRADE_v3.5.md` | **Liberado** — el buzón de aprendizaje; retira el ciclo de parches por pull request. Menor. **No requiere la v3.4** |
+| v3.5 → v3.6 | `UPGRADE_v3.6.md` | **Liberado** — la entrevista de nacimiento pasa de 25 preguntas a 15. Menor. **Requiere los artefactos de la v3.5** |
+| v3.5 → v3.7 | `UPGRADE_v3.7.md` | **Liberado** — la regla dura de fechas. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye la v3.6 |

@@ -4,29 +4,12 @@ tipo: plantilla ejecutable
 para: dominios en v3.5 o posterior — el master que trae nombra piezas de la v3.5
 ---
 
-> [!important] LA CADENA DE SALTOS — de dónde tienes que venir
-> Los saltos menores de la línea base v3 **no forman una sola fila**: hay una rama suelta.
+> [!danger] De dónde tienes que venir: REQUIERE la v3.5
+> La regla de fechas no depende de nada, **pero el master es un solo archivo acumulativo**: el
+> que trae este salto también nombra `/vuelamind-learn`, el artefacto de la v3.5. Si saltas
+> desde más atrás, el documento promete una pieza que no tienes.
 >
-> ```
->   v3.0 ──┬── v3.4  el canal        ORTOGONAL: no la necesita nadie
->          │                          y ella no necesita a nadie
->          │
->          └── v3.5  el buzón  ──▶  v3.6  la entrevista  ──▶  v3.7  las fechas
-> ```
->
-> **La v3.4 es independiente en las dos direcciones.** Sáltala solo si vas a hablar con otras
-> casas; ningún otro salto la nombra ni la necesita.
->
-> **De la v3.5 en adelante sí hay orden**, y por una razón concreta: **el master de la v3.6 y
-> el de la v3.7 nombran `/vuelamind-learn`**, que es el artefacto que instala la v3.5. Traer
-> ese master sin haber hecho la v3.5 deja un documento que **promete una pieza que no tienes**.
->
-> **Y el master es un solo archivo acumulativo:** traer el de la v3.7 te trae también la v3.6.
-> Lo que NO trae son los artefactos —skills, código, claves del manifiesto—, que viven fuera y
-> hay que instalar salto a salto.
->
-> **Si vienes de la v3.0, la ruta corta es: haz la v3.5, luego trae el master de la v3.7.**
-> Dos pasos, y quedas con las tres. El canal, aparte y solo si lo necesitas.
+> *El mapa completo de saltos vive en `UPGRADE.md`, que no muere con ninguna versión.*
 
 # UPGRADE a v3.7 — las fechas dejan de ser costumbre y pasan a ser regla
 
