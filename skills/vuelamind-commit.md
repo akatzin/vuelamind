@@ -21,7 +21,7 @@ Declara, como mínimo:
 
 | Clave | Qué es |
 |---|---|
-| `vault` | dónde vive el conocimiento en esta máquina |
+| `vault` | dónde vive el conocimiento en esta máquina. **Opcional desde la v3.6**: sin declarar, `<proyecto>/vault/`. Declararla gana sobre la convención |
 | `validador` | el script de comprobaciones mecánicas, con su ruta — o `—` si el dominio no tiene, y entonces los chequeos se hacen a mano y se dice |
 | `acceso_vivo` | cómo se llega a los sistemas que hay que verificar |
 | `notas:` `cola` · `archivo` · `panorama` · `decisiones` · `bitacora` · `arranque` | los nombres reales de las seis notas del ciclo |
