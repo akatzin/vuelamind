@@ -344,32 +344,29 @@ distintas las declara en su manifiesto, que gana siempre sobre la convención.
 | Qué se comparte entre dominios | **nada: los vaults son personales, siempre** |
 | Proponer lo aprendido | **apagado.** Lo enciende correr `/vuelamind-learn`, no la entrevista |
 
-> [!important] La convención NO es una atadura: `canon` existe desde antes y gana
-> Que esto salga de la entrevista **no significa que el destino sea fijo**. La clave `canon`
-> del manifiesto declara **de qué repositorio se jala el método**, admite un derivado o un
-> espejo, y **manda sobre la convención**. Lo que se quitó fue la *pregunta*, no la *opción*.
+> [!important] `canon` manda sobre esta convención
+> La clave `canon` del manifiesto declara **de qué repositorio se jala el método**, y admite un
+> espejo o un derivado. **La convención de arriba es el valor por omisión, no una atadura.**
 >
-> **Y no la contesta quien nace: la trae puesta la copia que le dieron.** Un dominio que nace
-> desde una plantilla de otra organización hereda el `canon` de esa plantilla, y la persona que
-> lo instala no ve la clave ni tiene que saber qué es un repositorio.
+> **No la contesta quien nace: la trae puesta la copia que le dieron.** Quien instala desde la
+> plantilla de una organización hereda su `canon` sin ver la clave ni saber qué es un
+> repositorio.
 >
-> **Por qué importa decirlo aquí, donde la convención se declara:** quien lea solo esta tabla
-> concluye que el método siempre se trae del mismo sitio, y **hay casos legítimos en los que no
-> debe** — una organización que necesita que su cadena de suministro apunte a su propia cuenta,
-> una copia auditada, un despliegue empaquetado. **Que la convención no diga que se puede
-> cambiar es indistinguible de que no se pueda.**
+> **Casos en los que declararlo es lo correcto:** una organización cuya cadena de suministro
+> debe apuntar a su propia cuenta; una copia auditada y congelada en una versión revisada; un
+> despliegue empaquetado, donde lo que se revisa es de dónde salió lo que hay dentro.
 
-> [!warning] Un espejo o un derivado NECESITA dueño y cadencia declarados
-> **Una copia que nadie actualiza es un canon congelado que se ve sano.** El arranque avisa si
-> el canon avanzó, pero **avisa contra el `canon` que el manifiesto declare**: si apunta a una
-> copia parada, dirá *«estás al día»* y será cierto **contra el espejo equivocado**.
+> [!warning] Un canon declarado necesita dueño y cadencia
+> **Una copia que nadie actualiza es un canon congelado que se ve sano.** El aviso de versión
+> nueva mira **el canon declarado**: apuntando a una copia parada dirá *«estás al día»*, y será
+> cierto **contra el espejo equivocado**.
 >
-> **Medido en este canon:** una casa estuvo diecinueve días con una pieza atrasada sin una sola
-> señal, y eso fue con **un solo** origen. Con una copia intermedia son dos capas de deriva, y
-> ninguna tiene síntoma.
+> *Caso medido: un dominio pasó diecinueve días con una pieza del canon atrasada sin ninguna
+> señal, y eso con un solo origen. Una copia intermedia añade otra capa, y ninguna tiene
+> síntoma.*
 >
-> Así que quien declare un `canon` distinto del oficial **declara también quién lo sincroniza y
-> cada cuánto**. No es burocracia: es lo único que distingue un espejo de una foto vieja.
+> **Quien declara un canon distinto declara quién lo sincroniza y cada cuánto.** Es lo único
+> que distingue un espejo de una foto vieja.
 
 > [!important] Por qué se fue el bloque que este documento llamaba «el que más se subestima»
 > No porque no importe: **porque no es del usuario**. Sus siete preguntas eran el 28% de la
