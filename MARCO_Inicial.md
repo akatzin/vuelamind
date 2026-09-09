@@ -340,9 +340,33 @@ distintas las declara en su manifiesto, que gana siempre sobre la convención.
 | El andamiaje del asistente | **`<proyecto>/.claude/`** |
 | Carpetas de otros programas | no se pregunta; si algo choca, se descubre y se declara |
 | La ruta como identificador | no se pregunta |
-| De dónde se trae el método | **el canon oficial** |
+| De dónde se trae el método | **el canon oficial** — y **`canon` en el manifiesto lo sobrescribe**: un espejo, un derivado, o una copia bajo otra cuenta |
 | Qué se comparte entre dominios | **nada: los vaults son personales, siempre** |
 | Proponer lo aprendido | **apagado.** Lo enciende correr `/vuelamind-learn`, no la entrevista |
+
+> [!important] `canon` manda sobre esta convención
+> La clave `canon` del manifiesto declara **de qué repositorio se jala el método**, y admite un
+> espejo o un derivado. **La convención de arriba es el valor por omisión, no una atadura.**
+>
+> **No la contesta quien nace: la trae puesta la copia que le dieron.** Quien instala desde la
+> plantilla de una organización hereda su `canon` sin ver la clave ni saber qué es un
+> repositorio.
+>
+> **Casos en los que declararlo es lo correcto:** una organización cuya cadena de suministro
+> debe apuntar a su propia cuenta; una copia auditada y congelada en una versión revisada; un
+> despliegue empaquetado, donde lo que se revisa es de dónde salió lo que hay dentro.
+
+> [!warning] Un canon declarado necesita dueño y cadencia
+> **Una copia que nadie actualiza es un canon congelado que se ve sano.** El aviso de versión
+> nueva mira **el canon declarado**: apuntando a una copia parada dirá *«estás al día»*, y será
+> cierto **contra el espejo equivocado**.
+>
+> *Caso medido: un dominio pasó diecinueve días con una pieza del canon atrasada sin ninguna
+> señal, y eso con un solo origen. Una copia intermedia añade otra capa, y ninguna tiene
+> síntoma.*
+>
+> **Quien declara un canon distinto declara quién lo sincroniza y cada cuánto.** Es lo único
+> que distingue un espejo de una foto vieja.
 
 > [!important] Por qué se fue el bloque que este documento llamaba «el que más se subestima»
 > No porque no importe: **porque no es del usuario**. Sus siete preguntas eran el 28% de la

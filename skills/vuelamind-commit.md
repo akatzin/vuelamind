@@ -25,7 +25,8 @@ Declara, como mínimo:
 | `validador` | el script de comprobaciones mecánicas, con su ruta — o `—` si el dominio no tiene, y entonces los chequeos se hacen a mano y se dice |
 | `acceso_vivo` | cómo se llega a los sistemas que hay que verificar |
 | `notas:` `cola` · `archivo` · `panorama` · `decisiones` · `bitacora` · `arranque` | los nombres reales de las seis notas del ciclo |
-| `marco` | dónde vive el master del método y sus parches |
+| `marco` | dónde vive la copia local del método y sus parches |
+| `canon` | **de qué repositorio se jala el método.** Por omisión el oficial; declararlo gana — un espejo, un derivado, o una copia bajo otra cuenta. **Quien declare uno distinto declara también quién lo sincroniza y cada cuánto** |
 | `antes_de_medir` | enganche opcional: qué correr antes del paso 0 (desbloquear una llave, montar algo) |
 | `despues_de_escribir` | enganche opcional: qué correr tras el paso 4 (un empuje manual, si el transporte lo pide) |
 | `avisos_del_dominio` | lista corta de trampas propias que el motor debe respetar al escribir |
