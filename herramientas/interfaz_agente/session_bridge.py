@@ -93,6 +93,13 @@ if sys.version_info < (3, 10):
 
 _load_env_file()
 
+# TODA lectura, escritura y tubería de este archivo declara `encoding="utf-8"`, y no es
+# manía: `read_text()` sin codificación usa la del SISTEMA — UTF-8 en Unix, CP1252 en
+# Windows. MEDIDO en Windows 11 el 2026-09-11: el servicio arrancaba, el puerto abría, y
+# al servir su PROPIA página moría con UnicodeDecodeError en el byte 0x8f. El archivo
+# estaba bien; el lector estaba mal. Lo mismo vale para las tuberías con el CLI: por ahí
+# viajan los acentos de cada turno.
+
 # ---------------------------------------------------------------- configuración
 HOST = "127.0.0.1"                                   # loopback SIEMPRE; salir por túnel SSH
 PORT = int(os.environ.get("PORT", "8850"))   # canonico del marco; 8787 colisiona
@@ -129,14 +136,14 @@ NAME_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")        # nombres seguros para di
 def load_registry() -> dict:
     if REGISTRY_FILE.exists():
         try:
-            return json.loads(REGISTRY_FILE.read_text())
+            return json.loads(REGISTRY_FILE.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             return {}
     return {}
 
 
 def save_registry(reg: dict) -> None:
-    REGISTRY_FILE.write_text(json.dumps(reg, indent=2))
+    REGISTRY_FILE.write_text(json.dumps(reg, indent=2), encoding="utf-8")
     REGISTRY_FILE.chmod(0o600)
 
 
@@ -227,6 +234,7 @@ def run_turn(text: str, attachments: list | None, session_id: str | None,
                             "message": {"role": "user", "content": content}}) + "\n"
     try:
         proc = subprocess.run(args, cwd=cwd, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace",
                               input=stdin_msg, timeout=TURN_TIMEOUT)
     except subprocess.TimeoutExpired:
         return {"session_id": session_id, "text": None, "is_error": True,
@@ -292,7 +300,8 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
     try:
         proc = subprocess.Popen(args, cwd=cwd, stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                text=True, bufsize=1)
+                                text=True, bufsize=1,
+                                encoding="utf-8", errors="replace")
     except Exception as e:
         emit({"kind": "error", "error": str(e)})
         return {"session_id": sid, "text": None, "is_error": True}
@@ -410,7 +419,8 @@ def deliver_turn(text: str, attachments: list | None, session_id: str | None,
     try:
         proc = subprocess.Popen(args, cwd=cwd, stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                text=True, bufsize=1)
+                                text=True, bufsize=1,
+                                encoding="utf-8", errors="replace")
     except Exception as e:
         on_error(str(e))
         return
@@ -527,7 +537,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/" or self.path == "/index.html":
             if HTML_FILE.exists():
-                return self._html(200, HTML_FILE.read_text())
+                return self._html(200, HTML_FILE.read_text(encoding="utf-8"))
             return self._html(200, "<h1>puente arriba</h1><p>falta session_bridge.html</p>")
         if self.path == "/favicon.ico":
             self.send_response(204)

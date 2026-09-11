@@ -52,6 +52,18 @@ DEFAULTS = {"PORT": "8850", "BRIDGE_MODEL": ""}
 
 
 # --------------------------------------------------------------- utilidades
+# La consola de Windows es CP1252 y este archivo imprime flechas, puntos medios y
+# tildes. MEDIDO en Windows 11 el 2026-09-11: con 3.9 el instalador CRASHEA con
+# UnicodeEncodeError al imprimir `→`; con 3.12 no truena pero el texto sale corrupto.
+# Mismo defecto, dos caras, y en macOS no se ve nunca. Se arregla en la SALIDA, una vez,
+# y así protege también las líneas que nadie ha escrito todavía.
+for _flujo in (sys.stdout, sys.stderr):
+    try:
+        _flujo.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+
+
 def say(msg):
     print(msg, flush=True)
 
@@ -363,6 +375,19 @@ def main(argv=None):
                  "Linux": install_linux}.get(osname)
     if not installer:
         sys.exit(f"SO no soportado: {osname}. Corre a mano: python {script}")
+    # Instalar el arranque automático de un servicio que ACABAS DE COMPROBAR que no puede
+    # arrancar garantiza un fallo mudo en cada inicio de sesión. MEDIDO en Windows 11 el
+    # 2026-09-11: sin el CLI, el instalador lo reportaba y creaba la tarea igual; el
+    # servicio salía con código 1 diciendo «no encuentro el binario claude», y como el
+    # autostart usa pythonw.exe —sin ventana— ese mensaje no llegaba a ningún sitio.
+    if not cfg.get("BRIDGE_CLAUDE_BIN") and not args.no_start:
+        sys.exit("NO INSTALO EL ARRANQUE AUTOMATICO: no encuentro el CLI `claude`.\n"
+                 "  El servicio no puede levantar sin el, y el autostart correria sin\n"
+                 "  ventana: fallaria mudo en cada inicio de sesion.\n"
+                 "  Instala el CLI, o dime donde esta:\n"
+                 "     --set BRIDGE_CLAUDE_BIN=<ruta al ejecutable>\n"
+                 "  (Si solo querias copiar los archivos, usa --no-start.)")
+
     if args.no_start:
         # `--no-start` significaba «no arranques AHORA» y dejaba el autostart escrito, asi
         # que el servicio aparecia solo en el siguiente inicio de sesion. Instalar el
