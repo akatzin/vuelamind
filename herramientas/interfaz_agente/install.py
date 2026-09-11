@@ -193,6 +193,9 @@ def write_env_file(cfg):
         if cfg.get(k):
             lines.append(f"{k}={cfg[k]}")
     ENV_FILE.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # En Windows esto NO protege el archivo: `chmod` solo toca el bit de solo-lectura y
+    # los permisos los hereda del perfil de usuario. No falla, y por eso no se nota.
+    # Declarado el 2026-09-11: en Windows la protección real pide ACLs (`icacls`).
     try:
         ENV_FILE.chmod(0o600)
     except OSError:

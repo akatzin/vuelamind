@@ -120,6 +120,26 @@ CONTEXT_WINDOW = int(os.environ.get("BRIDGE_CONTEXT_WINDOW", "200000"))
 CLAUDE = os.environ.get("BRIDGE_CLAUDE_BIN") or shutil.which("claude") or \
     str(Path.home() / ".local/bin/claude")
 
+
+def _invocacion(binario: str) -> list:
+    """Cómo hay que LLAMAR al CLI, que no siempre es «ejecútalo».
+
+    En Windows la instalación por npm deja un `claude.cmd`, y un .cmd/.bat NO lo puede
+    lanzar `CreateProcess` — que es lo que hace subprocess sin shell: falla con
+    «no es una aplicación Win32 válida». Hay que pasar por `cmd /c`.
+
+    INFERIDO (2026-09-11): no medido. La VM donde se probó Windows tenía el CLI como
+    `claude.exe` y por eso este camino nunca se ejerció allí; el instalador, en cambio, SÍ
+    busca `claude.cmd` — o sea que el caso existe y nadie ha pasado por él. Se escribe
+    defensivo en vez de esperar a que alguien lo descubra en su propia máquina.
+    """
+    if os.name == "nt" and binario.lower().endswith((".cmd", ".bat")):
+        return ["cmd", "/c", binario]
+    return [binario]
+
+
+CLAUDE_ARGS = _invocacion(CLAUDE)
+
 HTML_FILE = Path(__file__).resolve().parent / "session_bridge.html"
 CONF_DIR = Path.home() / ".claude"
 REGISTRY_FILE = Path(os.environ.get("BRIDGE_REGISTRY", CONF_DIR / "vuelamind-bridge-sessions.json"))
@@ -144,6 +164,9 @@ def load_registry() -> dict:
 
 def save_registry(reg: dict) -> None:
     REGISTRY_FILE.write_text(json.dumps(reg, indent=2), encoding="utf-8")
+    # En Windows esto NO protege el archivo: `chmod` solo toca el bit de solo-lectura
+    # y los permisos los hereda del perfil de usuario. No falla, y por eso no se nota.
+    # Declarado en 2026-09-11: en Windows la protección real pide ACLs (`icacls`).
     REGISTRY_FILE.chmod(0o600)
 
 
@@ -220,7 +243,7 @@ def run_turn(text: str, attachments: list | None, session_id: str | None,
     """Corre un turno headless (entrada stream-json) y devuelve
     {session_id, text, is_error, raw_error}. Soporta adjuntos multimedia y
     un nivel de permiso (full|tools|safe)."""
-    args = [CLAUDE, "-p",
+    args = CLAUDE_ARGS + ["-p",
             "--input-format", "stream-json",
             "--output-format", "stream-json", "--verbose",
             ]
@@ -282,7 +305,7 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
     """Corre un turno headless y llama emit(dict) por cada evento de UI, en vivo.
     Emite: init / tool / text / result / error. Devuelve {session_id, text, is_error}.
     emit puede lanzar (cliente desconectado); en ese caso matamos el proceso."""
-    args = [CLAUDE, "-p",
+    args = CLAUDE_ARGS + ["-p",
             "--input-format", "stream-json",
             "--output-format", "stream-json", "--verbose",
             ]
@@ -395,7 +418,7 @@ def deliver_turn(text: str, attachments: list | None, session_id: str | None,
     en el registro (al arrancar y al terminar), para que el registro quede fresco sin
     depender de que el cliente siga escuchando.
     """
-    args = [CLAUDE, "-p",
+    args = CLAUDE_ARGS + ["-p",
             "--input-format", "stream-json",
             "--output-format", "stream-json", "--verbose",
             ]
