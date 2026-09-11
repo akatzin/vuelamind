@@ -56,6 +56,30 @@ def say(msg):
     print(msg, flush=True)
 
 
+MINIMO_PY = (3, 10)
+
+
+def exigir_python(py):
+    """El autostart apunta a UN interprete concreto; si ese no sirve, el servicio no
+    arranca y NADA lo dice. MEDIDO el 2026-09-11: instalacion completa y con exito,
+    autostart escrito, URL impresa, sobre un python 3.9 que no podia ni importar el
+    servicio. En Windows pythonw.exe corre sin ventana y el error no se ve en ningun sitio."""
+    try:
+        sal = subprocess.run([py, "-c", "import sys; print('%d.%d' % sys.version_info[:2])"],
+                             capture_output=True, text=True, timeout=20)
+        may, men = (int(x) for x in sal.stdout.strip().split("."))
+    except Exception as e:
+        sys.exit(f"no pude preguntarle la version a {py}: {type(e).__name__}: {e}")
+    if (may, men) < MINIMO_PY:
+        sys.exit(f"ME NIEGO A INSTALAR: ese interprete es Python {may}.{men} y hace falta "
+                 f"{MINIMO_PY[0]}.{MINIMO_PY[1]} o superior.\n"
+                 f"  Interprete: {py}\n"
+                 "  El servicio usa anotaciones `X | None` y en 3.9 no llega ni a arrancar:\n"
+                 "  la instalacion terminaria bien y el puente no levantaria nunca.\n"
+                 "  Instala uno mas nuevo y vuelve a correr esto CON ese binario.")
+    return f"{may}.{men}"
+
+
 def resolve_claude():
     for name in ("claude", "claude.cmd", "claude.exe"):
         p = shutil.which(name)
@@ -83,7 +107,20 @@ def read_old_plist():
     cfg = {}
     if platform.system() != "Darwin":
         return cfg
-    import plistlib
+    # Este paso es OPCIONAL por definición: rescata una instalación previa que en una
+    # máquina nueva no existe. Antes importaba plistlib fuera de la guarda, así que un
+    # plistlib roto —MEDIDO el 2026-09-11: dos pythons de Homebrew con pyexpat enlazado
+    # contra un libexpat que ya no exporta su símbolo— tumbaba la instalación ENTERA por
+    # no poder hacer algo que no había que hacer. Un paso opcional no derriba al principal.
+    plistlib = None
+    if any((HOME / "Library/LaunchAgents" / f"{lbl}.plist").exists() for lbl in OLD_LABELS):
+        try:
+            import plistlib
+        except Exception as e:
+            say(f"  aviso: no puedo leer instalaciones previas ({type(e).__name__}); sigo sin migrar")
+            return cfg
+    if plistlib is None:
+        return cfg
     for lbl in OLD_LABELS:
         p = HOME / "Library/LaunchAgents" / f"{lbl}.plist"
         if p.exists():
@@ -310,7 +347,8 @@ def main(argv=None):
         say(fn() if fn else f"SO no soportado para desinstalar: {osname}")
         return 0
 
-    say(f"· sistema: {osname}   python: {python}")
+    ver = exigir_python(python)
+    say(f"· sistema: {osname}   python: {python}  ({ver})")
     cfg = build_config(args)
     script = copy_assets()
     write_env_file(cfg)
@@ -325,8 +363,15 @@ def main(argv=None):
                  "Linux": install_linux}.get(osname)
     if not installer:
         sys.exit(f"SO no soportado: {osname}. Corre a mano: python {script}")
-    where = installer(python, script, cfg["PORT"], not args.no_start)
-    say(f"· autostart → {where}")
+    if args.no_start:
+        # `--no-start` significaba «no arranques AHORA» y dejaba el autostart escrito, asi
+        # que el servicio aparecia solo en el siguiente inicio de sesion. Instalar el
+        # arranque automatico y arrancar son DOS cosas; esta bandera gobierna las dos.
+        say("· autostart → NO instalado (--no-start). Para ponerlo, corre esto sin la bandera.")
+        say(f"· a mano:  {python} {script}")
+    else:
+        where = installer(python, script, cfg["PORT"], True)
+        say(f"· autostart → {where}")
 
     if not args.no_start:
         import time

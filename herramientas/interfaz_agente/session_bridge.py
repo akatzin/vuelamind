@@ -78,6 +78,19 @@ def _load_env_file() -> None:
             os.environ[key] = val
 
 
+# Este archivo usa anotaciones de 3.10 (`list | None`). En 3.9 NO es error de sintaxis:
+# revienta al EVALUAR el primer `def` que las lleva, ya empezado el import, con un
+# TypeError que no explica nada. MEDIDO el 2026-09-11: con el python3 de fábrica de macOS
+# (3.9.6) el servicio no arrancaba y el instalador terminaba bien igual. En Windows el
+# autostart usa pythonw.exe, que corre SIN ventana: ahí el mismo error no se ve en ningún
+# sitio. Por eso el corte va ANTES, en sintaxis que 3.9 entiende, y dice qué hacer.
+if sys.version_info < (3, 10):
+    sys.exit(
+        "vuelamind-rc necesita Python 3.10 o superior; este es %d.%d (%s).\n"
+        "  El servicio usa anotaciones `X | None`, que en 3.9 fallan al importar.\n"
+        "  Instala uno mas nuevo y reinstala apuntando a el, o invocalo con ese binario."
+        % (sys.version_info[0], sys.version_info[1], sys.executable))
+
 _load_env_file()
 
 # ---------------------------------------------------------------- configuración
