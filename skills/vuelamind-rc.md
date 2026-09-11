@@ -26,7 +26,7 @@ red.
 - `install.py` — el instalador portable (abajo).
 
 El código se copia a `~/.claude/vuelamind-rc/`, la config a `~/.claude/vuelamind-rc.env`
-y el registro de sesiones a `~/.claude/liverpool-bridge-sessions.json`.
+y el registro de sesiones a `~/.claude/vuelamind-bridge-sessions.json`.
 
 ## Cómo instalar (lo hace el instalador, no a mano)
 

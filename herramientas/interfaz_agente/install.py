@@ -32,7 +32,7 @@ import urllib.request
 from pathlib import Path
 
 LABEL = "com.vuelamind.rc"
-OLD_LABELS = ["com.liverpool.session-bridge"]     # migración desde la versión a mano
+OLD_LABELS = ["ai.vuelamind.session-bridge"]      # etiquetas de versiones previas: se LEEN para migrar, nunca se crean
 HOME = Path.home()
 CONF_DIR = HOME / ".claude"
 ENV_FILE = CONF_DIR / "vuelamind-rc.env"

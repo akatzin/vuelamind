@@ -96,7 +96,7 @@ CLAUDE = os.environ.get("BRIDGE_CLAUDE_BIN") or shutil.which("claude") or \
 
 HTML_FILE = Path(__file__).resolve().parent / "session_bridge.html"
 CONF_DIR = Path.home() / ".claude"
-REGISTRY_FILE = Path(os.environ.get("BRIDGE_REGISTRY", CONF_DIR / "liverpool-bridge-sessions.json"))
+REGISTRY_FILE = Path(os.environ.get("BRIDGE_REGISTRY", CONF_DIR / "vuelamind-bridge-sessions.json"))
 
 # candados que sustituyen al token (ver docstring). Host y Origin permitidos.
 _LOCAL_HOSTS = {"127.0.0.1", "localhost", "::1", "[::1]"}
@@ -402,7 +402,7 @@ def stop_session(short_id: str) -> None:
 
 # ---------------------------------------------------------------- servidor HTTP
 class Handler(BaseHTTPRequestHandler):
-    server_version = "LiverpoolSessionBridge/1.0"
+    server_version = "VuelamindSessionBridge/1.0"
 
     # --- utilidades
     def _json(self, code: int, payload: dict) -> None:
