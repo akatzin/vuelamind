@@ -274,6 +274,34 @@ def uninstall_darwin():
 
 
 # --------------------------------------------------------------- Windows (schtasks)
+# MEDIDO en Windows 11 el 2026-09-11, con dos reinicios: la tarea se creaba bien —«At
+# logon time», usuario correcto— y NO DISPARABA NUNCA. Last Run Time se quedaba en la vez
+# que se forzó a mano. El sospechoso, señalado por quien lo midió y NO probado todavía:
+# `schtasks /Create` deja por defecto «No Start On Batteries / Stop On Battery Mode», que
+# es la causa clásica de tareas que no arrancan en VMs y portátiles.
+#
+# Por eso la tarea se crea ahora desde XML, que es la única vía por la que `schtasks` deja
+# declarar esas condiciones. El camino viejo queda de respaldo: si el XML falla, se hace
+# como antes y se DICE, en vez de quedarse sin autostart en silencio.
+#
+# Nota de formato, y muerde: `schtasks /Create /XML` quiere el archivo en UTF-16.
+TAREA_XML = """<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo><Description>vuelamind-rc session bridge</Description></RegistrationInfo>
+  <Triggers><LogonTrigger><Enabled>true</Enabled><UserId>{usuario}</UserId></LogonTrigger></Triggers>
+  <Principals><Principal id="Author"><UserId>{usuario}</UserId>
+    <LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
+  <Settings>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
+    <Enabled>true</Enabled>
+  </Settings>
+  <Actions Context="Author"><Exec><Command>{exe}</Command><Arguments>"{script}"</Arguments></Exec></Actions>
+</Task>"""
+
+
 def install_windows(python, script, port, start):
     pyw = python
     cand = Path(python).with_name("pythonw.exe")
@@ -282,8 +310,28 @@ def install_windows(python, script, port, start):
     tr = f'"{pyw}" "{script}"'
     subprocess.run(["schtasks", "/Delete", "/TN", "VuelamindRC", "/F"],
                    capture_output=True)
-    subprocess.run(["schtasks", "/Create", "/SC", "ONLOGON", "/TN", "VuelamindRC",
-                    "/TR", tr, "/RL", "LIMITED", "/F"], check=True)
+    usuario = os.environ.get("USERDOMAIN", "") + "\\" + os.environ.get("USERNAME", "")
+    xml = Path(os.environ.get("TEMP", ".")) / "vuelamind-rc-tarea.xml"
+    creada = False
+    try:
+        xml.write_text(TAREA_XML.format(usuario=usuario.lstrip("\\"), exe=pyw, script=script),
+                       encoding="utf-16")
+        r = subprocess.run(["schtasks", "/Create", "/TN", "VuelamindRC", "/XML", str(xml), "/F"],
+                           capture_output=True, text=True)
+        creada = r.returncode == 0
+        if not creada:
+            say(f"  aviso: no pude crear la tarea desde XML ({r.stderr.strip()[:120]});"
+                " uso el modo básico, que puede NO dispararse con la máquina en batería")
+    except Exception as e:
+        say(f"  aviso: fallo al escribir el XML de la tarea ({type(e).__name__}); uso el modo básico")
+    finally:
+        try:
+            xml.unlink()
+        except Exception:
+            pass
+    if not creada:
+        subprocess.run(["schtasks", "/Create", "/SC", "ONLOGON", "/TN", "VuelamindRC",
+                        "/TR", tr, "/RL", "LIMITED", "/F"], check=True)
     if start:
         # arranca ya, sin esperar al próximo login
         subprocess.Popen([pyw, str(script)],
