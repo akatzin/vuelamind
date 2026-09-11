@@ -78,8 +78,12 @@ es portable** — ésa es la separación que hace esto mudable de SO.
 3. **Adjuntos**: botón 📎, pegar, o arrastrar — texto/código (embebido), imágenes
    (`png/jpeg/gif/webp`) y PDF (bloques nativos).
 4. **En vivo**: cada turno muestra los pasos (`🔧 Bash`, `📖 Read`, `🌐 WebFetch`…)
-   con cronómetro, hasta la respuesta.
-5. **Cerrar sesión**: botón que la detiene y la olvida.
+   con cronómetro, hasta la respuesta. En la cabecera, el **medidor de contexto**
+   sube en vivo: `🧠 42% · 84k/200k · ↑1.2k tok` (ocupación real de la ventana +
+   tokens generados en el turno); si `claude` compacta en caliente, sale `🗜️`.
+5. **Autocompletar `/`**: al empezar el mensaje con `/`, se despliega la lista de
+   skills y comandos filtrada por prefijo (↑↓ para elegir, Enter/Tab para poner).
+6. **Cerrar sesión**: botón que la detiene y la olvida.
 
 ## Niveles de permiso (por sesión) — la decisión que importa
 
