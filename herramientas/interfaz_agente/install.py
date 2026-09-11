@@ -57,9 +57,17 @@ DEFAULTS = {"PORT": "8850", "BRIDGE_MODEL": ""}
 # UnicodeEncodeError al imprimir `→`; con 3.12 no truena pero el texto sale corrupto.
 # Mismo defecto, dos caras, y en macOS no se ve nunca. Se arregla en la SALIDA, una vez,
 # y así protege también las líneas que nadie ha escrito todavía.
+# NO se fuerza utf-8: se CONSERVA la codificación de la consola y solo se relaja el
+# error. MEDIDO el 2026-09-11 comparando las tres estrategias sobre la misma línea, tal
+# como la leería una consola cp1252:
+#   sin arreglo          → UnicodeEncodeError, el instalador muere
+#   utf-8 + replace      → «pÃ¡gina cÃ³digo aÃ±o»  (mojibake: no truena y no se entiende)
+#   conservar + replace  → «página código año», con `?` donde va la flecha  ← ésta
+# Forzar utf-8 arregla el crash y estropea los acentos, que en español son casi todo el
+# texto. Lo que cp1252 sí sabe escribir se escribe bien; lo que no, se marca.
 for _flujo in (sys.stdout, sys.stderr):
     try:
-        _flujo.reconfigure(encoding="utf-8", errors="replace")
+        _flujo.reconfigure(errors="replace")
     except Exception:
         pass
 
