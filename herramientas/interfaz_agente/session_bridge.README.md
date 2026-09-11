@@ -55,13 +55,25 @@ Lo que queda expuesto —y se asume— es **otro usuario/proceso LOCAL** en la m
 | GET | `/sessions` | — | registro local + salida de `claude agents --json --all` |
 | POST | `/sessions` | `{name, prompt, cwd?, model?, permission?, attachments?}` | `{name, session_id, text}` |
 | POST | `/sessions/<name>/messages` | `{message, attachments?}` | `{name, session_id, text}` (todo al final) |
-| POST | `/sessions/<name>/stream` | `{message, attachments?}` | **NDJSON en vivo**: `init` / `tool` / `text` / `result` / `error` |
+| POST | `/sessions/<name>/stream` | `{message, attachments?}` | **NDJSON en vivo**: `init` / `tool` / `text` / `usage` / `compact` / `result` / `error` |
 | POST | `/sessions/<name>/deliver` | `{message, attachments?}` | `{name, session_id, started}` — **entregar y soltar** |
 | DELETE | `/sessions/<name>` | — | `{deleted, stopped_short_id}` |
 
 `/stream` emite una línea JSON por evento según ocurre (progreso paso a paso: qué
 herramienta corre y con qué). La web lo usa para pintar `🔧 Bash: …`, `📖 Read: …`
 mientras el turno trabaja. `/messages` sigue existiendo (bloqueante) para `curl`.
+
+Además del progreso, `/stream` emite:
+
+- `init` → trae `commands` (lista de `slash_commands`) y `skills`. La web los usa
+  para el **autocompletar `/`** al componer el mensaje.
+- `usage` → `{context_tokens, output_tokens, window}` en **cada paso** `assistant`
+  y una vez `final:true` al cerrar. `context_tokens` es la **ocupación real** de la
+  ventana (el input del último paso, no la suma de facturación del `result`);
+  `window` = `contextWindow` del modelo (autoritativo en el `result`); `output_tokens`
+  = lo generado en el turno. La web lo pinta como `🧠 42% · 84k/200k · ↑1.2k tok`.
+- `compact` → `{trigger, pre_tokens}` cuando `claude` **compacta el contexto en
+  caliente** (evento `compact_boundary`). La web lo muestra como `🗜️ compactando…`.
 
 ### `/deliver` — entregar y soltar (despertar casas headless)
 
@@ -149,6 +161,8 @@ el nivel se fija al crearla (campo `permission`, o el selector en la web). Defau
 ## Variables de entorno
 
 `PORT`, `BRIDGE_MODEL`, `BRIDGE_PERMISSION`, `BRIDGE_CWD`, `BRIDGE_TIMEOUT`,
-`BRIDGE_DELIVER_INIT_TIMEOUT`, `BRIDGE_CLAUDE_BIN`, `BRIDGE_REGISTRY`.
+`BRIDGE_DELIVER_INIT_TIMEOUT`, `BRIDGE_CONTEXT_WINDOW` (default `200000`; solo el
+valor mientras el turno corre — el `result` trae el real), `BRIDGE_CLAUDE_BIN`,
+`BRIDGE_REGISTRY`.
 </content>
 </invoke>
