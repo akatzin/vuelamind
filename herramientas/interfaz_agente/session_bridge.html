@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Puente de sesiones — Vuelamind</title>
+<style>
+  :root{
+    color-scheme: light dark;
+    /* oscuro por defecto; el bloque de abajo lo cambia si el SO está en claro */
+    --bg:#1e1e1e; --panel:#262626; --line:#3a3a3a; --ink:#f0f0f0; --dim:#9b9b9b;
+    --field:#181818; --hover:#2e2e2e; --on:#3a3a3c; --chip:#333333;
+    --accent:#0a84ff; --accent-ink:#ffffff;
+    --user:#2f4257; --asst:#2a2a2a; --err:#4a2320;
+    --danger:#ff6b6b; --danger-line:#8a4032;
+    --ok:#34c759; --bad:#ff453a;
+  }
+  @media (prefers-color-scheme: light){
+    :root{
+      --bg:#ffffff; --panel:#f5f5f7; --line:#d9d9de; --ink:#1d1d1f; --dim:#6e6e73;
+      --field:#ffffff; --hover:#ececf0; --on:#e3e3ea; --chip:#e8e8ed;
+      --accent:#0071e3; --accent-ink:#ffffff;
+      --user:#d3e5fb; --asst:#f2f2f5; --err:#fdeceb;
+      --danger:#c0392b; --danger-line:#e6b3ac;
+      --ok:#28a745; --bad:#d70015;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+       background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column}
+  header{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header h1{font-size:14px;margin:0;font-weight:600;letter-spacing:.02em}
+  header .dot{width:9px;height:9px;border-radius:50%;background:var(--dim);flex:0 0 auto}
+  header .dot.ok{background:var(--ok)}header .dot.bad{background:var(--bad)}
+  header input{background:var(--field);border:1px solid var(--line);color:var(--ink);
+       padding:6px 8px;border-radius:7px;font:inherit;width:230px}
+  header .sp{flex:1}
+  button{background:var(--accent);background:AccentColor;color:var(--accent-ink);color:AccentColorText;
+       border:0;padding:6px 12px;border-radius:7px;font:inherit;font-weight:600;cursor:pointer}
+  input,textarea,select{accent-color:var(--accent)}
+  button.ghost{background:transparent;color:var(--dim);border:1px solid var(--line)}
+  button:disabled{opacity:.5;cursor:default}
+  main{flex:1;display:flex;min-height:0}
+  aside{width:250px;border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column}
+  aside .list{flex:1;overflow:auto}
+  .sess{padding:9px 14px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;flex-direction:column;gap:2px}
+  .sess:hover{background:var(--hover)}.sess.on{background:var(--on);border-left:3px solid var(--accent)}
+  .sess .n{font-weight:600}.sess .s{font-size:11px;color:var(--dim);font-family:ui-monospace,monospace}
+  aside .new{padding:10px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+  aside .new input,aside .new textarea,aside .new select{background:var(--field);border:1px solid var(--line);color:var(--ink);
+       padding:6px 8px;border-radius:7px;font:inherit}
+  aside .new textarea{resize:vertical;min-height:44px}
+  section{flex:1;display:flex;flex-direction:column;min-width:0}
+  .chathead{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .chathead .cur{font-weight:600}
+  .chathead .sp{flex:1}
+  button.danger{color:var(--danger);border-color:var(--danger-line)}
+  button.danger:hover{background:var(--err)}
+  .log{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
+  .msg{max-width:80%;padding:9px 12px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word}
+  .msg.user{align-self:flex-end;background:var(--user)}
+  .msg.asst{align-self:flex-start;background:var(--asst);border:1px solid var(--line);max-width:88%}
+  .msg.err{align-self:flex-start;background:var(--err);border:1px solid var(--danger-line)}
+  .msg .who{font-size:10px;color:var(--dim);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+  @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
+  .msg.stream{max-width:92%}
+  .msg.stream .st-status{font-style:italic;color:var(--dim);animation:pulse 1.4s ease-in-out infinite}
+  .msg.stream .st-steps{margin-top:6px;display:flex;flex-direction:column;gap:3px}
+  .msg.stream .st-step{font-size:12px;color:var(--dim);font-family:ui-monospace,SFMono-Regular,monospace;
+       white-space:pre-wrap;word-break:break-word;border-left:2px solid var(--line);padding-left:8px}
+  .composer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:var(--panel)}
+  .composer textarea{flex:1;background:var(--field);border:1px solid var(--line);color:var(--ink);
+       padding:9px 11px;border-radius:9px;font:inherit;resize:none;min-height:44px;max-height:180px}
+  .composer .attach{background:transparent;border:1px solid var(--line);color:var(--dim);
+       padding:0 12px;font-size:18px;line-height:1}
+  .attachbar{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 0}
+  .attachbar:empty{display:none}
+  .chip{display:flex;align-items:center;gap:4px;background:var(--chip);border:1px solid var(--line);
+       border-radius:14px;padding:3px 4px 3px 10px;font-size:12px}
+  .chip.bad{border-color:var(--danger-line);color:var(--danger)}
+  .chip .x{cursor:pointer;color:var(--dim);border:0;background:none;font-size:15px;padding:0 4px;line-height:1}
+  .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
+  .empty{margin:auto;color:var(--dim);text-align:center;padding:20px}
+  .hint{font-size:11px;color:var(--dim)}
+  /* markdown en las respuestas del asistente */
+  .msg .md{white-space:normal}
+  .msg .md>:first-child{margin-top:0}.msg .md>:last-child{margin-bottom:0}
+  .msg .md p{margin:.5em 0}
+  .msg .md strong{font-weight:700}.msg .md em{font-style:italic}
+  .msg .md h1,.msg .md h2,.msg .md h3,.msg .md h4,.msg .md h5,.msg .md h6{margin:.7em 0 .35em;line-height:1.25;font-weight:600}
+  .msg .md h1{font-size:1.35em}.msg .md h2{font-size:1.22em}.msg .md h3{font-size:1.1em}
+  .msg .md h4,.msg .md h5,.msg .md h6{font-size:1em}
+  .msg .md ul,.msg .md ol{margin:.4em 0;padding-left:1.4em}.msg .md li{margin:.15em 0}
+  .msg .md code{background:var(--field);border:1px solid var(--line);border-radius:5px;padding:.1em .35em;
+       font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
+  .msg .md pre{background:var(--field);border:1px solid var(--line);border-radius:9px;padding:10px 12px;overflow:auto;margin:.5em 0}
+  .msg .md pre code{background:none;border:0;padding:0;font-size:.9em;white-space:pre}
+  .msg .md blockquote{margin:.5em 0;padding:.2em .9em;border-left:3px solid var(--accent);color:var(--dim)}
+  .msg .md a{color:var(--accent)}
+  .msg .md hr{border:0;border-top:1px solid var(--line);margin:.8em 0}
+  .msg .md table{border-collapse:collapse;margin:.5em 0;font-size:.95em;display:block;overflow:auto}
+  .msg .md th,.msg .md td{border:1px solid var(--line);padding:5px 9px;text-align:left}
+  .msg .md th{background:var(--hover);font-weight:600}
+  /* botones de copiar */
+  .msg .who{display:flex;align-items:center;gap:8px}
+  .copy{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--dim);
+       border-radius:6px;padding:1px 8px;font-size:11px;line-height:1.7;cursor:pointer;
+       text-transform:none;font-weight:500;letter-spacing:0}
+  .copy:hover{color:var(--ink);border-color:var(--dim)}
+  .copy.ok{color:var(--ok);border-color:var(--ok)}
+  .msg .md pre{position:relative}
+  .msg .md pre .copy{position:absolute;top:6px;right:6px;margin:0;background:var(--panel);opacity:0;transition:opacity .12s}
+  .msg .md pre:hover .copy{opacity:1}
+</style>
+</head>
+<body>
+<header>
+  <span class="dot" id="dot"></span>
+  <h1>Puente de sesiones · Vuelamind</h1>
+  <span class="sp"></span>
+  <span class="hint">solo loopback · sin token</span>
+</header>
+<main>
+  <aside>
+    <div class="list" id="list"></div>
+    <div class="new">
+      <div class="hint">Nueva sesión</div>
+      <input id="newName" placeholder="nombre (a-z0-9._-)">
+      <textarea id="newPrompt" placeholder="primer mensaje…"></textarea>
+      <select id="newPerm" title="Nivel de permisos de la sesión">
+        <option value="full">Autonomía total (ejecuta / red / escribe)</option>
+        <option value="tools">Python + red acotada</option>
+        <option value="safe">Solo lectura / chat</option>
+      </select>
+      <select id="newModel" title="Modelo (vacío = el que use el servidor)">
+        <option value="">Modelo por defecto del servidor</option>
+        <option value="claude-opus-4-8">claude-opus-4-8 (este despliegue)</option>
+        <option value="claude-opus-5">claude-opus-5</option>
+        <option value="claude-sonnet-5">claude-sonnet-5</option>
+        <option value="claude-haiku-4-5-20251001">claude-haiku-4-5</option>
+      </select>
+      <button id="create">Crear sesión</button>
+    </div>
+  </aside>
+  <section>
+    <div class="chathead" id="chathead" style="display:none">
+      <span class="cur" id="curname"></span>
+      <span class="sp"></span>
+      <button id="close" class="ghost danger" title="Cerrar y borrar esta sesión">Cerrar sesión</button>
+    </div>
+    <div class="log" id="log"><div class="empty">Elige o crea una sesión.</div></div>
+    <div class="attachbar" id="attachbar"></div>
+    <div class="composer">
+      <input type="file" id="file" multiple hidden>
+      <button id="attach" class="ghost attach" title="Adjuntar archivo(s) de texto — o pega / arrastra al chat" disabled>📎</button>
+      <textarea id="input" placeholder="Escribe un mensaje…  (Enter envía · Shift+Enter salto · 📎 pega o arrastra texto/imágenes/PDF)" disabled></textarea>
+      <button id="send" disabled>Enviar</button>
+    </div>
+  </section>
+</main>
+<script>
+const $ = s => document.querySelector(s);
+const state = { current: null };
+
+function hdrs(){ return { "Content-Type":"application/json" }; }
+function setDot(ok){ $("#dot").className = "dot " + (ok?"ok":"bad"); }
+
+// transcript local por sesión (la API no guarda historial completo)
+function tx(name){ try{return JSON.parse(localStorage.getItem("tx:"+name))||[]}catch{return[]} }
+function pushTx(name,role,text){ const t=tx(name); t.push({role,text}); localStorage.setItem("tx:"+name,JSON.stringify(t)); }
+
+// ---- adjuntos: texto/código (embebido), imágenes y PDF (base64, bloque nativo) ----
+// atts: {name, ok, reason, kind:"text"|"media", text?, media_type?, data?}
+const atts = [];
+const MAX_TEXT = 512*1024, MAX_IMG = 5*1024*1024, MAX_PDF = 20*1024*1024;
+const IMG_TYPES = ["image/png","image/jpeg","image/gif","image/webp"];
+const TEXT_EXT = /\.(txt|md|markdown|mdx|rst|json|jsonl|ndjson|csv|tsv|log|ya?ml|toml|ini|conf|cfg|env|properties|xml|html?|css|scss|sass|less|js|mjs|cjs|jsx|ts|tsx|py|rb|go|rs|java|kt|kts|scala|c|h|cc|cpp|hpp|hh|m|mm|cs|php|swift|dart|lua|pl|r|sh|bash|zsh|fish|ps1|bat|sql|graphql|gql|proto|tf|hcl|dockerfile|makefile|gitignore|gitattributes|editorconfig)$/i;
+function isImage(f){ const t=(f.type||"").toLowerCase(); return t.startsWith("image/") && t!=="image/svg+xml"; }
+function isPdf(f){ return (f.type||"").toLowerCase()==="application/pdf" || /\.pdf$/i.test(f.name||""); }
+function isText(f){
+  const n=(f.name||"").toLowerCase(), t=(f.type||"").toLowerCase();
+  if(t.startsWith("text/")) return true;
+  if(/(json|xml|javascript|ecmascript|csv|yaml|x-sh|x-python|svg)/.test(t)) return true;
+  if(TEXT_EXT.test(n) || /(^|\/)(dockerfile|makefile)$/.test(n)) return true;
+  if(t==="" && f.size<=MAX_TEXT) return true;   // sin tipo → intentamos como texto
+  return false;
+}
+function renderAtts(){
+  const bar=$("#attachbar"); bar.innerHTML="";
+  atts.forEach((a,i)=>{
+    const c=document.createElement("div"); c.className="chip"+(a.ok?"":" bad");
+    const icon=!a.ok?"⚠️":a.kind==="media"?(a.media_type==="application/pdf"?"📕":"🖼️"):"📄";
+    const s=document.createElement("span");
+    s.textContent=icon+" "+a.name+(a.ok?"":" — "+a.reason);
+    const x=document.createElement("button"); x.className="x"; x.textContent="×"; x.title="quitar";
+    x.onclick=()=>{ atts.splice(i,1); renderAtts(); };
+    c.appendChild(s); c.appendChild(x); bar.appendChild(c);
+  });
+}
+function readB64(f,cb){ const r=new FileReader(); r.onload=()=>cb(String(r.result).split(",")[1]||""); r.onerror=()=>cb(null); r.readAsDataURL(f); }
+function addFiles(files){
+  [...files].forEach(f=>{
+    const push=(o)=>{ atts.push(o); renderAtts(); };
+    if(isImage(f)){
+      if(f.size>MAX_IMG) return push({name:f.name,ok:false,reason:"imagen muy grande (>5 MB)"});
+      const mt=IMG_TYPES.includes((f.type||"").toLowerCase())?f.type.toLowerCase():"image/png";
+      return readB64(f,d=> d?push({name:f.name,ok:true,kind:"media",media_type:mt,data:d})
+                            :push({name:f.name,ok:false,reason:"no se pudo leer"}));
+    }
+    if(isPdf(f)){
+      if(f.size>MAX_PDF) return push({name:f.name,ok:false,reason:"PDF muy grande (>20 MB)"});
+      return readB64(f,d=> d?push({name:f.name,ok:true,kind:"media",media_type:"application/pdf",data:d})
+                            :push({name:f.name,ok:false,reason:"no se pudo leer"}));
+    }
+    if(isText(f)){
+      if(f.size>MAX_TEXT) return push({name:f.name,ok:false,reason:"texto muy grande (>512 KB)"});
+      const r=new FileReader();
+      r.onload=()=>push({name:f.name,ok:true,kind:"text",text:String(r.result)});
+      r.onerror=()=>push({name:f.name,ok:false,reason:"no se pudo leer"});
+      return r.readAsText(f);
+    }
+    push({name:f.name,ok:false,reason:"tipo no soportado"});
+  });
+}
+function clearAtts(){ atts.length=0; renderAtts(); }
+function buildMessage(userText){
+  let m=userText;
+  atts.filter(a=>a.ok&&a.kind==="text").forEach(a=>{
+    const ext=(a.name.split(".").pop()||"").toLowerCase();
+    const fence=/[a-z0-9]/i.test(ext)&&ext.length<=12?ext:"";
+    m += (m?"\n\n":"")+`--- Archivo adjunto: ${a.name} ---\n\`\`\`${fence}\n${a.text}\n\`\`\``;
+  });
+  return m;
+}
+function buildAttachments(){
+  return atts.filter(a=>a.ok&&a.kind==="media").map(a=>({name:a.name,media_type:a.media_type,data:a.data}));
+}
+
+async function api(method, path, body){
+  const r = await fetch(path, {method, headers:hdrs(), body: body?JSON.stringify(body):undefined});
+  setDot(r.ok);
+  const j = await r.json().catch(()=>({error:"respuesta no-JSON"}));
+  if(!r.ok) throw new Error(j.error || ("HTTP "+r.status) + (j.detail?" — "+j.detail:""));
+  return j;
+}
+
+async function refresh(){
+  try{
+    const j = await api("GET","/sessions");
+    const list = $("#list"); list.innerHTML="";
+    (j.sessions||[]).forEach(s=>{
+      const d=document.createElement("div");
+      d.className="sess"+(s.name===state.current?" on":"");
+      const perm={full:"⚡autonomía",tools:"🐍python",safe:"👁solo-lectura"}[s.permission]||s.permission||"";
+      d.innerHTML=`<span class="n">${s.name}</span><span class="s">${(s.session_id||"").slice(0,8)} · ${s.live_state||"idle"} · ${perm}</span>`;
+      d.onclick=()=>select(s.name);
+      list.appendChild(d);
+    });
+    if(!(j.sessions||[]).length) list.innerHTML='<div class="empty">Sin sesiones aún.</div>';
+  }catch(e){ setDot(false); }
+}
+
+// ---- markdown → HTML, autocontenido (sin dependencias) ----
+// Regla de oro: ESCAPAR primero. El texto del modelo se pinta como HTML, así que
+// cualquier < > & del contenido debe neutralizarse antes de formatear, o es XSS.
+function escHtml(s){ return String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c])); }
+function mdInline(s){                       // s YA viene escapado
+  const codes=[];                           // proteger `código` de los demás pasos
+  s=s.replace(/`([^`]+)`/g,(m,c)=>{ codes.push(c); return ""+(codes.length-1)+""; });
+  s=s.replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  s=s.replace(/(^|[\s(])__(?=\S)([^_]+?)__(?=[\s).,!?;:]|$)/g,"$1<strong>$2</strong>");
+  s=s.replace(/(^|[^*])\*(?=\S)([^*]+?)\*/g,"$1<em>$2</em>");
+  s=s.replace(/(^|[\s(])_(?=\S)([^_]+?)_(?=[\s).,!?;:]|$)/g,"$1<em>$2</em>");   // evita partir snake_case
+  s=s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+|mailto:[^\s)]+)\)/g,(m,txt,url)=>
+      '<a href="'+url.replace(/"/g,"%22")+'" target="_blank" rel="noopener noreferrer">'+txt+'</a>');
+  return s.replace(/(\d+)/g,(m,i)=>"<code>"+codes[i]+"</code>");
+}
+function mdToHtml(src){
+  const lines=String(src).replace(/\r\n?/g,"\n").split("\n");
+  let html="", i=0; const para=[];
+  const flush=()=>{ if(para.length){ html+="<p>"+mdInline(escHtml(para.join(" ")))+"</p>"; para.length=0; } };
+  const parseRow=r=>r.replace(/^\s*\|/,"").replace(/\|\s*$/,"").split("|").map(c=>c.trim());
+  while(i<lines.length){
+    const line=lines[i];
+    const fence=line.match(/^```(.*)$/);
+    if(fence){ flush(); const code=[]; i++;
+      while(i<lines.length && !/^```/.test(lines[i])){ code.push(lines[i]); i++; } i++;
+      html+="<pre><code>"+escHtml(code.join("\n"))+"</code></pre>"; continue; }
+    const h=line.match(/^(#{1,6})\s+(.*)$/);
+    if(h){ flush(); const lv=h[1].length; html+="<h"+lv+">"+mdInline(escHtml(h[2].trim()))+"</h"+lv+">"; i++; continue; }
+    if(/^\s*$/.test(line)){ flush(); i++; continue; }
+    if(/^\s*([-*_])(\s*\1){2,}\s*$/.test(line)){ flush(); html+="<hr>"; i++; continue; }
+    if(/^\s*>\s?/.test(line)){ flush(); const q=[];
+      while(i<lines.length && /^\s*>\s?/.test(lines[i])){ q.push(lines[i].replace(/^\s*>\s?/,"")); i++; }
+      html+="<blockquote>"+mdToHtml(q.join("\n"))+"</blockquote>"; continue; }
+    if(line.includes("|") && i+1<lines.length && /^\s*\|?[\s:|-]*-[\s:|-]*\|?\s*$/.test(lines[i+1])){
+      flush(); const head=parseRow(line); i+=2; const rows=[];
+      while(i<lines.length && lines[i].includes("|") && !/^\s*$/.test(lines[i])){ rows.push(parseRow(lines[i])); i++; }
+      html+="<table><thead><tr>"+head.map(c=>"<th>"+mdInline(escHtml(c))+"</th>").join("")+"</tr></thead><tbody>"+
+        rows.map(r=>"<tr>"+r.map(c=>"<td>"+mdInline(escHtml(c))+"</td>").join("")+"</tr>").join("")+"</tbody></table>"; continue; }
+    if(/^\s*([-*+])\s+/.test(line) || /^\s*\d+\.\s+/.test(line)){ flush();
+      const ordered=/^\s*\d+\.\s+/.test(line); const items=[];
+      while(i<lines.length && (/^\s*([-*+])\s+/.test(lines[i]) || /^\s*\d+\.\s+/.test(lines[i]))){
+        items.push(lines[i].replace(/^\s*([-*+]|\d+\.)\s+/,"")); i++; }
+      html+=(ordered?"<ol>":"<ul>")+items.map(it=>"<li>"+mdInline(escHtml(it))+"</li>").join("")+(ordered?"</ol>":"</ul>"); continue; }
+    para.push(line.trim()); i++;
+  }
+  flush(); return html;
+}
+
+// botón de copiar reutilizable. getText() devuelve el texto crudo a copiar.
+function mkCopy(getText, title){
+  const b=document.createElement("button"); b.type="button"; b.className="copy";
+  b.textContent="Copiar"; b.title=title||"Copiar";
+  b.onclick=async e=>{
+    e.stopPropagation();
+    const text=getText()||"";
+    try{ await navigator.clipboard.writeText(text); }   // 127.0.0.1 es contexto seguro
+    catch{                                               // respaldo si no hay Clipboard API
+      const ta=document.createElement("textarea"); ta.value=text;
+      ta.style.position="fixed"; ta.style.opacity="0"; document.body.appendChild(ta);
+      ta.select(); try{ document.execCommand("copy"); }catch{} ta.remove();
+    }
+    b.textContent="✓"; b.classList.add("ok");
+    setTimeout(()=>{ b.textContent="Copiar"; b.classList.remove("ok"); }, 1000);
+  };
+  return b;
+}
+
+function render(){
+  const log=$("#log");
+  if(!state.current){ log.innerHTML='<div class="empty">Elige o crea una sesión.</div>'; return; }
+  log.innerHTML="";
+  tx(state.current).forEach(m=>{
+    const d=document.createElement("div");
+    d.className="msg "+(m.role==="user"?"user":m.role==="err"?"err":"asst");
+    const who=document.createElement("div"); who.className="who";
+    who.appendChild(document.createTextNode(m.role==="user"?"tú":m.role==="err"?"error":state.current));
+    if(m.role!=="user") who.appendChild(mkCopy(()=>m.text, "Copiar la respuesta"));   // copiar el mensaje entero
+    d.appendChild(who);
+    if(m.role==="asst"){                     // solo el asistente se renderiza como markdown
+      const body=document.createElement("div"); body.className="md";
+      body.innerHTML=mdToHtml(m.text||"");
+      body.querySelectorAll("pre").forEach(pre=>{        // + copiar cada bloque de código
+        const code=pre.querySelector("code");
+        pre.appendChild(mkCopy(()=> code?code.textContent:pre.textContent, "Copiar el código"));
+      });
+      d.appendChild(body);
+    } else {                                 // tú y los errores quedan literales (pre-wrap del .msg)
+      d.appendChild(document.createTextNode(m.text));
+    }
+    log.appendChild(d);
+  });
+  log.scrollTop=log.scrollHeight;
+}
+
+function select(name){
+  state.current=name;
+  $("#input").disabled=false; $("#send").disabled=false; $("#attach").disabled=false;
+  $("#chathead").style.display="flex"; $("#curname").textContent=name;
+  clearAtts();
+  document.querySelectorAll(".sess").forEach(e=>e.classList.toggle("on",e.querySelector(".n").textContent===name));
+  render();
+}
+
+async function closeSession(){
+  const name=state.current; if(!name) return;
+  if(!confirm(`¿Cerrar y borrar la sesión "${name}"? Se detiene y se olvida su historial local.`)) return;
+  $("#close").disabled=true;
+  try{
+    await api("DELETE","/sessions/"+encodeURIComponent(name));
+    localStorage.removeItem("tx:"+name);
+    state.current=null;
+    $("#input").disabled=true; $("#send").disabled=true; $("#attach").disabled=true;
+    $("#chathead").style.display="none"; clearAtts();
+    $("#log").innerHTML='<div class="empty">Sesión cerrada. Elige o crea otra.</div>';
+    await refresh();
+  }catch(e){ alert("No se pudo cerrar: "+e.message); }
+  $("#close").disabled=false;
+}
+$("#close").onclick=closeSession;
+
+
+$("#create").onclick=async()=>{
+  const name=$("#newName").value.trim(), prompt=$("#newPrompt").value.trim();
+  const permission=$("#newPerm").value, model=$("#newModel").value;
+  if(!name||!prompt){ alert("Falta nombre o primer mensaje"); return; }
+  $("#create").disabled=true; const lbl=$("#create").textContent; $("#create").textContent="Creando…";
+  try{
+    const body={name,prompt,permission}; if(model) body.model=model;
+    const j=await api("POST","/sessions",body);
+    pushTx(name,"user",prompt); pushTx(name,"asst",j.text||"");
+    $("#newName").value=""; $("#newPrompt").value="";
+    await refresh(); select(name);
+  }catch(e){ alert("No se pudo crear: "+e.message); }
+  $("#create").disabled=false; $("#create").textContent=lbl;
+};
+
+// ---- panel de progreso en vivo (streaming NDJSON) ----
+const TOOL_ICON={Bash:"🔧",Read:"📖",Write:"✍️",Edit:"✏️",NotebookEdit:"✏️",
+  WebFetch:"🌐",WebSearch:"🔎",Grep:"🔎",Glob:"🔎",Task:"🤖",Skill:"🧩"};
+function startStream(){
+  const log=$("#log");
+  const d=document.createElement("div"); d.className="msg asst stream"; d.id="stream";
+  d.innerHTML=`<div class="who">${state.current}</div>`;
+  const status=document.createElement("div"); status.className="st-status"; d.appendChild(status);
+  const steps=document.createElement("div"); steps.className="st-steps"; d.appendChild(steps);
+  log.appendChild(d); log.scrollTop=log.scrollHeight;
+  const t0=Date.now();
+  const upd=()=>{ const n=Math.round((Date.now()-t0)/1000);
+    status.textContent="⏳ trabajando… "+(n<60?n+"s":Math.floor(n/60)+"m "+(n%60)+"s"); };
+  upd(); const timer=setInterval(upd,1000);
+  return {el:d, status, steps, timer};
+}
+function addStep(p, icon, text){
+  const s=document.createElement("div"); s.className="st-step";
+  s.textContent=icon+" "+text; p.steps.appendChild(s);
+  $("#log").scrollTop=$("#log").scrollHeight;
+}
+function handleEv(ev, p){
+  if(ev.kind==="tool"){
+    addStep(p, TOOL_ICON[ev.name]||"🔧", ev.name+(ev.brief?": "+ev.brief:""));
+  } else if(ev.kind==="text"){
+    const t=ev.text.trim(); if(t) addStep(p, "💬", t.length>240?t.slice(0,240)+"…":t);
+  } else if(ev.kind==="error"){
+    addStep(p, "⚠️", (ev.error||"error").slice(0,240));
+  }
+}
+function endStream(p){ if(p&&p.timer)clearInterval(p.timer); if(p&&p.el)p.el.remove(); }
+
+async function send(){
+  const t=$("#input").value.trim();
+  const okAtts=atts.filter(a=>a.ok);
+  if((!t && !okAtts.length) || !state.current) return;
+  const message=buildMessage(t);
+  const attachments=buildAttachments();
+  const shown = t + (okAtts.length ? (t?"\n":"")+"📎 "+okAtts.map(a=>a.name).join(", ") : "");
+  $("#input").value=""; clearAtts(); $("#send").disabled=true;
+  pushTx(state.current,"user",shown); render();
+  const panel=startStream();
+  let finalText="", isErr=false;
+  try{
+    const body={message}; if(attachments.length) body.attachments=attachments;
+    const r=await fetch(`/sessions/${encodeURIComponent(state.current)}/stream`,
+                        {method:"POST", headers:hdrs(), body:JSON.stringify(body)});
+    setDot(r.ok);
+    if(!r.ok){ const j=await r.json().catch(()=>({})); throw new Error(j.error||("HTTP "+r.status)); }
+    const reader=r.body.getReader(), dec=new TextDecoder(); let buf="";
+    for(;;){
+      const {value,done}=await reader.read(); if(done) break;
+      buf+=dec.decode(value,{stream:true});
+      let nl;
+      while((nl=buf.indexOf("\n"))>=0){
+        const line=buf.slice(0,nl).trim(); buf=buf.slice(nl+1);
+        if(!line) continue;
+        let ev; try{ ev=JSON.parse(line); }catch{ continue; }
+        handleEv(ev, panel);
+        if(ev.kind==="result"){ finalText=ev.text||""; isErr=!!ev.is_error; }
+        if(ev.kind==="error"){ isErr=true; if(!finalText) finalText=ev.error||"error"; }
+      }
+    }
+    endStream(panel);
+    pushTx(state.current, isErr?"err":"asst", finalText || (isErr?"(error)":""));
+  }catch(e){ endStream(panel); setDot(false); pushTx(state.current,"err",e.message); }
+  render(); $("#send").disabled=false; $("#input").focus();
+}
+$("#send").onclick=send;
+$("#input").addEventListener("keydown",e=>{ if(e.key==="Enter"&&!e.shiftKey){ e.preventDefault(); send(); }});
+
+// adjuntar: botón + selector de archivos
+$("#attach").onclick=()=>$("#file").click();
+$("#file").addEventListener("change",e=>{ if(e.target.files.length) addFiles(e.target.files); e.target.value=""; });
+
+// pegar: si el portapapeles trae archivos (p. ej. captura), se adjuntan
+$("#input").addEventListener("paste",e=>{
+  const f=e.clipboardData&&e.clipboardData.files;
+  if(f&&f.length){ e.preventDefault(); addFiles(f); }
+});
+
+// arrastrar y soltar sobre el chat
+const logEl=$("#log");
+["dragenter","dragover"].forEach(ev=>logEl.addEventListener(ev,e=>{
+  if(!state.current) return; e.preventDefault(); logEl.classList.add("drop");
+}));
+["dragleave","drop"].forEach(ev=>logEl.addEventListener(ev,e=>{
+  e.preventDefault(); logEl.classList.remove("drop");
+}));
+logEl.addEventListener("drop",e=>{
+  if(state.current && e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
+});
+
+refresh(); setInterval(refresh, 8000);
+</script>
+</body>
+</html>
