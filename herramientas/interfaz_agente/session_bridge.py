@@ -92,6 +92,10 @@ TURN_TIMEOUT = int(os.environ.get("BRIDGE_TIMEOUT", "600"))   # segundos por tur
 # El turno YA arranca en segundos; este tope solo evita que el handler cuelgue si
 # claude no emite init (p.ej. no arrancó). El turno, si arrancó, sigue en background.
 DELIVER_INIT_TIMEOUT = int(os.environ.get("BRIDGE_DELIVER_INIT_TIMEOUT", "120"))
+# ventana de contexto del modelo, para pintar el % en vivo. El valor autoritativo
+# llega en result.modelUsage.contextWindow; éste es el default mientras el turno
+# corre (aún no hay result). 200000 = opus/sonnet en este despliegue.
+CONTEXT_WINDOW = int(os.environ.get("BRIDGE_CONTEXT_WINDOW", "200000"))
 
 CLAUDE = os.environ.get("BRIDGE_CLAUDE_BIN") or shutil.which("claude") or \
     str(Path.home() / ".local/bin/claude")
@@ -271,6 +275,7 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
                             "message": {"role": "user", "content": content}}) + "\n"
 
     sid, final_text, is_error = session_id, None, False
+    out_total, last_ctx = 0, 0   # tokens generados en el turno · último tamaño de contexto
     try:
         proc = subprocess.Popen(args, cwd=cwd, stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -300,17 +305,48 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
                 sid = ev["session_id"]
             t = ev.get("type")
             if t == "system" and ev.get("subtype") == "init":
-                emit({"kind": "init", "session_id": sid})
+                # slash_commands/skills viajan en el init: la web los usa para el
+                # autocomplete. Son del install entero, iguales para toda sesión.
+                emit({"kind": "init", "session_id": sid,
+                      "commands": ev.get("slash_commands") or [],
+                      "skills": ev.get("skills") or []})
+            elif t == "system" and ev.get("subtype") == "compact_boundary":
+                # el turno cruzó el umbral y claude compactó el contexto en caliente
+                cm = ev.get("compact_metadata") or {}
+                emit({"kind": "compact", "trigger": cm.get("trigger"),
+                      "pre_tokens": cm.get("pre_tokens")})
             elif t == "assistant":
-                for blk in ev.get("message", {}).get("content", []):
+                msg = ev.get("message", {})
+                for blk in msg.get("content", []):
                     if blk.get("type") == "tool_use":
                         emit({"kind": "tool", "name": blk.get("name"),
                               "brief": _tool_brief(blk.get("name"), blk.get("input"))})
                     elif blk.get("type") == "text" and blk.get("text", "").strip():
                         emit({"kind": "text", "text": blk["text"]})
+                # uso: el contexto es todo lo que entró (fresco + caché); el gasto
+                # del turno es la suma de lo generado en cada paso assistant.
+                u = msg.get("usage") or {}
+                if u:
+                    last_ctx = (u.get("input_tokens", 0)
+                                + u.get("cache_creation_input_tokens", 0)
+                                + u.get("cache_read_input_tokens", 0))
+                    out_total += u.get("output_tokens", 0)
+                    emit({"kind": "usage", "context_tokens": last_ctx,
+                          "output_tokens": out_total, "window": CONTEXT_WINDOW})
             elif t == "result":
                 final_text = ev.get("result")
                 is_error = bool(ev.get("is_error")) or ev.get("subtype") != "success"
+                # cierre autoritativo, con cuidado: result.usage SUMA el input de
+                # cada llamada del turno (vista de facturación), NO la ocupación de
+                # la ventana. La ocupación real es el último input por paso (last_ctx);
+                # del result tomamos sólo el contextWindow real y el total generado.
+                ru = ev.get("usage") or {}
+                mu = ev.get("modelUsage") or {}
+                win = next((m.get("contextWindow") for m in mu.values()
+                            if isinstance(m, dict) and m.get("contextWindow")), None)
+                emit({"kind": "usage", "context_tokens": last_ctx,
+                      "output_tokens": ru.get("output_tokens") or out_total,
+                      "window": win or CONTEXT_WINDOW, "final": True})
         proc.wait()
     finally:
         timer.cancel()
