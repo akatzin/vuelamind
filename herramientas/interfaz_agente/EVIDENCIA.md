@@ -56,8 +56,10 @@ Vertex, región, `cwd`, puerto, permiso, ruta de `claude`) vive en `~/.claude/vu
 
 ## Decisiones del mantenedor del canon (arbitrajes)
 
-Marcadas `INFERIDO` — son la lectura de quien **opera** el servicio, sujetas a la palabra de
-quien mantiene el canon:
+Nacieron `INFERIDO` — la lectura de quien **opera** el servicio, sujeta a la palabra de
+quien mantiene el canon. **Esa palabra ya está dada** (Akatzin, 2026-09-11), y cada
+arbitraje lleva abajo lo que quedó y cómo se aplicó. La recomendación original se conserva
+**sin reescribir**: era el insumo, no la decisión.
 
 1. **Token.** Recomendación: **opcional, apagado por defecto, exigido cuando el host no sea
    de un solo usuario.** En máquina de un dueño los candados `Host`+`Origin` bastan (MEDIDO);
@@ -73,6 +75,28 @@ quien mantiene el canon:
    puerto colisiona con otro servicio local. El número canónico lo fija el canon.
 4. **Windows/Linux.** Se quedan **INFERIDO** hasta que alguien los corra en máquinas reales;
    este PR no reclama paridad.
+
+## Lo que se decidió, y cómo quedó aplicado
+
+*Palabra de Akatzin, 2026-09-11, con el juicio del vigía delante. Aplicado por la casa
+vigía sobre el trabajo de su autor — el código es suyo; estos cambios son el arbitraje.*
+
+1. **Token.** Queda como se recomendó en el fondo, pero **más duro en la forma**: no hay
+   nivel de permiso por omisión. El servicio **se niega a arrancar** sin `BRIDGE_PERMISSION`
+   declarado, el instalador **exige** `--permission`, y un nivel desconocido **revienta en
+   vez de degradarse a `full`**. Lo anterior hacía `PERMISSION_ARGS.get(nivel, full)`: una
+   errata en el `.env` concedía ejecución arbitraria. **Falla cerrado, como el resto del
+   marco.**
+2. **Modelo.** Un solo default y **vacío** (= el del CLI). Se quitaron los dos que había
+   —`claude-opus-4-8` en el instalador y `opus` en el servicio, que además se contradecían—
+   y el flag `--model` **solo viaja si hay modelo declarado**.
+3. **Puerto.** El canon fija **8850**. Barrido por `grep` en código, README y skill, no de
+   memoria.
+4. **`deliver`.** Se juzgó como contrato el 2026-09-11 y **entra**, con una condición que ya
+   está escrita en el README y en el skill: declarar que **no comprueba el desenlace** si el
+   turno muere después de arrancar.
+5. **Windows y Linux** siguen `INFERIDO`. No se tocó nada ahí, y este trabajo tampoco
+   reclama paridad.
 
 ## Nota de origen
 

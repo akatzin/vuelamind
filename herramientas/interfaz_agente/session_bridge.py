@@ -13,7 +13,7 @@ que continúa la conversación guardada, corre un turno, y devuelve JSON limpio.
 
 Seguridad (decidido para este dominio):
   - Escucha SOLO en 127.0.0.1. El acceso "desde fuera" es por TÚNEL SSH:
-        ssh -N -L 8787:127.0.0.1:8787 <usuario>@<esta-máquina>
+        ssh -N -L 8850:127.0.0.1:8850 <usuario>@<esta-máquina>
     Así nunca se abre nada a 0.0.0.0 (evita el #119).
   - SIN token: el modelo de confianza es "solo esta máquina". Dos candados en su
     lugar, porque loopback NO basta contra el navegador:
@@ -27,7 +27,7 @@ Seguridad (decidido para este dominio):
     así que un subproceso sin --model explícito a un modelo válido falla (404).
 
 Uso:
-    python3 session_bridge.py                 # 127.0.0.1:8787
+    python3 session_bridge.py                 # 127.0.0.1:8850
     PORT=9000 python3 session_bridge.py       # otro puerto
 
 Endpoints (JSON):
@@ -82,8 +82,10 @@ _load_env_file()
 
 # ---------------------------------------------------------------- configuración
 HOST = "127.0.0.1"                                   # loopback SIEMPRE; salir por túnel SSH
-PORT = int(os.environ.get("PORT", "8787"))
-DEFAULT_MODEL = os.environ.get("BRIDGE_MODEL", "opus")   # haiku no existe en este despliegue
+PORT = int(os.environ.get("PORT", "8850"))   # canonico del marco; 8787 colisiona
+DEFAULT_MODEL = os.environ.get("BRIDGE_MODEL", "")   # vacio = el default del CLI.
+# El canon NO congela un id de modelo: "solo opus" fue un hecho del Model Garden de
+# origen, no del marco, y un id fijo revienta donde no este aprovisionado.
 DEFAULT_CWD = os.environ.get("BRIDGE_CWD", str(Path(__file__).resolve().parent.parent))
 TURN_TIMEOUT = int(os.environ.get("BRIDGE_TIMEOUT", "600"))   # segundos por turno
 # entregar-y-soltar: cuánto espera el handler el evento 'init' antes de rendirse.
@@ -168,7 +170,7 @@ def build_content(text: str, attachments: list | None) -> list:
 #   full  → autonomía total: ejecuta python/red/escritura sin preguntar.
 #   tools → default + allowlist: corre python y consulta la web, nada más auto.
 #   safe  → solo lectura/chat (lo que no pide permiso). Sin banderas extra.
-DEFAULT_PERMISSION = os.environ.get("BRIDGE_PERMISSION", "full")
+DEFAULT_PERMISSION = os.environ.get("BRIDGE_PERMISSION")   # SIN valor por omision
 PERMISSION_ARGS = {
     "full": ["--permission-mode", "bypassPermissions"],
     "tools": ["--allowedTools", "Bash(python3:*)", "Bash(python:*)", "WebFetch"],
@@ -177,7 +179,16 @@ PERMISSION_ARGS = {
 
 
 def permission_args(level: str | None) -> list:
-    return PERMISSION_ARGS.get(level or DEFAULT_PERMISSION, PERMISSION_ARGS["full"])
+    """Falla CERRADO. Un nivel ausente o desconocido no se degrada a `full`: revienta.
+
+    Lo anterior hacia `PERMISSION_ARGS.get(nivel, PERMISSION_ARGS["full"])`, asi que
+    una errata en el `.env` o un registro viejo concedian ejecucion arbitraria sin que
+    nadie lo pidiera. El resto del marco falla cerrado; esto tambien.
+    """
+    nivel = level or DEFAULT_PERMISSION
+    if nivel not in PERMISSION_ARGS:
+        raise ValueError(f"nivel de permiso desconocido o no declarado: {nivel!r}")
+    return PERMISSION_ARGS[nivel]
 
 
 def run_turn(text: str, attachments: list | None, session_id: str | None,
@@ -188,7 +199,9 @@ def run_turn(text: str, attachments: list | None, session_id: str | None,
     args = [CLAUDE, "-p",
             "--input-format", "stream-json",
             "--output-format", "stream-json", "--verbose",
-            "--model", model]
+            ]
+    if model:
+        args += ["--model", model]
     args += permission_args(permission)
     if session_id:
         args += ["--resume", session_id]
@@ -247,7 +260,9 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
     args = [CLAUDE, "-p",
             "--input-format", "stream-json",
             "--output-format", "stream-json", "--verbose",
-            "--model", model]
+            ]
+    if model:
+        args += ["--model", model]
     args += permission_args(permission)
     if session_id:
         args += ["--resume", session_id]
@@ -325,7 +340,9 @@ def deliver_turn(text: str, attachments: list | None, session_id: str | None,
     args = [CLAUDE, "-p",
             "--input-format", "stream-json",
             "--output-format", "stream-json", "--verbose",
-            "--model", model]
+            ]
+    if model:
+        args += ["--model", model]
     args += permission_args(permission)
     if session_id:
         args += ["--resume", session_id]
@@ -662,10 +679,21 @@ def _now() -> str:
 def main():
     if not Path(CLAUDE).exists() and not shutil.which(CLAUDE):
         sys.exit(f"no encuentro el binario claude en: {CLAUDE}")
+    # El nivel de permiso NO tiene valor por omision: sin declararlo, no se arranca.
+    # `full` concede ejecucion arbitraria, y nadie debe heredarla por no haber escrito
+    # nada. Quien la quiere, la firma en su .env.
+    if DEFAULT_PERMISSION is None:
+        sys.exit("ME NIEGO A ARRANCAR: BRIDGE_PERMISSION no esta declarado.\n"
+                 "  Escribelo en ~/.claude/vuelamind-rc.env con uno de: full | tools | safe\n"
+                 "  full = ejecucion arbitraria con tus privilegios. No hay default a proposito.")
+    if DEFAULT_PERMISSION not in PERMISSION_ARGS:
+        sys.exit(f"ME NIEGO A ARRANCAR: BRIDGE_PERMISSION={DEFAULT_PERMISSION!r} no existe. "
+                 "Usa full | tools | safe.")
     srv = ThreadingHTTPServer((HOST, PORT), Handler)
     print(f"puente escuchando en http://{HOST}:{PORT}  (solo loopback, sin token)")
     print(f"candados: allowlist de Host + chequeo de Origin en POST/DELETE")
-    print(f"modelo por defecto: {DEFAULT_MODEL}   ·   cwd por defecto: {DEFAULT_CWD}")
+    print(f"modelo por defecto: {DEFAULT_MODEL or '(el del CLI)'}   ·   cwd por defecto: {DEFAULT_CWD}")
+    print(f"permiso por defecto: {DEFAULT_PERMISSION}   (declarado, no heredado)")
     print(f"desde otra máquina:  ssh -N -L {PORT}:127.0.0.1:{PORT} <usuario>@<esta-máquina>")
     try:
         srv.serve_forever()

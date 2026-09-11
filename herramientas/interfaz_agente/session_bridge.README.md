@@ -21,15 +21,15 @@ uso local; accesible desde fuera **por túnel SSH** (nunca abre a la red).
 ## Arrancar
 
 ```sh
-python3 session_bridge.py            # 127.0.0.1:8787
+python3 session_bridge.py            # 127.0.0.1:8850
 PORT=9000 python3 session_bridge.py  # otro puerto
 ```
 
 ### Desde otra máquina — túnel SSH (así se "expone", sin abrir 0.0.0.0)
 
 ```sh
-ssh -N -L 8787:127.0.0.1:8787 <usuario>@<esta-máquina>
-# ahora http://127.0.0.1:8787 en tu máquina llega al puente
+ssh -N -L 8850:127.0.0.1:8850 <usuario>@<esta-máquina>
+# ahora http://127.0.0.1:8850 en tu máquina llega al puente
 ```
 
 ## Seguridad (sin token, dos candados en su lugar)
@@ -82,6 +82,14 @@ duración no acotada.
 Diferencia de diseño: `/deliver` **desacopla despertar de completar**. Confirma el
 acto que el disparador de verdad provoca (llegó el aviso), no la terminación ajena.
 
+**Y lo que NO cubre, declarado como parte del contrato:** confirma que el turno
+**arrancó**, no que terminó bien. Si el turno **muere después del arranque**, `/deliver`
+ya respondió `started` y **nadie comprueba el desenlace** — no hay reintento, no hay
+alarma, y quien disparó cree que entregó. Se asume a propósito, porque desacoplar es el
+punto; pero queda escrito porque **un centinela no puede delatar su propia muerte**.
+Quien construya encima de esto —una cadena de entrega, un disparador, un acuse— tiene que
+saber que **la comprobación posterior no existe todavía y le toca a él**.
+
 `attachments`: lista de `{name, media_type, data}` con `data` en **base64**.
 `media_type` soportado: `image/png|jpeg|gif|webp` (bloque `image`),
 `application/pdf` (bloque `document`), `text/*` (se decodifica y embebe como
@@ -91,7 +99,7 @@ texto). Otros tipos se ignoran. Límites del cliente web: 5 MB imagen, 20 MB PDF
 ### Ejemplo
 
 ```sh
-B=http://127.0.0.1:8787
+B=http://127.0.0.1:8850
 
 curl -s -X POST $B/sessions \
   -d '{"name":"demo","prompt":"Hola, preséntate en una línea"}'

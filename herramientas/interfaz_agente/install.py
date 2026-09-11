@@ -15,7 +15,8 @@ El servicio la lee al arrancar; el autostart solo tiene que lanzar python.
 Uso:
     python3 install.py                 # instala/actualiza y arranca
     python3 install.py --cwd <ruta>    # dir de trabajo por defecto de las sesiones
-    python3 install.py --port 8787 --permission full --model claude-opus-4-8
+    python3 install.py --permission safe          # el permiso es OBLIGATORIO
+    python3 install.py --port 8850 --permission full --model <id>
     python3 install.py --set CLAUDE_CODE_USE_VERTEX=1 --set ANTHROPIC_VERTEX_PROJECT_ID=...
     python3 install.py --status        # ¿está arriba?
     python3 install.py --uninstall     # quita el autostart
@@ -44,8 +45,10 @@ VERTEX_KEYS = ["CLAUDE_CODE_USE_VERTEX", "ANTHROPIC_VERTEX_PROJECT_ID",
                "CLOUD_ML_REGION", "ANTHROPIC_DEFAULT_OPUS_MODEL"]
 BRIDGE_KEYS = ["PORT", "BRIDGE_MODEL", "BRIDGE_PERMISSION", "BRIDGE_CWD",
                "BRIDGE_CLAUDE_BIN"]
-DEFAULTS = {"PORT": "8787", "BRIDGE_MODEL": "claude-opus-4-8",
-            "BRIDGE_PERMISSION": "full"}
+# El modelo NO se congela aqui: vacio = el default del CLI. Un id fijo revienta en
+# cualquier cuenta donde no este aprovisionado, y eso ya se midio.
+# Y BRIDGE_PERMISSION NO tiene default a proposito: se exige declararlo (ver abajo).
+DEFAULTS = {"PORT": "8850", "BRIDGE_MODEL": ""}
 
 
 # --------------------------------------------------------------- utilidades
@@ -114,6 +117,18 @@ def build_config(args):
     if args.cwd:
         cfg["BRIDGE_CWD"] = str(Path(args.cwd).expanduser().resolve())
     cfg.setdefault("BRIDGE_CWD", str(Path.cwd()))
+    # El permiso se DECLARA o no se instala. `full` concede ejecucion arbitraria con
+    # los privilegios de quien instala, y nadie debe heredarla por omision.
+    if not cfg.get("BRIDGE_PERMISSION"):
+        sys.exit("FALTA EL PERMISO — y es a proposito que no haya default.\n"
+                 "  Vuelve a correr esto con uno de:\n"
+                 "    --permission safe    solo lee, busca y conversa\n"
+                 "    --permission tools   ademas python y web\n"
+                 "    --permission full    TODO: ejecuta, escribe y borra sin preguntar\n"
+                 "  Con `full` cualquier proceso local que alcance el puerto ejecuta\n"
+                 "  comandos con tus privilegios. Eleges tu, no el instalador.")
+    if cfg["BRIDGE_PERMISSION"] not in ("full", "tools", "safe"):
+        sys.exit(f"PERMISO DESCONOCIDO: {cfg['BRIDGE_PERMISSION']!r}. Usa full | tools | safe.")
     if not cfg.get("BRIDGE_CLAUDE_BIN"):
         cb = resolve_claude()
         if cb:
@@ -284,7 +299,7 @@ def main(argv=None):
     python = sys.executable or shutil.which("python3") or shutil.which("python")
 
     if args.status:
-        port = read_env_file(ENV_FILE).get("PORT", "8787")
+        port = read_env_file(ENV_FILE).get("PORT", "8850")
         ok = health(port)
         say(f"{'✅ arriba' if ok else '❌ no responde'}  ·  http://127.0.0.1:{port}/")
         return 0 if ok else 1

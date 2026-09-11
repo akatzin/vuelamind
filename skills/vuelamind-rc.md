@@ -72,8 +72,8 @@ es portable** — ésa es la separación que hace esto mudable de SO.
 
 ## Cómo se opera
 
-1. Abre `http://127.0.0.1:<PORT>/` (default `8787`). Desde otra máquina, **túnel SSH**:
-   `ssh -N -L 8787:127.0.0.1:8787 <usuario>@<esta-máquina>` (nunca `0.0.0.0`).
+1. Abre `http://127.0.0.1:<PORT>/` (default `8850`). Desde otra máquina, **túnel SSH**:
+   `ssh -N -L 8850:127.0.0.1:8850 <usuario>@<esta-máquina>` (nunca `0.0.0.0`).
 2. **Nueva sesión**: nombre + primer mensaje + **nivel de permiso**. Chatea.
 3. **Adjuntos**: botón 📎, pegar, o arrastrar — texto/código (embebido), imágenes
    (`png/jpeg/gif/webp`) y PDF (bloques nativos).
@@ -85,6 +85,12 @@ es portable** — ésa es la separación que hace esto mudable de SO.
 
 Las sesiones corren **headless**: no hay quién apruebe permisos en vivo. El nivel
 se fija al crear la sesión y se persiste.
+
+> [!important] NO hay nivel por omisión, y es a propósito
+> El servicio **se niega a arrancar** si `BRIDGE_PERMISSION` no está declarado en el
+> `.env`, y el instalador **exige** `--permission`. Un nivel desconocido —una errata,
+> un registro viejo— **no se degrada a `full`**: revienta. `full` concede ejecución
+> arbitraria, y nadie debe heredarla por no haber escrito nada.
 
 | Nivel | Banderas | Puede |
 |---|---|---|
@@ -109,13 +115,23 @@ dispara confirma el acto que de verdad provoca (llegó), no la terminación ajen
 duración no acotada. Detalle y contraste con `/stream` y `/messages` en
 `herramientas/interfaz_agente/session_bridge.README.md`.
 
+> [!warning] Lo que `deliver` NO cubre, declarado
+> Confirma que el turno **arrancó**, no que terminó. Si el turno **muere después del
+> arranque**, `deliver` ya contestó que llegó y **nadie comprueba el desenlace**: no hay
+> reintento, no hay alarma, y quien disparó cree que entregó. Se asume a propósito —
+> desacoplar despertar de completar es el punto—, pero **queda escrito** porque un
+> centinela no puede delatar su propia muerte, y quien monte algo encima de esto tiene
+> que saber que la comprobación posterior **no existe todavía y le toca a él**.
+
 ## Condiciones medidas (no creer, comprobar)
 
 - **Multimedia headless: MEDIDO** — `claude -p --input-format stream-json` acepta
   bloques `image` y `document` (PDF), y `--resume` por esa vía **conserva memoria**.
 - **Model Garden estrecho: MEDIDO** — en el despliegue original **solo `opus`
   estaba aprovisionado**; `haiku`/`opus-5` daban `404`. Por eso el default de
-  modelo es un id de opus explícito. En otra cuenta, ajusta `BRIDGE_MODEL`.
+  modelo es **vacío = el del CLI**: el canon no congela un id que caduca ni exige un
+  modelo que la casa quizá no tenga aprovisionado. Si tu cuenta necesita uno fijo, lo
+  declaras en `BRIDGE_MODEL`.
 - **Loopback siempre** — escucha en `127.0.0.1` a propósito; salir por túnel. Atar
   a `0.0.0.0` es un escenario que necesita decisión, no un default.
 
