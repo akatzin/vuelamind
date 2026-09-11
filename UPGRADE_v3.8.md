@@ -13,11 +13,42 @@ para: dominios en v3.5 o posterior — el master que trae nombra piezas de la v3
 >
 > *El mapa completo de saltos vive en `UPGRADE.md`, que no muere con ninguna versión.*
 
-> [!important] NO CAMBIA NINGUNA REGLA — corrige lo que el documento decía mal de sí mismo
-> No hay claves nuevas, ningún skill cambia y no hay nada que instalar. **Si tu dominio ya
-> nació, lo único que cambia es que la plantilla de la que nació dejó de contradecirse.**
+> [!important] NO CAMBIA NINGUNA REGLA — pero SÍ hay algo nuevo que instalar
+> **No hay claves nuevas del manifiesto** y ninguna regla del método cambia: si tu dominio ya
+> nació, la plantilla de la que nació dejó de contradecirse y nada más.
+>
+> **Lo que sí cambia es el inventario de skills: el canon pasó de once a doce.** Ver abajo.
 >
 > Salta si vas a hacer nacer a alguien, o si quieres leer un master coherente.
+
+## Lo que hay que instalar: el skill doce
+
+El canon incorporó **`vuelamind-rc`** y sus herramientas en `herramientas/interfaz_agente/`.
+Es un puente HTTP local que crea y opera varias sesiones headless de Claude Code desde una
+página de chat propia; nace para donde no hay control remoto nativo.
+
+**Aunque no lo vayas a usar, tu dominio se entera.** El inventario de skills del canon es el
+que comprueban `comprobar_skills.py` y el validador de cada casa: con doce en el canon y once
+instalados, **tu validador sale ROJO** con *«skill del canon no instalado»*.
+
+**MEDIDO el 2026-09-11 en la casa vigía**, que fue la primera a la que le pasó en cuanto el
+skill entró a `main`.
+
+**Qué hacer, y son dos líneas:**
+
+```sh
+cp <clon-del-canon>/skills/vuelamind-rc.md ~/.claude/commands/
+python3 <clon-del-canon>/herramientas/comprobar_skills.py     # debe decir: AL DIA 12
+```
+
+*(Si tu máquina recibe los comandos por réplica automática, llegará solo; el comando de
+arriba sirve igual para comprobarlo.)*
+
+> [!warning] Instalar el skill NO es instalar el puente
+> Copiar el archivo solo pone el comando al día. **Levantar el servicio es otra cosa** y tiene
+> requisitos propios —Python 3.10 o superior, el CLI `claude` presente, y elegir a mano el
+> nivel de permiso, que no tiene valor por omisión a propósito—. El skill los explica. En
+> Windows, su camino de arranque automático **está sin medir del todo** al publicarse esto.
 
 ## Los cinco
 
