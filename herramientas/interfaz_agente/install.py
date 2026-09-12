@@ -346,7 +346,7 @@ def uninstall_darwin():
 TAREA_XML = """<?xml version="1.0" encoding="UTF-16"?>
 <Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
   <RegistrationInfo><Description>vuelamind-rc session bridge</Description></RegistrationInfo>
-  <Triggers><LogonTrigger><Enabled>true</Enabled><UserId>{usuario}</UserId></LogonTrigger></Triggers>
+  <Triggers>{disparadores}</Triggers>
   <Principals><Principal id="Author"><UserId>{usuario}</UserId>
     <LogonType>{tipo_logon}</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
   <Settings>
@@ -377,6 +377,47 @@ TAREA_XML = """<?xml version="1.0" encoding="UTF-16"?>
 # que no depende de que alguien haya iniciado sesion.
 TIPOS_LOGON = {"interactiva": "InteractiveToken", "siempre": "S4U"}
 
+# S4U cambia COMO corre la tarea, no CUANDO dispara. Con solo un `LogonTrigger`, una
+# maquina que nunca inicia sesion no produce el evento y la tarea no arranca jamas —
+# MEDIDO el 2026-09-11: tarea S4U creada, maquina reiniciada sin sesion, Last Run Time
+# en 11/30/1999 y nada escuchando. O sea que «siempre» no cumplia lo que su nombre dice.
+#
+# Por eso el modo `siempre` lleva ADEMAS un `BootTrigger`: arranca con la maquina, haya
+# o no sesion, y el LogonTrigger se queda para el caso de que alguien inicie sesion con
+# la maquina ya encendida. El modo `interactiva` conserva solo el logon, que es su
+# definicion.
+#
+# INFERIDO: el BootTrigger esta escrito y NO medido al publicarse esto.
+DISPARADORES = {
+    "interactiva": "<LogonTrigger><Enabled>true</Enabled><UserId>{usuario}</UserId></LogonTrigger>",
+    "siempre": ("<BootTrigger><Enabled>true</Enabled></BootTrigger>"
+                "<LogonTrigger><Enabled>true</Enabled><UserId>{usuario}</UserId></LogonTrigger>"),
+}
+
+
+def cuenta_windows():
+    """El `UserId` que la tarea entiende, y NO es siempre USERDOMAIN\\USERNAME.
+
+    MEDIDO en Windows 11 el 2026-09-11, en una maquina FUERA DE DOMINIO:
+
+      USERDOMAIN = WORKGROUP · USERNAME = vela · COMPUTERNAME = VELAVUE-EM18BEA
+      WORKGROUP\\vela -> «Some or all identity references could not be translated»
+      vela           -> S-1-5-21-...-1000
+
+    `WORKGROUP` es el nombre del grupo de trabajo, NO una autoridad de cuentas: no
+    resuelve a ningun SID, y `schtasks /create /xml` rechaza el XML entero por eso.
+
+    Una casa con dominio real SI necesita el dominio, asi que se prefiere USERDOMAIN
+    solo cuando NO es WORKGROUP, y se cae a COMPUTERNAME, que siempre es una autoridad
+    local valida.
+    """
+    usuario = os.environ.get("USERNAME", "")
+    dominio = os.environ.get("USERDOMAIN", "")
+    if dominio and dominio.upper() != "WORKGROUP":
+        return f"{dominio}\\{usuario}"
+    equipo = os.environ.get("COMPUTERNAME", "")
+    return f"{equipo}\\{usuario}" if equipo else usuario
+
 
 def install_windows(python, script, port, start, sesion="interactiva"):
     pyw = python
@@ -386,19 +427,36 @@ def install_windows(python, script, port, start, sesion="interactiva"):
     tr = f'"{pyw}" "{script}"'
     subprocess.run(["schtasks", "/Delete", "/TN", "VuelamindRC", "/F"],
                    capture_output=True)
-    usuario = os.environ.get("USERDOMAIN", "") + "\\" + os.environ.get("USERNAME", "")
+    usuario = cuenta_windows()
     xml = Path(os.environ.get("TEMP", ".")) / "vuelamind-rc-tarea.xml"
     creada = False
     try:
-        xml.write_text(TAREA_XML.format(usuario=usuario.lstrip("\\"), exe=pyw, script=script,
-                                        tipo_logon=TIPOS_LOGON[sesion]),
+        u = usuario.lstrip("\\")
+        xml.write_text(TAREA_XML.format(usuario=u, exe=pyw, script=script,
+                                        tipo_logon=TIPOS_LOGON[sesion],
+                                        disparadores=DISPARADORES[sesion].format(usuario=u)),
                        encoding="utf-16")
         r = subprocess.run(["schtasks", "/Create", "/TN", "VuelamindRC", "/XML", str(xml), "/F"],
                            capture_output=True, text=True)
         creada = r.returncode == 0
+        if not creada and sesion == "siempre":
+            # NO se cae en silencio a otra conducta. MEDIDO el 2026-09-11: el XML fallaba,
+            # el respaldo creaba una tarea INTERACTIVA, y la salida terminaba en «SUCCESS»
+            # y «servicio arriba» — quien instalaba se quedaba creyendo que tenia S4U.
+            # Un respaldo que entrega CONDUCTA DISTINTA de la pedida y lo reporta como
+            # exito es peor que un fallo: «aviso» es demasiado suave para «no hice lo que
+            # me pediste».
+            sys.exit("NO PUDE CREAR LA TAREA COMO LA PEDISTE, y no voy a crear otra "
+                     "distinta en su lugar.\n"
+                     f"  Pediste --sesion siempre (S4U) y el XML fue rechazado:\n"
+                     f"  {r.stderr.strip()[:200]}\n"
+                     "  El respaldo crearia una tarea INTERACTIVA, que solo corre con\n"
+                     "  sesion abierta: otra conducta con el mismo nombre.\n"
+                     "  Si la quieres asi, pidela: --sesion interactiva.")
         if not creada:
-            say(f"  aviso: no pude crear la tarea desde XML ({r.stderr.strip()[:120]});"
-                " uso el modo básico, que puede NO dispararse con la máquina en batería")
+            say(f"  ATENCION: no pude crear la tarea desde XML ({r.stderr.strip()[:120]}).\n"
+                "     Caigo al modo basico, y eso CAMBIA la tarea: puede no dispararse\n"
+                "     con la maquina en bateria. No es lo que pediste.")
     except Exception as e:
         say(f"  aviso: fallo al escribir el XML de la tarea ({type(e).__name__}); uso el modo básico")
     finally:
