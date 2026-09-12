@@ -114,12 +114,42 @@ def exigir_python(py):
     return f"{may}.{men}"
 
 
+def proteger_windows(ruta):
+    """El equivalente real de `chmod 600` en Windows, que `chmod` no da.
+
+    Dos pasos y los dos importan (aportado por la casa que lo midio, 2026-09-11):
+      · `/inheritance:r` corta la herencia — sin esto el archivo hereda los permisos del
+        perfil y la herencia devuelve todo lo que le quites;
+      · `/grant:r` REEMPLAZA la entrada en vez de sumarla — sin la `:r` acumulas permisos
+        creyendo que los restringes.
+    No pide elevacion: el dueno del archivo tiene WRITE_DAC por ser dueno.
+
+    LIMITE, y se dice en vez de fingirlo: un Administrador y SYSTEM siguen pudiendo leerlo.
+    En Windows eso no se puede quitar.
+    """
+    if os.name != "nt":
+        return ""
+    usuario = os.environ.get("USERNAME", "")
+    for args in (["icacls", str(ruta), "/inheritance:r"],
+                 ["icacls", str(ruta), "/grant:r", f"{usuario}:F"]):
+        r = subprocess.run(args, capture_output=True, text=True)
+        if r.returncode != 0:
+            return f"no pude restringir {ruta.name}: {r.stderr.strip()[:120]}"
+    return f"permisos de {ruta.name} restringidos a {usuario} (Administrador y SYSTEM siguen leyendo)"
+
+
 def resolve_claude():
     for name in ("claude", "claude.cmd", "claude.exe"):
         p = shutil.which(name)
         if p:
             return p
-    for c in (HOME / ".local/bin/claude", HOME / "AppData/Roaming/npm/claude.cmd"):
+    # `.exe` y `.cmd` en las rutas directas: MEDIDO en Windows el 2026-09-11, el binario
+    # estaba en `%USERPROFILE%\.local\bin\claude.exe` y NO se encontraba — `which()` no lo
+    # veia porque ese directorio no esta en PATH, y la ruta directa se probaba SIN extension,
+    # que en Windows no resuelve. Habia que pasarle la ruta a mano con --set.
+    for c in (HOME / ".local/bin/claude", HOME / ".local/bin/claude.exe",
+              HOME / ".local/bin/claude.cmd", HOME / "AppData/Roaming/npm/claude.cmd",
+              HOME / "AppData/Roaming/npm/claude.exe"):
         if c.exists():
             return str(c)
     return ""
@@ -222,6 +252,9 @@ def write_env_file(cfg):
         ENV_FILE.chmod(0o600)
     except OSError:
         pass
+    aviso = proteger_windows(ENV_FILE)
+    if aviso:
+        say("  " + aviso)
 
 
 def copy_assets():
@@ -315,7 +348,7 @@ TAREA_XML = """<?xml version="1.0" encoding="UTF-16"?>
   <RegistrationInfo><Description>vuelamind-rc session bridge</Description></RegistrationInfo>
   <Triggers><LogonTrigger><Enabled>true</Enabled><UserId>{usuario}</UserId></LogonTrigger></Triggers>
   <Principals><Principal id="Author"><UserId>{usuario}</UserId>
-    <LogonType>InteractiveToken</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
+    <LogonType>{tipo_logon}</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
   <Settings>
     <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
     <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
@@ -327,7 +360,20 @@ TAREA_XML = """<?xml version="1.0" encoding="UTF-16"?>
 </Task>"""
 
 
-def install_windows(python, script, port, start):
+# MEDIDO en Windows el 2026-09-11, y es de diseno y no de codigo: con `InteractiveToken` la
+# tarea solo puede correr si hay SESION ABIERTA. En una maquina sin sesion, el Programador
+# ACEPTA la orden y no ejecuta nada — `schtasks /run` responde «SUCCESS: Attempted to run»,
+# que es «lo intente», y el contador de ejecuciones ni se mueve. No hay error en ningun lado.
+#
+# `S4U` corre con o sin sesion iniciada y sin guardar contrasena, a cambio de no tener
+# escritorio ni credenciales de red. Para un servicio en loopback eso no estorba.
+#
+# El default se queda en `interactiva` porque es lo que habia y cambiarlo en silencio seria
+# cambiarle la conducta a quien ya lo instalo. La eleccion es de quien mantiene el canon.
+TIPOS_LOGON = {"interactiva": "InteractiveToken", "siempre": "S4U"}
+
+
+def install_windows(python, script, port, start, sesion="interactiva"):
     pyw = python
     cand = Path(python).with_name("pythonw.exe")
     if cand.exists():
@@ -339,7 +385,8 @@ def install_windows(python, script, port, start):
     xml = Path(os.environ.get("TEMP", ".")) / "vuelamind-rc-tarea.xml"
     creada = False
     try:
-        xml.write_text(TAREA_XML.format(usuario=usuario.lstrip("\\"), exe=pyw, script=script),
+        xml.write_text(TAREA_XML.format(usuario=usuario.lstrip("\\"), exe=pyw, script=script,
+                                        tipo_logon=TIPOS_LOGON[sesion]),
                        encoding="utf-16")
         r = subprocess.run(["schtasks", "/Create", "/TN", "VuelamindRC", "/XML", str(xml), "/F"],
                            capture_output=True, text=True)
@@ -410,6 +457,9 @@ def main(argv=None):
     ap.add_argument("--port", type=int)
     ap.add_argument("--model")
     ap.add_argument("--permission", choices=["full", "tools", "safe"])
+    ap.add_argument("--sesion", choices=["interactiva", "siempre"], default="interactiva",
+                    help="Windows: 'interactiva' solo corre con sesion abierta (lo de siempre); "
+                         "'siempre' corre con o sin sesion, sin escritorio ni red remota")
     ap.add_argument("--set", action="append", metavar="KEY=VALUE",
                     help="fija una variable en el .env (repetible)")
     ap.add_argument("--no-start", action="store_true")
@@ -468,7 +518,8 @@ def main(argv=None):
         say("· autostart → NO instalado (--no-start). Para ponerlo, corre esto sin la bandera.")
         say(f"· a mano:  {python} {script}")
     else:
-        where = installer(python, script, cfg["PORT"], True)
+        where = (installer(python, script, cfg["PORT"], True, args.sesion)
+                 if osname == "Windows" else installer(python, script, cfg["PORT"], True))
         say(f"· autostart → {where}")
 
     if not args.no_start:
