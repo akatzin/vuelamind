@@ -177,7 +177,7 @@ El **único** paso que escribe en el vault. En este orden, porque cada uno depen
 
 Al terminar, **volver a correr el validador**: los cambios pueden romper conteos o dejar un enlace colgante nuevo.
 
-**Y releer lo que la sesión escribió** — con `herramientas/instantanea_vault.sh diff`, o con lo que el dominio tenga. **Ni el barrido del radio ni el validador lo hacen**: el radio mira las **vecinas** de lo tocado, el validador mira **mecánica**. Un párrafo nuevo que afirma algo falso **pasa los dos**, porque cuadra, enlaza y no contradice a nadie — es la única parte del cierre que nada comprueba.
+**Y releer lo que la sesión escribió** — con `python3 herramientas/instantanea_vault.py diff <vault>`, o con lo que el dominio tenga. **Ni el barrido del radio ni el validador lo hacen**: el radio mira las **vecinas** de lo tocado, el validador mira **mecánica**. Un párrafo nuevo que afirma algo falso **pasa los dos**, porque cuadra, enlaza y no contradice a nadie — es la única parte del cierre que nada comprueba.
 
 > [!important] La instantánea se renueva al TERMINAR el cierre, no al empezarlo
 > Si se tomara al empezar, la copia ya traería dentro todo lo que la sesión escribió y **el
