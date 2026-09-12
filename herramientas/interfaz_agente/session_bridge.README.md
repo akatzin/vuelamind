@@ -1,5 +1,9 @@
 # session_bridge — puente HTTP local a sesiones de Claude Code
 
+> **Requisito: Python 3.10 o superior.** Medido: dos Macs de fábrica traen `3.9.6`, y
+> Windows no trae Python. Comprueba con `python3 --version` antes de instalar, e instala
+> **con ese mismo binario**: el arranque automático apunta al intérprete que lo invocó.
+
 Servicio HTTP **en loopback, sin token**, que **crea y maneja varias conversaciones
 de Claude Code** en esta máquina, cada una direccionable por nombre. Pensado para
 uso local; accesible desde fuera **por túnel SSH** (nunca abre a la red).

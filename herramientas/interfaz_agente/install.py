@@ -52,8 +52,90 @@ DEFAULTS = {"PORT": "8850", "BRIDGE_MODEL": ""}
 
 
 # --------------------------------------------------------------- utilidades
+# La consola de Windows es CP1252 y este archivo imprime flechas, puntos medios y
+# tildes. MEDIDO en Windows 11 el 2026-09-11: con 3.9 el instalador CRASHEA con
+# UnicodeEncodeError al imprimir `→`; con 3.12 no truena pero el texto sale corrupto.
+# Mismo defecto, dos caras, y en macOS no se ve nunca. Se arregla en la SALIDA, una vez,
+# y así protege también las líneas que nadie ha escrito todavía.
+# NO se fuerza utf-8: se CONSERVA la codificación de la consola y solo se relaja el
+# error. MEDIDO el 2026-09-11 comparando las tres estrategias sobre la misma línea, tal
+# como la leería una consola cp1252:
+#   sin arreglo          → UnicodeEncodeError, el instalador muere
+#   utf-8 + replace      → «pÃ¡gina cÃ³digo aÃ±o»  (mojibake: no truena y no se entiende)
+#   conservar + replace  → «página código año», con `?` donde va la flecha  ← ésta
+# Forzar utf-8 arregla el crash y estropea los acentos, que en español son casi todo el
+# texto. Lo que cp1252 sí sabe escribir se escribe bien; lo que no, se marca.
+for _flujo in (sys.stdout, sys.stderr):
+    try:
+        _flujo.reconfigure(errors="replace")
+    except Exception:
+        pass
+
+
 def say(msg):
     print(msg, flush=True)
+
+
+MINIMO_PY = (3, 10)
+
+
+def exigir_python(py):
+    """El autostart apunta a UN interprete concreto; si ese no sirve, el servicio no
+    arranca y NADA lo dice. MEDIDO el 2026-09-11: instalacion completa y con exito,
+    autostart escrito, URL impresa, sobre un python 3.9 que no podia ni importar el
+    servicio. En Windows pythonw.exe corre sin ventana y el error no se ve en ningun sitio."""
+    try:
+        sal = subprocess.run([py, "-c", "import sys; print('%d.%d' % sys.version_info[:2])"],
+                             capture_output=True, text=True, timeout=20)
+        may, men = (int(x) for x in sal.stdout.strip().split("."))
+    except Exception as e:
+        sys.exit(f"no pude preguntarle la version a {py}: {type(e).__name__}: {e}")
+    # Y no basta con la versión: en macOS el instalador ESCRIBE un plist, así que ese
+    # intérprete tiene que poder. MEDIDO el 2026-09-11: dos pythons de Homebrew de una
+    # misma máquina tienen `pyexpat` enlazado contra un libexpat que ya no exporta su
+    # símbolo, y `install_darwin()` moría con un traceback crudo DESPUÉS de haber escrito
+    # el .env y copiado los archivos. Se comprueba ANTES de tocar nada.
+    if platform.system() == "Darwin":
+        r = subprocess.run([py, "-c", "import plistlib"], capture_output=True, text=True)
+        if r.returncode != 0:
+            sys.exit("ME NIEGO A INSTALAR: ese interprete no puede escribir plists, y en\n"
+                     "  macOS el arranque automatico es un plist.\n"
+                     f"  Interprete: {py}\n"
+                     f"  Lo que dice al intentarlo: {r.stderr.strip().splitlines()[-1][:160]}\n"
+                     "  Suele ser una instalacion de Python con pyexpat roto. Usa otro\n"
+                     "  interprete, o instala solo el nucleo portable con --no-start.")
+    if (may, men) < MINIMO_PY:
+        sys.exit(f"ME NIEGO A INSTALAR: ese interprete es Python {may}.{men} y hace falta "
+                 f"{MINIMO_PY[0]}.{MINIMO_PY[1]} o superior.\n"
+                 f"  Interprete: {py}\n"
+                 "  El servicio usa anotaciones `X | None` y en 3.9 no llega ni a arrancar:\n"
+                 "  la instalacion terminaria bien y el puente no levantaria nunca.\n"
+                 "  Instala uno mas nuevo y vuelve a correr esto CON ese binario.")
+    return f"{may}.{men}"
+
+
+def proteger_windows(ruta):
+    """El equivalente real de `chmod 600` en Windows, que `chmod` no da.
+
+    Dos pasos y los dos importan (aportado por la casa que lo midio, 2026-09-11):
+      · `/inheritance:r` corta la herencia — sin esto el archivo hereda los permisos del
+        perfil y la herencia devuelve todo lo que le quites;
+      · `/grant:r` REEMPLAZA la entrada en vez de sumarla — sin la `:r` acumulas permisos
+        creyendo que los restringes.
+    No pide elevacion: el dueno del archivo tiene WRITE_DAC por ser dueno.
+
+    LIMITE, y se dice en vez de fingirlo: un Administrador y SYSTEM siguen pudiendo leerlo.
+    En Windows eso no se puede quitar.
+    """
+    if os.name != "nt":
+        return ""
+    usuario = os.environ.get("USERNAME", "")
+    for args in (["icacls", str(ruta), "/inheritance:r"],
+                 ["icacls", str(ruta), "/grant:r", f"{usuario}:F"]):
+        r = subprocess.run(args, capture_output=True, text=True)
+        if r.returncode != 0:
+            return f"no pude restringir {ruta.name}: {r.stderr.strip()[:120]}"
+    return f"permisos de {ruta.name} restringidos a {usuario} (Administrador y SYSTEM siguen leyendo)"
 
 
 def resolve_claude():
@@ -61,7 +143,13 @@ def resolve_claude():
         p = shutil.which(name)
         if p:
             return p
-    for c in (HOME / ".local/bin/claude", HOME / "AppData/Roaming/npm/claude.cmd"):
+    # `.exe` y `.cmd` en las rutas directas: MEDIDO en Windows el 2026-09-11, el binario
+    # estaba en `%USERPROFILE%\.local\bin\claude.exe` y NO se encontraba — `which()` no lo
+    # veia porque ese directorio no esta en PATH, y la ruta directa se probaba SIN extension,
+    # que en Windows no resuelve. Habia que pasarle la ruta a mano con --set.
+    for c in (HOME / ".local/bin/claude", HOME / ".local/bin/claude.exe",
+              HOME / ".local/bin/claude.cmd", HOME / "AppData/Roaming/npm/claude.cmd",
+              HOME / "AppData/Roaming/npm/claude.exe"):
         if c.exists():
             return str(c)
     return ""
@@ -83,7 +171,20 @@ def read_old_plist():
     cfg = {}
     if platform.system() != "Darwin":
         return cfg
-    import plistlib
+    # Este paso es OPCIONAL por definición: rescata una instalación previa que en una
+    # máquina nueva no existe. Antes importaba plistlib fuera de la guarda, así que un
+    # plistlib roto —MEDIDO el 2026-09-11: dos pythons de Homebrew con pyexpat enlazado
+    # contra un libexpat que ya no exporta su símbolo— tumbaba la instalación ENTERA por
+    # no poder hacer algo que no había que hacer. Un paso opcional no derriba al principal.
+    plistlib = None
+    if any((HOME / "Library/LaunchAgents" / f"{lbl}.plist").exists() for lbl in OLD_LABELS):
+        try:
+            import plistlib
+        except Exception as e:
+            say(f"  aviso: no puedo leer instalaciones previas ({type(e).__name__}); sigo sin migrar")
+            return cfg
+    if plistlib is None:
+        return cfg
     for lbl in OLD_LABELS:
         p = HOME / "Library/LaunchAgents" / f"{lbl}.plist"
         if p.exists():
@@ -144,10 +245,16 @@ def write_env_file(cfg):
         if cfg.get(k):
             lines.append(f"{k}={cfg[k]}")
     ENV_FILE.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    # En Windows esto NO protege el archivo: `chmod` solo toca el bit de solo-lectura y
+    # los permisos los hereda del perfil de usuario. No falla, y por eso no se nota.
+    # Declarado el 2026-09-11: en Windows la protección real pide ACLs (`icacls`).
     try:
         ENV_FILE.chmod(0o600)
     except OSError:
         pass
+    aviso = proteger_windows(ENV_FILE)
+    if aviso:
+        say("  " + aviso)
 
 
 def copy_assets():
@@ -225,7 +332,94 @@ def uninstall_darwin():
 
 
 # --------------------------------------------------------------- Windows (schtasks)
-def install_windows(python, script, port, start):
+# MEDIDO en Windows 11 el 2026-09-11, con dos reinicios: la tarea se creaba bien —«At
+# logon time», usuario correcto— y NO DISPARABA NUNCA. Last Run Time se quedaba en la vez
+# que se forzó a mano. El sospechoso, señalado por quien lo midió y NO probado todavía:
+# `schtasks /Create` deja por defecto «No Start On Batteries / Stop On Battery Mode», que
+# es la causa clásica de tareas que no arrancan en VMs y portátiles.
+#
+# Por eso la tarea se crea ahora desde XML, que es la única vía por la que `schtasks` deja
+# declarar esas condiciones. El camino viejo queda de respaldo: si el XML falla, se hace
+# como antes y se DICE, en vez de quedarse sin autostart en silencio.
+#
+# Nota de formato, y muerde: `schtasks /Create /XML` quiere el archivo en UTF-16.
+TAREA_XML = """<?xml version="1.0" encoding="UTF-16"?>
+<Task version="1.2" xmlns="http://schemas.microsoft.com/windows/2004/02/mit/task">
+  <RegistrationInfo><Description>vuelamind-rc session bridge</Description></RegistrationInfo>
+  <Triggers>{disparadores}</Triggers>
+  <Principals><Principal id="Author"><UserId>{usuario}</UserId>
+    <LogonType>{tipo_logon}</LogonType><RunLevel>LeastPrivilege</RunLevel></Principal></Principals>
+  <Settings>
+    <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
+    <StopIfGoingOnBatteries>false</StopIfGoingOnBatteries>
+    <MultipleInstancesPolicy>IgnoreNew</MultipleInstancesPolicy>
+    <ExecutionTimeLimit>PT0S</ExecutionTimeLimit>
+    <Enabled>true</Enabled>
+  </Settings>
+  <Actions Context="Author"><Exec><Command>{exe}</Command><Arguments>"{script}"</Arguments></Exec></Actions>
+</Task>"""
+
+
+# MEDIDO en Windows el 2026-09-11, y es de diseno y no de codigo: con `InteractiveToken` la
+# tarea solo puede correr si hay SESION ABIERTA. En una maquina sin sesion, el Programador
+# ACEPTA la orden y no ejecuta nada — `schtasks /run` responde «SUCCESS: Attempted to run»,
+# que es «lo intente», y el contador de ejecuciones ni se mueve. No hay error en ningun lado.
+#
+# `S4U` corre con o sin sesion iniciada y sin guardar contrasena, a cambio de no tener
+# escritorio ni credenciales de red. Para un servicio en loopback eso no estorba.
+#
+# EL DEFAULT ES `siempre` (S4U), por decision de quien mantiene el canon el 2026-09-11, y
+# la razon es que es el camino MEDIDO: `Last Result 267009` = TASK_RUNNING, puerto en
+# escucha, sin sesion iniciada y sin guardar contrasena. `interactiva` tambien se midio
+# funcionando ese mismo dia —disparo sola 27 segundos despues del logon, en Console 1—,
+# pero solo corre si hay sesion abierta, y sin ella el Programador ACEPTA la orden y no
+# ejecuta nada, sin error en ningun sitio. Entre dos caminos que funcionan, se publica el
+# que no depende de que alguien haya iniciado sesion.
+TIPOS_LOGON = {"interactiva": "InteractiveToken", "siempre": "S4U"}
+
+# S4U cambia COMO corre la tarea, no CUANDO dispara. Con solo un `LogonTrigger`, una
+# maquina que nunca inicia sesion no produce el evento y la tarea no arranca jamas —
+# MEDIDO el 2026-09-11: tarea S4U creada, maquina reiniciada sin sesion, Last Run Time
+# en 11/30/1999 y nada escuchando. O sea que «siempre» no cumplia lo que su nombre dice.
+#
+# Por eso el modo `siempre` lleva ADEMAS un `BootTrigger`: arranca con la maquina, haya
+# o no sesion, y el LogonTrigger se queda para el caso de que alguien inicie sesion con
+# la maquina ya encendida. El modo `interactiva` conserva solo el logon, que es su
+# definicion.
+#
+# INFERIDO: el BootTrigger esta escrito y NO medido al publicarse esto.
+DISPARADORES = {
+    "interactiva": "<LogonTrigger><Enabled>true</Enabled><UserId>{usuario}</UserId></LogonTrigger>",
+    "siempre": ("<BootTrigger><Enabled>true</Enabled></BootTrigger>"
+                "<LogonTrigger><Enabled>true</Enabled><UserId>{usuario}</UserId></LogonTrigger>"),
+}
+
+
+def cuenta_windows():
+    """El `UserId` que la tarea entiende, y NO es siempre USERDOMAIN\\USERNAME.
+
+    MEDIDO en Windows 11 el 2026-09-11, en una maquina FUERA DE DOMINIO:
+
+      USERDOMAIN = WORKGROUP · USERNAME = vela · COMPUTERNAME = VELAVUE-EM18BEA
+      WORKGROUP\\vela -> «Some or all identity references could not be translated»
+      vela           -> S-1-5-21-...-1000
+
+    `WORKGROUP` es el nombre del grupo de trabajo, NO una autoridad de cuentas: no
+    resuelve a ningun SID, y `schtasks /create /xml` rechaza el XML entero por eso.
+
+    Una casa con dominio real SI necesita el dominio, asi que se prefiere USERDOMAIN
+    solo cuando NO es WORKGROUP, y se cae a COMPUTERNAME, que siempre es una autoridad
+    local valida.
+    """
+    usuario = os.environ.get("USERNAME", "")
+    dominio = os.environ.get("USERDOMAIN", "")
+    if dominio and dominio.upper() != "WORKGROUP":
+        return f"{dominio}\\{usuario}"
+    equipo = os.environ.get("COMPUTERNAME", "")
+    return f"{equipo}\\{usuario}" if equipo else usuario
+
+
+def install_windows(python, script, port, start, sesion="interactiva"):
     pyw = python
     cand = Path(python).with_name("pythonw.exe")
     if cand.exists():
@@ -233,8 +427,46 @@ def install_windows(python, script, port, start):
     tr = f'"{pyw}" "{script}"'
     subprocess.run(["schtasks", "/Delete", "/TN", "VuelamindRC", "/F"],
                    capture_output=True)
-    subprocess.run(["schtasks", "/Create", "/SC", "ONLOGON", "/TN", "VuelamindRC",
-                    "/TR", tr, "/RL", "LIMITED", "/F"], check=True)
+    usuario = cuenta_windows()
+    xml = Path(os.environ.get("TEMP", ".")) / "vuelamind-rc-tarea.xml"
+    creada = False
+    try:
+        u = usuario.lstrip("\\")
+        xml.write_text(TAREA_XML.format(usuario=u, exe=pyw, script=script,
+                                        tipo_logon=TIPOS_LOGON[sesion],
+                                        disparadores=DISPARADORES[sesion].format(usuario=u)),
+                       encoding="utf-16")
+        r = subprocess.run(["schtasks", "/Create", "/TN", "VuelamindRC", "/XML", str(xml), "/F"],
+                           capture_output=True, text=True)
+        creada = r.returncode == 0
+        if not creada and sesion == "siempre":
+            # NO se cae en silencio a otra conducta. MEDIDO el 2026-09-11: el XML fallaba,
+            # el respaldo creaba una tarea INTERACTIVA, y la salida terminaba en «SUCCESS»
+            # y «servicio arriba» — quien instalaba se quedaba creyendo que tenia S4U.
+            # Un respaldo que entrega CONDUCTA DISTINTA de la pedida y lo reporta como
+            # exito es peor que un fallo: «aviso» es demasiado suave para «no hice lo que
+            # me pediste».
+            sys.exit("NO PUDE CREAR LA TAREA COMO LA PEDISTE, y no voy a crear otra "
+                     "distinta en su lugar.\n"
+                     f"  Pediste --sesion siempre (S4U) y el XML fue rechazado:\n"
+                     f"  {r.stderr.strip()[:200]}\n"
+                     "  El respaldo crearia una tarea INTERACTIVA, que solo corre con\n"
+                     "  sesion abierta: otra conducta con el mismo nombre.\n"
+                     "  Si la quieres asi, pidela: --sesion interactiva.")
+        if not creada:
+            say(f"  ATENCION: no pude crear la tarea desde XML ({r.stderr.strip()[:120]}).\n"
+                "     Caigo al modo basico, y eso CAMBIA la tarea: puede no dispararse\n"
+                "     con la maquina en bateria. No es lo que pediste.")
+    except Exception as e:
+        say(f"  aviso: fallo al escribir el XML de la tarea ({type(e).__name__}); uso el modo básico")
+    finally:
+        try:
+            xml.unlink()
+        except Exception:
+            pass
+    if not creada:
+        subprocess.run(["schtasks", "/Create", "/SC", "ONLOGON", "/TN", "VuelamindRC",
+                        "/TR", tr, "/RL", "LIMITED", "/F"], check=True)
     if start:
         # arranca ya, sin esperar al próximo login
         subprocess.Popen([pyw, str(script)],
@@ -288,6 +520,9 @@ def main(argv=None):
     ap.add_argument("--port", type=int)
     ap.add_argument("--model")
     ap.add_argument("--permission", choices=["full", "tools", "safe"])
+    ap.add_argument("--sesion", choices=["interactiva", "siempre"], default="siempre",
+                    help="Windows: 'interactiva' solo corre con sesion abierta (lo de siempre); "
+                         "'siempre' corre con o sin sesion, sin escritorio ni red remota")
     ap.add_argument("--set", action="append", metavar="KEY=VALUE",
                     help="fija una variable en el .env (repetible)")
     ap.add_argument("--no-start", action="store_true")
@@ -310,7 +545,8 @@ def main(argv=None):
         say(fn() if fn else f"SO no soportado para desinstalar: {osname}")
         return 0
 
-    say(f"· sistema: {osname}   python: {python}")
+    ver = exigir_python(python)
+    say(f"· sistema: {osname}   python: {python}  ({ver})")
     cfg = build_config(args)
     script = copy_assets()
     write_env_file(cfg)
@@ -325,8 +561,29 @@ def main(argv=None):
                  "Linux": install_linux}.get(osname)
     if not installer:
         sys.exit(f"SO no soportado: {osname}. Corre a mano: python {script}")
-    where = installer(python, script, cfg["PORT"], not args.no_start)
-    say(f"· autostart → {where}")
+    # Instalar el arranque automático de un servicio que ACABAS DE COMPROBAR que no puede
+    # arrancar garantiza un fallo mudo en cada inicio de sesión. MEDIDO en Windows 11 el
+    # 2026-09-11: sin el CLI, el instalador lo reportaba y creaba la tarea igual; el
+    # servicio salía con código 1 diciendo «no encuentro el binario claude», y como el
+    # autostart usa pythonw.exe —sin ventana— ese mensaje no llegaba a ningún sitio.
+    if not cfg.get("BRIDGE_CLAUDE_BIN") and not args.no_start:
+        sys.exit("NO INSTALO EL ARRANQUE AUTOMATICO: no encuentro el CLI `claude`.\n"
+                 "  El servicio no puede levantar sin el, y el autostart correria sin\n"
+                 "  ventana: fallaria mudo en cada inicio de sesion.\n"
+                 "  Instala el CLI, o dime donde esta:\n"
+                 "     --set BRIDGE_CLAUDE_BIN=<ruta al ejecutable>\n"
+                 "  (Si solo querias copiar los archivos, usa --no-start.)")
+
+    if args.no_start:
+        # `--no-start` significaba «no arranques AHORA» y dejaba el autostart escrito, asi
+        # que el servicio aparecia solo en el siguiente inicio de sesion. Instalar el
+        # arranque automatico y arrancar son DOS cosas; esta bandera gobierna las dos.
+        say("· autostart → NO instalado (--no-start). Para ponerlo, corre esto sin la bandera.")
+        say(f"· a mano:  {python} {script}")
+    else:
+        where = (installer(python, script, cfg["PORT"], True, args.sesion)
+                 if osname == "Windows" else installer(python, script, cfg["PORT"], True))
+        say(f"· autostart → {where}")
 
     if not args.no_start:
         import time

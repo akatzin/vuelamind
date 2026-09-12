@@ -18,6 +18,23 @@ red.
 > no tiene vía soportada; lo hace Remote Control y no hay equivalente. Este puente
 > maneja conversaciones que **él mismo** crea/continúa (`claude -p --resume`).
 
+> [!danger] REQUISITO: Python 3.10 o superior — y la máquina de fábrica NO lo trae
+> **MEDIDO el 2026-09-11 en dos Macs distintas: las dos traen `3.9.6`** y nada más. Es lo
+> que instalan las Command Line Tools; sin Homebrew o sin un intérprete bajado a mano, eso
+> es todo lo que hay. **Windows no trae Python en absoluto** — y escribir `python` allí no
+> falla: abre la Microsoft Store.
+>
+> El servicio usa anotaciones `X | None`, que en 3.9 **revientan al importar**. Tanto el
+> servicio como el instalador se niegan y lo explican, así que no falla en silencio; pero
+> **ese requisito se resuelve ANTES**, no durante:
+>
+> ```sh
+> python3 --version      # tiene que decir 3.10 o más
+> ```
+>
+> Si dice menos, instala uno más nuevo y **corre el instalador con ESE binario** — el
+> autostart apunta al intérprete con el que lo invocaste, no al que encuentre después.
+
 ## Qué instala
 
 - `session_bridge.py` — el servicio (loopback `127.0.0.1`, **sin token**; dos

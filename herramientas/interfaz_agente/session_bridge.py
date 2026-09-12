@@ -78,7 +78,41 @@ def _load_env_file() -> None:
             os.environ[key] = val
 
 
+# Este archivo usa anotaciones de 3.10 (`list | None`). En 3.9 NO es error de sintaxis:
+# revienta al EVALUAR el primer `def` que las lleva, ya empezado el import, con un
+# TypeError que no explica nada. MEDIDO el 2026-09-11: con el python3 de fábrica de macOS
+# (3.9.6) el servicio no arrancaba y el instalador terminaba bien igual. En Windows el
+# autostart usa pythonw.exe, que corre SIN ventana: ahí el mismo error no se ve en ningún
+# sitio. Por eso el corte va ANTES, en sintaxis que 3.9 entiende, y dice qué hacer.
+if sys.version_info < (3, 10):
+    sys.exit(
+        "vuelamind-rc necesita Python 3.10 o superior; este es %d.%d (%s).\n"
+        "  El servicio usa anotaciones `X | None`, que en 3.9 fallan al importar.\n"
+        "  Instala uno mas nuevo y reinstala apuntando a el, o invocalo con ese binario."
+        % (sys.version_info[0], sys.version_info[1], sys.executable))
+
 _load_env_file()
+
+# Sin consola —`pythonw` bajo el Programador— el servicio se queda MUDO: no hay dónde
+# escribir ni un arranque ni un error. Se le da una bitácora para que el silencio no sea
+# la única señal.
+if sys.stderr is None or sys.stdout is None:
+    try:
+        _bitacora = open(Path.home() / ".claude" / "vuelamind-rc.log", "a",
+                         encoding="utf-8", errors="replace", buffering=1)
+        if sys.stdout is None:
+            sys.stdout = _bitacora
+        if sys.stderr is None:
+            sys.stderr = _bitacora
+    except Exception:
+        pass   # sin bitácora se sigue: la guarda de log_message ya evita el crash
+
+# TODA lectura, escritura y tubería de este archivo declara `encoding="utf-8"`, y no es
+# manía: `read_text()` sin codificación usa la del SISTEMA — UTF-8 en Unix, CP1252 en
+# Windows. MEDIDO en Windows 11 el 2026-09-11: el servicio arrancaba, el puerto abría, y
+# al servir su PROPIA página moría con UnicodeDecodeError en el byte 0x8f. El archivo
+# estaba bien; el lector estaba mal. Lo mismo vale para las tuberías con el CLI: por ahí
+# viajan los acentos de cada turno.
 
 # ---------------------------------------------------------------- configuración
 HOST = "127.0.0.1"                                   # loopback SIEMPRE; salir por túnel SSH
@@ -100,6 +134,26 @@ CONTEXT_WINDOW = int(os.environ.get("BRIDGE_CONTEXT_WINDOW", "200000"))
 CLAUDE = os.environ.get("BRIDGE_CLAUDE_BIN") or shutil.which("claude") or \
     str(Path.home() / ".local/bin/claude")
 
+
+def _invocacion(binario: str) -> list:
+    """Cómo hay que LLAMAR al CLI, que no siempre es «ejecútalo».
+
+    En Windows la instalación por npm deja un `claude.cmd`, y un .cmd/.bat NO lo puede
+    lanzar `CreateProcess` — que es lo que hace subprocess sin shell: falla con
+    «no es una aplicación Win32 válida». Hay que pasar por `cmd /c`.
+
+    INFERIDO (2026-09-11): no medido. La VM donde se probó Windows tenía el CLI como
+    `claude.exe` y por eso este camino nunca se ejerció allí; el instalador, en cambio, SÍ
+    busca `claude.cmd` — o sea que el caso existe y nadie ha pasado por él. Se escribe
+    defensivo en vez de esperar a que alguien lo descubra en su propia máquina.
+    """
+    if os.name == "nt" and binario.lower().endswith((".cmd", ".bat")):
+        return ["cmd", "/c", binario]
+    return [binario]
+
+
+CLAUDE_ARGS = _invocacion(CLAUDE)
+
 HTML_FILE = Path(__file__).resolve().parent / "session_bridge.html"
 CONF_DIR = Path.home() / ".claude"
 REGISTRY_FILE = Path(os.environ.get("BRIDGE_REGISTRY", CONF_DIR / "vuelamind-bridge-sessions.json"))
@@ -116,14 +170,17 @@ NAME_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")        # nombres seguros para di
 def load_registry() -> dict:
     if REGISTRY_FILE.exists():
         try:
-            return json.loads(REGISTRY_FILE.read_text())
+            return json.loads(REGISTRY_FILE.read_text(encoding="utf-8"))
         except json.JSONDecodeError:
             return {}
     return {}
 
 
 def save_registry(reg: dict) -> None:
-    REGISTRY_FILE.write_text(json.dumps(reg, indent=2))
+    REGISTRY_FILE.write_text(json.dumps(reg, indent=2), encoding="utf-8")
+    # En Windows esto NO protege el archivo: `chmod` solo toca el bit de solo-lectura
+    # y los permisos los hereda del perfil de usuario. No falla, y por eso no se nota.
+    # Declarado en 2026-09-11: en Windows la protección real pide ACLs (`icacls`).
     REGISTRY_FILE.chmod(0o600)
 
 
@@ -200,7 +257,7 @@ def run_turn(text: str, attachments: list | None, session_id: str | None,
     """Corre un turno headless (entrada stream-json) y devuelve
     {session_id, text, is_error, raw_error}. Soporta adjuntos multimedia y
     un nivel de permiso (full|tools|safe)."""
-    args = [CLAUDE, "-p",
+    args = CLAUDE_ARGS + ["-p",
             "--input-format", "stream-json",
             "--output-format", "stream-json", "--verbose",
             ]
@@ -214,6 +271,7 @@ def run_turn(text: str, attachments: list | None, session_id: str | None,
                             "message": {"role": "user", "content": content}}) + "\n"
     try:
         proc = subprocess.run(args, cwd=cwd, capture_output=True, text=True,
+                              encoding="utf-8", errors="replace",
                               input=stdin_msg, timeout=TURN_TIMEOUT)
     except subprocess.TimeoutExpired:
         return {"session_id": session_id, "text": None, "is_error": True,
@@ -261,7 +319,7 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
     """Corre un turno headless y llama emit(dict) por cada evento de UI, en vivo.
     Emite: init / tool / text / result / error. Devuelve {session_id, text, is_error}.
     emit puede lanzar (cliente desconectado); en ese caso matamos el proceso."""
-    args = [CLAUDE, "-p",
+    args = CLAUDE_ARGS + ["-p",
             "--input-format", "stream-json",
             "--output-format", "stream-json", "--verbose",
             ]
@@ -279,7 +337,8 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
     try:
         proc = subprocess.Popen(args, cwd=cwd, stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                text=True, bufsize=1)
+                                text=True, bufsize=1,
+                                encoding="utf-8", errors="replace")
     except Exception as e:
         emit({"kind": "error", "error": str(e)})
         return {"session_id": sid, "text": None, "is_error": True}
@@ -373,7 +432,7 @@ def deliver_turn(text: str, attachments: list | None, session_id: str | None,
     en el registro (al arrancar y al terminar), para que el registro quede fresco sin
     depender de que el cliente siga escuchando.
     """
-    args = [CLAUDE, "-p",
+    args = CLAUDE_ARGS + ["-p",
             "--input-format", "stream-json",
             "--output-format", "stream-json", "--verbose",
             ]
@@ -397,7 +456,8 @@ def deliver_turn(text: str, attachments: list | None, session_id: str | None,
     try:
         proc = subprocess.Popen(args, cwd=cwd, stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                text=True, bufsize=1)
+                                text=True, bufsize=1,
+                                encoding="utf-8", errors="replace")
     except Exception as e:
         on_error(str(e))
         return
@@ -461,7 +521,7 @@ class Handler(BaseHTTPRequestHandler):
     def _json(self, code: int, payload: dict) -> None:
         body = json.dumps(payload).encode()
         self.send_response(code)
-        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -500,6 +560,20 @@ class Handler(BaseHTTPRequestHandler):
             return {}
 
     def log_message(self, fmt, *args):  # silencio; logging propio abajo
+        # `pythonw.exe` lanzado POR EL PROGRAMADOR DE TAREAS no tiene consola:
+        # `sys.stderr` es None, y esto corre EN CADA PETICIÓN. MEDIDO en Windows el
+        # 2026-09-11 con una tarea de prueba: el puente abría el puerto, quedaba
+        # LISTENING, y reventaba en TODA petición antes de responder. El cliente veía
+        # «the connection was closed unexpectedly» y no quedaba rastro, porque el único
+        # sitio donde se escribiría el error es justo el que no existe.
+        #
+        # Y lo peor, visto por accidente: el trabajo SÍ se hacía antes de reventar. Un
+        # turno creaba la sesión y la registraba, moría al escribir la línea del log, y
+        # al reintentar con el mismo nombre contestaba 409 «ya existe». El efecto queda
+        # hecho y el acuse se pierde: quien reintenta choca contra su propio trabajo
+        # invisible.
+        if sys.stderr is None:
+            return
         sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
 
     # --- ruteo
@@ -514,7 +588,7 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/" or self.path == "/index.html":
             if HTML_FILE.exists():
-                return self._html(200, HTML_FILE.read_text())
+                return self._html(200, HTML_FILE.read_text(encoding="utf-8"))
             return self._html(200, "<h1>puente arriba</h1><p>falta session_bridge.html</p>")
         if self.path == "/favicon.ico":
             self.send_response(204)
@@ -715,6 +789,19 @@ def _now() -> str:
 def main():
     if not Path(CLAUDE).exists() and not shutil.which(CLAUDE):
         sys.exit(f"no encuentro el binario claude en: {CLAUDE}")
+    # El `cwd` se comprueba AL ARRANCAR. MEDIDO el 2026-09-11 en Windows: con un
+    # `BRIDGE_CWD` inexistente el puente arranca, sirve la página entera y contesta
+    # `/health` con `ok: true` — y revienta en el PRIMER TURNO con `NotADirectoryError
+    # [WinError 267] The directory name is invalid`, que habla de directorios sin decir
+    # cuál. Quien lo reciba va a buscar el defecto en el CLI, que es donde no está.
+    # Un fallo diferido cuesta más que uno inmediato: el arranque sano es una promesa.
+    if not Path(DEFAULT_CWD).is_dir():
+        sys.exit(f"ME NIEGO A ARRANCAR: el directorio de trabajo no existe.\n"
+                 f"  BRIDGE_CWD = {DEFAULT_CWD}\n"
+                 "  Créalo, o apúntalo a otro con --set BRIDGE_CWD=<ruta> al instalar.\n"
+                 "  Si arrancara igual, el fallo saldría en el primer turno y hablaría\n"
+                 "  de directorios sin decir cuál.")
+
     # El nivel de permiso NO tiene valor por omision: sin declararlo, no se arranca.
     # `full` concede ejecucion arbitraria, y nadie debe heredarla por no haber escrito
     # nada. Quien la quiere, la firma en su .env.
@@ -725,7 +812,22 @@ def main():
     if DEFAULT_PERMISSION not in PERMISSION_ARGS:
         sys.exit(f"ME NIEGO A ARRANCAR: BRIDGE_PERMISSION={DEFAULT_PERMISSION!r} no existe. "
                  "Usa full | tools | safe.")
-    srv = ThreadingHTTPServer((HOST, PORT), Handler)
+    # En Windows, `allow_reuse_address` (SO_REUSEADDR) SI permite un bind duplicado, así
+    # que un segundo puente levanta EN SILENCIO sobre el mismo puerto. MEDIDO el
+    # 2026-09-11 provocándolo: dos procesos LISTENING en 8872, el segundo sin decir nada.
+    # Quedan dos puentes con DOS REGISTROS de sesiones distintos y las peticiones caen en
+    # cualquiera: el usuario ve sesiones que aparecen y desaparecen, y ningún log lo dice.
+    # En Linux y macOS el mismo código da «Address already in use». Es divergencia de
+    # plataforma, no del código — y aquí el diseño produce el escenario solo: la tarea
+    # levanta uno al iniciar sesión y alguien levanta otro a mano.
+    if os.name == "nt":
+        ThreadingHTTPServer.allow_reuse_address = False
+    try:
+        srv = ThreadingHTTPServer((HOST, PORT), Handler)
+    except OSError as e:
+        sys.exit(f"NO PUEDO ESCUCHAR EN {HOST}:{PORT} — {e}\n"
+                 "  Lo más probable: ya hay un puente corriendo en ese puerto.\n"
+                 "  Míralo y mátalo, o arranca éste con otro PORT.")
     print(f"puente escuchando en http://{HOST}:{PORT}  (solo loopback, sin token)")
     print(f"candados: allowlist de Host + chequeo de Origin en POST/DELETE")
     print(f"modelo por defecto: {DEFAULT_MODEL or '(el del CLI)'}   ·   cwd por defecto: {DEFAULT_CWD}")
