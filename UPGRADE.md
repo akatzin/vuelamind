@@ -105,3 +105,4 @@ documento que promete una pieza que no está instalada.
 | v3.0 → v3.5 | `UPGRADE_v3.5.md` | **Liberado** — el buzón de aprendizaje; retira el ciclo de parches por pull request. Menor. **No requiere la v3.4** |
 | v3.5 → v3.6 | `UPGRADE_v3.6.md` | **Liberado** — la entrevista de nacimiento pasa de 25 preguntas a 15. Menor. **Requiere los artefactos de la v3.5** |
 | v3.5 → v3.7 | `UPGRADE_v3.7.md` | **Liberado** — la regla dura de fechas. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye la v3.6 |
+| v3.5 → v3.8 | `UPGRADE_v3.8.md` | **Liberado** — cinco defectos de coherencia del propio master. Menor. **Requiere los artefactos de la v3.5**; no cambia ninguna regla ni ningún skill |

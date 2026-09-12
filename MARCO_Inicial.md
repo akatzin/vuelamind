@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.7
+version: 3.8
 
 > [!note] v3.4 (2026-09-05) — el canal entre instancias, y lo que NO trae
 > Entra la comunicación entre instancias: servicio, cliente, disparador e instalador, más el
@@ -49,7 +49,7 @@ origen: destilado de un dominio real, 2026-08-03 — las historias conservan el 
 Después, el dominio vive en un ciclo de cuatro actos: **nacer** una vez, **sumarse** cuando otra máquina se une, **retomarse** al abrir cada sesión y **reconciliarse** al cerrarla. Los tres últimos son comandos, no buenas intenciones — la Fase 3 y la sección *El ciclo completo*.
 
 > [!note] Nacer **no tiene comando**, y es a propósito: nacer es pegar este archivo
-> No hace falta instalar nada para empezar, ni un atajo que prepare el terreno. Un comando que decidiera las rutas por adelantado **duplicaría el Bloque E de la entrevista y la Fase 1** — y sobre todo contradiría la promesa: *pegar el archivo y contestar*. Los comandos aparecen **después** del primer dominio, para lo que se repite.
+> No hace falta instalar nada para empezar, ni un atajo que prepare el terreno. Un comando que decidiera las rutas por adelantado **duplicaría la convención del Bloque E y la Fase 1** — y sobre todo contradiría la promesa: *pegar el archivo y contestar*. Los comandos aparecen **después** del primer dominio, para lo que se repite.
 
 > [!warning] Lo que hace que esto funcione no es la estructura
 > Las carpetas y plantillas son la parte fácil y la menos valiosa. Lo que sostiene el marco es el **núcleo epistémico** de la Fase 2: la disciplina de no escribir nada que no se haya comprobado, y de dejar rastro de la diferencia entre lo medido y lo inferido. Un vault con esta estructura y sin esa disciplina es peor que no tener vault, porque se lee con una confianza que no se ganó.
@@ -329,9 +329,9 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 
 ---
 
-### Bloque E — no existe: el marco lo resuelve
+### Bloque E — lo resuelve el marco, no la entrevista
 
-Estas decisiones **ya no se preguntan**. Las trae el método por omisión, y quien las necesite
+**Estas decisiones no se preguntan en la entrevista.** Las trae el método por omisión, y quien las necesite
 distintas las declara en su manifiesto, que gana siempre sobre la convención.
 
 | Qué | Convención |
@@ -368,11 +368,11 @@ distintas las declara en su manifiesto, que gana siempre sobre la convención.
 > **Quien declara un canon distinto declara quién lo sincroniza y cada cuánto.** Es lo único
 > que distingue un espejo de una foto vieja.
 
-> [!important] Por qué se fue el bloque que este documento llamaba «el que más se subestima»
-> No porque no importe: **porque no es del usuario**. Sus siete preguntas eran el 28% de la
-> entrevista, la mayor concentración de fricción medida, y lo que producían era estructura
-> para el motor — no foco ni tiempo para quien contesta. Preguntar dónde poner una carpeta es
-> pedirle al usuario que resuelva un problema del marco.
+> [!important] Por qué estas decisiones las toma el marco y no quien nace
+> No porque no importen: **porque no son del usuario**. Preguntadas una por una ocupaban el
+> 28% de la entrevista —la mayor concentración de fricción medida— y lo que producían era
+> estructura para el motor, no foco ni tiempo para quien contesta. **Preguntarle a alguien
+> dónde poner una carpeta es pedirle que resuelva un problema del marco.**
 >
 > **Los dos planos siguen sin poder confundirse** —conocimiento y andamiaje— y por eso la
 > convención los separa desde el primer día. Lo que cambia es quién decide: antes el usuario,
@@ -419,7 +419,7 @@ no tres semanas después. Las tres se contestan **en frío**; el cierre viene al
 
 16. **¿Qué puede hacer el asistente por su cuenta y qué requiere que le digas?** Traza la
     línea entre leer, proponer y aplicar. Escríbela: **es la regla que más fricción evita
-    después**, y con el bloque E fuera es la única que fija la autonomía.
+    después**, y es la única de la entrevista que fija la autonomía.
 
 > [!important] Una regla que salió de aquí y NO se pierde: antes de decir «encontré», búscalo
 > Hasta la v3.5 esto era la pregunta 25, y **no era una pregunta**: nadie la contesta. Es una
@@ -1358,6 +1358,7 @@ Estas lecciones se ganaron en otro dominio y ya demostraron que generalizan. Van
 63. **Una decisión escrita en una clave deprecada deja de aplicarse sin avisar, y el archivo sigue leyéndose como vigente.** El método confía en el **registro escrito**: una decisión anotada es una decisión que no hay que volver a tomar. Esa confianza tiene una grieta que ningún chequeo cubre — **cuando la decisión vive en la configuración de una herramienta, la herramienta puede dejar de obedecerla y el archivo no cambia**. Una clave deprecada **no falla: se ignora.** No hay error, no hay aviso, no hay línea roja; el ajuste sigue ahí, escrito con la palabra correcta de su época, y quien lo lea concluye que está vigente — porque **un archivo de configuración no distingue «esto manda» de «esto ya no se lee»**. Es el mismo daño que un dato falso con un agravante: el dato falso puede medirse contra la realidad, y **una clave muerta se autovalida**, porque dice exactamente lo que la persona quería. La regla: **una decisión que se implementa en configuración ajena está cerrada cuando se comprueba su EFECTO**, no cuando se escribe la clave — y en el registro se anota **contra qué versión** se verificó, que es lo que permite distinguir más tarde *«sigue funcionando»* de *«nadie ha vuelto a mirar»*. Y la señal barata: cuando una decisión de configuración produzca un resultado que la contradiga, **sospechar de la clave antes que de la decisión**. *(En un dominio que publicaba a un repositorio público: veinticuatro registros llevaban un pie de atribución que una clave puesta en «no» debía haber quitado. La clave estaba deprecada y su propia documentación lo decía. La decisión estaba tomada, escrita, verificable — y sin efecto.)*
 
 64. **Consumir el canon por referencia obliga a un medidor recurrente, y nacer no lo trae en absoluto.**
+    El método permite leer el canon sin copia local y exige que el clon esté **al día contra la referencia remota** — pero lo exige **una sola vez**, como compuerta de la adhesión. Nada la vuelve recurrente, y **una exigencia de frescura comprobada una vez es una afirmación de estado sin fecha**: exactamente lo que la lección 41 prohíbe. **Un clon es una caché, y una caché sin caducidad miente con cara de fuente** — el día del salto la afirmación es cierta, a la semana es falsa, y el fallo **no tiene síntoma**: ningún error, ningún rojo, el dominio operando con el método de su fecha de adhesión. Y el agravante es compuesto: **el hueco crece cuanto más activo esté el canon**, así que un canon sano castiga a quien consume sin medidor. **La mitad más grave es la otra: la obligación vive en el documento del SALTO, y nacer es pegar la plantilla — un dominio recién nacido no lo lee nunca.** Quien salta tiene un instrumento que puede envejecer; **quien nace no tiene instrumento**, y la puerta por la que entra la mayoría es la que no lo menciona. Además, **pegar la plantilla produce una copia propia por construcción**, así que actualizar el clon no actualiza el dominio: son dos archivos desde el instante en que se pegó, y poner al día el primero **se siente** como haber hecho las dos cosas. No es la lección 61 —aquélla dice que el instrumento viejo miente; ésta dice que **la adhesión nueva no trae instrumento**—. **Al arrancar se mide la frescura y se reporta con su fecha**; inalcanzable es *no verificable*, que no es al día; **el medidor nombra el ref que mide, nunca el puntero de posición** —preguntar por *«donde estoy parado»* en vez de *«mi rama principal»* devuelve un número correcto de otra pregunta, y se ve idéntico a estar atrasado—; y **lo que hay que instalar el primer día, no al saltar**, es el medidor. *(Cuatro casos en un día, con afectado externo: un dominio adherido por referencia conocía 3 parches de 30 y su validador reportaba «0 sin mirar» midiendo contra el transporte anterior —27 invisibles, tres de ellos nacidos allí y devueltos ya incorporados—; el clon con que medía nunca se había actualizado; una instalación nueva de ese mismo día, de la que nadie podía saber si veía las correcciones publicadas; y el cuarto se cobró **al probar el medidor que este parche propone**: el clon del dominio que lo escribió salió atrasado, y el primer intento midió el puntero de posición en vez del ref.)*
 
 65. **Una identidad que se resuelve desde el directorio de invocación falla ABIERTA, y firma
     válido.** La guarda que estas herramientas traen cubre el **olvido** —sin configuración, no
@@ -1371,7 +1372,7 @@ Estas lecciones se ganaron en otro dominio y ya demostraron que generalizan. Van
     leído, y el error ocurrió igual. Las defensas que sí sirven son de código: que toda
     operación con identidad la **nombre en su salida**, y que la identidad **se declare en la
     invocación y se compare**, abortando antes de firmar. Y no hay reparación: en un registro
-    de solo inserción, la corrección es un mensaje nuevo. El método permite leer el canon sin copia local y exige que el clon esté **al día contra la referencia remota** — pero lo exige **una sola vez**, como compuerta de la adhesión. Nada la vuelve recurrente, y **una exigencia de frescura comprobada una vez es una afirmación de estado sin fecha**: exactamente lo que la lección 41 prohíbe. **Un clon es una caché, y una caché sin caducidad miente con cara de fuente** — el día del salto la afirmación es cierta, a la semana es falsa, y el fallo **no tiene síntoma**: ningún error, ningún rojo, el dominio operando con el método de su fecha de adhesión. Y el agravante es compuesto: **el hueco crece cuanto más activo esté el canon**, así que un canon sano castiga a quien consume sin medidor. **La mitad más grave es la otra: la obligación vive en el documento del SALTO, y nacer es pegar la plantilla — un dominio recién nacido no lo lee nunca.** Quien salta tiene un instrumento que puede envejecer; **quien nace no tiene instrumento**, y la puerta por la que entra la mayoría es la que no lo menciona. Además, **pegar la plantilla produce una copia propia por construcción**, así que actualizar el clon no actualiza el dominio: son dos archivos desde el instante en que se pegó, y poner al día el primero **se siente** como haber hecho las dos cosas. No es la lección 61 —aquélla dice que el instrumento viejo miente; ésta dice que **la adhesión nueva no trae instrumento**—. **Al arrancar se mide la frescura y se reporta con su fecha**; inalcanzable es *no verificable*, que no es al día; **el medidor nombra el ref que mide, nunca el puntero de posición** —preguntar por *«donde estoy parado»* en vez de *«mi rama principal»* devuelve un número correcto de otra pregunta, y se ve idéntico a estar atrasado—; y **lo que hay que instalar el primer día, no al saltar**, es el medidor. *(Cuatro casos en un día, con afectado externo: un dominio adherido por referencia conocía 3 parches de 30 y su validador reportaba «0 sin mirar» midiendo contra el transporte anterior —27 invisibles, tres de ellos nacidos allí y devueltos ya incorporados—; el clon con que medía nunca se había actualizado; una instalación nueva de ese mismo día, de la que nadie podía saber si veía las correcciones publicadas; y el cuarto se cobró **al probar el medidor que este parche propone**: el clon del dominio que lo escribió salió atrasado, y el primer intento midió el puntero de posición en vez del ref.)*
+    de solo inserción, la corrección es un mensaje nuevo.
 
 ### 3. Ciclo de vida de un pendiente
 
@@ -1611,13 +1612,16 @@ Qué hace, en orden:
 7. **La bitácora del día.** Una entrada **por día, no por sesión**, siempre al final. Si ya existe la de hoy, no se abre otra: se amplía. **Aquí no va nada que no sea una entrada con fecha** — si sale una lectura de conjunto, va a la nota de interpretación. La bitácora **solo crece**; las lecturas **se reescriben**. Una sección sin fecha aquí significa que se coló algo que no era bitácora.
 8. **¿Algo de esto es del MÉTODO y no de este dominio?** Reescribe cada hallazgo **sustituyendo los nombres propios por genéricos**. ¿Sigue siendo cierto y útil? Si sí, es del método: se escribe como **parche** y se anota en el registro de parches del dominio. **Ante la duda, se escribe** — uno de más cuesta un archivo que nadie aplica; uno de menos cuesta que otra instancia repita el mismo error meses después.
 
-> [!danger] Y revisa qué se PUBLICA, no solo qué se escribe
-> El comando de retomar presenta los parches **entrantes** uno a uno, y un
-> *pospuesto* vuelve a ofrecerse en cada arranque. **En la dirección contraria no
-> hay nada equivalente**, y eso rompe cualquier dominio que decida —con buen
-> criterio— que el asistente **no publica al marco por su cuenta**: publicar
-> escribe en un espacio compartido con otras instancias y no se revierte editando
+> [!danger] Por qué el cierre pregunta por lo que se publica, y no solo por lo que se escribe
+> El comando de retomar presenta los parches **entrantes** uno a uno, y un *pospuesto*
+> vuelve a ofrecerse en cada arranque. **En la dirección de salida hace falta un
+> equivalente** — y es el punto 10 de esta misma fase. Sin él se rompe cualquier dominio que
+> decida —con buen criterio— que el asistente **no publica al marco por su cuenta**:
+> publicar escribe en un espacio compartido con otras instancias y no se revierte editando
 > un archivo local.
+>
+> **Lo que sigue es el porqué de ese punto, no una repetición:** el punto 10 dice qué hacer;
+> esto dice qué pasa cuando no se hace.
 >
 > El problema no es que los borradores se rechacen: es que **no se deciden
 > nunca**. *"Publica solo si el responsable lo pide"* se convierte en *"nunca"*,
@@ -1683,7 +1687,7 @@ Qué hace, en orden:
 
 La regla por defecto de este método es que **publicar al master es parte del mismo acto de aplicar** — no se escala. Un dominio puede decidir lo contrario (que toda publicación pase por el responsable), y esa política es legítima; lo que no puede es quedarse a medias: **una decisión delegada sin momento definido de presentarla no se rechaza — no se toma nunca.** Los borradores se acumulan sin que nada falle ni nadie los vea.
 
-**El momento ya no lo inventa cada dominio: lo da el orden.** El cierre termina presentando los parches pendientes y pidiendo la decisión — el punto 9 de esta fase, y el paso homónimo del motor. Por eso **no hay clave de manifiesto para esto**: si el momento fuera declarable, el dominio que no lo declarara volvería a quedarse sin ninguno, que es exactamente el defecto que esta sección nombra. Un dominio con `aportar_a: ninguno` no recibe la pregunta, porque no delegó nada: sus parches se quedan en casa por diseño.
+**El momento ya no lo inventa cada dominio: lo da el orden.** El cierre termina presentando los parches pendientes y pidiendo la decisión — el punto 10 de esta fase, y el paso homónimo del motor. Por eso **no hay clave de manifiesto para esto**: si el momento fuera declarable, el dominio que no lo declarara volvería a quedarse sin ninguno, que es exactamente el defecto que esta sección nombra. Un dominio con `aportar_a: ninguno` no recibe la pregunta, porque no delegó nada: sus parches se quedan en casa por diseño.
 
 > *En el dominio de origen: la instancia que eligió esa política acumuló borradores sin momento de revisión hasta que un parche lo señaló; la instancia con la política contraria lo descartó con razón — su regla hace que los borradores no lleguen a existir.*
 
@@ -1704,12 +1708,12 @@ origen: <dominio donde nació>
 ---
 ```
 
-#### Cómo se propone un parche al canon
+#### Cómo llega un parche al canon — y quién hace cada parte
 
 Desde el corte 3.0 el canon vive en un repositorio git. **Desde la v3.5 un parche nuevo no se propone ahí: se manda al buzón de aprendizaje con `/vuelamind-learn`**, y el vigía del canon lo escribe en `parches/` con su frontmatter y sus cuatro secciones si sobrevive al juicio. Quien lo revisa **no juzga la verdad del caso ajeno** —no puede, y no debe intentarlo—: juzga **si la lección generaliza**, con la única prueba que este método reconoce — reescríbela sin nombres propios; ¿sobrevive? La verdad del caso se queda donde siempre ha estado: **cada dominio que jale el parche lo juzga contra su propia evidencia**, con los tres veredictos.
 
 - **`origen:`** en un parche propuesto es el handle de quien lo firma, o `anonimo` — nunca el nombre de una organización o un área.
-- **Antes de abrir el PR, anonimiza el conjunto, no el fragmento.** Dos detalles inocentes por separado pueden identificar tu operación juntos, y el que los une suele ser un nombre que quedó en otro archivo por parecer inofensivo. Publicar es irreversible: la revisión va antes del primer push.
+- **Antes de que salga de tu casa, anonimiza el conjunto, no el fragmento.** Dos detalles inocentes por separado pueden identificar tu operación juntos, y el que los une suele ser un nombre que quedó en otro archivo por parecer inofensivo. Publicar es irreversible: **la revisión va antes de que salga de tu casa**, no después.
 > [!important] Desde la v3.5, NI consumir NI aportar cuestan una cuenta
 > **Bajar el método es libre y anónimo.** Cualquiera puede clonar el canon público —el oficial o el que su dominio haya configurado— y recibir cada corrección sin registrarse en ningún sitio, sin pedir permiso y sin dejar rastro.
 >
@@ -1724,6 +1728,17 @@ Desde el corte 3.0 el canon vive en un repositorio git. **Desde la v3.5 un parch
 > **Y no es una puerta que se cierre.** Si algún día abre una cuenta, esos parches acumulados **siguen siendo proponibles tal cual** — llevan fecha, caso y forma de verificarse desde el día que se escribieron. Un parche no caduca por haber esperado.
 >
 > Por eso el manifiesto lo distingue: **`ninguno` es una decisión** —lo aprendido se queda en casa a propósito—, y **no tener cuenta es una circunstancia**. El resultado inmediato se parece; la salida no.
+
+> [!important] Quién hace qué, porque esta sección describe a dos actores
+> **La casa que aporta** escribe su parche —con su `origen:`, sus cuatro secciones y su
+> anonimización— y lo **manda al buzón**. Ahí termina su parte, y **no necesita cuenta en
+> ninguna plataforma**.
+>
+> **El vigía del canon** hace el resto: juzga, armoniza contra la plantilla, **abre el pull
+> request** y rechaza con su porqué. Todo lo que en esta sección hable de PRs es suyo.
+>
+> Se dice porque las dos cosas conviven aquí, y **una casa que lea las instrucciones del
+> vigía como suyas va a buscar una cuenta que no necesita**.
 
 - **Descartar con razón vale más que aplicar por cortesía** — también para el canon: un PR rechazado con su porqué escrito enseña más que uno fusionado por amabilidad.
 
@@ -1777,8 +1792,8 @@ Desde el corte 3.0 el canon vive en un repositorio git. **Desde la v3.5 un parch
 > cifrados, inalcanzables o en otra máquina—, **no la implementes en verde**:
 > diría *"en ningún otro dominio"* para todo, que es el mismo falso negativo con
 > forma de dato.
-8. **`initPrompt.md`.** Reescribirlo con el estado real: por dónde seguir, qué se cerró, qué se descubrió, y **qué supuestos resultaron falsos** — esa última parte es la que evita repetir el error en la sesión siguiente.
-9. **Presentar los parches por proponer, y pedir la decisión.** El último acto, después de reportar. Si `aportar_a` nombra un repositorio, **se presentan uno a uno los parches pendientes de proponer** —qué corrige cada uno y qué costaría publicarlo— y se pide confirmación de publicarlos. Con `aportar_a: ninguno` no se presenta nada: no hay decisión que pedir, y preguntarlo cada cierre es ruido que enseña a contestar que no sin mirar. **Dos estados, porque en un listado se ven idénticos:** `nunca presentado` se re-ofrece en **cada** cierre hasta que haya decisión; `decidido no publicar` lleva su motivo escrito y **no vuelve a ofrecerse**. Confirmar el checkpoint y confirmar una publicación son **actos distintos**: el segundo cruza el borde de salida del dominio y por eso se pide aparte. *(Parche `los-parches-por-proponer-se-quedan-sin-presentar`.)*
+9. **`initPrompt.md`.** Reescribirlo con el estado real: por dónde seguir, qué se cerró, qué se descubrió, y **qué supuestos resultaron falsos** — esa última parte es la que evita repetir el error en la sesión siguiente.
+10. **Presentar los parches por proponer, y pedir la decisión.** El último acto, después de reportar. Si `aportar_a` nombra un repositorio, **se presentan uno a uno los parches pendientes de proponer** —qué corrige cada uno y qué costaría publicarlo— y se pide confirmación de publicarlos. Con `aportar_a: ninguno` no se presenta nada: no hay decisión que pedir, y preguntarlo cada cierre es ruido que enseña a contestar que no sin mirar. **Dos estados, porque en un listado se ven idénticos:** `nunca presentado` se re-ofrece en **cada** cierre hasta que haya decisión; `decidido no publicar` lleva su motivo escrito y **no vuelve a ofrecerse**. Confirmar el checkpoint y confirmar una publicación son **actos distintos**: el segundo cruza el borde de salida del dominio y por eso se pide aparte. *(Parche `los-parches-por-proponer-se-quedan-sin-presentar`.)*
 
 **Conviene tener un validador mecánico** para los puntos 1 a 3, que son puramente estructurales. Tres advertencias ganadas en el original:
 
