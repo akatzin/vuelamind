@@ -84,7 +84,7 @@ Prioridad a **lo que se afirmó sin comprobar** y a lo que depende de estado vol
 
 ### El radio del cambio — descubre las relaciones ANTES de cerrar la lista
 
-La lista de notas a tocar **no sale solo de lo que la sesión tuvo abierto**: sale del **grafo de enlaces**. Por cada nota candidata, dos barridos:
+La lista de notas a tocar **no sale solo de lo que la sesión tuvo abierto**: sale del **grafo de enlaces** — y de lo que la sesión hizo desaparecer. Por cada nota candidata, cuatro barridos:
 
 1. **Hacia afuera**: sus `[[enlaces]]` salientes — ¿alguna vecina habla del mismo tema y quedaría desactualizada, o tiene un *"por confirmar"* que este cambio responde?
 2. **Hacia adentro**: quién la enlaza (`grep` del nombre de la nota sobre el vault) — ¿alguien cita como hecho lo que este cambio vuelve falso?
@@ -97,6 +97,19 @@ La lista de notas a tocar **no sale solo de lo que la sesión tuvo abierto**: sa
    > Una regla que cambia **no rompe nada visible**: los conteos cuadran, los enlaces resuelven, el validador sale verde. El desalineamiento vive en el contenido, y el contenido no se valida solo.
    >
    > **Si el barrido devuelve muchos, no es motivo para posponerlo entero:** se corrige lo que la regla vuelve *falso* —que es urgente— y se anota como pendiente lo que solo vuelve *inconsistente*. Lo que no se vale es cambiar la regla y dejar el corpus sin mirar, porque entonces la regla nueva convive con su contradicción y **la siguiente sesión no sabrá cuál de las dos manda**.
+
+4. **Hacia lo retirado** — éste no mira notas: mira **lo que ya no está**. Qué desmontó, apagó, borró o consumió esta sesión, y si está escrito **cómo se rehace**.
+
+   Los tres anteriores miran lo que el cambio **afirma**. Una rama borrada, un servicio apagado, una máquina de pruebas desmontada, una credencial retirada **no vuelven falsa ninguna nota**: desaparecen sin contradecir nada, así que ningún barrido las delata y ningún validador las cuenta.
+
+   > [!danger] Documentar cómo se retira algo NO es documentar cómo se rehace
+   > Son dos procedimientos distintos y el que hace falta después es el segundo. Pero **una nota de retirada se lee como completa** — tiene título y pasos, y el hueco solo aparece cuando alguien quiere lo contrario.
+
+   **Se lleva un registro de desmontajes** con cuatro columnas obligatorias: **qué · cuándo · por qué · cómo se rehace**. Una fila sin la cuarta aparenta que el desmontaje está documentado.
+
+   **La cuarta admite tres respuestas**, no una: la **receta**; **quién la tiene**, si es de otro; o **«no se rehace sin decisión»**, cuando volver exige una autorización que no se hereda. Vacía no — eso es indistinguible de que nadie se lo preguntó.
+
+   Registro y no sección de prosa: lo desmontado **no tiene tema propio**, así que sin un sitio común se documenta donde caiga y no se encuentra; y unas columnas fijas **se validan mecánicamente**.
 
 Lo que el barrido encuentre **entra a la lista del paso 3 como fila propia**, con su porqué. Mirar la estructura de carpetas no basta — nada en un nombre de archivo dice "esto es relevante"; la relación temática vive en el grafo. Y si el tema no tiene nota de la que salir, eso también es hallazgo: un track sin nodo no aparece en ningún censo.
 
