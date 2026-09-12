@@ -11,18 +11,25 @@
 # el método sirve a casas que no tienen por qué aprender git para poder releerse. Un dominio
 # que YA viva en git puede usar el suyo y saltarse esto.
 #
-#   instantanea_vault.sh tomar <vault>   al abrir, antes de tocar nada
-#   instantanea_vault.sh diff  <vault>   al cerrar, antes de darlo por bueno
-#   instantanea_vault.sh tirar <vault>   cuando ya se leyó
+#   instantanea_vault.sh diff     <vault>   al cerrar: qué se escribió desde el cierre anterior
+#   instantanea_vault.sh renovar  <vault>   al TERMINAR el cierre, ya releído
+#   instantanea_vault.sh tomar    <vault>   la primera vez, o si se perdió
 #
-# El dominio lo engancha en `antes_de_medir` para que nadie tenga que acordarse.
+# CUÁNDO SE TOMA, que es lo único que hay que entender: al TERMINAR cada cierre, no al
+# empezar. Si se tomara al empezar el cierre, la copia ya traería dentro todo lo que la
+# sesión escribió y el diff saldría vacío — es el error fácil, y da un verde que miente.
+#
+# Tomándola al terminar, el diff del cierre siguiente cubre TODO lo escrito desde el
+# anterior. Y esa es además la unidad correcta: no «lo de esta sesión», sino **lo que nadie
+# ha releído todavía** — que es lo que importa, porque una sesión que no cerró también
+# escribió.
 
 set -eu
 
 ACCION="${1:-}"
 VAULT="${2:-${VUELAMIND_VAULT:-}}"
 
-[ -n "$ACCION" ] || { echo "uso: $0 tomar|diff|tirar <ruta-del-vault>" >&2; exit 1; }
+[ -n "$ACCION" ] || { echo "uso: $0 diff|renovar|tomar|tirar <ruta-del-vault>" >&2; exit 1; }
 [ -n "$VAULT" ] || { echo "falta la ruta del vault (o la variable VUELAMIND_VAULT)" >&2; exit 1; }
 [ -d "$VAULT" ] || { echo "no existe el vault: $VAULT" >&2; exit 2; }
 
@@ -37,18 +44,21 @@ notas() {
 }
 
 case "$ACCION" in
-tomar)
+tomar|renovar)
     rm -rf "$COPIA"; mkdir -p "$COPIA"
     notas | while IFS= read -r f; do
         mkdir -p "$COPIA/$(dirname "$f")"
         cp "$VAULT/$f" "$COPIA/$f"
     done
-    echo "instantánea tomada: $(notas | wc -l | tr -d ' ') notas"
+    echo "instantánea $([ "$ACCION" = renovar ] && echo renovada || echo tomada): $(notas | wc -l | tr -d ' ') notas"
+    echo "  el próximo cierre comparará contra esto"
+
     ;;
 diff)
     [ -d "$COPIA" ] || {
-        echo "NO HAY INSTANTÁNEA — este cierre NO puede releer lo que escribió." >&2
-        echo "  Se toma al abrir:  $0 tomar $VAULT" >&2
+        echo "NO HAY INSTANTÁNEA — este cierre NO puede releer lo que se escribió." >&2
+        echo "  Se toma una vez:  $0 tomar $VAULT" >&2
+        echo "  y se renueva al terminar cada cierre, ya releído." >&2
         echo "  Dilo en el reporte en vez de seguir como si se hubiera releído." >&2
         exit 3; }
     nuevas=$(notas | while IFS= read -r f; do [ -f "$COPIA/$f" ] || echo "$f"; done)
@@ -69,6 +79,6 @@ tirar)
     rm -rf "$COPIA"; echo "instantánea tirada"
     ;;
 *)
-    echo "uso: $0 tomar|diff|tirar <ruta-del-vault>" >&2; exit 1
+    echo "uso: $0 diff|renovar|tomar|tirar <ruta-del-vault>" >&2; exit 1
     ;;
 esac
