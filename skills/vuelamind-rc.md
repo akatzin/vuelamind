@@ -50,16 +50,32 @@ y el registro de sesiones a `~/.claude/vuelamind-bridge-sessions.json`.
 Desde las herramientas del skill:
 
 ```sh
-python3 herramientas/interfaz_agente/install.py --cwd <ruta-de-trabajo-de-las-sesiones>
+python3 herramientas/interfaz_agente/install.py \
+        --permission safe \
+        --cwd <ruta-de-trabajo-de-las-sesiones>
 ```
+
+**`--permission` es obligatorio y no tiene valor por omisión**: `safe` solo lee y conversa,
+`tools` añade Python y web, `full` ejecuta todo sin preguntar. Sin la bandera el instalador
+se niega — ver la tabla de niveles abajo.
 
 El instalador **detecta el SO** y arma el arranque automático que corresponde:
 
 | SO | Mecanismo | Estado |
 |---|---|---|
 | macOS | LaunchAgent `com.vuelamind.rc` (`~/Library/LaunchAgents`) | **MEDIDO** |
-| Windows | Tarea Programada `VuelamindRC` al iniciar sesión (`schtasks`, con `pythonw`) | INFERIDO (escrito, no probado en Windows) |
+| Windows | Tarea Programada `VuelamindRC` (`schtasks` desde XML, con `pythonw`) | **MEDIDO** |
 | Linux | unidad `systemd --user` (`vuelamind-rc.service`) | INFERIDO |
+
+### En Windows, cuándo arranca: `--sesion`
+
+| | Qué hace | Precio |
+|---|---|---|
+| **`siempre`** *(default)* | arranca **con la máquina**, haya sesión iniciada o no, y sin guardar contraseña | corre sin escritorio ni credenciales de red — para un servicio en loopback no estorba |
+| `interactiva` | arranca al **iniciar sesión**, dentro de la sesión del usuario | **sin sesión abierta no corre**, y el Programador acepta la orden sin ejecutar nada ni dar error |
+
+El default es `siempre` porque es el que no depende de que alguien haya entrado. En macOS y
+Linux la bandera no aplica.
 
 > [!danger] Ejecutar el instalador puede requerir tu mano
 > En modo auto, tocar el arranque del sistema (`launchctl` / `schtasks` /
@@ -73,7 +89,8 @@ El instalador **detecta el SO** y arma el arranque automático que corresponde:
 ```sh
 python3 herramientas/interfaz_agente/install.py --status        # ¿está arriba?
 python3 herramientas/interfaz_agente/install.py --uninstall     # quita el autostart
-python3 herramientas/interfaz_agente/install.py --no-start      # instala sin arrancar
+python3 herramientas/interfaz_agente/install.py --no-start      # copia los archivos y NO instala el autostart
+python3 herramientas/interfaz_agente/install.py --sesion interactiva --permission safe   # Windows: arrancar solo con sesión
 python3 herramientas/interfaz_agente/install.py --set CLAUDE_CODE_USE_VERTEX=1 \
         --set ANTHROPIC_VERTEX_PROJECT_ID=<proj> --set CLOUD_ML_REGION=<region>
 ```
