@@ -90,6 +90,20 @@ def exigir_python(py):
         may, men = (int(x) for x in sal.stdout.strip().split("."))
     except Exception as e:
         sys.exit(f"no pude preguntarle la version a {py}: {type(e).__name__}: {e}")
+    # Y no basta con la versión: en macOS el instalador ESCRIBE un plist, así que ese
+    # intérprete tiene que poder. MEDIDO el 2026-09-11: dos pythons de Homebrew de una
+    # misma máquina tienen `pyexpat` enlazado contra un libexpat que ya no exporta su
+    # símbolo, y `install_darwin()` moría con un traceback crudo DESPUÉS de haber escrito
+    # el .env y copiado los archivos. Se comprueba ANTES de tocar nada.
+    if platform.system() == "Darwin":
+        r = subprocess.run([py, "-c", "import plistlib"], capture_output=True, text=True)
+        if r.returncode != 0:
+            sys.exit("ME NIEGO A INSTALAR: ese interprete no puede escribir plists, y en\n"
+                     "  macOS el arranque automatico es un plist.\n"
+                     f"  Interprete: {py}\n"
+                     f"  Lo que dice al intentarlo: {r.stderr.strip().splitlines()[-1][:160]}\n"
+                     "  Suele ser una instalacion de Python con pyexpat roto. Usa otro\n"
+                     "  interprete, o instala solo el nucleo portable con --no-start.")
     if (may, men) < MINIMO_PY:
         sys.exit(f"ME NIEGO A INSTALAR: ese interprete es Python {may}.{men} y hace falta "
                  f"{MINIMO_PY[0]}.{MINIMO_PY[1]} o superior.\n"
