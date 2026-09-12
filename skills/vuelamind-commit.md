@@ -177,6 +177,22 @@ El **único** paso que escribe en el vault. En este orden, porque cada uno depen
 
 Al terminar, **volver a correr el validador**: los cambios pueden romper conteos o dejar un enlace colgante nuevo.
 
+**Y releer lo que la sesión escribió** — con `herramientas/instantanea_vault.sh diff`, o con lo que el dominio tenga. **Ni el barrido del radio ni el validador lo hacen**: el radio mira las **vecinas** de lo tocado, el validador mira **mecánica**. Un párrafo nuevo que afirma algo falso **pasa los dos**, porque cuadra, enlaza y no contradice a nadie — es la única parte del cierre que nada comprueba.
+
+> [!important] La instantánea se renueva al TERMINAR el cierre, no al empezarlo
+> Si se tomara al empezar, la copia ya traería dentro todo lo que la sesión escribió y **el
+> diff saldría vacío** — un verde que miente, y el error fácil de cometer.
+>
+> Renovándola al terminar, el diff del cierre siguiente cubre **todo lo escrito desde el
+> anterior**. Y ésa es además la unidad correcta: no *«lo de esta sesión»* sino **lo que nadie
+> ha releído todavía** — porque una sesión que no llegó a cerrar también escribió.
+
+Así que el cierre hace dos cosas con ella: **comparar** aquí, y **renovar** al final, ya
+releída. **Si falta la instantánea, se dice** en vez de seguir como si se hubiera releído.
+
+> [!note] Por qué esto no es git
+> Lo que hace falta es el diff de **una sesión**, no una historia — y meter un repositorio sube la barrera para quien no es técnico sin dar nada más. Un dominio que ya viva en git puede usar el suyo; el resto no debería tener que aprenderlo para poder releerse.
+
 **Y barrer las remisiones con fecha que se escribieron hoy.** Una frase del tipo *"ver `<nota>`, `<fecha>`"* **promete una sección**, y el chequeo de enlaces no puede verla: comprueba que el archivo destino exista —y existe siempre—, no que la entrada de ese día esté dentro. Una remisión a una sección no escrita **pasa en verde y se lee como respaldo**, que es peor que no citar nada: quien la sigue encuentra el archivo lleno de otras entradas y concluye que buscó mal.
 
 Es un `grep` por fecha, no una lectura: por cada remisión con la fecha de hoy, comprobar que el destino tenga una sección con esa fecha. Lo que **no** debe reportarse es un enlace **sin** fecha — ése no promete nada. Y la regla al escribir: **la entrada primero, aunque sea su título y una línea; el enlace después.** Si no va a escribirse ahora, la remisión correcta es sin fecha, que se lee como pendiente. *(Parche `un-enlace-con-fecha-promete-contenido`.)*
