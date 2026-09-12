@@ -93,6 +93,20 @@ if sys.version_info < (3, 10):
 
 _load_env_file()
 
+# Sin consola —`pythonw` bajo el Programador— el servicio se queda MUDO: no hay dónde
+# escribir ni un arranque ni un error. Se le da una bitácora para que el silencio no sea
+# la única señal.
+if sys.stderr is None or sys.stdout is None:
+    try:
+        _bitacora = open(Path.home() / ".claude" / "vuelamind-rc.log", "a",
+                         encoding="utf-8", errors="replace", buffering=1)
+        if sys.stdout is None:
+            sys.stdout = _bitacora
+        if sys.stderr is None:
+            sys.stderr = _bitacora
+    except Exception:
+        pass   # sin bitácora se sigue: la guarda de log_message ya evita el crash
+
 # TODA lectura, escritura y tubería de este archivo declara `encoding="utf-8"`, y no es
 # manía: `read_text()` sin codificación usa la del SISTEMA — UTF-8 en Unix, CP1252 en
 # Windows. MEDIDO en Windows 11 el 2026-09-11: el servicio arrancaba, el puerto abría, y
@@ -546,6 +560,20 @@ class Handler(BaseHTTPRequestHandler):
             return {}
 
     def log_message(self, fmt, *args):  # silencio; logging propio abajo
+        # `pythonw.exe` lanzado POR EL PROGRAMADOR DE TAREAS no tiene consola:
+        # `sys.stderr` es None, y esto corre EN CADA PETICIÓN. MEDIDO en Windows el
+        # 2026-09-11 con una tarea de prueba: el puente abría el puerto, quedaba
+        # LISTENING, y reventaba en TODA petición antes de responder. El cliente veía
+        # «the connection was closed unexpectedly» y no quedaba rastro, porque el único
+        # sitio donde se escribiría el error es justo el que no existe.
+        #
+        # Y lo peor, visto por accidente: el trabajo SÍ se hacía antes de reventar. Un
+        # turno creaba la sesión y la registraba, moría al escribir la línea del log, y
+        # al reintentar con el mismo nombre contestaba 409 «ya existe». El efecto queda
+        # hecho y el acuse se pierde: quien reintenta choca contra su propio trabajo
+        # invisible.
+        if sys.stderr is None:
+            return
         sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
 
     # --- ruteo

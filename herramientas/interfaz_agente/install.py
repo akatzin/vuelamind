@@ -368,8 +368,13 @@ TAREA_XML = """<?xml version="1.0" encoding="UTF-16"?>
 # `S4U` corre con o sin sesion iniciada y sin guardar contrasena, a cambio de no tener
 # escritorio ni credenciales de red. Para un servicio en loopback eso no estorba.
 #
-# El default se queda en `interactiva` porque es lo que habia y cambiarlo en silencio seria
-# cambiarle la conducta a quien ya lo instalo. La eleccion es de quien mantiene el canon.
+# EL DEFAULT ES `siempre` (S4U), por decision de quien mantiene el canon el 2026-09-11, y
+# la razon es que es el camino MEDIDO: `Last Result 267009` = TASK_RUNNING, puerto en
+# escucha, sin sesion iniciada y sin guardar contrasena. `interactiva` tambien se midio
+# funcionando ese mismo dia —disparo sola 27 segundos despues del logon, en Console 1—,
+# pero solo corre si hay sesion abierta, y sin ella el Programador ACEPTA la orden y no
+# ejecuta nada, sin error en ningun sitio. Entre dos caminos que funcionan, se publica el
+# que no depende de que alguien haya iniciado sesion.
 TIPOS_LOGON = {"interactiva": "InteractiveToken", "siempre": "S4U"}
 
 
@@ -457,7 +462,7 @@ def main(argv=None):
     ap.add_argument("--port", type=int)
     ap.add_argument("--model")
     ap.add_argument("--permission", choices=["full", "tools", "safe"])
-    ap.add_argument("--sesion", choices=["interactiva", "siempre"], default="interactiva",
+    ap.add_argument("--sesion", choices=["interactiva", "siempre"], default="siempre",
                     help="Windows: 'interactiva' solo corre con sesion abierta (lo de siempre); "
                          "'siempre' corre con o sin sesion, sin escritorio ni red remota")
     ap.add_argument("--set", action="append", metavar="KEY=VALUE",
