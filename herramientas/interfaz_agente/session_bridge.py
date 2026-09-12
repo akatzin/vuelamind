@@ -507,7 +507,7 @@ class Handler(BaseHTTPRequestHandler):
     def _json(self, code: int, payload: dict) -> None:
         body = json.dumps(payload).encode()
         self.send_response(code)
-        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -761,6 +761,19 @@ def _now() -> str:
 def main():
     if not Path(CLAUDE).exists() and not shutil.which(CLAUDE):
         sys.exit(f"no encuentro el binario claude en: {CLAUDE}")
+    # El `cwd` se comprueba AL ARRANCAR. MEDIDO el 2026-09-11 en Windows: con un
+    # `BRIDGE_CWD` inexistente el puente arranca, sirve la página entera y contesta
+    # `/health` con `ok: true` — y revienta en el PRIMER TURNO con `NotADirectoryError
+    # [WinError 267] The directory name is invalid`, que habla de directorios sin decir
+    # cuál. Quien lo reciba va a buscar el defecto en el CLI, que es donde no está.
+    # Un fallo diferido cuesta más que uno inmediato: el arranque sano es una promesa.
+    if not Path(DEFAULT_CWD).is_dir():
+        sys.exit(f"ME NIEGO A ARRANCAR: el directorio de trabajo no existe.\n"
+                 f"  BRIDGE_CWD = {DEFAULT_CWD}\n"
+                 "  Créalo, o apúntalo a otro con --set BRIDGE_CWD=<ruta> al instalar.\n"
+                 "  Si arrancara igual, el fallo saldría en el primer turno y hablaría\n"
+                 "  de directorios sin decir cuál.")
+
     # El nivel de permiso NO tiene valor por omision: sin declararlo, no se arranca.
     # `full` concede ejecucion arbitraria, y nadie debe heredarla por no haber escrito
     # nada. Quien la quiere, la firma en su .env.
@@ -771,7 +784,22 @@ def main():
     if DEFAULT_PERMISSION not in PERMISSION_ARGS:
         sys.exit(f"ME NIEGO A ARRANCAR: BRIDGE_PERMISSION={DEFAULT_PERMISSION!r} no existe. "
                  "Usa full | tools | safe.")
-    srv = ThreadingHTTPServer((HOST, PORT), Handler)
+    # En Windows, `allow_reuse_address` (SO_REUSEADDR) SI permite un bind duplicado, así
+    # que un segundo puente levanta EN SILENCIO sobre el mismo puerto. MEDIDO el
+    # 2026-09-11 provocándolo: dos procesos LISTENING en 8872, el segundo sin decir nada.
+    # Quedan dos puentes con DOS REGISTROS de sesiones distintos y las peticiones caen en
+    # cualquiera: el usuario ve sesiones que aparecen y desaparecen, y ningún log lo dice.
+    # En Linux y macOS el mismo código da «Address already in use». Es divergencia de
+    # plataforma, no del código — y aquí el diseño produce el escenario solo: la tarea
+    # levanta uno al iniciar sesión y alguien levanta otro a mano.
+    if os.name == "nt":
+        ThreadingHTTPServer.allow_reuse_address = False
+    try:
+        srv = ThreadingHTTPServer((HOST, PORT), Handler)
+    except OSError as e:
+        sys.exit(f"NO PUEDO ESCUCHAR EN {HOST}:{PORT} — {e}\n"
+                 "  Lo más probable: ya hay un puente corriendo en ese puerto.\n"
+                 "  Míralo y mátalo, o arranca éste con otro PORT.")
     print(f"puente escuchando en http://{HOST}:{PORT}  (solo loopback, sin token)")
     print(f"candados: allowlist de Host + chequeo de Origin en POST/DELETE")
     print(f"modelo por defecto: {DEFAULT_MODEL or '(el del CLI)'}   ·   cwd por defecto: {DEFAULT_CWD}")
