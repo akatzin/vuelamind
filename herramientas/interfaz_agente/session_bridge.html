@@ -182,7 +182,9 @@
 </main>
 <script>
 const $ = s => document.querySelector(s);
-const state = { current: null, usage: {}, commands: [], skills: [] };
+const state = { current: null, usage: {}, commands: [], skills: [], streams: {} };
+// streams: los turnos EN VUELO, por nombre de sesión. Un turno pertenece a la sesión
+// que lo pidió, no a la que estés mirando cuando termine — ver el comentario de send().
 
 function hdrs(){ return { "Content-Type":"application/json" }; }
 function setDot(ok){ $("#dot").className = "dot " + (ok?"ok":"bad"); }
@@ -403,6 +405,8 @@ function render(){
     }
     log.appendChild(d);
   });
+  const vivo=state.streams[state.current];        // un turno en vuelo de ESTA sesión
+  if(vivo && vivo.el) log.appendChild(vivo.el);   // el nodo conserva sus pasos: vuelve entero
   log.scrollTop=log.scrollHeight;
 }
 
@@ -453,15 +457,15 @@ $("#create").onclick=async()=>{
 // ---- panel de progreso en vivo (streaming NDJSON) ----
 const TOOL_ICON={Bash:"🔧",Read:"📖",Write:"✍️",Edit:"✏️",NotebookEdit:"✏️",
   WebFetch:"🌐",WebSearch:"🔎",Grep:"🔎",Glob:"🔎",Task:"🤖",Skill:"🧩"};
-function startStream(){
-  const log=$("#log");
-  const d=document.createElement("div"); d.className="msg asst stream"; d.id="stream";
-  d.innerHTML=`<div class="who">${state.current}</div>`;
+function startStream(owner){
+  const d=document.createElement("div"); d.className="msg asst stream";
+  d.innerHTML=`<div class="who">${owner}</div>`;
   const status=document.createElement("div"); status.className="st-status"; d.appendChild(status);
   const steps=document.createElement("div"); steps.className="st-steps"; d.appendChild(steps);
-  log.appendChild(d); log.scrollTop=log.scrollHeight;
   const t0=Date.now();
-  const p={el:d, status, steps, timer:null, usage:null};
+  const p={el:d, status, steps, timer:null, usage:null, owner};
+  state.streams[owner]=p;
+  if(owner===state.current){ const log=$("#log"); log.appendChild(d); log.scrollTop=log.scrollHeight; }
   const fmtDur=n=>n<60?n+"s":Math.floor(n/60)+"m "+(n%60)+"s";
   p.upd=()=>{ const n=Math.round((Date.now()-t0)/1000);
     p.status.textContent="⏳ trabajando… "+fmtDur(n)+(p.usage?"   ·   "+usageText(p.usage):""); };
@@ -471,12 +475,12 @@ function startStream(){
 function addStep(p, icon, text){
   const s=document.createElement("div"); s.className="st-step";
   s.textContent=icon+" "+text; p.steps.appendChild(s);
-  $("#log").scrollTop=$("#log").scrollHeight;
+  if(p.owner===state.current) $("#log").scrollTop=$("#log").scrollHeight;
 }
-function updUsage(ev){
-  if(!state.current) return;
+function updUsage(ev, owner){
+  if(!owner) return;
   const u={context_tokens:ev.context_tokens,output_tokens:ev.output_tokens,window:ev.window};
-  state.usage[state.current]=u; saveUsage(state.current,u); renderUsage(state.current);
+  state.usage[owner]=u; saveUsage(owner,u); if(owner===state.current) renderUsage(owner);
 }
 function handleEv(ev, p){
   if(ev.kind==="init"){
@@ -486,7 +490,7 @@ function handleEv(ev, p){
   } else if(ev.kind==="text"){
     const t=ev.text.trim(); if(t) addStep(p, "💬", t.length>240?t.slice(0,240)+"…":t);
   } else if(ev.kind==="usage"){
-    updUsage(ev);                                  // badge persistente en la cabecera
+    updUsage(ev, p&&p.owner);                      // badge persistente en la cabecera
     if(p){ p.usage={context_tokens:ev.context_tokens,output_tokens:ev.output_tokens,window:ev.window};
            if(p.upd) p.upd(); }                    // + en vivo, al lado del cronómetro
   } else if(ev.kind==="compact"){
@@ -495,7 +499,12 @@ function handleEv(ev, p){
     addStep(p, "⚠️", (ev.error||"error").slice(0,240));
   }
 }
-function endStream(p){ if(p&&p.timer)clearInterval(p.timer); if(p&&p.el)p.el.remove(); }
+function endStream(p){
+  if(!p) return;
+  if(p.timer) clearInterval(p.timer);
+  if(p.el) p.el.remove();
+  if(p.owner && state.streams[p.owner]===p) delete state.streams[p.owner];
+}
 
 async function send(){
   const t=$("#input").value.trim();
@@ -504,13 +513,18 @@ async function send(){
   const message=buildMessage(t);
   const attachments=buildAttachments();
   const shown = t + (okAtts.length ? (t?"\n":"")+"📎 "+okAtts.map(a=>a.name).join(", ") : "");
+  // EL DUEÑO DEL TURNO SE CAPTURA AQUÍ Y NO SE VUELVE A PREGUNTAR.
+  // Antes todo esto leía state.current en vivo: si cambiabas de sesión mientras el turno
+  // corría, la respuesta se guardaba en el historial de la sesión que estuvieras mirando
+  // al terminar — se perdía de la suya y ensuciaba la otra, sin que nada fallara.
+  const owner=state.current;
   $("#input").value=""; clearAtts(); $("#send").disabled=true;
-  pushTx(state.current,"user",shown); render();
-  const panel=startStream();
+  pushTx(owner,"user",shown); render();
+  const panel=startStream(owner);
   let finalText="", isErr=false;
   try{
     const body={message}; if(attachments.length) body.attachments=attachments;
-    const r=await fetch(`/sessions/${encodeURIComponent(state.current)}/stream`,
+    const r=await fetch(`/sessions/${encodeURIComponent(owner)}/stream`,
                         {method:"POST", headers:hdrs(), body:JSON.stringify(body)});
     setDot(r.ok);
     if(!r.ok){ const j=await r.json().catch(()=>({})); throw new Error(j.error||("HTTP "+r.status)); }
@@ -529,8 +543,8 @@ async function send(){
       }
     }
     endStream(panel);
-    pushTx(state.current, isErr?"err":"asst", finalText || (isErr?"(error)":""));
-  }catch(e){ endStream(panel); setDot(false); pushTx(state.current,"err",e.message); }
+    pushTx(owner, isErr?"err":"asst", finalText || (isErr?"(error)":""));
+  }catch(e){ endStream(panel); setDot(false); pushTx(owner,"err",e.message); }
   render(); $("#send").disabled=false; $("#input").focus();
 }
 $("#send").onclick=send;
