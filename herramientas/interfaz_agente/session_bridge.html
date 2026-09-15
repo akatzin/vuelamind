@@ -229,8 +229,20 @@ const IMG_TYPES = ["image/png","image/jpeg","image/gif","image/webp"];
 const TEXT_EXT = /\.(txt|md|markdown|mdx|rst|json|jsonl|ndjson|csv|tsv|log|ya?ml|toml|ini|conf|cfg|env|properties|xml|html?|css|scss|sass|less|js|mjs|cjs|jsx|ts|tsx|py|rb|go|rs|java|kt|kts|scala|c|h|cc|cpp|hpp|hh|m|mm|cs|php|swift|dart|lua|pl|r|sh|bash|zsh|fish|ps1|bat|sql|graphql|gql|proto|tf|hcl|dockerfile|makefile|gitignore|gitattributes|editorconfig)$/i;
 function isImage(f){ const t=(f.type||"").toLowerCase(); return t.startsWith("image/") && t!=="image/svg+xml"; }
 function isPdf(f){ return (f.type||"").toLowerCase()==="application/pdf" || /\.pdf$/i.test(f.name||""); }
+// Los formatos de Office son ZIP con XML dentro, y su tipo MIME lleva la palabra
+// "openxmlformats" — que contiene "xml". Sin esta guarda, isText() los daba por texto y
+// readAsText() leía el ZIP: al modelo le llegaba un galimatías CON NOMBRE DE DOCUMENTO,
+// sin error y sin aviso. Solo fallaba en voz alta si pasaba de 512 KB, y entonces mentía
+// diciendo "texto muy grande". MEDIDO con un .docx real.
+const OFFICE_EXT = /\.(docx?|xlsx?|pptx?|odt|ods|odp|pages|numbers|key|rtf)$/i;
+function isOffice(f){
+  const n=(f.name||"").toLowerCase(), t=(f.type||"").toLowerCase();
+  return OFFICE_EXT.test(n) || t.includes("officedocument") || t.includes("opendocument")
+         || t.includes("msword") || t.includes("ms-excel") || t.includes("ms-powerpoint");
+}
 function isText(f){
   const n=(f.name||"").toLowerCase(), t=(f.type||"").toLowerCase();
+  if(isOffice(f)) return false;              // antes que nada: un ZIP no es texto
   if(t.startsWith("text/")) return true;
   if(/(json|xml|javascript|ecmascript|csv|yaml|x-sh|x-python|svg)/.test(t)) return true;
   if(TEXT_EXT.test(n) || /(^|\/)(dockerfile|makefile)$/.test(n)) return true;
@@ -263,6 +275,9 @@ function addFiles(files){
       if(f.size>MAX_PDF) return push({name:f.name,ok:false,reason:"PDF muy grande (>20 MB)"});
       return readB64(f,d=> d?push({name:f.name,ok:true,kind:"media",media_type:"application/pdf",data:d})
                             :push({name:f.name,ok:false,reason:"no se pudo leer"}));
+    }
+    if(isOffice(f)){
+      return push({name:f.name,ok:false,reason:"documento de Office: no se lee como texto"});
     }
     if(isText(f)){
       if(f.size>MAX_TEXT) return push({name:f.name,ok:false,reason:"texto muy grande (>512 KB)"});
