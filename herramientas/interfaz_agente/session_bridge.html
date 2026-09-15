@@ -149,13 +149,16 @@
         <option value="tools">Python + red acotada</option>
         <option value="safe">Solo lectura / chat</option>
       </select>
-      <select id="newModel" title="Modelo (vacío = el que use el servidor)">
-        <option value="">Modelo por defecto del servidor</option>
-        <option value="claude-opus-4-8">claude-opus-4-8 (este despliegue)</option>
-        <option value="claude-opus-5">claude-opus-5</option>
-        <option value="claude-sonnet-5">claude-sonnet-5</option>
-        <option value="claude-haiku-4-5-20251001">claude-haiku-4-5</option>
-      </select>
+      <input id="newModel" list="modelosSugeridos" autocomplete="off"
+             placeholder="Modelo por defecto del servidor"
+             title="Modelo (vacío = el que use el servidor). Se puede teclear cualquier id, p.ej. claude-opus-4-8[1m] para la ventana de 1M">
+      <datalist id="modelosSugeridos">
+        <option value="claude-opus-4-8">
+        <option value="claude-opus-4-8[1m]">
+        <option value="claude-opus-5">
+        <option value="claude-sonnet-5">
+        <option value="claude-haiku-4-5-20251001">
+      </datalist>
       <button id="create">Crear sesión</button>
     </div>
   </aside>
