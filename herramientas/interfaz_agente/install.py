@@ -24,6 +24,9 @@ Uso:
 """
 
 import argparse
+import datetime
+import hashlib
+import json
 import os
 import platform
 import shutil
@@ -37,6 +40,7 @@ OLD_LABELS = ["ai.vuelamind.session-bridge"]      # etiquetas de versiones previ
 HOME = Path.home()
 CONF_DIR = HOME / ".claude"
 ENV_FILE = CONF_DIR / "vuelamind-rc.env"
+HUELLA_FILE = "INSTALADO.json"   # estado que escribe la maquina, no configuracion
 INSTALL_DIR = CONF_DIR / "vuelamind-rc"
 ASSETS = Path(__file__).resolve().parent
 
@@ -70,6 +74,10 @@ for _flujo in (sys.stdout, sys.stderr):
         _flujo.reconfigure(errors="replace")
     except Exception:
         pass
+
+
+def _ahora_iso() -> str:
+    return datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
 
 
 def say(msg):
@@ -259,12 +267,66 @@ def write_env_file(cfg):
 
 def copy_assets():
     INSTALL_DIR.mkdir(parents=True, exist_ok=True)
+    copiados = {}
     for f in ("session_bridge.py", "session_bridge.html"):
         src = ASSETS / f
         if not src.exists():
             sys.exit(f"falta el asset: {src}")
         shutil.copy2(src, INSTALL_DIR / f)
+        copiados[f] = hashlib.sha256((INSTALL_DIR / f).read_bytes()).hexdigest()
+    dejar_huella(copiados)
     return INSTALL_DIR / "session_bridge.py"
+
+
+def dejar_huella(copiados: dict, acto: str = "instalado") -> None:
+    """Escribe QUE se instalo y CON QUE instalador, para que se pueda preguntar despues.
+
+    EL HUECO QUE CIERRA: el puente no lleva version escrita, y la de los archivos se puede
+    deducir de la historia del canon — pero la DEL INSTALADOR no, porque el instalador no se
+    copia. Sin esta huella, un despliegue no puede decir con que se instalo, y un cambio en el
+    instalador -arranque automatico, claves del .env, que archivos se copian- queda sin
+    aplicar SIN NINGUN SINTOMA.
+
+    Se guarda aparte del `.env` a proposito: el `.env` es configuracion que edita una persona;
+    esto es estado que escribe la maquina. Mezclarlos invita a que una edicion a mano borre un
+    hecho medido.
+
+    Tambien guarda la huella de cada archivo escrito. Eso permite distinguir despues dos cosas
+    que si no se ven igual: un archivo que llego asi, y uno que alguien edito DESPUES.
+
+    OJO AL MANTENERLO: `archivos` es lo que se escribio LA ULTIMA VEZ que alguien toco este
+    despliegue — instalando o actualizando—, no lo que puso el instalador aquella vez. Quien
+    actualice tiene que refrescarlo, o el dato empieza a describir un pasado mientras aparenta
+    describir el presente. Por eso va con `ultimo_acto` y su fecha: un campo que no dice
+    CUANDO se escribio invita a leerlo como actual para siempre.
+    """
+    # Lo que es del INSTALE original -cuando fue y con que instalador- se conserva: un
+    # refresco describe los archivos, no reescribe la historia del despliegue.
+    previo = {}
+    try:
+        previo = json.loads((INSTALL_DIR / HUELLA_FILE).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        pass
+    ahora = _ahora_iso()
+    huella = {
+        "ultimo_acto": acto,
+        "fecha": ahora,
+        "instalado": previo.get("instalado", ahora) if acto != "instalado" else ahora,
+        "instalador_sha256": (
+            previo.get("instalador_sha256") if acto != "instalado" and previo.get("instalador_sha256")
+            else hashlib.sha256(Path(__file__).resolve().read_bytes()).hexdigest()),
+        "archivos": copiados,
+        "nota": "Lo escribe el instalador, y lo REFRESCA /vuelamind-rc-update al actualizar. "
+                "Si falta, la instalacion es anterior a que existiera esta huella (antes del "
+                "2026-09-17), y eso NO es un defecto.",
+    }
+    try:
+        (INSTALL_DIR / HUELLA_FILE).write_text(
+            json.dumps(huella, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    except OSError as e:
+        # No se aborta la instalacion por no poder escribir un dato de diagnostico: se dice.
+        say(f"  aviso: no pude escribir {HUELLA_FILE} ({e}); este despliegue no podra "
+            f"decir con que instalador nacio")
 
 
 def warn_missing_vertex(cfg):
@@ -528,6 +590,10 @@ def main(argv=None):
     ap.add_argument("--no-start", action="store_true")
     ap.add_argument("--uninstall", action="store_true")
     ap.add_argument("--status", action="store_true")
+    ap.add_argument("--refrescar-huella", action="store_true",
+                    dest="refrescar_huella",
+                    help="reescribe INSTALADO.json con lo que HAY en la instalación, sin "
+                         "tocar nada más. Lo usa /vuelamind-rc-update tras actualizar")
     args = ap.parse_args(argv)
 
     osname = platform.system()
@@ -538,6 +604,24 @@ def main(argv=None):
         ok = health(port)
         say(f"{'✅ arriba' if ok else '❌ no responde'}  ·  http://127.0.0.1:{port}/")
         return 0 if ok else 1
+
+    if args.refrescar_huella:
+        # Solo reescribe el dato de diagnostico. No copia, no arranca, no toca el .env: si
+        # hiciera algo mas, seria un instalador disfrazado de refresco — y nadie lo esperaria.
+        if not INSTALL_DIR.is_dir():
+            say(f"no hay instalacion en {INSTALL_DIR}; nada que refrescar")
+            return 2
+        presentes = {}
+        for f in ("session_bridge.py", "session_bridge.html"):
+            ruta = INSTALL_DIR / f
+            if ruta.exists():
+                presentes[f] = hashlib.sha256(ruta.read_bytes()).hexdigest()
+        if not presentes:
+            say(f"la instalacion en {INSTALL_DIR} no tiene los archivos del puente")
+            return 2
+        dejar_huella(presentes, acto="actualizado")
+        say(f"· huella refrescada → {INSTALL_DIR / HUELLA_FILE}  ({len(presentes)} archivo(s))")
+        return 0
 
     if args.uninstall:
         fn = {"Darwin": uninstall_darwin, "Windows": uninstall_windows,
