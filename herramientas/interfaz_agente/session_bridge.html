@@ -542,13 +542,20 @@ $("#create").onclick=async()=>{
   const permission=$("#newPerm").value, model=$("#newModel").value;
   if(!name||!prompt){ alert("Falta nombre o primer mensaje"); return; }
   $("#create").disabled=true; const lbl=$("#create").textContent; $("#create").textContent="Creando…";
-  try{
-    const body={name,prompt,permission}; if(model) body.model=model;
-    const j=await api("POST","/sessions",body);
-    pushTx(name,"user",prompt); pushTx(name,"asst",j.text||"");
-    $("#newName").value=""; $("#newPrompt").value="";
-    await refresh(); select(name);
-  }catch(e){ alert("No se pudo crear: "+e.message); }
+  // Entramos a la sesión ANTES de que conteste: el primer mensaje suele ser el más caro
+  // -poner al día al asistente corre su validador entero- y esperar minutos mirando un
+  // botón no dice siquiera si sigue vivo. Se ve el turno desde el primer paso.
+  const cuerpo={name,prompt,permission}; if(model) cuerpo.model=model;
+  pushTx(name,"user",prompt);
+  state.current=name;
+  $("#input").disabled=false; $("#send").disabled=true; $("#attach").disabled=false;
+  $("#chathead").style.display="flex"; $("#curname").textContent=name;
+  $("#newName").value=""; $("#newPrompt").value="";
+  render();
+  const ok=await correrTurno("/sessions/crear", cuerpo, name);
+  await refresh();
+  if(ok) select(name); else render();
+  $("#send").disabled=false;
   $("#create").disabled=false; $("#create").textContent=lbl;
 };
 
@@ -624,26 +631,14 @@ async function recuperar(owner, panel){
   return {estado:"tarda"};
 }
 
-async function send(){
-  const t=$("#input").value.trim();
-  const okAtts=atts.filter(a=>a.ok);
-  if((!t && !okAtts.length) || !state.current) return;
-  const message=buildMessage(t);
-  const attachments=buildAttachments();
-  const shown = t + (okAtts.length ? (t?"\n":"")+"📎 "+okAtts.map(a=>a.name).join(", ") : "");
-  // EL DUEÑO DEL TURNO SE CAPTURA AQUÍ Y NO SE VUELVE A PREGUNTAR.
-  // Antes todo esto leía state.current en vivo: si cambiabas de sesión mientras el turno
-  // corría, la respuesta se guardaba en el historial de la sesión que estuvieras mirando
-  // al terminar — se perdía de la suya y ensuciaba la otra, sin que nada fallara.
-  const owner=state.current;
-  $("#input").value=""; clearAtts(); $("#send").disabled=true;
-  pushTx(owner,"user",shown); render();
+// ---- el motor de un turno en vivo, compartido por «enviar» y por «crear» ----
+// Crear era el unico camino que no pasaba por aqui: bloqueaba hasta el final, sin un solo
+// evento, y era ademas el ultimo turno que seguia muriendo con el cliente.
+async function correrTurno(url, body, owner){
   const panel=startStream(owner);
   let finalText="", isErr=false;
   try{
-    const body={message}; if(attachments.length) body.attachments=attachments;
-    const r=await fetch(`/sessions/${encodeURIComponent(owner)}/stream`,
-                        {method:"POST", headers:hdrs(), body:JSON.stringify(body)});
+    const r=await fetch(url,{method:"POST", headers:hdrs(), body:JSON.stringify(body)});
     setDot(r.ok);
     if(!r.ok){ const j=await r.json().catch(()=>({})); throw new Error(j.error||("HTTP "+r.status)); }
     const reader=r.body.getReader(), dec=new TextDecoder(); let buf="";
@@ -662,6 +657,7 @@ async function send(){
     }
     endStream(panel);
     pushTx(owner, isErr?"err":"asst", finalText || (isErr?"(error)":""));
+    return !isErr;
   }catch(e){
     setDot(false);
     // NO escribir el error del transporte donde va el contenido: mañana parecería que el
@@ -676,7 +672,26 @@ async function send(){
     else if(r.estado==="vacio") pushTx(owner,"err",
       "Se cortó la conexión ("+e.message+"). El turno terminó sin texto, solo con herramientas.");
     else pushTx(owner,"err","Se cortó la conexión ("+e.message+") y tampoco alcanzo al puente para recuperar el turno.");
+    return false;
   }
+}
+
+async function send(){
+  const t=$("#input").value.trim();
+  const okAtts=atts.filter(a=>a.ok);
+  if((!t && !okAtts.length) || !state.current) return;
+  const message=buildMessage(t);
+  const attachments=buildAttachments();
+  const shown = t + (okAtts.length ? (t?"\n":"")+"📎 "+okAtts.map(a=>a.name).join(", ") : "");
+  // EL DUEÑO DEL TURNO SE CAPTURA AQUÍ Y NO SE VUELVE A PREGUNTAR.
+  // Antes todo esto leía state.current en vivo: si cambiabas de sesión mientras el turno
+  // corría, la respuesta se guardaba en el historial de la sesión que estuvieras mirando
+  // al terminar — se perdía de la suya y ensuciaba la otra, sin que nada fallara.
+  const owner=state.current;
+  $("#input").value=""; clearAtts(); $("#send").disabled=true;
+  pushTx(owner,"user",shown); render();
+  const cuerpo={message}; if(attachments.length) cuerpo.attachments=attachments;
+  await correrTurno(`/sessions/${encodeURIComponent(owner)}/stream`, cuerpo, owner);
   render(); $("#send").disabled=false; $("#input").focus();
 }
 $("#send").onclick=send;
