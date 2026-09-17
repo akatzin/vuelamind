@@ -686,9 +686,12 @@ function startStream(owner){
   if(owner===state.current){ const log=$("#log"); log.appendChild(d); log.scrollTop=log.scrollHeight; }
   const fmtDur=n=>n<60?n+"s":Math.floor(n/60)+"m "+(n%60)+"s";
   p.upd=()=>{ const n=Math.round((Date.now()-t0)/1000);
-    // El consumo vive en la cabecera del chat, y repetirlo aquí no añade nada: dos sitios
-    // con el mismo dato solo crean la duda de cuál mirar.
-    p.status.textContent="⏳ trabajando… "+fmtDur(n); };
+    // Aquí va lo que está COSTANDO este turno, no cuánto ocupa el contexto: el porcentaje
+    // vive en la cabecera y repetirlo solo creaba la duda de cuál mirar. Los tokens
+    // generados son otra cosa —el precio de lo que corre ahora mismo— y se ven crecer
+    // junto al cronómetro, que es donde uno está mirando mientras espera.
+    p.status.textContent="⏳ trabajando… "+fmtDur(n)
+      +(p.usage&&p.usage.output_tokens?"   ·   ↑"+fmtTok(p.usage.output_tokens)+" tok":""); };
   p.upd(); p.timer=setInterval(p.upd,1000);
   return p;
 }
