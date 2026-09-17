@@ -78,6 +78,11 @@
   .chip{display:flex;align-items:center;gap:4px;background:var(--chip);border:1px solid var(--line);
        border-radius:14px;padding:3px 4px 3px 10px;font-size:12px}
   .chip.bad{border-color:var(--danger-line);color:var(--danger)}
+  .hint-atts{width:100%;font-size:12px;color:var(--dim);margin-top:4px;line-height:1.5}
+  .hint-atts .ruta{display:flex;align-items:center;gap:6px;margin-top:2px}
+  .hint-atts code{font-family:ui-monospace,SFMono-Regular,monospace;font-size:12px;
+    background:var(--field);border:1px solid var(--line);border-radius:5px;padding:1px 5px;
+    color:var(--ink);word-break:break-all}
   .chip .x{cursor:pointer;color:var(--dim);border:0;background:none;font-size:15px;padding:0 4px;line-height:1}
   .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
   .empty{margin:auto;color:var(--dim);text-align:center;padding:20px}
@@ -182,7 +187,7 @@
 </main>
 <script>
 const $ = s => document.querySelector(s);
-const state = { current: null, usage: {}, commands: [], skills: [], streams: {} };
+const state = { current: null, usage: {}, commands: [], skills: [], streams: {}, cwds: {} };
 // streams: los turnos EN VUELO, por nombre de sesión. Un turno pertenece a la sesión
 // que lo pidió, no a la que estés mirando cuando termine — ver el comentario de send().
 
@@ -262,6 +267,25 @@ function renderAtts(){
     x.onclick=()=>{ atts.splice(i,1); renderAtts(); };
     c.appendChild(s); c.appendChild(x); bar.appendChild(c);
   });
+  // Un rechazo que solo nombra la causa deja a la persona con el problema y sin la salida.
+  // El puente ya sabe en qué carpeta trabaja la sesión, así que puede decir dónde dejarlo —
+  // y pedir el NOMBRE en vez de una ruta, que es lo que la persona sí tiene a mano.
+  if(atts.some(a=>!a.ok)){
+    const cwd=state.cwds[state.current];
+    const h=document.createElement("div"); h.className="hint-atts";
+    const linea=document.createElement("div");
+    linea.textContent = cwd
+      ? "Déjalo en esta carpeta y dime con qué nombre lo dejaste; yo lo tomo de ahí:"
+      : "Déjalo en la carpeta de trabajo de esta sesión y dime con qué nombre lo dejaste; yo lo tomo de ahí.";
+    h.appendChild(linea);
+    if(cwd){
+      const r=document.createElement("div"); r.className="ruta";
+      const code=document.createElement("code"); code.textContent=cwd;
+      r.appendChild(code); r.appendChild(mkCopy(()=>cwd, "Copiar la carpeta"));
+      h.appendChild(r);
+    }
+    bar.appendChild(h);
+  }
 }
 function readB64(f,cb){ const r=new FileReader(); r.onload=()=>cb(String(r.result).split(",")[1]||""); r.onerror=()=>cb(null); r.readAsDataURL(f); }
 function addFiles(files){
@@ -321,6 +345,7 @@ async function refresh(){
       const d=document.createElement("div");
       d.className="sess"+(s.name===state.current?" on":"");
       const perm={full:"⚡autonomía",tools:"🐍python",safe:"👁solo-lectura"}[s.permission]||s.permission||"";
+      if(s.cwd) state.cwds[s.name]=s.cwd;        // el backend ya lo manda; sirve para decir DÓNDE dejar un archivo
       d.innerHTML=`<span class="n">${s.name}</span><span class="s">${(s.session_id||"").slice(0,8)} · ${s.live_state||"idle"} · ${perm}</span>`;
       d.onclick=()=>select(s.name);
       list.appendChild(d);
