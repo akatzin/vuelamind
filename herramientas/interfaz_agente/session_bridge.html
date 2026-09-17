@@ -530,6 +530,26 @@ function endStream(p){
   if(p.owner && state.streams[p.owner]===p) delete state.streams[p.owner];
 }
 
+// ---- recuperar un turno cuyo stream se rompió ----
+// El servidor sigue el turno aunque el navegador se caiga, y el CLI lo escribe en su
+// transcript. Así que un corte de conexión ya no es "se perdió la respuesta": es "hay que
+// ir a buscarla". Lo que NO se hace es enseñar la respuesta anterior como si fuera ésta —
+// por eso se mira `terminado`, y no solo si hay texto.
+async function recuperar(owner, panel){
+  const url="/sessions/"+encodeURIComponent(owner)+"/ultimo";
+  for(let intento=0; intento<60; intento++){
+    let d;
+    try{ const r=await fetch(url,{headers:hdrs()}); if(!r.ok) throw 0; d=await r.json(); }
+    catch{ return {estado:"sin-puente"}; }
+    if(d.terminado && d.hay) return {estado:"recuperado", texto:d.texto};
+    if(!d.en_vuelo) return {estado:d.terminado ? "vacio" : "muerto"};
+    if(panel && panel.status) panel.status.textContent =
+      "⏳ se cortó la conexión, pero el turno sigue — esperando su respuesta… " + ((intento+1)*2) + "s";
+    await new Promise(r=>setTimeout(r,2000));
+  }
+  return {estado:"tarda"};
+}
+
 async function send(){
   const t=$("#input").value.trim();
   const okAtts=atts.filter(a=>a.ok);
@@ -568,7 +588,21 @@ async function send(){
     }
     endStream(panel);
     pushTx(owner, isErr?"err":"asst", finalText || (isErr?"(error)":""));
-  }catch(e){ endStream(panel); setDot(false); pushTx(owner,"err",e.message); }
+  }catch(e){
+    setDot(false);
+    // NO escribir el error del transporte donde va el contenido: mañana parecería que el
+    // asistente contestó "network error". Primero se va a buscar la respuesta.
+    const r=await recuperar(owner, panel);
+    endStream(panel);
+    if(r.estado==="recuperado") pushTx(owner,"asst",r.texto);
+    else if(r.estado==="muerto") pushTx(owner,"err",
+      "Se cortó la conexión ("+e.message+") y el turno no llegó a terminar. No hay respuesta que recuperar: hay que repetir el mensaje.");
+    else if(r.estado==="tarda") pushTx(owner,"err",
+      "Se cortó la conexión ("+e.message+"). El turno seguía corriendo tras dos minutos de espera; su respuesta quedará en la sesión y se puede recuperar recargando.");
+    else if(r.estado==="vacio") pushTx(owner,"err",
+      "Se cortó la conexión ("+e.message+"). El turno terminó sin texto, solo con herramientas.");
+    else pushTx(owner,"err","Se cortó la conexión ("+e.message+") y tampoco alcanzo al puente para recuperar el turno.");
+  }
   render(); $("#send").disabled=false; $("#input").focus();
 }
 $("#send").onclick=send;
