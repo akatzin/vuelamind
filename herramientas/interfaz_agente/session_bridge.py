@@ -297,6 +297,20 @@ def historial_del_transcript(session_id: str, limite: int = 50) -> dict:
             "parcial": parcial, "por_que": "" if mensajes else "el transcript no trae textos"}
 
 
+def guardar_ventana(nombre: str, win) -> None:
+    """Anota la ventana REAL que ese modelo demostro, para que el turno siguiente no
+    empiece midiendo contra una suposicion. Se guarda por sesion porque es propiedad del
+    modelo con el que esa sesion corre, no de la maquina."""
+    if not win:
+        return
+    with _registry_lock:
+        reg = load_registry()
+        meta = reg.get(nombre)
+        if meta is not None and meta.get("context_window") != win:
+            meta["context_window"] = win
+            save_registry(reg)
+
+
 def load_registry() -> dict:
     if REGISTRY_FILE.exists():
         try:
@@ -445,7 +459,8 @@ def _tool_brief(name: str, inp: dict | None) -> str:
 
 
 def stream_turn(text: str, attachments: list | None, session_id: str | None,
-                cwd: str, model: str, permission: str | None, emit) -> dict:
+                cwd: str, model: str, permission: str | None, emit,
+                ventana: int | None = None) -> dict:
     """Corre un turno headless y llama emitir(dict) por cada evento de UI, en vivo.
     Emite: init / tool / text / result / error. Devuelve {session_id, text, is_error}.
 
@@ -471,6 +486,14 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
 
     sid, final_text, is_error = session_id, None, False
     out_total, last_ctx = 0, 0   # tokens generados en el turno · último tamaño de contexto
+    # La ventana REAL del modelo solo llega al final, dentro del `result`. Durante el turno se
+    # usaba el valor por omision (200k), y en una sesion de 1M eso pinta 56% lo que es 11%:
+    # el porcentaje sube cinco veces mas rapido y salta a su sitio al cerrar. Ahora se recibe
+    # la ventana que esta sesion ya demostro en su turno anterior; solo el PRIMER turno de una
+    # sesion nueva usa el valor por omision, y entonces se marca `provisional` para que la
+    # pagina no lo presente como un dato medido.
+    ventana_conocida = int(ventana) if ventana else None
+    ventana_viva = ventana_conocida or CONTEXT_WINDOW
 
     # Si el cliente se fue, dejamos de escribirle — pero NO dejamos de leer al CLI.
     ido = {"si": False}
@@ -539,7 +562,8 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
                                 + u.get("cache_read_input_tokens", 0))
                     out_total += u.get("output_tokens", 0)
                     emitir({"kind": "usage", "context_tokens": last_ctx,
-                          "output_tokens": out_total, "window": CONTEXT_WINDOW})
+                          "output_tokens": out_total, "window": ventana_viva,
+                          "provisional": ventana_conocida is None})
             elif t == "result":
                 final_text = ev.get("result")
                 is_error = bool(ev.get("is_error")) or ev.get("subtype") != "success"
@@ -551,9 +575,11 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
                 mu = ev.get("modelUsage") or {}
                 win = next((m.get("contextWindow") for m in mu.values()
                             if isinstance(m, dict) and m.get("contextWindow")), None)
+                if win:
+                    ventana_viva = win          # la autoritativa, para quien la guarde
                 emitir({"kind": "usage", "context_tokens": last_ctx,
                       "output_tokens": ru.get("output_tokens") or out_total,
-                      "window": win or CONTEXT_WINDOW, "final": True})
+                      "window": win or ventana_viva, "final": True})
         proc.wait()
     finally:
         timer.cancel()
@@ -565,7 +591,8 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
         err = ("".join(stderr_buf) or "").strip()[:2000] or f"exit {proc.returncode}"
         emitir({"kind": "error", "error": err})
     emitir({"kind": "result", "text": final_text, "is_error": is_error, "session_id": sid})
-    return {"session_id": sid, "text": final_text, "is_error": is_error}
+    return {"session_id": sid, "text": final_text, "is_error": is_error,
+            "window": ventana_viva if ventana_viva != CONTEXT_WINDOW else None}
 
 
 def deliver_turn(text: str, attachments: list | None, session_id: str | None,
@@ -867,7 +894,9 @@ class Handler(BaseHTTPRequestHandler):
 
             marcar_vivo(name, True)
             try:
-                stream_turn(prompt or "", attachments, None, cwd, model, permission, emit)
+                res = stream_turn(prompt or "", attachments, None, cwd, model, permission,
+                                  emit)
+                guardar_ventana(name, res.get("window"))
             except (BrokenPipeError, ConnectionResetError):
                 return   # el cliente se fue; el turno sigue y la sesión ya quedó anotada
             finally:
@@ -958,11 +987,13 @@ class Handler(BaseHTTPRequestHandler):
                 res = stream_turn(msg, attachments, meta["session_id"],
                                   meta.get("cwd") or DEFAULT_CWD,
                                   meta.get("model") or DEFAULT_MODEL,
-                                  meta.get("permission") or DEFAULT_PERMISSION, emit)
+                                  meta.get("permission") or DEFAULT_PERMISSION, emit,
+                                  ventana=meta.get("context_window"))
             except (BrokenPipeError, ConnectionResetError):
                 return   # el cliente se fue; el turno NO: sigue drenándose hasta terminar
             finally:
                 marcar_vivo(name, False)
+            guardar_ventana(name, res.get("window"))
             if res.get("session_id") and res["session_id"] != meta["session_id"]:
                 with _registry_lock:
                     reg = load_registry()
