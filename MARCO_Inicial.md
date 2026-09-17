@@ -34,7 +34,7 @@ version: 3.8
 > revisión no se automatiza nunca por comodidad.
 
 corpus_incorporado: 64 parches · corte 2026-08-13 · anonimizado para publicación en el corte 3.0
-canon: declarado en config.yml — de ahí sale el repositorio, la rama y el sitio. Los parches NO se proponen ahí: se aportan al buzón declarado en aportar_a
+canon: declarado en config.yml — de ahí sale el repositorio, la rama y el sitio. Los parches NO se proponen ahí: se escriben en tu propio vault, y si alguna vez decides que uno viaje, lo manda /vuelamind-learn al destino que tú declares
 origen: destilado de un dominio real, 2026-08-03 — las historias conservan el caso y omiten los nombres
 ---
 
@@ -2016,7 +2016,7 @@ Cuando el asistente termine, debe entregar:
 - [ ] `rsync_project.sh` **generado y probado**, si el transporte lo requiere (Fase 1.3)
 - [ ] **El ciclo enseñado con un caso del propio dominio**, y los comandos que existen en esta máquina, mostrados con su nombre exacto
 - [ ] **Tres o cuatro entregables propuestos como preguntas**, y anotado cuál eligió
-- [ ] **Las dos decisiones de canon**: de dónde se trae el método y **a dónde se manda lo que aprenda** — con su respuesta escrita, `ninguno` incluido, o marcada como hueco con fecha. *(Sin esta línea el reporte está incompleto: la pregunta existía y se saltaba.)*
+- [ ] **La decisión de canon**: **de dónde se trae el método** — con su respuesta escrita, o marcada como hueco con fecha. *(A dónde se manda lo aprendido NO se pregunta aquí: el aprendizaje nace local y apagado, y el destino lo pide `/vuelamind-learn` el día que decidas usarlo.)*
 - [ ] **El traspaso dicho**: cerrar la sesión, volver a entrar, correr el de retomar y luego el de ayuda — o, si el entorno no soporta comandos, dicho que no van a existir
 - [ ] **Un primer paso concreto para la siguiente sesión**
 - [ ] `initPrompt.md` apuntando al primer trabajo real

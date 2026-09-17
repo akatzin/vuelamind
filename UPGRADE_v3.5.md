@@ -32,11 +32,12 @@ para: dominios en la línea base v3 — NO requiere la v3.4
 
 ## Qué trae, en una frase cada cosa
 
-**Un buzón abierto.** `POST` a `https://learning.vuelamind.ai` con tu libro de errores en el
-cuerpo, en markdown. **Sin llaves, sin cuenta, sin registro.** Devuelve el identificador de
-tu aportación, que es el hash de su contenido — así que **si coincide con el que calculaste
-antes de mandar, tienes prueba de que llegó completo**. Deduplica por contenido: mandar dos
-veces lo mismo no ensucia nada.
+**Un buzón abierto.** Un `POST` con tu libro de errores en el cuerpo, en markdown, al
+endpoint que tú elijas — **el skill te lo pregunta antes de mandar nada**, salvo que tú
+hayas declarado lo contrario en tu manifiesto. **Sin llaves, sin cuenta, sin registro.**
+Devuelve el identificador de tu aportación, que es el hash de su contenido — así que **si
+coincide con el que calculaste antes de mandar, tienes prueba de que llegó completo**.
+Deduplica por contenido: mandar dos veces lo mismo no ensucia nada.
 
 **Un skill que lo usa bien: `/vuelamind-learn`.** No es un `curl` con buenos modales. Hace
 cuatro cosas que nadie hace a mano dos veces seguidas:
@@ -155,7 +156,7 @@ del vigía y hoy no vuelve. Si tu lección entra al canon, la verás en el canon
 
    | clave | qué es | si falta |
    |---|---|---|
-   | `buzon_aprendizaje` | **el endpoint del buzón** — `https://learning.vuelamind.ai`, o el de tu ecosistema. Es una URL HTTP | el skill te la pregunta cada vez |
+   | `buzon_aprendizaje` | **el endpoint del buzón al que quieras aportar**, si decides aportar a alguno. Es una URL HTTP, y **vacía o `ninguno` deja el aprendizaje en casa** | el skill te la pregunta cada vez |
    | `learning_procedencia` | si tus aportaciones **se identifican** o van anónimas | **la corrida se detiene y la pide** |
    | `learning_terceros` | si se **tachan los nombres** de otras casas y personas | **la corrida se detiene y la pide** |
 
