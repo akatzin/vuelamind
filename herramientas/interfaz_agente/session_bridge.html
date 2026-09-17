@@ -90,6 +90,21 @@
   .sess:hover{background:var(--hover)}
   .sess.on{background:var(--on);box-shadow:inset 2px 0 0 var(--accent)}
   .sess .n{font-weight:500}.sess .s{font-size:11px;color:var(--dim);font-family:ui-monospace,monospace}
+  /* Mientras la sesión trabaja, una luz recorre su nombre. Se ve de reojo, que es la
+     diferencia con una palabra: no hay que leerla para enterarse. */
+  @keyframes barrido{ from{background-position:200% 0} to{background-position:-200% 0} }
+  .sess.trabajando .est{display:none}
+  .sess.trabajando .n{
+    background:linear-gradient(100deg, var(--ink) 38%, var(--accent) 50%, var(--ink) 62%);
+    background-size:200% 100%;
+    -webkit-background-clip:text; background-clip:text;
+    -webkit-text-fill-color:transparent; color:transparent;
+    animation:barrido 1.9s linear infinite;
+  }
+  @media (prefers-reduced-motion: reduce){
+    /* Quien pidió menos movimiento no pierde la señal: la conserva sin barrido. */
+    .sess.trabajando .n{animation:none;-webkit-text-fill-color:var(--accent);color:var(--accent)}
+  }
   aside .new{padding:10px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
   aside .new input,aside .new textarea,aside .new select{background:var(--field);border:1px solid var(--line);color:var(--ink);
        padding:6px 8px;border-radius:7px;font:inherit}
@@ -406,7 +421,18 @@ async function refresh(){
       const d=document.createElement("div");
       d.className="sess"+(s.name===state.current?" on":"");
       const perm={full:"⚡autonomía",tools:"🐍python",safe:"👁solo-lectura"}[s.permission]||s.permission||"";
-      d.innerHTML=`<span class="n">${s.name}</span><span class="s">${(s.session_id||"").slice(0,8)} · ${s.live_state||"idle"} · ${perm}</span>`;
+      // "busy" es una palabra que hay que leer; una luz que recorre el nombre se ve sin
+      // mirar. Se toma de lo que sabe esta página (un turno en vuelo suyo) Y de lo que
+      // reporta el servidor, porque la sesión puede estar trabajando por orden de otra
+      // ventana — y ahí es justo donde una señal pasiva vale más.
+      const trabajando = !!state.streams[s.name] || s.live_state === "busy";
+      if(trabajando) d.classList.add("trabajando");
+      // El estado va en su propio elemento para poder callarlo en el acto: mientras el
+      // nombre late, la palabra sobra — y tener las dos señales a la vez, una diciendo que
+      // trabaja y otra "idle", es peor que no tener ninguna.
+      d.innerHTML=`<span class="n">${s.name}</span><span class="s">`
+        + `${(s.session_id||"").slice(0,8)}<span class="est"> · ${s.live_state||"idle"}</span>`
+        + ` · ${perm}</span>`;
       d.onclick=()=>select(s.name);
       list.appendChild(d);
     });
@@ -615,6 +641,16 @@ $("#create").onclick=async()=>{
 // ---- panel de progreso en vivo (streaming NDJSON) ----
 const TOOL_ICON={Bash:"🔧",Read:"📖",Write:"✍️",Edit:"✏️",NotebookEdit:"✏️",
   WebFetch:"🌐",WebSearch:"🔎",Grep:"🔎",Glob:"🔎",Task:"🤖",Skill:"🧩"};
+// La fila se marca EN EL ACTO, no en el refresco: éste corre cada 8 s, y una señal de
+// "estoy trabajando" que tarda ocho segundos en aparecer llega tarde justo cuando importa.
+// El refresco sigue marcando las sesiones que trabajan por orden de otra ventana.
+function marcarTrabajando(name, si){
+  document.querySelectorAll(".sess").forEach(e=>{
+    const n=e.querySelector(".n");
+    if(n && n.textContent===name) e.classList.toggle("trabajando", !!si);
+  });
+}
+
 function startStream(owner){
   const d=document.createElement("div"); d.className="msg asst stream";
   d.innerHTML=`<div class="who">${owner}</div>`;
@@ -623,10 +659,13 @@ function startStream(owner){
   const t0=Date.now();
   const p={el:d, status, steps, timer:null, usage:null, owner};
   state.streams[owner]=p;
+  marcarTrabajando(owner, true);
   if(owner===state.current){ const log=$("#log"); log.appendChild(d); log.scrollTop=log.scrollHeight; }
   const fmtDur=n=>n<60?n+"s":Math.floor(n/60)+"m "+(n%60)+"s";
   p.upd=()=>{ const n=Math.round((Date.now()-t0)/1000);
-    p.status.textContent="⏳ trabajando… "+fmtDur(n)+(p.usage?"   ·   "+usageText(p.usage):""); };
+    // El consumo vive en la cabecera del chat, y repetirlo aquí no añade nada: dos sitios
+    // con el mismo dato solo crean la duda de cuál mirar.
+    p.status.textContent="⏳ trabajando… "+fmtDur(n); };
   p.upd(); p.timer=setInterval(p.upd,1000);
   return p;
 }
@@ -664,6 +703,7 @@ function endStream(p){
   if(p.timer) clearInterval(p.timer);
   if(p.el) p.el.remove();
   if(p.owner && state.streams[p.owner]===p) delete state.streams[p.owner];
+  if(p.owner) marcarTrabajando(p.owner, false);
 }
 
 // ---- recuperar un turno cuyo stream se rompió ----
@@ -712,6 +752,10 @@ async function correrTurno(url, body, owner){
     }
     endStream(panel);
     pushTx(owner, isErr?"err":"asst", finalText || (isErr?"(error)":""));
+    // Reconciliar la lista AHORA: al terminar, esta página deja de marcar la fila pero el
+    // servidor puede seguir reportando `busy` unos segundos, y el refresco periódico la
+    // volvería a encender. Un parpadeo pequeño, pero es una señal diciendo dos cosas.
+    refresh();
     return !isErr;
   }catch(e){
     setDot(false);
