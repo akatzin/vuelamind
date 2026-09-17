@@ -28,6 +28,42 @@
       --ok:#4f8a4f; --bad:#c0392b;
     }
   }
+  /* ---- TEMA: blueprint (el original) ---- */
+  :root[data-tema="blueprint"]{
+    --bg:#1e1e1e; --panel:#262626; --line:#3a3a3a; --ink:#f0f0f0; --dim:#9b9b9b;
+    --field:#181818; --hover:#2e2e2e; --on:#3a3a3c; --chip:#333333;
+    --accent:#0a84ff; --accent-ink:#ffffff;
+    --user:#2f4257; --asst:transparent; --err:#4a2320;
+    --danger:#ff6b6b; --danger-line:#8a4032;
+    --ok:#34c759; --bad:#ff453a;
+  }
+  /* ---- TEMA: magenta (paleta de marca, armonizada para leer sin cansar) ---- */
+  :root[data-tema="magenta"]{
+    --bg:#221b1f; --panel:#2c2328; --line:#443640; --ink:#f6eff3; --dim:#a99aa2;
+    --field:#1b1418; --hover:#362a30; --on:#3b2c35; --chip:#382a32;
+    --accent:#d4477f; --accent-ink:#ffffff;
+    --user:#352730; --asst:transparent; --err:#43212b;
+    --danger:#e8809c; --danger-line:#7d3a52;
+    --ok:#6fb08a; --bad:#e0657f;
+  }
+  @media (prefers-color-scheme: light){
+    :root[data-tema="blueprint"]{
+      --bg:#ffffff; --panel:#f5f5f7; --line:#d9d9de; --ink:#1d1d1f; --dim:#6e6e73;
+      --field:#ffffff; --hover:#ececf0; --on:#e3e3ea; --chip:#e8e8ed;
+      --accent:#0071e3; --accent-ink:#ffffff;
+      --user:#d3e5fb; --asst:transparent; --err:#fdeceb;
+      --danger:#c0392b; --danger-line:#e6b3ac;
+      --ok:#28a745; --bad:#d70015;
+    }
+    :root[data-tema="magenta"]{
+      --bg:#fdf8fa; --panel:#f6ecf1; --line:#ecdbe3; --ink:#241b20; --dim:#7f6d76;
+      --field:#ffffff; --hover:#f2e3ea; --on:#eedde5; --chip:#f2e3ea;
+      --accent:#b4144f; --accent-ink:#ffffff;
+      --user:#f6ecf1; --asst:transparent; --err:#fceaef;
+      --danger:#a01540; --danger-line:#e8c2d0;
+      --ok:#3f8a63; --bad:#c0264c;
+    }
+  }
   *{box-sizing:border-box}
   body{margin:0;font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
        background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column}
@@ -106,6 +142,8 @@
   .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
   .empty{margin:auto;color:var(--dim);text-align:center;padding:20px}
   .hint{font-size:11px;color:var(--dim)}
+  header .tema{background:var(--field);border:1px solid var(--line);color:var(--dim);
+       font:inherit;font-size:12px;padding:3px 6px;border-radius:8px;cursor:pointer}
   /* medidor de contexto + gasto del turno (en la cabecera del chat) */
   .usage{font-size:11px;color:var(--dim);font-family:ui-monospace,SFMono-Regular,monospace;
        display:flex;align-items:center;gap:7px;white-space:nowrap}
@@ -159,6 +197,11 @@
   <span class="dot" id="dot"></span>
   <h1>Session Bridge · Vuelamind</h1>
   <span class="sp"></span>
+  <select id="tema" class="tema" title="Tema de color — se recuerda en esta máquina">
+    <option value="claude">Claude</option>
+    <option value="magenta">Magenta</option>
+    <option value="blueprint">Blueprint</option>
+  </select>
   <span class="hint">solo loopback · sin token</span>
 </header>
 <main>
@@ -211,6 +254,16 @@ const $ = s => document.querySelector(s);
 const state = { current: null, usage: {}, commands: [], skills: [], streams: {} };
 // streams: los turnos EN VUELO, por nombre de sesión. Un turno pertenece a la sesión
 // que lo pidió, no a la que estés mirando cuando termine — ver el comentario de send().
+
+// ---- tema de color: los tres viven en CSS; esto solo pone el atributo y lo recuerda ----
+const TEMAS=["claude","magenta","blueprint"];
+function aplicarTema(t){
+  if(!TEMAS.includes(t)) t="claude";
+  document.documentElement.setAttribute("data-tema", t);
+  try{ localStorage.setItem("tema", t); }catch{}
+  const s=$("#tema"); if(s) s.value=t;
+}
+aplicarTema((()=>{ try{ return localStorage.getItem("tema")||"claude"; }catch{ return "claude"; } })());
 
 function hdrs(){ return { "Content-Type":"application/json" }; }
 function setDot(ok){ $("#dot").className = "dot " + (ok?"ok":"bad"); }
@@ -480,6 +533,7 @@ async function closeSession(){
 $("#close").onclick=closeSession;
 
 
+$("#tema").onchange=e=>aplicarTema(e.target.value);
 $("#sugLoad").onclick=()=>{            // sugerir y además dejarlo puesto: un clic, no un dictado
   const ta=$("#newPrompt"); ta.value="/vuelamind-load"; ta.focus();
 };
