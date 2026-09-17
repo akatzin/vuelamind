@@ -236,7 +236,7 @@
       <span class="cur" id="curname"></span>
       <span class="usage" id="usage" title="contexto usado · tokens generados en el último turno"></span>
       <span class="sp"></span>
-      <button id="close" class="ghost danger" title="Cerrar y borrar esta sesión">Cerrar sesión</button>
+      <button id="close" class="ghost danger" title="Cierra este chat y olvida su historial; la sesión del agente se detiene">Cerrar este chat</button>
     </div>
     <div class="log" id="log"><div class="empty">Elige o crea una sesión.</div></div>
     <div class="attachbar" id="attachbar"></div>
@@ -516,7 +516,7 @@ function select(name){
 
 async function closeSession(){
   const name=state.current; if(!name) return;
-  if(!confirm(`¿Cerrar y borrar la sesión "${name}"? Se detiene y se olvida su historial local.`)) return;
+  if(!confirm(`¿Cerrar el chat "${name}"? Se detiene su sesión y se olvida el historial de esta página.`)) return;
   $("#close").disabled=true;
   try{
     await api("DELETE","/sessions/"+encodeURIComponent(name));
