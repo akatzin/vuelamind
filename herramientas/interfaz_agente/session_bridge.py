@@ -167,6 +167,79 @@ NAME_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")        # nombres seguros para di
 
 
 # ---------------------------------------------------------------- registro
+# Turnos que se estan drenando AHORA, por nombre de sesion. Existe para que el endpoint
+# de recuperacion pueda decir "sigue corriendo" en vez de dejar al cliente girando sobre
+# un turno que ya murio: sin esto, "todavia no hay respuesta" y "no la va a haber nunca"
+# se ven identicos desde fuera.
+TURNOS_VIVOS: set = set()
+_VIVOS_LOCK = threading.Lock()
+
+
+def marcar_vivo(nombre: str, vivo: bool) -> None:
+    with _VIVOS_LOCK:
+        TURNOS_VIVOS.add(nombre) if vivo else TURNOS_VIVOS.discard(nombre)
+
+
+def esta_en_vuelo(nombre: str) -> bool:
+    with _VIVOS_LOCK:
+        return nombre in TURNOS_VIVOS
+
+
+def ultimo_del_transcript(session_id: str) -> dict:
+    """Lee la ultima respuesta que el CLI YA escribio en disco para esa sesion.
+
+    EL HUECO QUE CIERRA: si el navegador pierde el stream -pestana recargada, red
+    interrumpida, maquina dormida- el turno NO se pierde: el CLI lo sigue y lo escribe en
+    su propio transcript. Lo que se pierde es el CAMINO, no el texto. Esto lo va a buscar.
+
+    NO le pide nada al modelo: no cuesta tokens, no puede alucinar, no reescribe nada. Es
+    el texto que ya existe, leido del archivo que lo guarda.
+
+    POR QUE SE BUSCA POR NOMBRE DE ARCHIVO Y NO POR RUTA CALCULADA: el CLI nombra cada
+    transcript como su session_id, que es unico, y lo guarda bajo una carpeta derivada del
+    cwd con una regla de sustitucion que no esta documentada -medido: `/` y `_` pasan a
+    `-`, y adivinar el resto seria inventar-. Buscarlo por su nombre no depende de esa
+    regla, asi que no se rompe el dia que cambie.
+    """
+    raiz = Path.home() / ".claude" / "projects"
+    if not raiz.is_dir():
+        return {"hay": False, "por_que": "no existe ~/.claude/projects"}
+    archivo = next(raiz.glob(f"*/{session_id}.jsonl"), None)
+    if archivo is None:
+        return {"hay": False, "por_que": "esa sesion no tiene transcript todavia"}
+    ultimo_asistente = ultimo_usuario = None
+    try:
+        with archivo.open(encoding="utf-8", errors="replace") as fh:
+            for linea in fh:
+                linea = linea.strip()
+                if not linea:
+                    continue
+                try:
+                    d = json.loads(linea)
+                except json.JSONDecodeError:
+                    continue                  # una linea a medio escribir no invalida el resto
+                if d.get("type") == "assistant":
+                    ultimo_asistente = d
+                elif d.get("type") == "user":
+                    ultimo_usuario = d
+    except OSError as e:
+        return {"hay": False, "por_que": f"no se pudo leer el transcript: {e}"}
+    if ultimo_asistente is None:
+        return {"hay": False, "por_que": "el transcript no tiene ninguna respuesta todavia"}
+
+    bloques = (ultimo_asistente.get("message") or {}).get("content") or []
+    texto = "\n\n".join(b.get("text", "") for b in bloques if b.get("type") == "text").strip()
+    t_asis = ultimo_asistente.get("timestamp") or ""
+    t_usua = (ultimo_usuario or {}).get("timestamp") or ""
+    # Si lo ultimo escrito es una pregunta y no una respuesta, el turno SIGUE en vuelo.
+    # Decirlo importa: ensenar la respuesta ANTERIOR como si fuera la de ahora seria
+    # justo el modo de fallo que este puente lleva semanas persiguiendo.
+    terminado = bool(t_asis) and (not t_usua or t_asis >= t_usua)
+    return {"hay": bool(texto), "texto": texto, "cuando": t_asis, "terminado": terminado,
+            "stop_reason": (ultimo_asistente.get("message") or {}).get("stop_reason"),
+            "por_que": "" if texto else "la ultima respuesta no trae texto, solo herramientas"}
+
+
 def load_registry() -> dict:
     if REGISTRY_FILE.exists():
         try:
@@ -316,9 +389,16 @@ def _tool_brief(name: str, inp: dict | None) -> str:
 
 def stream_turn(text: str, attachments: list | None, session_id: str | None,
                 cwd: str, model: str, permission: str | None, emit) -> dict:
-    """Corre un turno headless y llama emit(dict) por cada evento de UI, en vivo.
+    """Corre un turno headless y llama emitir(dict) por cada evento de UI, en vivo.
     Emite: init / tool / text / result / error. Devuelve {session_id, text, is_error}.
-    emit puede lanzar (cliente desconectado); en ese caso matamos el proceso."""
+
+    EL CLIENTE PUEDE IRSE Y EL TURNO SIGUE. Antes, si `emit` lanzaba -pestana cerrada, red
+    caida, maquina dormida- la excepcion subia y el `finally` mataba el proceso: el trabajo
+    se perdia entero, no solo su camino. MEDIDO: matando al cliente a los 4 s de un turno
+    largo, el transcript quedaba con la pregunta escrita y SIN respuesta, y no habia nada
+    que recuperar. Ahora la escritura hacia el navegador puede fallar sin detener la
+    lectura: el turno termina, el CLI lo escribe en su transcript, y
+    `GET /sessions/<n>/ultimo` puede devolverlo."""
     args = CLAUDE_ARGS + ["-p",
             "--input-format", "stream-json",
             "--output-format", "stream-json", "--verbose",
@@ -334,13 +414,24 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
 
     sid, final_text, is_error = session_id, None, False
     out_total, last_ctx = 0, 0   # tokens generados en el turno · último tamaño de contexto
+
+    # Si el cliente se fue, dejamos de escribirle — pero NO dejamos de leer al CLI.
+    ido = {"si": False}
+
+    def emitir(ev):
+        if ido["si"]:
+            return
+        try:
+            emit(ev)
+        except Exception:
+            ido["si"] = True
     try:
         proc = subprocess.Popen(args, cwd=cwd, stdin=subprocess.PIPE,
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                 text=True, bufsize=1,
                                 encoding="utf-8", errors="replace")
     except Exception as e:
-        emit({"kind": "error", "error": str(e)})
+        emitir({"kind": "error", "error": str(e)})
         return {"session_id": sid, "text": None, "is_error": True}
 
     stderr_buf: list = []
@@ -366,22 +457,22 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
             if t == "system" and ev.get("subtype") == "init":
                 # slash_commands/skills viajan en el init: la web los usa para el
                 # autocomplete. Son del install entero, iguales para toda sesión.
-                emit({"kind": "init", "session_id": sid,
+                emitir({"kind": "init", "session_id": sid,
                       "commands": ev.get("slash_commands") or [],
                       "skills": ev.get("skills") or []})
             elif t == "system" and ev.get("subtype") == "compact_boundary":
                 # el turno cruzó el umbral y claude compactó el contexto en caliente
                 cm = ev.get("compact_metadata") or {}
-                emit({"kind": "compact", "trigger": cm.get("trigger"),
+                emitir({"kind": "compact", "trigger": cm.get("trigger"),
                       "pre_tokens": cm.get("pre_tokens")})
             elif t == "assistant":
                 msg = ev.get("message", {})
                 for blk in msg.get("content", []):
                     if blk.get("type") == "tool_use":
-                        emit({"kind": "tool", "name": blk.get("name"),
+                        emitir({"kind": "tool", "name": blk.get("name"),
                               "brief": _tool_brief(blk.get("name"), blk.get("input"))})
                     elif blk.get("type") == "text" and blk.get("text", "").strip():
-                        emit({"kind": "text", "text": blk["text"]})
+                        emitir({"kind": "text", "text": blk["text"]})
                 # uso: el contexto es todo lo que entró (fresco + caché); el gasto
                 # del turno es la suma de lo generado en cada paso assistant.
                 u = msg.get("usage") or {}
@@ -390,7 +481,7 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
                                 + u.get("cache_creation_input_tokens", 0)
                                 + u.get("cache_read_input_tokens", 0))
                     out_total += u.get("output_tokens", 0)
-                    emit({"kind": "usage", "context_tokens": last_ctx,
+                    emitir({"kind": "usage", "context_tokens": last_ctx,
                           "output_tokens": out_total, "window": CONTEXT_WINDOW})
             elif t == "result":
                 final_text = ev.get("result")
@@ -403,7 +494,7 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
                 mu = ev.get("modelUsage") or {}
                 win = next((m.get("contextWindow") for m in mu.values()
                             if isinstance(m, dict) and m.get("contextWindow")), None)
-                emit({"kind": "usage", "context_tokens": last_ctx,
+                emitir({"kind": "usage", "context_tokens": last_ctx,
                       "output_tokens": ru.get("output_tokens") or out_total,
                       "window": win or CONTEXT_WINDOW, "final": True})
         proc.wait()
@@ -415,8 +506,8 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
     if final_text is None and proc.returncode not in (0, None):
         is_error = True
         err = ("".join(stderr_buf) or "").strip()[:2000] or f"exit {proc.returncode}"
-        emit({"kind": "error", "error": err})
-    emit({"kind": "result", "text": final_text, "is_error": is_error, "session_id": sid})
+        emitir({"kind": "error", "error": err})
+    emitir({"kind": "result", "text": final_text, "is_error": is_error, "session_id": sid})
     return {"session_id": sid, "text": final_text, "is_error": is_error}
 
 
@@ -609,6 +700,20 @@ class Handler(BaseHTTPRequestHandler):
                                "permission": meta.get("permission") or DEFAULT_PERMISSION,
                                "live_state": a.get("state") or a.get("status")})
             return self._json(200, {"sessions": merged, "agents_raw": list(live.values())})
+        # GET /sessions/<name>/ultimo  -> RECUPERAR lo que el stream no alcanzo a traer
+        mu = re.match(r"^/sessions/([^/]+)/ultimo$", self.path)
+        if mu:
+            nombre = mu.group(1)
+            meta = load_registry().get(nombre)
+            if not meta:
+                return self._json(404, {"error": f"no hay sesión '{nombre}'"})
+            if not meta.get("session_id"):
+                return self._json(409, {"error": "esa sesión no tiene session_id todavía"})
+            resp = ultimo_del_transcript(meta["session_id"])
+            # Tres estados, no dos: sin esto, "todavía no" y "ya nunca" son la misma cosa
+            # vistos desde el navegador, y la página se queda esperando para siempre.
+            resp["en_vuelo"] = esta_en_vuelo(nombre)
+            return self._json(200, resp)
         return self._json(404, {"error": "ruta desconocida"})
 
     def do_POST(self):
@@ -713,13 +818,16 @@ class Handler(BaseHTTPRequestHandler):
                 self.wfile.write((json.dumps(ev) + "\n").encode())
                 self.wfile.flush()
 
+            marcar_vivo(name, True)
             try:
                 res = stream_turn(msg, attachments, meta["session_id"],
                                   meta.get("cwd") or DEFAULT_CWD,
                                   meta.get("model") or DEFAULT_MODEL,
                                   meta.get("permission") or DEFAULT_PERMISSION, emit)
             except (BrokenPipeError, ConnectionResetError):
-                return   # el cliente se fue; el proceso ya se mató en stream_turn
+                return   # el cliente se fue; el turno NO: sigue drenándose hasta terminar
+            finally:
+                marcar_vivo(name, False)
             if res.get("session_id") and res["session_id"] != meta["session_id"]:
                 with _registry_lock:
                     reg = load_registry()
