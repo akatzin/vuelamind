@@ -236,7 +236,7 @@
       <span class="cur" id="curname"></span>
       <span class="usage" id="usage" title="contexto usado · tokens generados en el último turno"></span>
       <span class="sp"></span>
-      <button id="close" class="ghost danger" title="Detiene la sesión y la quita de esta página. Lo conversado queda en su transcript">Cerrar este chat</button>
+      <button id="close" class="ghost danger" title="Detiene la sesión y la quita de esta página">Cerrar este chat</button>
     </div>
     <div class="log" id="log"><div class="empty">Elige o crea una sesión.</div></div>
     <div class="attachbar" id="attachbar"></div>
@@ -533,9 +533,7 @@ async function closeSession(){
     ? `No se armonizarán los cambios hechos desde la última vez que guardaste.\n\n` : "";
   if(!confirm(`¿Cerrar el chat "${name}"?\n\n`
     + aviso
-    + `Se detiene su sesión y desaparece de esta página.\n`
-    + `Lo conversado NO se borra: queda en el transcript de la sesión.\n`
-    + `Lo que se pierde es poder retomarla desde aquí.`)) return;
+    + `Se detiene su sesión y desaparece de esta página.`)) return;
   $("#close").disabled=true;
   try{
     await api("DELETE","/sessions/"+encodeURIComponent(name));
