@@ -213,10 +213,11 @@ def main() -> int:
             print(f"  {f:22} DESCONOCIDO — su huella no esta en la historia del canon.")
             puesta = (hue.get("archivos") or {}).get(f)
             if puesta and puesta != r["huella"]:
-                print( "                         Y NO es como se instalo: alguien lo edito despues.")
+                print(f"                         Y NO es como quedo el ultimo "
+                      f"{hue.get('ultimo_acto','acto')}: alguien lo edito despues.")
             elif puesta and puesta == r["huella"]:
-                print( "                         Se instalo asi: el instalador copio esto mismo,")
-                print( "                         o sea que el canon de entonces no era este.")
+                print( "                         Quedo asi en el ultimo acto sobre este")
+                print( "                         despliegue: el canon de entonces no era este.")
             else:
                 print( "                         Esta modificado localmente o viene de otra parte.")
             print(f"                         huella: {r['huella'][:16]}...")
@@ -233,11 +234,14 @@ def main() -> int:
     # cambio, actualizar los archivos deja el despliegue a medias SIN NINGUN SINTOMA.
     if hue.get("hay") and hue.get("instalador_sha256"):
         ins = identificar_instalador(clon, ref, hue["instalador_sha256"])
+        acto = hue.get("ultimo_acto", "escrito")
+        fecha = (hue.get("fecha") or hue.get("instalado") or "")[:19]
+        print(f"\nhuella      : {acto} el {fecha}" if fecha else f"\nhuella      : {acto}")
         if ins["estado"] == "al-dia":
-            print("\ninstalador  : AL DIA (huella del que instaló)")
+            print("instalador  : AL DIA (el que instalo este despliegue)")
         elif ins["estado"] == "atrasado":
             peor = max(peor, 1)
-            print(f"\ninstalador  : ATRASADO — instalaste con la version {ins['commit']}, "
+            print(f"instalador  : ATRASADO — instalaste con la version {ins['commit']}, "
                   f"{len(ins['cambios'])} cambio(s) detras:")
             for tt in ins["cambios"]:
                 print(f"      · {tt}")
@@ -245,7 +249,7 @@ def main() -> int:
             print("  reinstala con /vuelamind-rc en vez de copiar.")
         elif ins["estado"] == "desconocido":
             peor = max(peor, 3)
-            print("\ninstalador  : DESCONOCIDO — con el que instalaste no esta en la historia")
+            print("instalador  : DESCONOCIDO — con el que instalaste no esta en la historia")
             print("                del canon. Era una copia modificada, o de otra procedencia.")
     else:
         # EL CASO DE EXCEPCION. No es un defecto: es una instalacion anterior a la huella.

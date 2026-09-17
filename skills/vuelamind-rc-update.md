@@ -124,6 +124,25 @@ medias un servicio es peor que no tocarlo.
 Volver a correr `rc_estado.py`: debe salir **al día**. *Esa es la comprobación, no el recuerdo
 de haber copiado.*
 
+### Y refrescar la huella, que si no empieza a describir un pasado
+
+```
+python3 <clon>/herramientas/interfaz_agente/install.py --refrescar-huella
+```
+
+`INSTALADO.json` dice **qué se escribió la última vez que alguien tocó este despliegue**. Si se
+actualizan los archivos y no se refresca, ese dato sigue describiendo lo que puso el
+instalador **mientras aparenta describir el presente** — y la comprobación de *«alguien lo
+editó después»* pasa a medir contra un pasado.
+
+**El refresco no instala nada:** reescribe solo ese archivo, con lo que hay en el directorio, y
+**conserva lo que es del instale original** — cuándo fue y con qué instalador—, porque un
+refresco describe los archivos, no reescribe la historia del despliegue. Queda marcado como
+`ultimo_acto: actualizado`, con su fecha.
+
+*(Vive en el instalador y no en `rc_estado.py` a propósito: ése **mide**, y un mecanismo que
+sirve a dos propósitos esconde el segundo.)*
+
 ## 3. Reiniciar SOLO si cambió el backend
 
 | Qué cambió | Qué hace falta |
