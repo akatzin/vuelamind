@@ -55,10 +55,40 @@ puede leerla, usa la conocida **y lo declara**, porque una suposición callada e
 indistinguible de un dato.
 
 **Pero el instalador hace más que copiar:** escribe el arranque automático, fija claves del
-`.env` y decide qué se copia. Si cambió después de la versión instalada, el guion **lo dice y
-nombra esos cambios**: copiar los archivos no los aplica, y ese hueco **no da síntoma** — el
-despliegue se vería al día con un cambio estructural sin aplicar. Cuando salga ese aviso, hay
-que leer esos commits y decidir si toca **reinstalar con `/vuelamind-rc`** en vez de copiar.
+`.env` y decide qué se copia. Copiar archivos **no aplica nada de eso**, y ese hueco **no da
+síntoma** — el despliegue se vería al día con un cambio estructural sin aplicar.
+
+Por eso **el instalador deja huella al instalar**, en `INSTALADO.json` junto al código:
+
+| Campo | Para qué |
+|---|---|
+| `instalador_sha256` | Identifica **con qué instalador nació** ese despliegue, por la misma técnica: buscando la huella en la historia del canon |
+| `archivos` | La huella de **cada archivo tal como se copió** |
+| `instalado` | Cuándo |
+
+Vive **aparte del `.env` a propósito**: el `.env` es configuración que edita una persona; esto
+es estado que escribe la máquina, y mezclarlos invita a que una edición a mano borre un hecho
+medido.
+
+**Y la huella de los archivos distingue dos cosas que antes se veían igual:** un archivo que
+**alguien editó después de instalar**, y uno que **llegó así** porque el canon de entonces era
+otro. Lo primero es trabajo de alguien; lo segundo es historia.
+
+### El caso de excepción: una instalación sin huella
+
+**Una instalación anterior a esta huella no tiene ningún defecto — nació antes.** Tratarla como
+un problema sería la vía más rápida a que la gente aprenda a ignorar el aviso.
+
+Así que cuando falta:
+
+- **se dice en una línea**, sin teñir el resultado — la salida **no empeora** por eso;
+- **los archivos se siguen midiendo igual**, porque su versión no depende de esta huella;
+- **se da lo más cerca que se puede estar sin ella**: si el instalador cambió desde la versión
+  de los archivos, se nombran esos commits;
+- **y se ofrece la salida**: reinstalar con `/vuelamind-rc` deja la huella puesta.
+
+**Ausente e ilegible no son lo mismo**, y el guion los separa: lo primero es historia, lo
+segundo es algo roto y lo dice como tal.
 
 **El caso `3` es la razón de que este skill mida así.** Un comparador ingenuo pregunta *«¿es
 igual a la última?»*, y con un «no» junta dos cosas que no se parecen: **una copia vieja** y

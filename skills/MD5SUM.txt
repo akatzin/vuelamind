@@ -6,7 +6,7 @@ b40da63a6996c0cc133d8cadeac29046  README.md
 0cd7be14c853e6b93a6fcbf9df02cffa  vuelamind-learn.md
 770e83ea8cf64d51f8780778ce63cc48  vuelamind-load.md
 f1f88bfb72e9ae0599a7bfae1bd1ab8b  vuelamind-mensajeria.md
-2c18ebd946b9df153b3d503da92ba3ab  vuelamind-rc-update.md
+ede31747c1465ce0d1613521be97e0fc  vuelamind-rc-update.md
 908cd73833d5006c6f76e3ec39f6e1f2  vuelamind-rc.md
 aa38de14e8dbd637ff23b991671ead0e  vuelamind-skills.md
 749de85d2bb99897f186dfe9f5f2d571  vuelamind-soul.md
