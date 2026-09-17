@@ -501,12 +501,15 @@ function render(){
     }
     log.appendChild(d);
   });
+  // Una historia traída entera se ve EXACTAMENTE como una nacida aquí — misma etiqueta,
+  // mismo render—, y avisar de eso no aporta nada: es la misma conversación. La nota sale
+  // solo cuando hubo RECORTE, que es cuando lleva información que el usuario no puede
+  // deducir: que lo que ve no es todo.
   const t=state.traido[state.current];
-  if(t){                                          // decir de dónde salió lo que se está viendo
+  if(t && t.parcial){
     const n=document.createElement("div"); n.className="hint-traido";
-    n.textContent = t.parcial
-      ? `Historial traído del transcript de la sesión — los últimos ${t.mostrados} de ${t.total} mensajes.`
-      : "Historial traído del transcript de la sesión.";
+    n.textContent = `Los ${t.mostrados} mensajes más recientes de ${t.total}. `
+      + `Lo anterior sigue en el transcript de la sesión.`;
     log.insertBefore(n, log.firstChild);
   }
   const vivo=state.streams[state.current];        // un turno en vuelo de ESTA sesión
