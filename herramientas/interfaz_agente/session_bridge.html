@@ -7,73 +7,93 @@
 <style>
   :root{
     color-scheme: light dark;
-    /* oscuro por defecto; el bloque de abajo lo cambia si el SO está en claro */
-    --bg:#1e1e1e; --panel:#262626; --line:#3a3a3a; --ink:#f0f0f0; --dim:#9b9b9b;
-    --field:#181818; --hover:#2e2e2e; --on:#3a3a3c; --chip:#333333;
-    --accent:#0a84ff; --accent-ink:#ffffff;
-    --user:#2f4257; --asst:#2a2a2a; --err:#4a2320;
-    --danger:#ff6b6b; --danger-line:#8a4032;
-    --ok:#34c759; --bad:#ff453a;
+    /* Paleta cálida, del mismo aire que el cliente de Claude: crema en claro, carbón
+       templado en oscuro, y un solo acento terracota. Oscuro por defecto; el bloque de
+       abajo lo cambia si el SO está en claro. */
+    --bg:#262624; --panel:#30302e; --line:#413f3c; --ink:#f4f3ee; --dim:#a3a097;
+    --field:#212120; --hover:#3a3a37; --on:#3d3c39; --chip:#3a3a37;
+    --accent:#c96442; --accent-ink:#ffffff;
+    --user:#34332f; --asst:transparent; --err:#40251f;
+    --danger:#e08b72; --danger-line:#7d4636;
+    --ok:#7bb47b; --bad:#e0685a;
+    --radio:14px;
   }
   @media (prefers-color-scheme: light){
     :root{
-      --bg:#ffffff; --panel:#f5f5f7; --line:#d9d9de; --ink:#1d1d1f; --dim:#6e6e73;
-      --field:#ffffff; --hover:#ececf0; --on:#e3e3ea; --chip:#e8e8ed;
-      --accent:#0071e3; --accent-ink:#ffffff;
-      --user:#d3e5fb; --asst:#f2f2f5; --err:#fdeceb;
-      --danger:#c0392b; --danger-line:#e6b3ac;
-      --ok:#28a745; --bad:#d70015;
+      --bg:#faf9f5; --panel:#f2f0e8; --line:#e3e0d6; --ink:#1f1e1d; --dim:#7c7a72;
+      --field:#ffffff; --hover:#eceadf; --on:#e6e3d6; --chip:#eceadf;
+      --accent:#c96442; --accent-ink:#ffffff;
+      --user:#f0eee6; --asst:transparent; --err:#f9ece8;
+      --danger:#b0472b; --danger-line:#e3c3b7;
+      --ok:#4f8a4f; --bad:#c0392b;
     }
   }
   *{box-sizing:border-box}
   body{margin:0;font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
        background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column}
-  header{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
-  header h1{font-size:14px;margin:0;font-weight:600;letter-spacing:.02em}
+  header{display:flex;gap:10px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);background:var(--panel)}
+  header h1{font-size:15px;margin:0;font-weight:600;letter-spacing:-.01em}
   header .dot{width:9px;height:9px;border-radius:50%;background:var(--dim);flex:0 0 auto}
   header .dot.ok{background:var(--ok)}header .dot.bad{background:var(--bad)}
   header input{background:var(--field);border:1px solid var(--line);color:var(--ink);
        padding:6px 8px;border-radius:7px;font:inherit;width:230px}
   header .sp{flex:1}
-  button{background:var(--accent);background:AccentColor;color:var(--accent-ink);color:AccentColorText;
-       border:0;padding:6px 12px;border-radius:7px;font:inherit;font-weight:600;cursor:pointer}
+  button{background:var(--accent);color:var(--accent-ink);
+       border:0;padding:7px 14px;border-radius:9px;font:inherit;font-weight:500;cursor:pointer;
+       transition:filter .12s ease}
+  button:hover:not(:disabled){filter:brightness(1.07)}
   input,textarea,select{accent-color:var(--accent)}
   button.ghost{background:transparent;color:var(--dim);border:1px solid var(--line)}
   button:disabled{opacity:.5;cursor:default}
   main{flex:1;display:flex;min-height:0}
   aside{width:250px;border-right:1px solid var(--line);background:var(--panel);display:flex;flex-direction:column}
   aside .list{flex:1;overflow:auto}
-  .sess{padding:9px 14px;border-bottom:1px solid var(--line);cursor:pointer;display:flex;flex-direction:column;gap:2px}
-  .sess:hover{background:var(--hover)}.sess.on{background:var(--on);border-left:3px solid var(--accent)}
-  .sess .n{font-weight:600}.sess .s{font-size:11px;color:var(--dim);font-family:ui-monospace,monospace}
+  aside .list{padding:8px}
+  .sess{padding:9px 11px;margin-bottom:2px;border-radius:10px;cursor:pointer;
+       display:flex;flex-direction:column;gap:2px;transition:background .12s ease}
+  .sess:hover{background:var(--hover)}
+  .sess.on{background:var(--on);box-shadow:inset 2px 0 0 var(--accent)}
+  .sess .n{font-weight:500}.sess .s{font-size:11px;color:var(--dim);font-family:ui-monospace,monospace}
   aside .new{padding:10px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
   aside .new input,aside .new textarea,aside .new select{background:var(--field);border:1px solid var(--line);color:var(--ink);
        padding:6px 8px;border-radius:7px;font:inherit}
   aside .new textarea{resize:vertical;min-height:44px}
   section{flex:1;display:flex;flex-direction:column;min-width:0}
-  .chathead{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--panel)}
+  .chathead{display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--bg)}
   .chathead .cur{font-weight:600}
   .chathead .sp{flex:1}
-  button.danger{color:var(--danger);border-color:var(--danger-line)}
-  button.danger:hover{background:var(--err)}
-  .log{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
-  .msg{max-width:80%;padding:9px 12px;border-radius:12px;white-space:pre-wrap;word-wrap:break-word}
-  .msg.user{align-self:flex-end;background:var(--user)}
-  .msg.asst{align-self:flex-start;background:var(--asst);border:1px solid var(--line);max-width:88%}
-  .msg.err{align-self:flex-start;background:var(--err);border:1px solid var(--danger-line)}
-  .msg .who{font-size:10px;color:var(--dim);margin-bottom:3px;text-transform:uppercase;letter-spacing:.05em}
+  /* Cerrar y borrar una sesión no puede ser el botón más llamativo de la pantalla. */
+  button.danger{background:transparent;color:var(--danger);border:1px solid var(--danger-line)}
+  button.danger:hover:not(:disabled){background:var(--err);filter:none}
+  /* La columna se centra y se acota, como en el cliente: leer no es llenar la pantalla. */
+  .log{flex:1;overflow:auto;display:flex;flex-direction:column;gap:22px;line-height:1.65;
+       padding:28px max(20px, calc((100% - 780px) / 2)) 40px}
+  .msg{max-width:100%;white-space:pre-wrap;word-wrap:break-word}
+  /* Tú vas en burbuja; el asistente va a página limpia. Ésa es la diferencia que más se nota. */
+  .msg.user{align-self:flex-end;max-width:85%;background:var(--user);
+       padding:11px 16px;border-radius:var(--radio)}
+  .msg.asst{align-self:stretch;background:none;border:0;padding:0}
+  .msg.err{align-self:stretch;background:var(--err);border:1px solid var(--danger-line);
+       padding:11px 14px;border-radius:var(--radio)}
+  .msg .who{font-size:11px;color:var(--dim);margin-bottom:6px;letter-spacing:.01em;font-weight:500}
+  .msg.user .who{text-align:right}
   @keyframes pulse{0%,100%{opacity:.55}50%{opacity:1}}
   .msg.stream{max-width:92%}
   .msg.stream .st-status{font-style:italic;color:var(--dim);animation:pulse 1.4s ease-in-out infinite}
   .msg.stream .st-steps{margin-top:6px;display:flex;flex-direction:column;gap:3px}
   .msg.stream .st-step{font-size:12px;color:var(--dim);font-family:ui-monospace,SFMono-Regular,monospace;
-       white-space:pre-wrap;word-break:break-word;border-left:2px solid var(--line);padding-left:8px}
-  .composer{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);background:var(--panel)}
+       white-space:pre-wrap;word-break:break-word;border-left:2px solid var(--line);padding-left:10px}
+  .msg.stream{align-self:stretch}
+  .composer{display:flex;gap:8px;align-items:flex-end;background:var(--bg);border-top:0;
+       padding:8px max(20px, calc((100% - 780px) / 2)) 20px}
   .composer textarea{flex:1;background:var(--field);border:1px solid var(--line);color:var(--ink);
-       padding:9px 11px;border-radius:9px;font:inherit;resize:none;min-height:44px;max-height:180px}
+       padding:12px 14px;border-radius:var(--radio);font:inherit;resize:none;min-height:52px;max-height:200px;
+       box-shadow:0 1px 2px rgba(0,0,0,.04)}
+  .composer textarea:focus{outline:none;border-color:var(--accent)}
   .composer .attach{background:transparent;border:1px solid var(--line);color:var(--dim);
-       padding:0 12px;font-size:18px;line-height:1}
-  .attachbar{display:flex;flex-wrap:wrap;gap:6px;padding:8px 12px 0}
+       padding:0 14px;height:52px;font-size:18px;line-height:1;border-radius:var(--radio)}
+  .composer button{height:52px;border-radius:var(--radio)}
+  .attachbar{display:flex;flex-wrap:wrap;gap:6px;padding:8px max(20px, calc((100% - 780px) / 2)) 0}
   .attachbar:empty{display:none}
   .chip{display:flex;align-items:center;gap:4px;background:var(--chip);border:1px solid var(--line);
        border-radius:14px;padding:3px 4px 3px 10px;font-size:12px}
