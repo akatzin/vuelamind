@@ -253,6 +253,8 @@
       <span class="cur" id="curname"></span>
       <span class="usage" id="usage" title="contexto usado · tokens generados en el último turno"></span>
       <span class="sp"></span>
+      <button id="guardar" class="ghost" hidden
+              title="Manda /vuelamind-commit a esta sesión: mide, te enseña qué va a escribir y solo escribe con tu sí">Guardar</button>
       <button id="close" class="ghost danger" title="Detiene la sesión y la quita de esta página">Cerrar este chat</button>
     </div>
     <div class="log" id="log"><div class="empty">Elige o crea una sesión.</div></div>
@@ -311,6 +313,7 @@ function loadUsage(name){ try{ return JSON.parse(localStorage.getItem("usage:"+n
 function saveCommands(cmds, skills){
   if(Array.isArray(cmds)&&cmds.length){
     state.commands=cmds;
+    setTimeout(refrescarGuardar, 0);   // la lista llega con el primer `init` del turno
     state.skills=Array.isArray(skills)?skills:[];
     try{ localStorage.setItem("bridge:commands",JSON.stringify(cmds));
          localStorage.setItem("bridge:skills",JSON.stringify(state.skills)); }catch{}
@@ -565,12 +568,23 @@ async function traerHistorial(name){
   }catch{}                                          // sin puente no se inventa nada
 }
 
+// El botón solo existe si ESA sesión tiene el ciclo instalado — lo declara el evento `init`,
+// no se supone. Ofrecer un atajo a un comando que no está es peor que no ofrecerlo: falla
+// después de haber gastado un turno.
+function refrescarGuardar(){
+  const hay = (state.commands||[]).some(c => /^vuelamind-commit$/i.test(c));
+  const b = $("#guardar");
+  b.hidden = !hay;
+  // Dispara un turno que cuesta y tarda: mientras corre, no se puede pulsar dos veces.
+  b.disabled = !!state.streams[state.current];
+}
+
 function select(name){
   state.current=name;
   $("#input").disabled=false; $("#send").disabled=false; $("#attach").disabled=false;
   $("#chathead").style.display="flex"; $("#curname").textContent=name;
   clearAtts(); acClose();
-  state.usage[name]=loadUsage(name); renderUsage(name);
+  state.usage[name]=loadUsage(name); renderUsage(name); refrescarGuardar();
   document.querySelectorAll(".sess").forEach(e=>e.classList.toggle("on",e.querySelector(".n").textContent===name));
   render();
   traerHistorial(name);
@@ -610,6 +624,14 @@ async function closeSession(){
   $("#close").disabled=false;
 }
 $("#close").onclick=closeSession;
+
+// Guardar es exactamente teclear el comando: mismo camino, misma protección, mismo panel de
+// progreso. No es un mecanismo aparte — serlo lo volvería otra cosa que mantener.
+$("#guardar").onclick=()=>{
+  if(!state.current || state.streams[state.current]) return;
+  $("#input").value="/vuelamind-commit";
+  send();
+};
 
 
 $("#tema").onchange=e=>aplicarTema(e.target.value);
@@ -660,6 +682,7 @@ function startStream(owner){
   const p={el:d, status, steps, timer:null, usage:null, owner};
   state.streams[owner]=p;
   marcarTrabajando(owner, true);
+  refrescarGuardar();
   if(owner===state.current){ const log=$("#log"); log.appendChild(d); log.scrollTop=log.scrollHeight; }
   const fmtDur=n=>n<60?n+"s":Math.floor(n/60)+"m "+(n%60)+"s";
   p.upd=()=>{ const n=Math.round((Date.now()-t0)/1000);
@@ -704,6 +727,7 @@ function endStream(p){
   if(p.el) p.el.remove();
   if(p.owner && state.streams[p.owner]===p) delete state.streams[p.owner];
   if(p.owner) marcarTrabajando(p.owner, false);
+  refrescarGuardar();
 }
 
 // ---- recuperar un turno cuyo stream se rompió ----
