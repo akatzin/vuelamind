@@ -142,6 +142,8 @@
   .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
   .empty{margin:auto;color:var(--dim);text-align:center;padding:20px}
   .hint{font-size:11px;color:var(--dim)}
+  .hint-traido{align-self:center;font-size:12px;color:var(--dim);border:1px dashed var(--line);
+       border-radius:10px;padding:4px 10px;margin-bottom:6px}
   header .tema{background:var(--field);border:1px solid var(--line);color:var(--dim);
        font:inherit;font-size:12px;padding:3px 6px;border-radius:8px;cursor:pointer}
   /* medidor de contexto + gasto del turno (en la cabecera del chat) */
@@ -251,7 +253,7 @@
 </main>
 <script>
 const $ = s => document.querySelector(s);
-const state = { current: null, usage: {}, commands: [], skills: [], streams: {} };
+const state = { current: null, usage: {}, commands: [], skills: [], streams: {}, traido: {} };
 // streams: los turnos EN VUELO, por nombre de sesión. Un turno pertenece a la sesión
 // que lo pidió, no a la que estés mirando cuando termine — ver el comentario de send().
 
@@ -499,9 +501,38 @@ function render(){
     }
     log.appendChild(d);
   });
+  // Una historia traída entera se ve EXACTAMENTE como una nacida aquí — misma etiqueta,
+  // mismo render—, y avisar de eso no aporta nada: es la misma conversación. La nota sale
+  // solo cuando hubo RECORTE, que es cuando lleva información que el usuario no puede
+  // deducir: que lo que ve no es todo.
+  const t=state.traido[state.current];
+  if(t && t.parcial){
+    const n=document.createElement("div"); n.className="hint-traido";
+    n.textContent = `Los ${t.mostrados} mensajes más recientes de ${t.total}. `
+      + `Lo anterior sigue en el transcript de la sesión.`;
+    log.insertBefore(n, log.firstChild);
+  }
   const vivo=state.streams[state.current];        // un turno en vuelo de ESTA sesión
   if(vivo && vivo.el) log.appendChild(vivo.el);   // el nodo conserva sus pasos: vuelve entero
   log.scrollTop=log.scrollHeight;
+}
+
+// Si ESTE navegador no tiene la conversación, se pide al servidor — que la tiene, porque el
+// CLI la escribe en su transcript. Manda el navegador: solo se rellena cuando está vacío, y
+// nunca se mezclan dos historias, que es como se fabrica un Frankenstein que nadie audita.
+async function traerHistorial(name){
+  if(tx(name).length) return;                       // el navegador manda
+  try{
+    const r=await fetch(`/sessions/${encodeURIComponent(name)}/historial?limite=50`,
+                        {headers:hdrs()});
+    if(!r.ok) return;
+    const d=await r.json();
+    if(!d.hay || !d.mensajes || !d.mensajes.length) return;
+    localStorage.setItem("tx:"+name, JSON.stringify(d.mensajes));
+    state.traido[name]={parcial:!!d.parcial, total:d.total||d.mensajes.length,
+                        mostrados:d.mensajes.length};
+    if(state.current===name) render();
+  }catch{}                                          // sin puente no se inventa nada
 }
 
 function select(name){
@@ -512,6 +543,7 @@ function select(name){
   state.usage[name]=loadUsage(name); renderUsage(name);
   document.querySelectorAll(".sess").forEach(e=>e.classList.toggle("on",e.querySelector(".n").textContent===name));
   render();
+  traerHistorial(name);
 }
 
 async function closeSession(){

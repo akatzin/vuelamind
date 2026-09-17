@@ -245,6 +245,58 @@ def ultimo_del_transcript(session_id: str) -> dict:
             "por_que": "" if texto else "la ultima respuesta no trae texto, solo herramientas"}
 
 
+def historial_del_transcript(session_id: str, limite: int = 50) -> dict:
+    """Reconstruye la conversacion desde el transcript que el CLI ya escribio.
+
+    EL HUECO QUE CIERRA: la pagina guarda la conversacion en el navegador que la escribio.
+    Abrir el puente desde otra ventana, otro perfil o -su caso de uso declarado- otra maquina
+    por tunel, ensena la sesion viva y el chat EN BLANCO. La conversacion existe: esta en el
+    transcript del CLI, que es el mismo archivo del que lee la recuperacion.
+
+    SE RECONSTRUYEN SOLO LOS TEXTOS, no las llamadas a herramientas. La pagina nunca guardo
+    los pasos de un turno -viven en el panel de progreso y mueren con el-, asi que incluirlos
+    aqui daria a la segunda ventana un historial que la primera nunca tuvo: dos vistas
+    distintas de la misma sesion. Se reconstruye lo que habia, no lo que el disco guardo.
+    """
+    raiz = Path.home() / ".claude" / "projects"
+    archivo = next(raiz.glob(f"*/{session_id}.jsonl"), None) if raiz.is_dir() else None
+    if archivo is None:
+        return {"hay": False, "mensajes": [], "parcial": False,
+                "por_que": "esa sesion no tiene transcript todavia"}
+    mensajes = []
+    try:
+        with archivo.open(encoding="utf-8", errors="replace") as fh:
+            for linea in fh:
+                linea = linea.strip()
+                if not linea:
+                    continue
+                try:
+                    d = json.loads(linea)
+                except json.JSONDecodeError:
+                    continue
+                tipo = d.get("type")
+                if tipo not in ("user", "assistant"):
+                    continue
+                c = (d.get("message") or {}).get("content")
+                if tipo == "user":
+                    texto = c if isinstance(c, str) else "\n".join(
+                        b.get("text", "") for b in (c or []) if b.get("type") == "text")
+                else:
+                    texto = "\n\n".join(b.get("text", "") for b in (c or [])
+                                         if b.get("type") == "text")
+                texto = (texto or "").strip()
+                if texto:
+                    mensajes.append({"role": "user" if tipo == "user" else "asst",
+                                     "text": texto})
+    except OSError as e:
+        return {"hay": False, "mensajes": [], "parcial": False,
+                "por_que": f"no se pudo leer el transcript: {e}"}
+    total = len(mensajes)
+    parcial = total > limite
+    return {"hay": bool(mensajes), "mensajes": mensajes[-limite:], "total": total,
+            "parcial": parcial, "por_que": "" if mensajes else "el transcript no trae textos"}
+
+
 def load_registry() -> dict:
     if REGISTRY_FILE.exists():
         try:
@@ -705,6 +757,17 @@ class Handler(BaseHTTPRequestHandler):
                                "permission": meta.get("permission") or DEFAULT_PERMISSION,
                                "live_state": a.get("state") or a.get("status")})
             return self._json(200, {"sessions": merged, "agents_raw": list(live.values())})
+        # GET /sessions/<name>/historial -> la conversacion, para una ventana que no la tiene
+        mh = re.match(r"^/sessions/([^/]+)/historial(?:\?limite=(\d+))?$", self.path)
+        if mh:
+            nombre, lim = mh.group(1), int(mh.group(2) or 50)
+            meta = load_registry().get(nombre)
+            if not meta:
+                return self._json(404, {"error": f"no hay sesión '{nombre}'"})
+            if not meta.get("session_id"):
+                return self._json(409, {"error": "esa sesión no tiene session_id todavía"})
+            return self._json(200, historial_del_transcript(meta["session_id"],
+                                                            max(1, min(lim, 500))))
         # GET /sessions/<name>/ultimo  -> RECUPERAR lo que el stream no alcanzo a traer
         mu = re.match(r"^/sessions/([^/]+)/ultimo$", self.path)
         if mu:
