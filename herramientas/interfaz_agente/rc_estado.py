@@ -32,6 +32,7 @@ from pathlib import Path
 ARCHIVOS_POR_OMISION = ("session_bridge.py", "session_bridge.html")
 EN_CANON = "herramientas/interfaz_agente"
 INSTALADOR = "install.py"
+HUELLA_FILE = "INSTALADO.json"
 
 
 def huella(datos: bytes) -> str:
@@ -51,6 +52,43 @@ def git_bytes(clon: str, *args: str) -> bytes:
     if r.returncode != 0:
         raise RuntimeError(f"git {' '.join(args)} falló")
     return r.stdout
+
+
+def leer_huella(dir_inst: Path) -> dict:
+    """La huella que dejo el instalador, si la dejo.
+
+    EL CASO DE EXCEPCION, Y SE TRATA COMO LO QUE ES: una instalacion hecha antes de que esta
+    huella existiera NO tiene defecto ninguno — simplemente nacio antes. Confundir «no hay
+    dato» con «hay un problema» es la forma mas rapida de que la gente aprenda a ignorar un
+    aviso. Asi que se dice en una linea, se sigue midiendo por las huellas de los archivos
+    -que no dependen de esto-, y se ofrece la salida: reinstalar deja la huella puesta.
+    """
+    f = dir_inst / HUELLA_FILE
+    if not f.exists():
+        return {"hay": False, "por_que": "anterior a que el instalador dejara huella"}
+    try:
+        d = json.loads(f.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        # Ilegible NO es lo mismo que ausente: una es historia, la otra es algo roto.
+        return {"hay": False, "roto": True, "por_que": f"{HUELLA_FILE} ilegible: {e}"}
+    d["hay"] = True
+    return d
+
+
+def identificar_instalador(clon: str, ref: str, sha: str) -> dict:
+    """Misma tecnica que con los archivos: buscar la huella en la historia del canon."""
+    ruta = f"{EN_CANON}/{INSTALADOR}"
+    try:
+        if huella(git_bytes(clon, "show", f"{ref}:{ruta}")) == sha:
+            return {"estado": "al-dia"}
+        for c in git(clon, "log", "--format=%H", ref, "--", ruta).split():
+            if huella(git_bytes(clon, "show", f"{c}:{ruta}")) == sha:
+                titulos = [l for l in git(clon, "log", "--format=%s", f"{c}..{ref}", "--",
+                                          ruta).splitlines() if l]
+                return {"estado": "atrasado", "commit": c[:12], "cambios": titulos}
+    except RuntimeError:
+        return {"estado": "sin-canon"}
+    return {"estado": "desconocido"}
 
 
 def archivos_de_una_instalacion(clon: str, ref: str) -> tuple:
@@ -138,6 +176,7 @@ def main() -> int:
         print(f"NO PUEDO LEER EL CANON en {clon}: {e}", file=sys.stderr)
         return 4
 
+    hue = leer_huella(dir_inst)
     archivos, aviso_lista = archivos_de_una_instalacion(clon, ref)
     faltan = [f for f in archivos if not (dir_inst / f).exists()]
     if faltan:
@@ -172,7 +211,14 @@ def main() -> int:
         else:
             peor = max(peor, 3)
             print(f"  {f:22} DESCONOCIDO — su huella no esta en la historia del canon.")
-            print( "                         Esta modificado localmente o viene de otra parte.")
+            puesta = (hue.get("archivos") or {}).get(f)
+            if puesta and puesta != r["huella"]:
+                print( "                         Y NO es como se instalo: alguien lo edito despues.")
+            elif puesta and puesta == r["huella"]:
+                print( "                         Se instalo asi: el instalador copio esto mismo,")
+                print( "                         o sea que el canon de entonces no era este.")
+            else:
+                print( "                         Esta modificado localmente o viene de otra parte.")
             print(f"                         huella: {r['huella'][:16]}...")
 
     # El .py exige reiniciar el servicio; el .html se recarga solo. Confundirlo hace que un
@@ -182,21 +228,42 @@ def main() -> int:
     # que reiniciar: es si hay que sobrescribir, y eso lo decide una persona. Dar el consejo
     # operativo ahi seria cierto en una rama y enganoso en la otra —medido: la primera
     # version de este guion decia "basta recargar" sobre un archivo modificado a mano—.
-    # El instalador NO se copia a la instalacion, asi que no tiene huella que comparar. Lo
-    # que si se puede saber: si cambio DESPUES de la version instalada. Copiar los archivos
-    # no aplica lo que el instalador hace -arranque automatico, claves del .env, que se
-    # copia-, y ese hueco no da sintoma: este guion diria "al dia" sobre un despliegue al
-    # que le falta un cambio estructural.
-    viejos = [r["commit"] for r in res.values() if r.get("commit")]
-    if viejos:
-        tocado = instalador_cambio_desde(clon, ref, viejos[0])
-        if tocado:
-            print(f"\nEL INSTALADOR TAMBIEN CAMBIO desde tu version ({len(tocado)}):")
-            for tt in tocado:
+    # --- El instalador: lo que hace no se aplica copiando archivos ---
+    # Escribe el arranque automatico, fija claves del .env y decide que se copia. Si eso
+    # cambio, actualizar los archivos deja el despliegue a medias SIN NINGUN SINTOMA.
+    if hue.get("hay") and hue.get("instalador_sha256"):
+        ins = identificar_instalador(clon, ref, hue["instalador_sha256"])
+        if ins["estado"] == "al-dia":
+            print("\ninstalador  : AL DIA (huella del que instaló)")
+        elif ins["estado"] == "atrasado":
+            peor = max(peor, 1)
+            print(f"\ninstalador  : ATRASADO — instalaste con la version {ins['commit']}, "
+                  f"{len(ins['cambios'])} cambio(s) detras:")
+            for tt in ins["cambios"]:
                 print(f"      · {tt}")
-            print("  Copiar los archivos NO aplica lo que el instalador hace: arranque")
-            print("  automatico, claves del .env, y que archivos se copian. Si alguno de esos")
-            print("  cambios toca tu despliegue, reinstala con /vuelamind-rc en vez de copiar.")
+            print("  Copiar los archivos NO aplica esto. Si alguno toca tu despliegue,")
+            print("  reinstala con /vuelamind-rc en vez de copiar.")
+        elif ins["estado"] == "desconocido":
+            peor = max(peor, 3)
+            print("\ninstalador  : DESCONOCIDO — con el que instalaste no esta en la historia")
+            print("                del canon. Era una copia modificada, o de otra procedencia.")
+    else:
+        # EL CASO DE EXCEPCION. No es un defecto: es una instalacion anterior a la huella.
+        print(f"\ninstalador  : SIN HUELLA — {hue.get('por_que')}.")
+        if hue.get("roto"):
+            print("                (ilegible NO es lo mismo que ausente: esto si es algo roto)")
+        print("                Los archivos se siguen midiendo igual; lo que no se puede")
+        print("                saber es CON QUE instalador nacio este despliegue.")
+        viejos = [r["commit"] for r in res.values() if r.get("commit")]
+        if viejos:
+            tocado = instalador_cambio_desde(clon, ref, viejos[0])
+            if tocado:
+                print(f"                Y el instalador cambio {len(tocado)} vez(ces) desde la")
+                print("                version de tus archivos, que es lo mas cerca que se")
+                print("                puede estar sin la huella:")
+                for tt in tocado:
+                    print(f"                    · {tt}")
+        print("                Reinstalar con /vuelamind-rc deja la huella puesta.")
 
     if any(r["estado"] == "desconocido" for r in res.values()):
         print("\nNO ACTUALICES A CIEGAS: hay al menos un archivo que no viene del canon.")

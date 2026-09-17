@@ -24,6 +24,9 @@ Uso:
 """
 
 import argparse
+import datetime
+import hashlib
+import json
 import os
 import platform
 import shutil
@@ -37,6 +40,7 @@ OLD_LABELS = ["ai.vuelamind.session-bridge"]      # etiquetas de versiones previ
 HOME = Path.home()
 CONF_DIR = HOME / ".claude"
 ENV_FILE = CONF_DIR / "vuelamind-rc.env"
+HUELLA_FILE = "INSTALADO.json"   # estado que escribe la maquina, no configuracion
 INSTALL_DIR = CONF_DIR / "vuelamind-rc"
 ASSETS = Path(__file__).resolve().parent
 
@@ -70,6 +74,10 @@ for _flujo in (sys.stdout, sys.stderr):
         _flujo.reconfigure(errors="replace")
     except Exception:
         pass
+
+
+def _ahora_iso() -> str:
+    return datetime.datetime.now().astimezone().replace(microsecond=0).isoformat()
 
 
 def say(msg):
@@ -259,12 +267,48 @@ def write_env_file(cfg):
 
 def copy_assets():
     INSTALL_DIR.mkdir(parents=True, exist_ok=True)
+    copiados = {}
     for f in ("session_bridge.py", "session_bridge.html"):
         src = ASSETS / f
         if not src.exists():
             sys.exit(f"falta el asset: {src}")
         shutil.copy2(src, INSTALL_DIR / f)
+        copiados[f] = hashlib.sha256((INSTALL_DIR / f).read_bytes()).hexdigest()
+    dejar_huella(copiados)
     return INSTALL_DIR / "session_bridge.py"
+
+
+def dejar_huella(copiados: dict) -> None:
+    """Escribe QUE se instalo y CON QUE instalador, para que se pueda preguntar despues.
+
+    EL HUECO QUE CIERRA: el puente no lleva version escrita, y la de los archivos se puede
+    deducir de la historia del canon — pero la DEL INSTALADOR no, porque el instalador no se
+    copia. Sin esta huella, un despliegue no puede decir con que se instalo, y un cambio en el
+    instalador -arranque automatico, claves del .env, que archivos se copian- queda sin
+    aplicar SIN NINGUN SINTOMA.
+
+    Se guarda aparte del `.env` a proposito: el `.env` es configuracion que edita una persona;
+    esto es estado que escribe la maquina. Mezclarlos invita a que una edicion a mano borre un
+    hecho medido.
+
+    Tambien guarda la huella de cada archivo copiado. Eso permite distinguir despues dos cosas
+    que hoy se ven igual: un archivo que llego asi, y uno que alguien edito DESPUES de
+    instalar.
+    """
+    huella = {
+        "instalado": _ahora_iso(),
+        "instalador_sha256": hashlib.sha256(Path(__file__).resolve().read_bytes()).hexdigest(),
+        "archivos": copiados,
+        "nota": "Lo escribe el instalador. Si falta, la instalacion es anterior a que "
+                "existiera esta huella (antes del 2026-09-17), y eso NO es un defecto.",
+    }
+    try:
+        (INSTALL_DIR / HUELLA_FILE).write_text(
+            json.dumps(huella, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    except OSError as e:
+        # No se aborta la instalacion por no poder escribir un dato de diagnostico: se dice.
+        say(f"  aviso: no pude escribir {HUELLA_FILE} ({e}); este despliegue no podra "
+            f"decir con que instalador nacio")
 
 
 def warn_missing_vertex(cfg):
