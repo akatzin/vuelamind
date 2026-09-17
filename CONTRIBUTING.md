@@ -1,15 +1,17 @@
 > [!important] v3.5 (2026-09-06) · The inbox is open · El buzón está abierto
-> **Do not open patch PRs.** Since v3.5 you send your lessons to
-> **https://learning.vuelamind.ai** — an open `POST`, no keys, no account, no sign-up. Run
-> `/vuelamind-learn`: it keeps only what generalises, anonymises it, **shows you the exact
-> text**, and sends it once you approve. A watcher reads, judges and harmonises. **Nothing
-> reaches the canon without a human.**
+> **Do not open patch PRs.** Your lessons are **local by default** — your own book of
+> errors, in your own vault. If you want one to travel further, that is what
+> **`/vuelamind-learn`** is for: it keeps only what generalises, anonymises it, **shows you
+> the exact text**, **asks you where it should go**, and sends it only once you approve —
+> an open `POST`, no keys, no account, no sign-up. A watcher reads, judges and harmonises.
+> **Nothing reaches the canon without a human.**
 >
-> **No abras PRs de parches.** Desde la v3.5 mandas tus lecciones a
-> **https://learning.vuelamind.ai** — un `POST` abierto, sin llaves, sin cuenta y sin
-> registro. Corre `/vuelamind-learn`: se queda con lo que sirve a cualquier casa, lo
-> anonimiza, **te enseña el texto exacto**, y lo manda cuando lo apruebas. Un vigía lee,
-> juzga y armoniza. **Nada sube al canon sin palabra humana.**
+> **No abras PRs de parches.** Tus lecciones son **locales por omisión** — tu libro de
+> errores, en tu vault. Si quieres que alguna viaje más lejos, para eso está
+> **`/vuelamind-learn`**: se queda con lo que sirve a cualquier casa, lo anonimiza, **te
+> enseña el texto exacto**, **te pregunta a dónde va**, y lo manda solo cuando lo apruebas
+> — un `POST` abierto, sin llaves, sin cuenta y sin registro. Un vigía lee, juzga y
+> armoniza. **Nada sube al canon sin palabra humana.**
 >
 > *Why the change / Por qué cambió:* the old cycle made the house that made the mistake pay
 > for the whole ceremony — write the patch, anonymise it, hold an account, follow the review.
