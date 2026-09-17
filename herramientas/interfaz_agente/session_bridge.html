@@ -276,7 +276,11 @@ function usageText(u){
   if(!u) return "";
   const pct = u.window ? Math.round(100*u.context_tokens/u.window) : null;
   const ctx = fmtTok(u.context_tokens)+(u.window?"/"+fmtTok(u.window):"");
-  return (pct!=null?"🧠 "+pct+"% · ":"")+ctx+" · ↑"+fmtTok(u.output_tokens)+" tok";
+  // El primer turno de una sesión nueva no sabe todavía la ventana real del modelo: usa el
+  // valor por omisión. Se marca con ~ en vez de presentarlo como un dato medido — un número
+  // supuesto con la misma cara que uno medido es el defecto que este arreglo vino a quitar.
+  const aprox = u.provisional ? "~" : "";
+  return (pct!=null?"🧠 "+aprox+pct+"% · ":"")+aprox+ctx+" · ↑"+fmtTok(u.output_tokens)+" tok";
 }
 function renderUsage(name){
   const el=$("#usage"), u=state.usage[name];
@@ -633,7 +637,8 @@ function addStep(p, icon, text){
 }
 function updUsage(ev, owner){
   if(!owner) return;
-  const u={context_tokens:ev.context_tokens,output_tokens:ev.output_tokens,window:ev.window};
+  const u={context_tokens:ev.context_tokens,output_tokens:ev.output_tokens,window:ev.window,
+           provisional:!!ev.provisional};
   state.usage[owner]=u; saveUsage(owner,u); if(owner===state.current) renderUsage(owner);
 }
 function handleEv(ev, p){
@@ -645,7 +650,8 @@ function handleEv(ev, p){
     const t=ev.text.trim(); if(t) addStep(p, "💬", t.length>240?t.slice(0,240)+"…":t);
   } else if(ev.kind==="usage"){
     updUsage(ev, p&&p.owner);                      // badge persistente en la cabecera
-    if(p){ p.usage={context_tokens:ev.context_tokens,output_tokens:ev.output_tokens,window:ev.window};
+    if(p){ p.usage={context_tokens:ev.context_tokens,output_tokens:ev.output_tokens,
+                    window:ev.window,provisional:!!ev.provisional};
            if(p.upd) p.upd(); }                    // + en vivo, al lado del cronómetro
   } else if(ev.kind==="compact"){
     addStep(p, "🗜️", "compactando contexto"+(ev.pre_tokens?" ("+fmtTok(ev.pre_tokens)+" tok)":"")+"…");
