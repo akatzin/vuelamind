@@ -22,14 +22,16 @@ Salidas: 0 = al día · 1 = atrasado · 2 = no hay instalación · 3 = desconoci
          4 = error de uso o de acceso al canon
 """
 import hashlib
+import re
 import json
 import os
 import subprocess
 import sys
 from pathlib import Path
 
-ARCHIVOS = ("session_bridge.py", "session_bridge.html")
+ARCHIVOS_POR_OMISION = ("session_bridge.py", "session_bridge.html")
 EN_CANON = "herramientas/interfaz_agente"
+INSTALADOR = "install.py"
 
 
 def huella(datos: bytes) -> str:
@@ -49,6 +51,42 @@ def git_bytes(clon: str, *args: str) -> bytes:
     if r.returncode != 0:
         raise RuntimeError(f"git {' '.join(args)} falló")
     return r.stdout
+
+
+def archivos_de_una_instalacion(clon: str, ref: str) -> tuple:
+    """Que archivos copia el instalador — leidos DEL INSTALADOR, no de aqui.
+
+    Un instrumento que lleva su propia copia de la verdad envejece en silencio: el dia que el
+    canon empiece a copiar un tercer archivo, este guion seguiria diciendo "al dia" mirando
+    solo dos. Asi que la lista se saca del instalador vigente; si no se puede, se usa la
+    conocida Y SE DICE, porque una suposicion callada es indistinguible de un dato.
+    """
+    try:
+        fuente = git_bytes(clon, "show", f"{ref}:{EN_CANON}/{INSTALADOR}").decode(
+            "utf-8", "replace")
+        m = re.search(r"for\s+f\s+in\s*\(([^)]*)\)\s*:", fuente)
+        if m:
+            nombres = tuple(re.findall(r'"([^"]+)"', m.group(1)))
+            if nombres:
+                return nombres, ""
+    except Exception as e:
+        return ARCHIVOS_POR_OMISION, f"no pude leer {INSTALADOR} ({e}); uso la lista conocida"
+    return ARCHIVOS_POR_OMISION, f"no reconoci la lista dentro de {INSTALADOR}; uso la conocida"
+
+
+def instalador_cambio_desde(clon: str, ref: str, commit: str) -> list:
+    """Titulos de los commits que tocaron el INSTALADOR despues de la version instalada.
+
+    Copiar los archivos no aplica lo que hace el instalador: escribe el arranque automatico,
+    fija claves del .env y decide que se copia. Si eso cambio, actualizar los dos archivos
+    deja el despliegue a medias **y sin sintoma**.
+    """
+    try:
+        salida = git(clon, "log", "--format=%s", f"{commit}..{ref}", "--",
+                     f"{EN_CANON}/{INSTALADOR}")
+        return [l for l in salida.splitlines() if l.strip()]
+    except Exception:
+        return []
 
 
 def identificar(clon: str, ref: str, archivo: str, instalado: bytes) -> dict:
@@ -100,16 +138,26 @@ def main() -> int:
         print(f"NO PUEDO LEER EL CANON en {clon}: {e}", file=sys.stderr)
         return 4
 
-    faltan = [f for f in ARCHIVOS if not (dir_inst / f).exists()]
+    archivos, aviso_lista = archivos_de_una_instalacion(clon, ref)
+    faltan = [f for f in archivos if not (dir_inst / f).exists()]
     if faltan:
         print(f"INSTALACION INCOMPLETA en {dir_inst}: falta {', '.join(faltan)}")
         return 3
 
     print(f"instalacion : {dir_inst}")
     print(f"canon       : {clon}  ({ref})")
+    print(f"archivos    : {', '.join(archivos)}"
+          + (f"   [{aviso_lista}]" if aviso_lista else "   (leidos del instalador)"))
     res = {}
-    for f in ARCHIVOS:
-        res[f] = identificar(clon, ref, f, (dir_inst / f).read_bytes())
+    for f in archivos:
+        try:
+            res[f] = identificar(clon, ref, f, (dir_inst / f).read_bytes())
+        except RuntimeError as e:
+            # Una referencia donde el puente todavia no existia no es un error del
+            # despliegue: es una comparacion imposible. Se dice, no se revienta.
+            print(f"\nNO PUEDO COMPARAR {f} contra {ref}: {e}", file=sys.stderr)
+            print("  ¿Es una referencia anterior a que el puente existiera?", file=sys.stderr)
+            return 4
 
     peor = 0
     for f, r in res.items():
@@ -134,14 +182,30 @@ def main() -> int:
     # que reiniciar: es si hay que sobrescribir, y eso lo decide una persona. Dar el consejo
     # operativo ahi seria cierto en una rama y enganoso en la otra —medido: la primera
     # version de este guion decia "basta recargar" sobre un archivo modificado a mano—.
+    # El instalador NO se copia a la instalacion, asi que no tiene huella que comparar. Lo
+    # que si se puede saber: si cambio DESPUES de la version instalada. Copiar los archivos
+    # no aplica lo que el instalador hace -arranque automatico, claves del .env, que se
+    # copia-, y ese hueco no da sintoma: este guion diria "al dia" sobre un despliegue al
+    # que le falta un cambio estructural.
+    viejos = [r["commit"] for r in res.values() if r.get("commit")]
+    if viejos:
+        tocado = instalador_cambio_desde(clon, ref, viejos[0])
+        if tocado:
+            print(f"\nEL INSTALADOR TAMBIEN CAMBIO desde tu version ({len(tocado)}):")
+            for tt in tocado:
+                print(f"      · {tt}")
+            print("  Copiar los archivos NO aplica lo que el instalador hace: arranque")
+            print("  automatico, claves del .env, y que archivos se copian. Si alguno de esos")
+            print("  cambios toca tu despliegue, reinstala con /vuelamind-rc en vez de copiar.")
+
     if any(r["estado"] == "desconocido" for r in res.values()):
         print("\nNO ACTUALICES A CIEGAS: hay al menos un archivo que no viene del canon.")
         print("  Comparalo antes de decidir:")
         print(f"    diff <(git -C {clon} show {ref}:{EN_CANON}/<archivo>) {dir_inst}/<archivo>")
         print("  Si el cambio local vale, sale al canon como propuesta; no se pisa en silencio.")
-    elif res["session_bridge.py"]["estado"] != "al-dia":
+    elif res.get("session_bridge.py", {}).get("estado", "al-dia") != "al-dia":
         print("\nREINICIO NECESARIO si actualizas: cambia el backend (session_bridge.py).")
-    elif res["session_bridge.html"]["estado"] != "al-dia":
+    elif res.get("session_bridge.html", {}).get("estado", "al-dia") != "al-dia":
         print("\nSIN REINICIO: solo cambia la pagina; basta recargar el navegador.")
 
     if "--json" in sys.argv:

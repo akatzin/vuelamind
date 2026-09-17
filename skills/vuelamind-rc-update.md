@@ -45,6 +45,21 @@ cosa:
 | `2` **no instalado** | No hay puente en esta máquina | Se dice y se manda a `/vuelamind-rc`. **No se instala aquí** |
 | `3` **desconocido** | Su huella no está en la historia: **modificado localmente**, o de otra procedencia | **Se para.** Ver abajo |
 
+### Y una quinta cosa que el guion dice, porque copiar archivos no es actualizar
+
+**`install.py` no forma parte de una instalación.** Lo que vive en el directorio instalado son
+los archivos que el instalador copia — hoy dos, y **el guion lee esa lista del propio
+instalador** en vez de llevar su copia: el día que el canon empiece a copiar un tercero, un
+instrumento con la lista escrita dentro seguiría diciendo «al día» mirando solo dos. Si no
+puede leerla, usa la conocida **y lo declara**, porque una suposición callada es
+indistinguible de un dato.
+
+**Pero el instalador hace más que copiar:** escribe el arranque automático, fija claves del
+`.env` y decide qué se copia. Si cambió después de la versión instalada, el guion **lo dice y
+nombra esos cambios**: copiar los archivos no los aplica, y ese hueco **no da síntoma** — el
+despliegue se vería al día con un cambio estructural sin aplicar. Cuando salga ese aviso, hay
+que leer esos commits y decidir si toca **reinstalar con `/vuelamind-rc`** en vez de copiar.
+
 **El caso `3` es la razón de que este skill mida así.** Un comparador ingenuo pregunta *«¿es
 igual a la última?»*, y con un «no» junta dos cosas que no se parecen: **una copia vieja** y
 **el trabajo de alguien**. Sobrescribir la segunda borra ese trabajo sin que nada falle.
@@ -71,7 +86,8 @@ saber que la vuelta es barata es lo que le permite decir que sí.
 
 ## 2. Escribir y verificar por huella
 
-Copiar desde el clon los archivos que salieron atrasados —**solo ésos**— y **comprobar la
+Copiar desde el clon los archivos que salieron atrasados —**solo ésos**, y solo los que el
+instalador declare que forman una instalación— y **comprobar la
 huella del lado escrito antes de arrancar nada**. Si alguna no cuadra, se para ahí: escribir a
 medias un servicio es peor que no tocarlo.
 
