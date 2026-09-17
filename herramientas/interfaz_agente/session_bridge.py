@@ -201,12 +201,17 @@ def ultimo_del_transcript(session_id: str) -> dict:
     `-`, y adivinar el resto seria inventar-. Buscarlo por su nombre no depende de esa
     regla, asi que no se rompe el dia que cambie.
     """
+    # Todas las salidas traen LAS MISMAS CLAVES. Una respuesta que a veces incluye
+    # `terminado` y a veces no obliga a cada cliente a adivinar la forma, y el que adivine
+    # mal no falla: lee `undefined` y sigue. MEDIDO mientras se probaba esto: el propio
+    # guion de prueba reventó con KeyError en el primer sondeo, antes de que existiera el
+    # transcript.
     raiz = Path.home() / ".claude" / "projects"
     if not raiz.is_dir():
-        return {"hay": False, "por_que": "no existe ~/.claude/projects"}
+        return {"hay": False, "terminado": False, "texto": "", "por_que": "no existe ~/.claude/projects"}
     archivo = next(raiz.glob(f"*/{session_id}.jsonl"), None)
     if archivo is None:
-        return {"hay": False, "por_que": "esa sesion no tiene transcript todavia"}
+        return {"hay": False, "terminado": False, "texto": "", "por_que": "esa sesion no tiene transcript todavia"}
     ultimo_asistente = ultimo_usuario = None
     try:
         with archivo.open(encoding="utf-8", errors="replace") as fh:
@@ -223,9 +228,9 @@ def ultimo_del_transcript(session_id: str) -> dict:
                 elif d.get("type") == "user":
                     ultimo_usuario = d
     except OSError as e:
-        return {"hay": False, "por_que": f"no se pudo leer el transcript: {e}"}
+        return {"hay": False, "terminado": False, "texto": "", "por_que": f"no se pudo leer el transcript: {e}"}
     if ultimo_asistente is None:
-        return {"hay": False, "por_que": "el transcript no tiene ninguna respuesta todavia"}
+        return {"hay": False, "terminado": False, "texto": "", "por_que": "el transcript no tiene ninguna respuesta todavia"}
 
     bloques = (ultimo_asistente.get("message") or {}).get("content") or []
     texto = "\n\n".join(b.get("text", "") for b in bloques if b.get("type") == "text").strip()
@@ -748,6 +753,73 @@ class Handler(BaseHTTPRequestHandler):
                 save_registry(reg)
             return self._json(201, {"name": name, "session_id": res["session_id"],
                                     "text": res["text"]})
+        # POST /sessions/crear  -> CREAR VIENDO. Misma entrada que POST /sessions, pero el
+        # primer turno viaja como NDJSON en vez de esperarse entero.
+        #
+        # POR QUE EXISTE: crear con run_turn bloquea hasta que el turno TERMINA y no emite
+        # nada por el camino; con un primer mensaje caro -leer el arranque del dominio,
+        # correr el validador- eso son minutos con un boton que dice "Creando..." y ninguna
+        # senal de si sigue vivo. Y era ademas el ultimo turno que seguia muriendo con el
+        # cliente, porque no pasaba por stream_turn.
+        #
+        # EL REGISTRO SE ESCRIBE AL LLEGAR EL `init`, no al final: ahi aparece el session_id,
+        # y a partir de ese instante la sesion existe aunque el navegador se caiga.
+        if self.path == "/sessions/crear":
+            b = self._body()
+            name, prompt = b.get("name"), b.get("prompt")
+            attachments = b.get("attachments") or []
+            if not name or not NAME_RE.match(name):
+                return self._json(400, {"error": "name inválido (usa [A-Za-z0-9._-], 1-64)"})
+            if not prompt and not attachments:
+                return self._json(400, {"error": "falta prompt (o al menos un adjunto)"})
+            with _registry_lock:
+                reg = load_registry()
+                if name in reg:
+                    return self._json(409, {"error": f"ya existe una sesión '{name}'"})
+            cwd = b.get("cwd") or DEFAULT_CWD
+            model = b.get("model") or DEFAULT_MODEL
+            permission = b.get("permission") or DEFAULT_PERMISSION
+            if permission not in PERMISSION_ARGS:
+                return self._json(400, {"error": "permission inválido (full|tools|safe)"})
+
+            self.send_response(200)
+            self.send_header("Content-Type", "application/x-ndjson; charset=utf-8")
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            registrada = {"si": False}
+
+            def emit(ev):
+                # El init trae el session_id: es el momento exacto en que la sesión pasa a
+                # existir, y por eso se anota aquí y no cuando el turno termine.
+                if ev.get("kind") == "init" and ev.get("session_id") and not registrada["si"]:
+                    with _registry_lock:
+                        reg2 = load_registry()
+                        reg2[name] = {"session_id": ev["session_id"], "cwd": cwd,
+                                      "model": model, "permission": permission,
+                                      "created": _now()}
+                        save_registry(reg2)
+                    registrada["si"] = True
+                self.wfile.write((json.dumps(ev) + "\n").encode())
+                self.wfile.flush()
+
+            marcar_vivo(name, True)
+            try:
+                stream_turn(prompt or "", attachments, None, cwd, model, permission, emit)
+            except (BrokenPipeError, ConnectionResetError):
+                return   # el cliente se fue; el turno sigue y la sesión ya quedó anotada
+            finally:
+                marcar_vivo(name, False)
+            if not registrada["si"]:
+                # Nunca hubo `init`: no hay sesión que anotar. Se dice, en vez de dejar un
+                # nombre a medias que el usuario creeria creado.
+                try:
+                    self.wfile.write((json.dumps(
+                        {"kind": "error", "error": "la sesión no llegó a arrancar: sin init"}
+                    ) + "\n").encode())
+                    self.wfile.flush()
+                except Exception:
+                    pass
+            return
         # POST /sessions/<name>/deliver  -> ENTREGAR Y SOLTAR (arranca, acusa al init, se desengancha)
         md = re.match(r"^/sessions/([^/]+)/deliver$", self.path)
         if md:
