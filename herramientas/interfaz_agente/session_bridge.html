@@ -235,6 +235,10 @@
         <option value="tools">Python + red acotada</option>
         <option value="safe">Solo lectura / chat</option>
       </select>
+      <input id="newCwd" list="cwdsUsados" autocomplete="off"
+             placeholder="Directorio de trabajo del servidor"
+             title="El directorio decide QUÉ agente es: su vault, su CLAUDE.md y su memoria automática salen de ahí. Vacío = el del servidor">
+      <datalist id="cwdsUsados"></datalist>
       <input id="newModel" list="modelosSugeridos" autocomplete="off"
              placeholder="Modelo por defecto del servidor"
              title="Modelo (vacío = el que use el servidor). Se puede teclear cualquier id, p.ej. claude-opus-4-8[1m] para la ventana de 1M">
@@ -440,6 +444,15 @@ async function refresh(){
       list.appendChild(d);
     });
     if(!(j.sessions||[]).length) list.innerHTML='<div class="empty">Sin sesiones aún.</div>';
+    // Los directorios que ya usan otras sesiones se ofrecen como sugerencia: levantar un
+    // segundo agente en una casa que ya corre aquí es el caso frecuente, y teclear una ruta
+    // larga a mano es donde se cuela la errata que hace nacer la sesión en el sitio
+    // equivocado — y eso no falla: arranca, y es otro agente.
+    const dl=$("#cwdsUsados");
+    if(dl){
+      const vistos=[...new Set((j.sessions||[]).map(s=>s.cwd).filter(Boolean))].sort();
+      dl.innerHTML=vistos.map(c=>`<option value="${c}">`).join("");
+    }
   }catch(e){ setDot(false); }
 }
 
@@ -641,17 +654,20 @@ $("#sugLoad").onclick=()=>{            // sugerir y además dejarlo puesto: un c
 $("#create").onclick=async()=>{
   const name=$("#newName").value.trim(), prompt=$("#newPrompt").value.trim();
   const permission=$("#newPerm").value, model=$("#newModel").value;
+  const cwd=$("#newCwd").value.trim();
   if(!name||!prompt){ alert("Falta nombre o primer mensaje"); return; }
   $("#create").disabled=true; const lbl=$("#create").textContent; $("#create").textContent="Creando…";
   // Entramos a la sesión ANTES de que conteste: el primer mensaje suele ser el más caro
   // -poner al día al asistente corre su validador entero- y esperar minutos mirando un
   // botón no dice siquiera si sigue vivo. Se ve el turno desde el primer paso.
-  const cuerpo={name,prompt,permission}; if(model) cuerpo.model=model;
+  const cuerpo={name,prompt,permission};
+  if(model) cuerpo.model=model;
+  if(cwd) cuerpo.cwd=cwd;          // vacío = el del servidor, que es el caso de siempre
   pushTx(name,"user",prompt);
   state.current=name;
   $("#input").disabled=false; $("#send").disabled=true; $("#attach").disabled=false;
   $("#chathead").style.display="flex"; $("#curname").textContent=name;
-  $("#newName").value=""; $("#newPrompt").value="";
+  $("#newName").value=""; $("#newPrompt").value=""; $("#newCwd").value="";
   render();
   const ok=await correrTurno("/sessions/crear", cuerpo, name);
   await refresh();

@@ -832,6 +832,11 @@ class Handler(BaseHTTPRequestHandler):
             permission = b.get("permission") or DEFAULT_PERMISSION
             if permission not in PERMISSION_ARGS:
                 return self._json(400, {"error": "permission inválido (full|tools|safe)"})
+            # El cwd decide QUE agente es esta sesion -su vault, su CLAUDE.md y su memoria
+            # automatica salen de ahi-. Si no existe, hoy reventaba dentro del subproceso con
+            # un error que no dice que paso; una ruta mal tecleada merece decirse aqui.
+            if not Path(cwd).is_dir():
+                return self._json(400, {"error": f"el directorio no existe: {cwd}"})
             res = run_turn(prompt or "", attachments, None, cwd, model, permission)
             if res["is_error"] or not res["session_id"]:
                 return self._json(502, {"error": "claude falló al crear",
@@ -871,6 +876,11 @@ class Handler(BaseHTTPRequestHandler):
             permission = b.get("permission") or DEFAULT_PERMISSION
             if permission not in PERMISSION_ARGS:
                 return self._json(400, {"error": "permission inválido (full|tools|safe)"})
+            # El cwd decide QUE agente es esta sesion -su vault, su CLAUDE.md y su memoria
+            # automatica salen de ahi-. Si no existe, hoy reventaba dentro del subproceso con
+            # un error que no dice que paso; una ruta mal tecleada merece decirse aqui.
+            if not Path(cwd).is_dir():
+                return self._json(400, {"error": f"el directorio no existe: {cwd}"})
 
             self.send_response(200)
             self.send_header("Content-Type", "application/x-ndjson; charset=utf-8")
