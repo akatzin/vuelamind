@@ -1,0 +1,11 @@
+# Aquí vive TU dominio, no el canon. Nada de lo que escribas aquí entra a este
+# repositorio: se ignora todo salvo estos dos archivos, que son los que hacen que la
+# carpeta exista antes del primer arranque.
+#
+# POR QUE LA CARPETA VIAJA VACIA EN VEZ DE CREARLA DOCKER: en Linux, Docker crea como
+# root lo que falta, y dentro del contenedor se corre como uid 1000. Un clon recien
+# hecho no levantaba —medido en Debian con Engine 29.5.2—, y el arreglo era una linea
+# que se salta cualquiera. Viniendo la carpeta en el clon, el caso no existe.
+*
+!.gitignore
+!LEEME.txt

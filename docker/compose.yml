@@ -64,12 +64,14 @@ services:
       # El dominio que nace. Es tuyo y vive fuera del contenedor a proposito:
       # un vault que muere con `docker rm` no es un vault.
       #
-      # EN LINUX, CREALA TU ANTES DEL PRIMER `up`:  mkdir -p trabajo
-      # Si no existe, la crea Docker y la crea como ROOT; dentro se corre como uid
-      # 1000 y no se puede escribir. El puente lo detecta y se niega a arrancar con
-      # el comando para arreglarlo, pero es un tropiezo que no hace falta dar.
-      # MEDIDO en Debian con Engine 29.5.2: un clon nuevo no levanta sin esto.
-      # En Docker Desktop (macOS, Windows) no pasa: el montaje traduce los dueños.
+      # LA CARPETA VIAJA CON EL CANON, vacia y con su .gitignore, para que Docker no
+      # tenga que crearla: en Linux la crearia como ROOT y dentro se corre como uid
+      # 1000 — un clon nuevo no levantaba (medido en Debian con Engine 29.5.2). Si la
+      # borras, vuelve el caso: el puente se niega a arrancar y dice como arreglarlo.
+      #
+      # Y esta DENTRO del clon del canon por comodidad del primer arranque, no porque
+      # sea el mejor sitio. Para trabajar en serio, sacala fuera y cambia esta ruta:
+      # `git clean -fdx` sobre el clon se lleva todo lo ignorado, y aqui todo lo es.
       - ./trabajo:/trabajo
       # El hogar del usuario `node`: login del CLI, registro de sesiones del puente,
       # config y los transcripts de las conversaciones. Volumen nombrado para no

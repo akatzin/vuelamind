@@ -1,0 +1,19 @@
+AQUI VIVE TU DOMINIO.
+
+Lo que el contenedor escriba en /trabajo aterriza en esta carpeta, en tu disco. Es tuyo:
+sobrevive a apagar el contenedor, a borrarlo y a borrar la imagen.
+
+  Levantar:  desde la carpeta de arriba,  docker compose up -d --build
+  Entrar:    http://127.0.0.1:8850
+
+DOS AVISOS QUE CUESTAN CAROS SI NADIE LOS DICE:
+
+1. ESTA CARPETA ESTA DENTRO DE UN REPOSITORIO GIT (el del canon). `git pull` no la toca,
+   pero `git clean -fdx` BORRA TODO LO IGNORADO — y aqui todo esta ignorado. Ese comando
+   se corre para «limpiar» y se lleva tu dominio entero por delante.
+
+   Si vas a trabajar en serio, mueve esta carpeta fuera del clon o cambia la ruta en el
+   `compose.yml`. Aqui esta por comodidad del primer arranque, no por ser el mejor sitio.
+
+2. `docker compose down -v` borra el volumen del hogar —login e historial de
+   conversaciones—, pero NO toca esta carpeta. Tu vault no esta ahi dentro.
