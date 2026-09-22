@@ -57,8 +57,12 @@ services:
     # clave, un igual, un valor. Editar este archivo a mano para poner un
     # proyecto es pedir un error de indentacion, y llega disfrazado de
     # "go-yaml load error in parser", que no dice que lo rompio fue el editor.
+    # `required: false` porque este archivo es OPCIONAL: quien se autentica con su
+    # cuenta de Claude no lo necesita. Sin esta linea, BORRARLO ROMPE EL ARRANQUE con
+    # un error de Compose que habla de un archivo que nadie dijo que fuera obligatorio.
     env_file:
-      - vertex.env
+      - path: vertex.env
+        required: false
 
     volumes:
       # El dominio que nace. Es tuyo y vive fuera del contenedor a proposito:
