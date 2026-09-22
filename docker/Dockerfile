@@ -50,8 +50,14 @@ COPY bienvenida.sh /usr/local/bin/vuelamind-bienvenida
 COPY actualizar.sh /usr/local/bin/vuelamind-actualizar
 COPY puente.sh /usr/local/bin/vuelamind-puente
 COPY vertex.sh /usr/local/bin/vuelamind-vertex
-RUN chmod 755 /usr/local/bin/vuelamind-bienvenida /usr/local/bin/vuelamind-actualizar \
-                /usr/local/bin/vuelamind-puente /usr/local/bin/vuelamind-vertex
+# El `sed` no es paranoia: si estos .sh se descomprimen o se clonan en Windows, viajan
+# con CRLF, y un script con CRLF dentro de una imagen Linux falla con «bad interpreter»
+# o «no such file or directory» — un error que acusa al archivo que si esta ahi y no
+# menciona ni a Windows ni a los saltos de linea. Se normaliza al copiar, una vez.
+RUN sed -i 's/\r$//' /usr/local/bin/vuelamind-bienvenida /usr/local/bin/vuelamind-actualizar \
+                      /usr/local/bin/vuelamind-puente /usr/local/bin/vuelamind-vertex \
+ && chmod 755 /usr/local/bin/vuelamind-bienvenida /usr/local/bin/vuelamind-actualizar \
+              /usr/local/bin/vuelamind-puente /usr/local/bin/vuelamind-vertex
 
 USER node
 WORKDIR /trabajo
