@@ -37,6 +37,17 @@ RUN npm install -g @anthropic-ai/claude-code
 # El canon, horneado. Vive aparte del trabajo y se lee, no se edita:
 # el metodo dice que la copia propia se compara contra el canon, no que
 # se confundan. /trabajo es del usuario; /opt/vuelamind es del marco.
+# ESTO INVALIDA LA CACHE DEL CLON CUANDO EL CANON AVANZA, y sin ello el contenedor
+# se queda congelado en el dia que se construyo la primera vez. MEDIDO el 2026-09-22:
+# una imagen reconstruida con `--build` seguia trayendo el canon del dia anterior,
+# porque la capa del `git clone` no cambia nunca — el Dockerfile no cambia, asi que
+# Docker la reusa. El sintoma es el peor de todos: `--build` dice que construyo, la
+# imagen es nueva, y el metodo de dentro es viejo.
+#
+# El truco: descargar la referencia de la rama ANTES de clonar. Si el commit es el
+# mismo, este archivo es identico y la capa se reusa; si cambio, se rehace el clone.
+ADD https://api.github.com/repos/akatzin/vuelamind/git/refs/heads/$VUELAMIND_REF /tmp/canon-ref.json
+
 RUN git clone --depth 1 --branch "$VUELAMIND_REF" \
       https://github.com/akatzin/vuelamind.git /opt/vuelamind \
     && cd /opt/vuelamind \
