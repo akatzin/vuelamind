@@ -87,7 +87,23 @@ Prioridad a **lo que se afirmó sin comprobar** y a lo que depende de estado vol
 La lista de notas a tocar **no sale solo de lo que la sesión tuvo abierto**: sale del **grafo de enlaces**. Por cada nota candidata, dos barridos:
 
 1. **Hacia afuera**: sus `[[enlaces]]` salientes — ¿alguna vecina habla del mismo tema y quedaría desactualizada, o tiene un *"por confirmar"* que este cambio responde?
-2. **Hacia adentro**: quién la enlaza (`grep` del nombre de la nota sobre el vault) — ¿alguien cita como hecho lo que este cambio vuelve falso?
+2. **Hacia adentro**: quién la enlaza — ¿alguien cita como hecho lo que este cambio vuelve falso?
+
+**Los dos barridos los da un comando**, y conviene usarlo en vez de improvisar un `grep`:
+
+    python3 <canon>/herramientas/vecinas.py <nota> <vault>
+
+> [!warning] Por qué no basta con `grep` del nombre de la nota
+> Es lo que este paso decía antes, y **falla en las tres formas en que se escribe un
+> enlace**: no distingue un `[[enlace]]` de una mención suelta en prosa, no resuelve
+> `[[Nota|alias]]` ni `[[Nota#sección]]` —que apuntan a la misma nota con otro texto— y no
+> normaliza acentos ni mayúsculas. **Sus fallos son silenciosos en la dirección peor**:
+> devuelve de menos, y de menos aquí significa una vecina que se quedó desactualizada sin
+> que nadie lo viera.
+>
+> Y el comando **marca si sirvió** (`--sirvio` / `--nada`). Si en semanas de uso real ningún
+> barrido cambia una sola decisión, este paso está costando más de lo que devuelve y hay que
+> decirlo con la cifra delante, no por intuición.
 
 3. **Hacia la regla** — y este barrido es de otra naturaleza. Si lo que cambió **no es un hecho sino una regla** —una memoria, una convención, un vocabulario, un umbral—, **el radio no es el grafo: es el corpus**. Lo escrito bajo la regla anterior no tiene ningún enlace que lo delate; sigue ahí, coherente consigo mismo y desalineado con la regla nueva.
 

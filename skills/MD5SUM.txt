@@ -1,10 +1,10 @@
 b40da63a6996c0cc133d8cadeac29046  README.md
 4b0336c11c3b58ea28e0cf0ac7ccb988  vuelamind-accidente.md
-27401f0447fc21e6dbc2aabf867b826c  vuelamind-commit.md
+839c31c12e8da6eeb5232d0dc69018cb  vuelamind-commit.md
 74ca47c43cafe9aed039669418ebddd1  vuelamind-help.md
 36f6874240e4c10318753ec419ac1ff8  vuelamind-join.md
 0cd7be14c853e6b93a6fcbf9df02cffa  vuelamind-learn.md
-68f27880b85c6d45f1f0921fb0a0060e  vuelamind-load.md
+770e83ea8cf64d51f8780778ce63cc48  vuelamind-load.md
 f1f88bfb72e9ae0599a7bfae1bd1ab8b  vuelamind-mensajeria.md
 b98ced3c4816c08e850526ccf245dabd  vuelamind-rc-update.md
 908cd73833d5006c6f76e3ec39f6e1f2  vuelamind-rc.md
