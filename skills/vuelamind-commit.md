@@ -182,6 +182,30 @@ Con **`AskUserQuestion`**, no con una pregunta suelta — así el visto bueno es
 
 El **único** paso que escribe en el vault. En este orden, porque cada uno depende del anterior — los nombres reales los da el manifiesto:
 
+> [!danger] LA NARRATIVA VA A LA BITÁCORA. En ninguna otra nota.
+> No es «poca narrativa fuera de la bitácora»: es **ninguna**. En el resto se escribe **el
+> hecho y la regla**; el relato de cómo se llegó a ellos tiene un sitio y ya existe.
+>
+> **Es presupuesto, no estilo.** Cada línea que cuenta el camino en vez del destino la paga
+> **cada sesión que cargue ese texto**, para siempre. Y tiene un segundo coste menos visible:
+> **el relato diluye la regla** — quien lee tres párrafos sobre cómo se descubrió algo tiene
+> que extraer él la instrucción, y la extrae mal más veces de las que nadie mide.
+>
+> **El corte, que es mecánico:** una frase se queda si **cambia una decisión futura**.
+>
+>     se queda:  «se comprueba escribiendo: mirar permisos no basta, un montaje miente»
+>     se va:     «lo intenté mirando permisos, no funcionó, y entonces probé a escribir»
+>
+> El caso medido **sí** se queda cuando es lo que sostiene la regla, comprimido a su hecho
+> —*medido en X, falló así*—. Lo que se va es la crónica de la jornada.
+>
+> **La prueba, al releer:** si un párrafo se puede sustituir por su primera frase sin perder
+> ninguna instrucción, era relato. A la bitácora, o fuera.
+>
+> *La versión blanda no sirve: «menos narrativa» no se puede barrer porque no se puede medir
+> —todo autor cree que la suya es la mínima— y el texto vuelve a crecer en el cierre
+> siguiente.*
+
 1. **La cola** — items cerrados condensados a un párrafo, correcciones, conteos.
 2. **Las notas de componente** — la lección se promueve **antes** de archivar: archivar una lección es perderla. **Y también a la nota que hacía la PREGUNTA**: si el item nació de un *"por confirmar"* escrito en una nota temática, esa nota es destino obligatorio de la respuesta — hacia atrás no va nadie, y una pregunta sin tachar invita a re-medir lo ya medido. *(Parche `la-leccion-va-tambien-a-la-nota-que-preguntaba`.)*
 3. **El archivo de cerrados** — el registro completo, con su evidencia.
@@ -190,6 +214,14 @@ El **único** paso que escribe en el vault. En este orden, porque cada uno depen
 6. **La bitácora** — la entrada **del día**, al final; si ya existe la de hoy, se amplía con un `###`, no se abre otra. Solo entradas con fecha — las lecturas de conjunto van al registro de decisiones. Se escribe **en voz alta, para contárselo a un amigo**: si una frase no se entendería en una cocina, se reescribe. **Los errores propios van, y van con nombre** — es lo que separa una bitácora de un boletín de logros.
 7. **El parche**, si el paso 3 detectó algo del método.
 8. **El documento de arranque** — al final, porque resume todo lo anterior y es lo que más envejece: le habla a una sesión que no tiene el contexto de ésta. Revisar que el conteo cuadre con la cola, que no mande a rehacer trabajo hecho, que los hechos de arquitectura sigan ciertos, y que liste los errores más instructivos con fecha.
+
+   **Y que lleve escrita la regla de la narrativa**, porque este documento es lo único que
+   **toda** sesión del dominio lee siempre. Una regla de cómo se escribe que vive en el
+   registro de decisiones la cumple quien va a buscarla; escrita aquí, la cumple quien
+   empieza. Es también el documento donde más cara sale incumplirla: lo carga cada sesión.
+
+   > **El arranque es el sitio más caro del vault.** Si una sección suya se puede sustituir
+   > por su primera frase, sobra — y sobra multiplicada por todas las sesiones que vengan.
 
 Al terminar, **volver a correr el validador**: los cambios pueden romper conteos o dejar un enlace colgante nuevo.
 
