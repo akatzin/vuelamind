@@ -127,6 +127,33 @@ Una línea, no un catálogo: el catálogo es de ese comando y se genera solo. Si
 
 Y entonces **preguntar por dónde seguir**. No empezar a trabajar por cuenta propia: el `initPrompt` propone un orden, pero el usuario puede traer otra cosa en mente.
 
+### 6. Y durante la sesión: antes de afirmar sobre una nota, mira quién la enlaza
+
+**No es un paso del arranque: es la regla que el arranque deja puesta**, y por eso vive aquí
+y no en el ciclo de cierre.
+
+    python3 <canon>/herramientas/vecinas.py <nota> <vault>
+
+Dice **quién enlaza esa nota y a quién enlaza ella**, calculado en vivo desde los wikilinks.
+Las dos direcciones sirven para cosas distintas: **hacia adentro** está quien puede quedarse
+desactualizado si la cambias; **hacia afuera**, lo que conviene leer antes de afirmar.
+
+> [!important] El hueco que cubre, y por qué no lo cubría nada
+> El ciclo ya obliga a barrer el radio **al escribir** —qué notas vuelve falsas un cambio,
+> quién lo cita—. **No hay nada equivalente al RESPONDER**, y ahí es donde se contesta sobre
+> una nota sin mirar las que hablan de lo mismo. Nada lo delata: la respuesta sale coherente,
+> enlaza bien y no contradice a nadie.
+
+> [!warning] Un instrumento sin su momento no se corre
+> Esta línea está aquí porque **medido**: en un dominio con el guion ya escrito y la regla
+> ya sabida, pasó una jornada entera afirmando sobre notas del vault **sin correrlo una sola
+> vez**, hasta que el responsable preguntó por él. Tenerlo no basta; hay que nombrar cuándo.
+>
+> Y por lo mismo el instrumento **registra su propio uso**: `--sirvio` y `--nada` marcan si
+> una corrida cambió o no lo que se iba a decir, y `--informe` lo cuenta. Si en semanas de
+> uso real ninguna corrida cambió nada, **el hueco no era éste y esta sección sobra** — se
+> retira y se anota por qué.
+
 ## Qué NO hace
 
 - **No escribe nada.** Es de lectura. Lo que corrige documentación es el checkpoint.
