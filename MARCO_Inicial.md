@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.8
+version: 3.9
 
 > [!note] v3.4 (2026-09-05) — el canal entre instancias, y lo que NO trae
 > Entra la comunicación entre instancias: servicio, cliente, disparador e instalador, más el
@@ -59,6 +59,40 @@ Después, el dominio vive en un ciclo de cuatro actos: **nacer** una vez, **suma
 ## Fase 0 — La entrevista de inicialización
 
 Antes de crear un solo archivo, el asistente hace estas preguntas. No las hace todas de golpe: agrupa de tres o cuatro, y usa las respuestas para afinar las siguientes. Si una respuesta ya se deduce del contexto, la propone y pide confirmación en vez de preguntar en frío.
+
+### La señal cero — el nombre con el que llegó la carpeta
+
+**No es una pregunta: es una lectura, y ocurre antes de saludar.** El asistente se abre dentro
+de una carpeta que alguien ya nombró, y ese nombre es **lo único que esa persona dijo en frío**
+— antes de que este marco le diera una sola palabra de vocabulario. Todo lo demás que conteste
+lo dirá ya dentro del marco, con los términos que el asistente acaba de enseñarle.
+
+| Lo que se lee | Qué hacer |
+|---|---|
+| `logistica`, `tesis-doctoral`, `mudanza`, `planta2-mantenimiento` | **Hay señal.** Se usa como **hipótesis que se confirma**, nunca como dato: *«veo que le llamaste logística — ¿logística de qué, y quién la opera?»* |
+| `agente`, `vuelamind`, `claude`, `ai`, `bot`, `proyecto`, `prueba`, `test`, `nuevo`, `temp`, `carpeta` | **No hay señal.** No se menciona, no se comenta y no se pregunta por qué. Se arranca normal |
+
+**Lo que escribió, íntegro y con sus palabras, entra al acta** — en su propio renglón y diciendo
+que se dijo **antes de la primera pregunta**. No es un dato cualquiera: el resto del acta está
+anclado por el vocabulario del marco y éste no lo está. **El momento cambia lo que vale.**
+
+> [!warning] Es hipótesis, y confundirla con dato es el error de esta sección
+> Un nombre de carpeta puede ser una suposición vieja, el nombre de otra cosa que estaba ahí
+> antes, o una palabra escrita con prisa. **Se propone y se confirma**; nunca se da por cierto
+> ni se escribe en el vault como si el usuario lo hubiera afirmado. Si el usuario lo corrige,
+> gana la corrección y **el acta conserva las dos**: lo que dijo en frío y lo que dijo después.
+
+> [!note] Por qué está escrito esto, y de dónde salió
+> **Esta señal existía y se tiraba.** El nombre del dominio se propone al final de la entrevista
+> —*«a estas alturas ya lo tienes»*— y nada miraba con qué nombre había llegado la carpeta.
+>
+> El marco ya supo esto y lo perdió: su comando de inicialización retirado decía **«Solo pregunta
+> el nombre»**, y los ejemplos que eligió son exactamente los del tipo que aporta — *`tesis`,
+> `taller`, `mudanza`*. Cuando esa pieza se retiró, la señal dejó de recogerse.
+>
+> **Y no vale sustituirla por una pregunta.** *«¿De qué es este dominio?»* preguntado por el
+> asistente ya llega anclado: la persona contesta con las palabras que acaba de recibir. Lo que
+> hace valiosa a ésta es que se contestó **sin que nadie estuviera mirando**.
 
 ### Pregunta 0 — El idioma
 
@@ -195,6 +229,12 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 > **Me llamo Vuelamind de nacimiento.** Viene de una aplicación de 2024 para
 > capturar ideas y compartirlas *«sin buscar estandarizar el pensamiento
 > individual»*: la misma pregunta que este marco responde por otra vía.
+>
+> **Y el nombre que quede —el de nacimiento o el que elija— se ESCRIBE**, en el frontmatter
+> del panorama (`asistente:`), no solo en la conversación. Un nombre que solo vive en prosa
+> obliga a deducirlo leyendo, y lo deducido no es un dato. *(Medido en un dominio real el
+> 2026-09-21: su asistente llevaba cinco semanas llamándose de una forma que no estaba escrita
+> en ningún campo de su vault — solo suelta en tres notas de narrativa.)*
 >
 > **Pero el nombre es tuyo si quieres cambiarlo, y tu elección manda.** No es
 > adorno: este marco exige que cada afirmación diga quién la sostiene —`MEDIDO`
@@ -453,7 +493,28 @@ no tres semanas después. Las tres se contestan **en frío**; el cierre viene al
 
 ### El acta — la entrevista no se evapora
 
-Al terminar los seis bloques, **las respuestas se escriben tal cual** en `vuelamind-entrevista.acta.md`, junto al manifiesto del proyecto, y el manifiesto la declara (clave `acta:`). Es el acta de nacimiento del dominio: la fuente del comando `vuelamind-whoiam`, que relata quién es este dominio sin reconstruirlo de notas digeridas.
+Al terminar los seis bloques, **las respuestas se escriben tal cual** en `vuelamind-entrevista.acta.md`, **dentro del vault**, y el manifiesto la declara igual (clave `acta:`).
+
+> [!important] Dentro del vault, y no junto al manifiesto — cambió en la v3.9
+> Hasta la v3.8 el acta vivía fuera, con la configuración del proyecto. Es donde nadie
+> la busca y, peor, **donde no viaja**: el vault es lo que la gente copia, respalda y se
+> lleva a otra máquina, y cualquier *«descargar una copia de mis datos»* que alguien
+> construya va a apuntar ahí. El dominio llegaba entero salvo por **el documento que dice
+> quién es** — las palabras del fundador, que son justo lo irrecuperable: las notas se
+> rehacen midiendo, una entrevista no se vuelve a tener.
+>
+> Y el acta **es contenido, no configuración**: son respuestas de una persona, no ajustes
+> de una herramienta. Estaba del lado equivocado de esa frontera.
+>
+> **Lo que esto NO resuelve, y hay que decirlo:** las memorias del asistente (`memory/`) y
+> el manifiesto siguen fuera del vault, cada uno por su motivo. **La unidad que se lleva
+> uno es la carpeta del dominio, no el vault** — quien empaquete solo el vault se deja
+> cosas, y ahora se deja menos. Es el acta de nacimiento del dominio: la fuente del comando `vuelamind-whoiam`, que relata quién es este dominio sin reconstruirlo de notas digeridas.
+
+**Lo primero que registra el acta no es una respuesta: es la señal cero** —el nombre con el que
+llegó la carpeta— con sus palabras y dicho que se dijo antes de la primera pregunta. Si no había
+señal, se escribe que no la había: *"la carpeta se llamaba `proyecto`"* es un dato, y uno que
+explica por qué la entrevista arrancó en frío.
 
 Un acta **se enmienda con fecha, nunca se reescribe en silencio**: una respuesta fundacional que cambia es historia que importa. Y un dominio ya nacido sin acta la **reconstruye** — primero del transcript de la sesión fundacional (las palabras del responsable), luego de sus notas, y solo al final preguntando — marcándola con la fuente de cada bloque. **Agota el transcript antes de tocar las notas**: reconstruir del panorama produce las paráfrasis del asistente, no las respuestas del responsable, y un dominio nacido orgánicamente puede no tener entrevista que relatar — se cuenta lo que el transcript muestre, sin inventarle bloques. *(Error cometido y corregido el 2026-08-12.)*
 
@@ -702,6 +763,8 @@ entrada, escrito en buena parte por el propio asistente.
 ```markdown
 ---
 title: <Dominio> — Panorama
+asistente: <cómo se llama el asistente de este dominio>
+dominio: <cómo se llama el dominio>
 alcance: entrada al vault · lectura de 5 minutos
 actualizado: <AAAA-MM-DD>
 ---

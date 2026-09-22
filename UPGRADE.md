@@ -80,13 +80,13 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
   v3.0 ──┬── v3.4  el canal        ORTOGONAL: no requiere ningún salto,
          │                          y ningún salto lo requiere a él
          │
-         └── v3.5 ──▶ v3.6 ──▶ v3.7
+         └── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9
 ```
 
-**Por qué la v3.4 cuelga suelta:** los masters de la v3.6 y la v3.7 **no nombran el canal ni
+**Por qué la v3.4 cuelga suelta:** los masters de la v3.6 en adelante **no nombran el canal ni
 una vez**. Es una capacidad que vive en sus propios archivos.
 
-**Por qué de la v3.5 en adelante hay orden:** los masters de la v3.6 y la v3.7 **nombran
+**Por qué de la v3.5 en adelante hay orden:** los masters de la v3.6 en adelante **nombran
 `/vuelamind-learn`**, que es el artefacto que instala la v3.5. Saltar desde más atrás deja un
 documento que promete una pieza que no está instalada.
 
@@ -106,3 +106,4 @@ documento que promete una pieza que no está instalada.
 | v3.5 → v3.6 | `UPGRADE_v3.6.md` | **Liberado** — la entrevista de nacimiento pasa de 25 preguntas a 15. Menor. **Requiere los artefactos de la v3.5** |
 | v3.5 → v3.7 | `UPGRADE_v3.7.md` | **Liberado** — la regla dura de fechas. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye la v3.6 |
 | v3.5 → v3.8 | `UPGRADE_v3.8.md` | **Liberado** — cinco defectos de coherencia del propio master. Menor. **Requiere los artefactos de la v3.5**; no cambia ninguna regla ni ningún skill |
+| v3.5 → v3.9 | `UPGRADE_v3.9.md` | **Liberado** — la señal cero (el nombre con el que llegó la carpeta), la identidad declarada en el frontmatter del panorama, y el acta de nacimiento mudada dentro del vault. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.8. **Único salto menor que pide tocar el vault de un dominio ya nacido**: dos claves y un archivo que se mueve |
