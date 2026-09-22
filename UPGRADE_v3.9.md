@@ -99,6 +99,44 @@ El manifiesto la sigue declarando con `acta:` — la clave no cambia, cambia a d
    **Se MUEVE, no se copia.** Dos actas es peor que una mal colocada: un acta se enmienda
    con fecha, y con dos copias nadie sabrá dentro de un mes cuál recibió la enmienda.
 
+   > [!danger] ¿Y si no hay ninguna acta que mover? Entonces este paso no es un `mv`
+   > **Un dominio nacido antes del 2026-08-12 puede no tener acta en absoluto**: el acta la
+   > instauró un parche de esa fecha y **nunca se aplicó con retroactividad**. Su manifiesto
+   > no declara `acta:` y no hay archivo en ningún sitio. Para ése, `$ACTA_VIEJA` no existe y
+   > el paso, tal como está arriba, no dice qué hacer.
+   >
+   > **Lo que toca no es saltárselo: es RECONSTRUIRLA**, y el protocolo ya existe y no es de
+   > este documento — vive en `vuelamind-whoiam` y en el parche `la-entrevista-deja-acta`. En
+   > una línea: **transcript de la sesión fundacional → notas fundacionales fechadas →
+   > preguntar**, en ese orden, agotando cada fuente antes de bajar a la siguiente, y
+   > **marcando en el frontmatter que es reconstruida y no original**.
+   >
+   > Se escribe **directo en el vault**, que es donde la v3.9 la quiere. Y ahí no hay riesgo
+   > de duplicado: nunca hubo una primera.
+   >
+   > **Y una reconstruida tiene que poder distinguirse de una original de un vistazo**, o
+   > dentro de un año alguien la citará como si fueran las palabras del fundador. La forma que
+   > funcionó, de quien la escribió primero:
+   >
+   > | En el frontmatter | Para qué |
+   > |---|---|
+   > | `estado: reconstruida` y su fecha | que no haya que deducirlo leyendo |
+   > | `fuente_primaria_intentada` | **se declara aunque no sirviera** — «el transcript ya no existe en esta máquina» es un dato, y sin él nadie sabe si se intentó |
+   > | `fuente_usada` | de dónde salió de verdad |
+   >
+   > Los seis bloques van en el orden de siempre, **cada uno citando su fuente ahí mismo**
+   > —nota y fecha—, y al final una sección de **Enmiendas** con fecha y motivo: un acta se
+   > enmienda, no se reescribe, y una reconstruida se enmienda más que ninguna.
+   >
+   > *Declarar la fuente que se intentó y falló es lo que separa una reconstrucción honesta de
+   > una que se hizo por el camino corto.*
+   >
+   > *Encontrado en la PRIMERA corrida real de este upgrader, por una casa distinta de la que
+   > lo escribió y el mismo día de publicarse: su dominio nació el 2026-08-04 y tuvo que
+   > salirse de este documento para saber qué hacer. Un salto que asume un archivo que no
+   > todos tienen deja al que no lo tiene sin instrucción, y con la sensación de estar
+   > haciéndolo mal.*
+
    Después, **reescribe la clave `acta:` del manifiesto** apuntando al sitio nuevo — si la
    tienes con ruta absoluta, la ruta entera.
 
@@ -119,6 +157,13 @@ El manifiesto la sigue declarando con `acta:` — la clave no cambia, cambia a d
 > **Éste es el momento de leerla.** Si algo de ahí no debe salir de esta máquina, se resuelve
 > ahora —enmendando el acta con fecha, que es como se corrige un acta— y no el día que
 > alguien comparta una copia del vault sin pensarlo.
+>
+> **Este aviso NO aplica si estás reconstruyendo el acta**, y conviene decirlo para que nadie
+> lo cumpla de mentira: quien la escribe sabe su contenido mientras la escribe, y sus fuentes
+> ya viven dentro del vault. No hay ninguna «primera lectura de algo ajeno» que hacer. El
+> mismo cuidado existe, pero en otro momento — **al decidir qué se cita**, no al decidir qué
+> se tapa. Donde este aviso hace todo el trabajo es en un acta **original**, escrita por la
+> entrevista misma, con material que nadie ha vuelto a mirar desde entonces.
 
 **Cómo sabes que funcionó**, y compruébalo en el disco, no de memoria:
 
