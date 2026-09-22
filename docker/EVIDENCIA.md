@@ -38,23 +38,56 @@ Medido por la casa que tiene la máquina, sobre el commit exacto de esta rama.
 
 ## Windows 11 Pro (build 26200) · VM con virtualización anidada
 
-Medido dentro de la máquina por la casa que la opera.
+Medido dentro de la máquina por la casa que la opera. El entorno se montó entero:
+WSL2 2.7.14.0, Docker Desktop con backend `wsl-2`, git 2.55.0.
 
 | Qué | Estado |
 |---|---|
-| `HypervisorPresent = True` dentro de la VM | **MEDIDO** — la anidada llega; el camino existe |
-| Docker Desktop instalado | **NO lo está** (`Get-Command docker` vacío) |
-| WSL y VirtualMachinePlatform | **Disabled** las dos |
-| **El contenedor entero en Windows** | **SIN MEDIR** |
-| La normalización de CRLF en su escenario real (clonar *en* Windows) | **SIN MEDIR** — atada a lo mismo |
+| `HypervisorPresent = True` dentro de la VM | **MEDIDO** |
+| **El escenario de CRLF existe y es el camino normal** | **MEDIDO** — ver abajo |
+| **El blindaje de CRLF, ejercido de punta a punta en Windows** | **SIN EJERCER** — el build no completó |
+| El contenedor entero en Windows | **SIN MEDIR** |
 
-**Por qué sin medir, y no es una excusa:** sin WSL2 no hay Docker Desktop, sin las dos
-características no hay WSL2, y habilitarlas es DISM más reinicio. Sumado a ~500 MB de
-descarga y 5-6 GB en disco, **eso convierte una VM que nació «para medir, no para quedarse»
-en otra cosa** — y eso lo decide su dueño, no quien quiere el dato.
+### El escenario de CRLF: reproducido, y no hay que hacer nada raro
 
-El día que se desbloquee, el camino está despejado: no hay que pelearse con la
-virtualización, solo instalar.
+Clonando esta rama **en Windows** con git recién instalado y **opciones por omisión**, los
+cuatro `.sh` que el `Dockerfile` copia llegan convertidos:
+
+```
+actualizar.sh   41 CRLF      puente.sh     118 CRLF
+bienvenida.sh   60 CRLF      vertex.sh      61 CRLF
+```
+
+La causa es que **git para Windows trae `core.autocrlf = true` de fábrica**. Nadie tiene que
+configurar nada mal: el camino de fábrica produce exactamente los archivos que dentro de una
+imagen Linux fallan con «bad interpreter», un error que no menciona ni a Windows ni a los
+saltos de línea.
+
+**Eso valida la necesidad del `sed`, no su efecto.** El efecto está medido **en macOS**,
+construyendo la imagen desde fuentes convertidos a CRLF a propósito. Lo que falta es la
+cadena completa —clonar en Windows y construir en Windows—, y **no se pudo cerrar porque el
+motor no se sostiene en esa VM**: tres intentos, tres modos de fallar, ninguno atribuible a
+este contenedor.
+
+```
+vpnkit-bridge: /run/guest-services/socketforwarder-receive-fds.sock: does not exist
+com.docker.backend.ipc [W] GET /ping: context deadline exceeded
+```
+
+Es WSL2 anidado dentro de KVM, no la imagen. **Declararlo «blindado en Windows» hoy sería un
+verde inventado.**
+
+### Tres cosas que muerden al probar esto en Windows por SSH
+
+No son de este contenedor, pero quien lo pruebe en un banco sin pantalla se las encuentra:
+
+1. **Docker Desktop muere con la sesión SSH que lo lanzó.** Vive en la sesión del usuario, no
+   como servicio: hay que arrancarlo y usarlo sin soltar esa misma sesión.
+2. **El almacén de credenciales no existe en sesión SSH** — `error getting credentials - A
+   specified logon session does not exist`. Se rodea quitando `credsStore` de
+   `%USERPROFILE%\.docker\config.json`.
+3. **Sin sesión de escritorio no arranca**: Docker Desktop necesita una sesión iniciada, así
+   que en una VM headless hace falta autologon.
 
 ## En ninguna plataforma fuera de macOS
 
