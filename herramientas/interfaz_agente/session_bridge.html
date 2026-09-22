@@ -153,6 +153,32 @@
   .new .sug button{font-family:ui-monospace,SFMono-Regular,monospace;font-size:11px;cursor:pointer;
     background:var(--field);border:1px solid var(--line);border-radius:5px;padding:1px 5px;color:var(--ink)}
   .new .sug button:hover{background:var(--hover)}
+  /* El paso a lo avanzado es un renglon, no un control: no compite con las dos
+     acciones y se descubre leyendo. Que se vea es lo importante — una vista simple
+     sin salida visible se lee como una limitacion del programa en vez de como una
+     eleccion de quien lo usa. */
+  .new .cambiomodo{background:none;border:0;color:var(--dim);font-size:11px;padding:2px 0;
+       text-align:left;text-transform:none;letter-spacing:0;font-weight:500;cursor:pointer;
+       align-self:flex-start}
+  .new .cambiomodo:hover{color:var(--ink);background:none;filter:none}
+  .new #vistaAvz .cambiomodo{border-bottom:1px solid var(--line);align-self:stretch;
+       padding-bottom:6px;margin-bottom:2px}
+  .new #vistaNormal,.new #vistaAvz{display:flex;flex-direction:column;gap:6px}
+  /* `hidden` es un atributo que el navegador aplica con display:none desde SU hoja,
+     y cualquier display de autor le gana en silencio. Se ve fatal y no falla: el
+     elemento dice estar oculto -lo dice el DOM, lo dice el atributo- y sigue en
+     pantalla. Medido aquí el 2026-09-21: las dos vistas se pintaron a la vez y la
+     comprobación por JS daba hidden=true en la que sobraba. */
+  [hidden]{display:none !important}
+  .new #panelCrear,.new #panelAbrir{display:flex;flex-direction:column;gap:6px}
+  .new #paraQuePie{font-size:10px;line-height:1.35;opacity:.85}
+  /* Un agente no es una fila de lista cualquiera: es a quien vas a hablarle. */
+  .agente{background:var(--field);border:1px solid var(--line);border-radius:7px;
+       padding:7px 9px;cursor:pointer;display:flex;flex-direction:column;gap:1px}
+  .agente:hover{background:var(--hover)}
+  .agente .quien{font-weight:600;font-size:13px}
+  .agente .donde{font-size:11px;color:var(--dim)}
+  .agente .sindecl{font-size:11px;color:var(--dim);font-style:italic}
   .chip .x{cursor:pointer;color:var(--dim);border:0;background:none;font-size:15px;padding:0 4px;line-height:1}
   .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
   .empty{margin:auto;color:var(--dim);text-align:center;padding:20px}
@@ -214,6 +240,10 @@
   <span class="dot" id="dot"></span>
   <h1>Session Bridge · Vuelamind</h1>
   <span class="sp"></span>
+  <select id="idioma" class="tema" title="Idioma">
+    <option value="es">Español</option>
+    <option value="en">English</option>
+  </select>
   <select id="tema" class="tema" title="Tema de color — se recuerda en esta máquina">
     <option value="claude">Claude</option>
     <option value="magenta">Magenta</option>
@@ -225,10 +255,30 @@
   <aside>
     <div class="list" id="list"></div>
     <div class="new">
-      <div class="hint">Nueva sesión</div>
+      <div id="vistaNormal">
+        <button id="btnCrear">Crear agente</button>
+        <button id="btnAbrir" class="ghost">Abrir agente</button>
+
+        <div id="panelCrear" hidden>
+          <div class="hint" id="paraQueLbl">¿Para qué es este agente?</div>
+          <input id="paraQue" placeholder="logística de planta 2">
+          <div class="hint" id="paraQuePie">El nombre que le pongas aquí es lo primero que sabrá de ti.</div>
+          <button id="confirmarCrear">Empezar</button>
+        </div>
+
+        <div id="panelAbrir" hidden>
+          <div id="listaAgentes"></div>
+        </div>
+
+        <button type="button" class="cambiomodo" id="irAvz">Vista avanzada ›</button>
+      </div>
+
+      <div id="vistaAvz" hidden>
+      <button type="button" class="cambiomodo" id="irNormal">‹ Volver a lo simple</button>
+      <div class="hint" id="nuevaLbl">Nueva sesión</div>
       <input id="newName" placeholder="nombre (a-z0-9._-)">
       <textarea id="newPrompt" placeholder="primer mensaje…"></textarea>
-      <div class="sug">sugerencia: <button type="button" id="sugLoad"
+      <div class="sug"><span id="sugLbl">sugerencia: </span><button type="button" id="sugLoad"
         title="Pone al día al asistente antes de empezar: lee el arranque del dominio, corre su validador y reporta el estado">/vuelamind-load</button></div>
       <select id="newPerm" title="Nivel de permisos de la sesión">
         <option value="full">Autonomía total (ejecuta / red / escribe)</option>
@@ -250,6 +300,7 @@
         <option value="claude-haiku-4-5-20251001">
       </datalist>
       <button id="create">Crear sesión</button>
+      </div>
     </div>
   </aside>
   <section>
@@ -277,6 +328,143 @@ const $ = s => document.querySelector(s);
 const state = { current: null, usage: {}, commands: [], skills: [], streams: {}, traido: {} };
 // streams: los turnos EN VUELO, por nombre de sesión. Un turno pertenece a la sesión
 // que lo pidió, no a la que estés mirando cuando termine — ver el comentario de send().
+
+// ---- idioma: la interfaz habla dos, y el navegador decide si nadie eligió ----------
+// El idioma NO es cosmética aquí: el primer mensaje que se manda arranca la entrevista,
+// y el marco pregunta el idioma de trabajo EN EL IDIOMA EN QUE LLEGÓ el usuario. Mandar
+// "Initialize" o "Inicializa" es, en la práctica, la primera respuesta de la entrevista.
+const IDIOMAS=["es","en"];
+const I18N={
+ es:{
+  tema_tt:"Tema de color — se recuerda en esta máquina", idioma_tt:"Idioma",
+  loopback:"solo loopback · sin token", nueva:"Nueva sesión",
+  nombre_ph:"nombre (a-z0-9._-)", prompt_ph:"primer mensaje…",
+  sug_lbl:"sugerencia: ",
+  sugload_tt:"Pone al día al asistente antes de empezar: lee el arranque del dominio, corre su validador y reporta el estado",
+  perm_tt:"Nivel de permisos de la sesión",
+  perm_full:"Autonomía total (ejecuta / red / escribe)", perm_tools:"Python + red acotada",
+  perm_safe:"Solo lectura / chat",
+  cwd_ph:"Directorio del servidor",
+  cwd_tt:"El directorio decide QUÉ agente es: su vault, su CLAUDE.md y su memoria automática salen de ahí. Vacío = el del servidor",
+  modelo_ph:"Modelo del servidor",
+  modelo_tt:"Modelo (vacío = el que use el servidor). Se puede teclear cualquier id, p.ej. claude-opus-4-8[1m] para la ventana de 1M",
+  crear:"Crear sesión", creando:"Creando…",
+  ir_avz:"Vista avanzada ›", volver_simple:"‹ Volver a lo simple",
+  btn_crear:"Crear agente", btn_abrir:"Abrir agente",
+  para_que:"¿Para qué es este agente?", para_que_ph:"logística de planta 2",
+  para_que_pie:"Lo que escribas aquí es lo primero que sabrá de ti, y da el nombre de su carpeta.",
+  empezar:"Empezar", naciendo:"Naciendo…", abriendo:"Abriendo…",
+  falta_para_que:"Dime para qué es, aunque sean dos palabras.",
+  sin_master:"Esta máquina no tiene el marco a mano, así que no puedo hacer nacer un agente desde aquí.",
+  sin_agentes:"Todavía no hay ningún agente aquí.",
+  sin_declarar:"sin nombre declarado",
+  prompt_nacer:"Inicializa {m}\n\nPara qué es este agente, dicho antes de la primera pregunta: «{q}»",
+  usage_tt:"contexto usado · tokens generados en el último turno",
+  guardar:"Guardar",
+  guardar_tt:"Manda /vuelamind-commit a esta sesión: mide, te enseña qué va a escribir y solo escribe con tu sí",
+  cerrar:"Cerrar este chat", cerrar_tt:"Detiene la sesión y la quita de esta página",
+  log_vacio:"Elige o crea una sesión.", sin_sesiones:"Sin sesiones aún.",
+  adjuntar_tt:"Adjuntar archivo(s) de texto — o pega / arrastra al chat",
+  input_ph:"Escribe un mensaje…  (Enter envía · Shift+Enter salto · 📎 pega o arrastra texto/imágenes/PDF)",
+  enviar:"Enviar", copiar:"Copiar", copiar_codigo:"Copiar el código", quitar:"quitar",
+  tu:"tú", trabajando:"⏳ trabajando… ",
+  falta:"Falta nombre o primer mensaje",
+  perm_l_full:"⚡autonomía", perm_l_tools:"🐍python", perm_l_safe:"👁solo-lectura",
+  recuperando:"⏳ se cortó la conexión, pero el turno sigue — esperando su respuesta… ",
+  corte_muerto:"Se cortó la conexión ({e}) y el turno no llegó a terminar. No hay respuesta que recuperar: hay que repetir el mensaje.",
+  corte_tarda:"Se cortó la conexión ({e}). El turno seguía corriendo tras dos minutos de espera; su respuesta quedará en la sesión y se puede recuperar recargando.",
+  corte_vacio:"Se cortó la conexión ({e}). El turno terminó sin texto, solo con herramientas.",
+  corte_sin_puente:"Se cortó la conexión ({e}) y tampoco alcanzo al puente para recuperar el turno."
+ },
+ en:{
+  tema_tt:"Color theme — remembered on this machine", idioma_tt:"Language",
+  loopback:"loopback only · no token", nueva:"New session",
+  nombre_ph:"name (a-z0-9._-)", prompt_ph:"first message…",
+  sug_lbl:"suggestion: ",
+  sugload_tt:"Brings the assistant up to date before you start: reads the domain's startup note, runs its validator and reports the state",
+  perm_tt:"Permission level for this session",
+  perm_full:"Full autonomy (runs / network / writes)", perm_tools:"Python + limited network",
+  perm_safe:"Read-only / chat",
+  cwd_ph:"Server's directory",
+  cwd_tt:"The directory decides WHICH agent this is: its vault, its CLAUDE.md and its automatic memory all come from there. Empty = the server's own",
+  modelo_ph:"Server's model",
+  modelo_tt:"Model (empty = whatever the server uses). Any id works, e.g. claude-opus-4-8[1m] for the 1M window",
+  crear:"Create session", creando:"Creating…",
+  ir_avz:"Advanced view ›", volver_simple:"‹ Back to the simple view",
+  btn_crear:"Create agent", btn_abrir:"Open agent",
+  para_que:"What is this agent for?", para_que_ph:"logistics, plant 2",
+  para_que_pie:"What you write here is the first thing it will know about you, and it names its folder.",
+  empezar:"Start", naciendo:"Starting…", abriendo:"Opening…",
+  falta_para_que:"Tell me what it is for, even in two words.",
+  sin_master:"This machine does not have the framework at hand, so I cannot start an agent from here.",
+  sin_agentes:"No agents here yet.",
+  sin_declarar:"name not declared",
+  prompt_nacer:"Initialize {m}\n\nWhat this agent is for, said before the first question: «{q}»",
+  usage_tt:"context used · tokens generated in the last turn",
+  guardar:"Save",
+  guardar_tt:"Sends /vuelamind-commit to this session: it measures, shows you what it would write, and writes only with your yes",
+  cerrar:"Close this chat", cerrar_tt:"Stops the session and removes it from this page",
+  log_vacio:"Pick or create a session.", sin_sesiones:"No sessions yet.",
+  adjuntar_tt:"Attach text file(s) — or paste / drop them into the chat",
+  input_ph:"Write a message…  (Enter sends · Shift+Enter newline · 📎 paste or drop text/images/PDF)",
+  enviar:"Send", copiar:"Copy", copiar_codigo:"Copy the code", quitar:"remove",
+  tu:"you", trabajando:"⏳ working… ",
+  falta:"Name or first message is missing",
+  perm_l_full:"⚡autonomy", perm_l_tools:"🐍python", perm_l_safe:"👁read-only",
+  recuperando:"⏳ the connection dropped, but the turn is still running — waiting for its answer… ",
+  corte_muerto:"The connection dropped ({e}) and the turn never finished. There is no answer to recover: the message has to be sent again.",
+  corte_tarda:"The connection dropped ({e}). The turn was still running after two minutes of waiting; its answer will stay in the session and can be recovered by reloading.",
+  corte_vacio:"The connection dropped ({e}). The turn ended with no text, only tools.",
+  corte_sin_puente:"The connection dropped ({e}) and I cannot reach the bridge to recover the turn either."
+ }
+};
+let LANG="es";
+// Al castellano por omisión y no al inglés: el marco nace en español y su master está
+// escrito en español. Un idioma que falta cae a la clave, nunca a una cadena vacía.
+const T=(k,vars)=>{
+  let s=(I18N[LANG]&&I18N[LANG][k])||I18N.es[k]||k;
+  if(vars) for(const n in vars) s=s.split("{"+n+"}").join(vars[n]);
+  return s;
+};
+// Los textos fijos viven aquí y no repartidos por el marcado: traducir obliga a
+// encontrarlos todos, y lo que se queda fuera de esta lista se queda en un idioma
+// sin que nada falle.
+const MARCAS=[
+ ["#idioma","tt","idioma_tt"], ["#tema","tt","tema_tt"], ["header .hint","txt","loopback"],
+ ["#nuevaLbl","txt","nueva"], ["#newName","ph","nombre_ph"], ["#newPrompt","ph","prompt_ph"],
+ ["#irAvz","txt","ir_avz"], ["#irNormal","txt","volver_simple"],
+ ["#btnCrear","txt","btn_crear"], ["#btnAbrir","txt","btn_abrir"],
+ ["#paraQueLbl","txt","para_que"], ["#paraQue","ph","para_que_ph"],
+ ["#paraQuePie","txt","para_que_pie"], ["#confirmarCrear","txt","empezar"],
+ ["#sugLbl","txt","sug_lbl"], ["#sugLoad","tt","sugload_tt"],
+ ["#newPerm","tt","perm_tt"],
+ ["#newPerm option[value=full]","txt","perm_full"], ["#newPerm option[value=tools]","txt","perm_tools"],
+ ["#newPerm option[value=safe]","txt","perm_safe"],
+ ["#newCwd","ph","cwd_ph"], ["#newCwd","tt","cwd_tt"],
+ ["#newModel","ph","modelo_ph"], ["#newModel","tt","modelo_tt"],
+ ["#create","txt","crear"], ["#usage","tt","usage_tt"],
+ ["#guardar","txt","guardar"], ["#guardar","tt","guardar_tt"],
+ ["#close","txt","cerrar"], ["#close","tt","cerrar_tt"],
+ ["#attach","tt","adjuntar_tt"], ["#input","ph","input_ph"], ["#send","txt","enviar"]
+];
+function aplicarIdioma(l){
+  LANG=IDIOMAS.includes(l)?l:"es";
+  try{ localStorage.setItem("bridge_lang",LANG); }catch(e){}
+  document.documentElement.lang=LANG;
+  for(const [sel,tipo,clave] of MARCAS){
+    const el=document.querySelector(sel); if(!el) continue;
+    if(tipo==="txt") el.textContent=T(clave);
+    else if(tipo==="ph") el.placeholder=T(clave);
+    else if(tipo==="tt") el.title=T(clave);
+  }
+  const s=$("#idioma"); if(s) s.value=LANG;
+  const vacio=document.querySelector("#log .empty"); if(vacio) vacio.textContent=T("log_vacio");
+  const nada=document.querySelector("#list .empty"); if(nada) nada.textContent=T("sin_sesiones");
+}
+try{ const g=localStorage.getItem("bridge_lang");
+     LANG = IDIOMAS.includes(g) ? g
+          : ((navigator.language||"es").toLowerCase().startsWith("en") ? "en" : "es");
+}catch(e){}
 
 // ---- tema de color: los tres viven en CSS; esto solo pone el atributo y lo recuerda ----
 const TEMAS=["claude","magenta","blueprint"];
@@ -365,7 +553,7 @@ function renderAtts(){
     const icon=!a.ok?"⚠️":a.kind==="media"?(a.media_type==="application/pdf"?"📕":"🖼️"):"📄";
     const s=document.createElement("span");
     s.textContent=icon+" "+a.name+(a.ok?"":" — "+a.reason);
-    const x=document.createElement("button"); x.className="x"; x.textContent="×"; x.title="quitar";
+    const x=document.createElement("button"); x.className="x"; x.textContent="×"; x.title=T("quitar");
     x.onclick=()=>{ atts.splice(i,1); renderAtts(); };
     c.appendChild(s); c.appendChild(x); bar.appendChild(c);
   });
@@ -427,7 +615,7 @@ async function refresh(){
     (j.sessions||[]).forEach(s=>{
       const d=document.createElement("div");
       d.className="sess"+(s.name===state.current?" on":"");
-      const perm={full:"⚡autonomía",tools:"🐍python",safe:"👁solo-lectura"}[s.permission]||s.permission||"";
+      const perm={full:T("perm_l_full"),tools:T("perm_l_tools"),safe:T("perm_l_safe")}[s.permission]||s.permission||"";
       // "busy" es una palabra que hay que leer; una luz que recorre el nombre se ve sin
       // mirar. Se toma de lo que sabe esta página (un turno en vuelo suyo) Y de lo que
       // reporta el servidor, porque la sesión puede estar trabajando por orden de otra
@@ -443,7 +631,10 @@ async function refresh(){
       d.onclick=()=>select(s.name);
       list.appendChild(d);
     });
-    if(!(j.sessions||[]).length) list.innerHTML='<div class="empty">Sin sesiones aún.</div>';
+    if(!(j.sessions||[]).length) list.innerHTML='<div class="empty">'+T("sin_sesiones")+'</div>';
+    // El master lo declara el servidor, no lo adivina la página: sin él, no hay botón.
+    state.master=j.master||""; state.base=j.base||""; state.sesiones=j.sessions||[];
+    resolverVista(!!state.master);
     // Los directorios que ya usan otras sesiones se ofrecen como sugerencia: levantar un
     // segundo agente en una casa que ya corre aquí es el caso frecuente, y teclear una ruta
     // larga a mano es donde se cuela la errata que hace nacer la sesión en el sitio
@@ -507,7 +698,7 @@ function mdToHtml(src){
 // botón de copiar reutilizable. getText() devuelve el texto crudo a copiar.
 function mkCopy(getText, title){
   const b=document.createElement("button"); b.type="button"; b.className="copy";
-  b.textContent="Copiar"; b.title=title||"Copiar";
+  b.textContent=T("copiar"); b.title=title||T("copiar");
   b.onclick=async e=>{
     e.stopPropagation();
     const text=getText()||"";
@@ -518,7 +709,7 @@ function mkCopy(getText, title){
       ta.select(); try{ document.execCommand("copy"); }catch{} ta.remove();
     }
     b.textContent="✓"; b.classList.add("ok");
-    setTimeout(()=>{ b.textContent="Copiar"; b.classList.remove("ok"); }, 1000);
+    setTimeout(()=>{ b.textContent=T("copiar"); b.classList.remove("ok"); }, 1000);
   };
   return b;
 }
@@ -531,7 +722,7 @@ function render(){
     const d=document.createElement("div");
     d.className="msg "+(m.role==="user"?"user":m.role==="err"?"err":"asst");
     const who=document.createElement("div"); who.className="who";
-    who.appendChild(document.createTextNode(m.role==="user"?"tú":m.role==="err"?"error":state.current));
+    who.appendChild(document.createTextNode(m.role==="user"?T("tu"):m.role==="err"?"error":state.current));
     if(m.role!=="user") who.appendChild(mkCopy(()=>m.text, "Copiar la respuesta"));   // copiar el mensaje entero
     d.appendChild(who);
     if(m.role==="asst"){                     // solo el asistente se renderiza como markdown
@@ -539,7 +730,7 @@ function render(){
       body.innerHTML=mdToHtml(m.text||"");
       body.querySelectorAll("pre").forEach(pre=>{        // + copiar cada bloque de código
         const code=pre.querySelector("code");
-        pre.appendChild(mkCopy(()=> code?code.textContent:pre.textContent, "Copiar el código"));
+        pre.appendChild(mkCopy(()=> code?code.textContent:pre.textContent, T("copiar_codigo")));
       });
       d.appendChild(body);
     } else {                                 // tú y los errores quedan literales (pre-wrap del .msg)
@@ -648,32 +839,138 @@ $("#guardar").onclick=()=>{
 
 
 $("#tema").onchange=e=>aplicarTema(e.target.value);
+$("#idioma").onchange=e=>aplicarIdioma(e.target.value);
 $("#sugLoad").onclick=()=>{            // sugerir y además dejarlo puesto: un clic, no un dictado
   const ta=$("#newPrompt"); ta.value="/vuelamind-load"; ta.focus();
 };
+aplicarIdioma(LANG);
+
+// Los tres caminos que abren conversación -crear sesión, nacer un agente y abrir
+// uno que ya existe- hacen exactamente lo mismo a partir de aquí. Vivía suelto
+// dentro del botón de crear, y copiarlo dos veces más era garantizar que dentro de
+// un mes hubiera tres versiones distintas de entrar a una sesión.
+async function arrancarSesion(cuerpo, boton, etiquetaOcupado){
+  const name=cuerpo.name;
+  const lbl=boton?boton.textContent:"";
+  if(boton){ boton.disabled=true; boton.textContent=etiquetaOcupado; }
+  pushTx(name,"user",cuerpo.prompt);
+  state.current=name;
+  $("#input").disabled=false; $("#send").disabled=true; $("#attach").disabled=false;
+  $("#chathead").style.display="flex"; $("#curname").textContent=name;
+  render();
+  const ok=await correrTurno("/sessions/crear", cuerpo, name);
+  await refresh();
+  if(ok) select(name); else render();
+  $("#send").disabled=false;
+  if(boton){ boton.disabled=false; boton.textContent=lbl; }
+  return ok;
+}
+
+// ---- las dos vistas -------------------------------------------------------
+// Normal: dos verbos y ninguna ruta. Avanzada: el puente entero, tal como es.
+// No son dos productos: es que la mayoría de las veces no hay nada que elegir,
+// y poner a elegir a quien no tiene con qué es lo que convierte una herramienta
+// en un trámite.
+function aplicarModo(m, recordar){
+  const normal = m!=="avz";
+  $("#vistaNormal").hidden=!normal; $("#vistaAvz").hidden=normal;
+  if(normal){ $("#panelCrear").hidden=true; $("#panelAbrir").hidden=true; }
+  if(recordar!==false){ try{ localStorage.setItem("bridge_modo", normal?"normal":"avz"); }catch(e){} }
+}
+$("#irNormal").onclick=()=>aplicarModo("normal");
+$("#irAvz").onclick=()=>aplicarModo("avz");
+
+// La vista de agentes NO se ofrece en una máquina que no puede darla. Y la condición
+// no es "esto corre en un contenedor" -se puede detectar, y responde otra pregunta-:
+// es que el servidor tenga el marco a mano. Un contenedor sin master tampoco puede
+// hacer nacer a nadie, y un portátil con el canon clonado sí.
+//
+// El botón ya se negaba, pero se negaba TARDE: dejaba pulsar, dejaba escribir para
+// qué era el agente, y recién al confirmar decía que no. Una capacidad que falta se
+// declara antes de ofrecerla, no después de que alguien apostó por ella.
+let modoResuelto=false;
+function resolverVista(hayMaster){
+  $("#irAvz").hidden = !hayMaster;      // sin capacidad no hay dos vistas: hay una
+  if(!hayMaster){ aplicarModo("avz", false); modoResuelto=true; return; }
+  if(modoResuelto) return;
+  let guardado=null;
+  try{ guardado=localStorage.getItem("bridge_modo"); }catch(e){}
+  aplicarModo(guardado||"normal", false);
+  modoResuelto=true;
+}
+// Hasta la primera respuesta del servidor no se sabe cuál toca, así que no se pinta
+// ninguna: adivinar y corregir medio segundo después enseña una vista que no era.
+$("#vistaNormal").hidden=true; $("#vistaAvz").hidden=true;
+
+// El nombre de la carpeta sale de lo que la persona escribió, no de un contador:
+// es la señal que el marco lee antes de su primera pregunta. Se limpia para que
+// sirva de ruta y el texto íntegro viaja aparte, en el mensaje.
+const aRuta = s => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,40) || "agente";
+
+$("#btnCrear").onclick=()=>{
+  $("#panelAbrir").hidden=true;
+  $("#panelCrear").hidden=!$("#panelCrear").hidden;
+  if(!$("#panelCrear").hidden) $("#paraQue").focus();
+};
+$("#paraQue").onkeydown=e=>{ if(e.key==="Enter"){ e.preventDefault(); $("#confirmarCrear").click(); } };
+$("#confirmarCrear").onclick=async()=>{
+  const q=$("#paraQue").value.trim();
+  if(!q){ alert(T("falta_para_que")); $("#paraQue").focus(); return; }
+  if(!state.master){ alert(T("sin_master")); return; }
+  const carpeta=aRuta(q);
+  const base=(state.base||"").replace(/\/+$/,"");
+  if(!base){ alert(T("sin_master")); return; }
+  $("#paraQue").value=""; $("#panelCrear").hidden=true;
+  await arrancarSesion({name:carpeta, prompt:T("prompt_nacer",{m:state.master,q:q}),
+                        cwd:base+"/"+carpeta, crear_cwd:true, permission:"full"},
+                       $("#confirmarCrear"), T("naciendo"));
+};
+
+$("#btnAbrir").onclick=async()=>{
+  $("#panelCrear").hidden=true;
+  if(!$("#panelAbrir").hidden){ $("#panelAbrir").hidden=true; return; }
+  $("#panelAbrir").hidden=false;
+  const cont=$("#listaAgentes"); cont.innerHTML="";
+  let j={};
+  try{ j=await api("GET","/agentes"); }catch(e){ cont.innerHTML='<div class="empty">'+e.message+'</div>'; return; }
+  const ag=j.agentes||[];
+  if(!ag.length){ cont.innerHTML='<div class="empty">'+T("sin_agentes")+'</div>'; return; }
+  ag.forEach(a=>{
+    const d=document.createElement("div"); d.className="agente";
+    // Si el dominio no declaró su identidad, se dice — no se rellena con el nombre
+    // de la carpeta como si fuera el suyo. Un nombre inventado aquí se leería igual
+    // de cierto que uno escrito por quien lo fundó.
+    const q=document.createElement("span"); q.className="quien";
+    const w=document.createElement("span");
+    if(a.asistente){ q.textContent=a.asistente; w.className="donde"; w.textContent=a.dominio||a.carpeta; }
+    else { q.textContent=a.carpeta; w.className="sindecl"; w.textContent=T("sin_declarar"); }
+    d.appendChild(q); d.appendChild(w);
+    d.onclick=()=>abrirAgente(a);
+    cont.appendChild(d);
+  });
+};
+async function abrirAgente(a){
+  const viva=(state.sesiones||[]).find(s=>s.cwd===a.cwd);
+  if(viva){ $("#panelAbrir").hidden=true; select(viva.name); return; }
+  $("#panelAbrir").hidden=true;
+  await arrancarSesion({name:a.carpeta, prompt:"/vuelamind-load", cwd:a.cwd, permission:"full"},
+                       $("#btnAbrir"), T("abriendo"));
+}
+
 $("#create").onclick=async()=>{
   const name=$("#newName").value.trim(), prompt=$("#newPrompt").value.trim();
   const permission=$("#newPerm").value, model=$("#newModel").value;
   const cwd=$("#newCwd").value.trim();
-  if(!name||!prompt){ alert("Falta nombre o primer mensaje"); return; }
-  $("#create").disabled=true; const lbl=$("#create").textContent; $("#create").textContent="Creando…";
+  if(!name||!prompt){ alert(T("falta")); return; }
   // Entramos a la sesión ANTES de que conteste: el primer mensaje suele ser el más caro
   // -poner al día al asistente corre su validador entero- y esperar minutos mirando un
   // botón no dice siquiera si sigue vivo. Se ve el turno desde el primer paso.
   const cuerpo={name,prompt,permission};
   if(model) cuerpo.model=model;
   if(cwd) cuerpo.cwd=cwd;          // vacío = el del servidor, que es el caso de siempre
-  pushTx(name,"user",prompt);
-  state.current=name;
-  $("#input").disabled=false; $("#send").disabled=true; $("#attach").disabled=false;
-  $("#chathead").style.display="flex"; $("#curname").textContent=name;
   $("#newName").value=""; $("#newPrompt").value=""; $("#newCwd").value="";
-  render();
-  const ok=await correrTurno("/sessions/crear", cuerpo, name);
-  await refresh();
-  if(ok) select(name); else render();
-  $("#send").disabled=false;
-  $("#create").disabled=false; $("#create").textContent=lbl;
+  await arrancarSesion(cuerpo, $("#create"), T("creando"));
 };
 
 // ---- panel de progreso en vivo (streaming NDJSON) ----
@@ -706,7 +1003,7 @@ function startStream(owner){
     // vive en la cabecera y repetirlo solo creaba la duda de cuál mirar. Los tokens
     // generados son otra cosa —el precio de lo que corre ahora mismo— y se ven crecer
     // junto al cronómetro, que es donde uno está mirando mientras espera.
-    p.status.textContent="⏳ trabajando… "+fmtDur(n)
+    p.status.textContent=T("trabajando")+fmtDur(n)
       +(p.usage&&p.usage.output_tokens?"   ·   ↑"+fmtTok(p.usage.output_tokens)+" tok":""); };
   p.upd(); p.timer=setInterval(p.upd,1000);
   return p;
@@ -763,7 +1060,7 @@ async function recuperar(owner, panel){
     if(d.terminado && d.hay) return {estado:"recuperado", texto:d.texto};
     if(!d.en_vuelo) return {estado:d.terminado ? "vacio" : "muerto"};
     if(panel && panel.status) panel.status.textContent =
-      "⏳ se cortó la conexión, pero el turno sigue — esperando su respuesta… " + ((intento+1)*2) + "s";
+      T("recuperando") + ((intento+1)*2) + "s";
     await new Promise(r=>setTimeout(r,2000));
   }
   return {estado:"tarda"};
@@ -808,12 +1105,12 @@ async function correrTurno(url, body, owner){
     endStream(panel);
     if(r.estado==="recuperado") pushTx(owner,"asst",r.texto);
     else if(r.estado==="muerto") pushTx(owner,"err",
-      "Se cortó la conexión ("+e.message+") y el turno no llegó a terminar. No hay respuesta que recuperar: hay que repetir el mensaje.");
+      T("corte_muerto",{e:e.message}));
     else if(r.estado==="tarda") pushTx(owner,"err",
-      "Se cortó la conexión ("+e.message+"). El turno seguía corriendo tras dos minutos de espera; su respuesta quedará en la sesión y se puede recuperar recargando.");
+      T("corte_tarda",{e:e.message}));
     else if(r.estado==="vacio") pushTx(owner,"err",
-      "Se cortó la conexión ("+e.message+"). El turno terminó sin texto, solo con herramientas.");
-    else pushTx(owner,"err","Se cortó la conexión ("+e.message+") y tampoco alcanzo al puente para recuperar el turno.");
+      T("corte_vacio",{e:e.message}));
+    else pushTx(owner,"err",T("corte_sin_puente",{e:e.message}));
     return false;
   }
 }

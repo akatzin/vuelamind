@@ -130,6 +130,54 @@ DELIVER_INIT_TIMEOUT = int(os.environ.get("BRIDGE_DELIVER_INIT_TIMEOUT", "120"))
 # llega en result.modelUsage.contextWindow; éste es el default mientras el turno
 # corre (aún no hay result). 200000 = opus/sonnet en este despliegue.
 CONTEXT_WINDOW = int(os.environ.get("BRIDGE_CONTEXT_WINDOW", "200000"))
+# Ruta del master del marco, si esta maquina lo tiene a mano (p.ej. dentro del
+# contenedor, donde el canon viene horneado). El puente NO la sabe por si mismo y
+# no se inventa una ruta por omision: sin esto, la pagina no ofrece nacer un
+# dominio, que es mejor que ofrecer un boton que abre un archivo inexistente.
+MASTER = os.environ.get("BRIDGE_MASTER", "")
+
+
+def _dentro_de(hijo: str, padre: str) -> bool:
+    """True si `hijo` cuelga de `padre` una vez resueltos los dos. Es lo que impide
+    que crear un agente escriba carpetas en cualquier punto del disco: el puente
+    crea directorios SOLO bajo el suyo."""
+    try:
+        h = Path(hijo).resolve()
+        pa = Path(padre).resolve()
+        return h == pa or pa in h.parents
+    except Exception:
+        return False
+
+
+def _identidad(d: Path) -> dict:
+    """Lee `asistente:` y `dominio:` del frontmatter del panorama (`0_*.md`), que la
+    v3.9 del marco manda escribir. Mira el propio directorio y UN nivel adentro,
+    que es donde cae el vault segun la convencion.
+
+    Lo que NO hace, y es deliberado: deducir el nombre leyendo la prosa. Un dominio
+    que no lo declara vuelve con los campos vacios y quien lo muestre dira que no
+    esta declarado. Un nombre inventado por el puente se veria igual de cierto."""
+    for patron in ("0_*.md", "*/0_*.md"):
+        for nota in sorted(d.glob(patron)):
+            try:
+                texto = nota.read_text(encoding="utf-8", errors="replace")[:4000]
+            except Exception:
+                continue
+            if not texto.startswith("---"):
+                continue
+            fin = texto.find("\n---", 3)
+            fm = texto[3:fin] if fin > 0 else ""
+            campos = {}
+            for linea in fm.splitlines():
+                if ":" in linea and not linea.startswith(" "):
+                    k, v = linea.split(":", 1)
+                    campos[k.strip()] = v.strip()
+            if "asistente" in campos or "dominio" in campos:
+                return {"asistente": campos.get("asistente", ""),
+                        "dominio": campos.get("dominio", ""),
+                        "panorama": nota.name}
+            return {"asistente": "", "dominio": "", "panorama": nota.name}
+    return {"asistente": "", "dominio": "", "panorama": ""}
 
 CLAUDE = os.environ.get("BRIDGE_CLAUDE_BIN") or shutil.which("claude") or \
     str(Path.home() / ".local/bin/claude")
@@ -783,7 +831,30 @@ class Handler(BaseHTTPRequestHandler):
                                "cwd": meta.get("cwd"), "created": meta.get("created"),
                                "permission": meta.get("permission") or DEFAULT_PERMISSION,
                                "live_state": a.get("state") or a.get("status")})
-            return self._json(200, {"sessions": merged, "agents_raw": list(live.values())})
+            # Se comprueba AQUI y no al arrancar: el master puede llegar en un
+            # montaje posterior, y un dato cacheado del arranque mentiria sin fallar.
+            master = MASTER if (MASTER and Path(MASTER).is_file()) else ""
+            # `base` es donde nacen los agentes nuevos. La pagina no la adivina ni la
+            # teclea nadie: el que manda es el directorio con el que arrancó el puente.
+            return self._json(200, {"sessions": merged, "agents_raw": list(live.values()),
+                                    "master": master, "base": str(Path(DEFAULT_CWD))})
+        # GET /agentes -> los dominios que viven bajo el directorio del puente.
+        # Un agente NO es una sesion: la sesion es efimera y el agente es la carpeta,
+        # con su vault y su memoria. Aqui se enumera lo que hay en disco, exista o no
+        # una conversacion abierta contra ello.
+        if self.path == "/agentes":
+            base = Path(DEFAULT_CWD)
+            salida = []
+            if base.is_dir():
+                for d in sorted(base.iterdir()):
+                    if not d.is_dir() or d.name.startswith("."):
+                        continue
+                    ident = _identidad(d)
+                    if not ident["panorama"]:
+                        continue          # una carpeta cualquiera no es un dominio
+                    salida.append({"carpeta": d.name, "cwd": str(d), **ident})
+            return self._json(200, {"agentes": salida, "base": str(base)})
+
         # GET /sessions/<name>/historial -> la conversacion, para una ventana que no la tiene
         mh = re.match(r"^/sessions/([^/]+)/historial(?:\?limite=(\d+))?$", self.path)
         if mh:
@@ -836,7 +907,16 @@ class Handler(BaseHTTPRequestHandler):
             # automatica salen de ahi-. Si no existe, hoy reventaba dentro del subproceso con
             # un error que no dice que paso; una ruta mal tecleada merece decirse aqui.
             if not Path(cwd).is_dir():
-                return self._json(400, {"error": f"el directorio no existe: {cwd}"})
+                # Nacer un agente crea su carpeta; teclear mal una ruta, no. La
+                # diferencia la marca quien llama pidiendolo, y el limite es duro:
+                # solo bajo el directorio del puente, nunca en cualquier sitio.
+                if b.get("crear_cwd") and _dentro_de(cwd, DEFAULT_CWD):
+                    try:
+                        Path(cwd).mkdir(parents=True, exist_ok=True)
+                    except Exception as e:
+                        return self._json(400, {"error": f"no pude crear {cwd}: {e}"})
+                else:
+                    return self._json(400, {"error": f"el directorio no existe: {cwd}"})
             res = run_turn(prompt or "", attachments, None, cwd, model, permission)
             if res["is_error"] or not res["session_id"]:
                 return self._json(502, {"error": "claude falló al crear",
@@ -880,7 +960,16 @@ class Handler(BaseHTTPRequestHandler):
             # automatica salen de ahi-. Si no existe, hoy reventaba dentro del subproceso con
             # un error que no dice que paso; una ruta mal tecleada merece decirse aqui.
             if not Path(cwd).is_dir():
-                return self._json(400, {"error": f"el directorio no existe: {cwd}"})
+                # Nacer un agente crea su carpeta; teclear mal una ruta, no. La
+                # diferencia la marca quien llama pidiendolo, y el limite es duro:
+                # solo bajo el directorio del puente, nunca en cualquier sitio.
+                if b.get("crear_cwd") and _dentro_de(cwd, DEFAULT_CWD):
+                    try:
+                        Path(cwd).mkdir(parents=True, exist_ok=True)
+                    except Exception as e:
+                        return self._json(400, {"error": f"no pude crear {cwd}: {e}"})
+                else:
+                    return self._json(400, {"error": f"el directorio no existe: {cwd}"})
 
             self.send_response(200)
             self.send_header("Content-Type", "application/x-ndjson; charset=utf-8")
@@ -1112,8 +1201,18 @@ def main():
         sys.exit(f"NO PUEDO ESCUCHAR EN {HOST}:{PORT} — {e}\n"
                  "  Lo más probable: ya hay un puente corriendo en ese puerto.\n"
                  "  Míralo y mátalo, o arranca éste con otro PORT.")
+    # Sin esto, NADA de lo que sigue llega al log cuando la salida no es una terminal:
+    # stdout queda en buffer de bloque y el arranque se queda dentro, mientras las
+    # peticiones -que van por stderr- sí se ven. Medido el 2026-09-21 corriendo el
+    # puente como servicio: el log tenía los GET y ni una línea del arranque, que es
+    # justo donde se lee en qué puerto quedó y con qué configuración.
+    try: sys.stdout.reconfigure(line_buffering=True)
+    except Exception: pass
     print(f"puente escuchando en http://{HOST}:{PORT}  (solo loopback, sin token)")
     print(f"candados: allowlist de Host + chequeo de Origin en POST/DELETE")
+    if MASTER:
+        print(f"master del marco: {MASTER}" if Path(MASTER).is_file()
+              else f"AVISO: BRIDGE_MASTER apunta a {MASTER}, que NO existe — la página no lo ofrecerá")
     print(f"modelo por defecto: {DEFAULT_MODEL or '(el del CLI)'}   ·   cwd por defecto: {DEFAULT_CWD}")
     print(f"permiso por defecto: {DEFAULT_PERMISSION}   (declarado, no heredado)")
     print(f"desde otra máquina:  ssh -N -L {PORT}:127.0.0.1:{PORT} <usuario>@<esta-máquina>")
