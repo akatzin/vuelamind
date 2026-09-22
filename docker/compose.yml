@@ -63,6 +63,13 @@ services:
     volumes:
       # El dominio que nace. Es tuyo y vive fuera del contenedor a proposito:
       # un vault que muere con `docker rm` no es un vault.
+      #
+      # EN LINUX, CREALA TU ANTES DEL PRIMER `up`:  mkdir -p trabajo
+      # Si no existe, la crea Docker y la crea como ROOT; dentro se corre como uid
+      # 1000 y no se puede escribir. El puente lo detecta y se niega a arrancar con
+      # el comando para arreglarlo, pero es un tropiezo que no hace falta dar.
+      # MEDIDO en Debian con Engine 29.5.2: un clon nuevo no levanta sin esto.
+      # En Docker Desktop (macOS, Windows) no pasa: el montaje traduce los dueños.
       - ./trabajo:/trabajo
       # El hogar del usuario `node`: login del CLI, registro de sesiones del puente,
       # config y los transcripts de las conversaciones. Volumen nombrado para no

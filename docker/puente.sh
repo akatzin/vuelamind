@@ -47,12 +47,19 @@ if ! ( touch "$BRIDGE_CWD/.escritura-de-prueba" && rm -f "$BRIDGE_CWD/.escritura
   echo "  soy:      uid $(id -u), gid $(id -g)"
   echo "  el dueño: uid $(stat -c '%u' "$BRIDGE_CWD" 2>/dev/null || echo '?'), gid $(stat -c '%g' "$BRIDGE_CWD" 2>/dev/null || echo '?')"
   echo
-  echo "Suele pasar en Linux cuando Docker crea la carpeta que falta, como root."
-  echo "En la maquina anfitriona, junto al compose.yml:"
+  echo "Pasa en Linux SIEMPRE que la carpeta no existe antes: Docker la crea el, y la"
+  echo "crea como root. No es un caso raro — es el primer arranque de un clon nuevo."
   echo
-  echo "    mkdir -p trabajo && sudo chown -R $(id -u):$(id -g) trabajo"
+  echo "Hay dos salidas, y la primera NO necesita sudo. En la maquina anfitriona,"
+  echo "junto al compose.yml:"
   echo
-  echo "Y vuelve a levantar. Prefiero parar aqui que fallar a media entrevista."
+  echo "    mkdir -p trabajo && docker compose up -d"
+  echo
+  echo "Basta si tu usuario del anfitrion tiene uid $(id -u). Si no, hace falta la otra:"
+  echo
+  echo "    sudo chown -R $(id -u):$(id -g) trabajo"
+  echo
+  echo "Prefiero parar aqui que fallar a media entrevista."
   exit 1
 fi
 
