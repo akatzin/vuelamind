@@ -91,7 +91,7 @@ La lista de notas a tocar **no sale solo de lo que la sesión tuvo abierto**: sa
 
 **Los dos barridos los da un comando**, y conviene usarlo en vez de improvisar un `grep`:
 
-    python3 <canon>/herramientas/vecinas.py <nota> <vault>
+    python3 herramientas/vecinas.py <nota> <vault>
 
 > [!warning] Por qué no basta con `grep` del nombre de la nota
 > Es lo que este paso decía antes, y **falla en las tres formas en que se escribe un
