@@ -1,0 +1,17 @@
+# Como trata git —y GitHub— los archivos de este repositorio.
+
+# GITHUB LO COLAPSABA COMO «GENERADO» Y NADIE VEIA EL DIFF. Su heuristica marca asi los
+# archivos con lineas larguisimas (aqui hasta 1720 caracteres) y varios cientos de KB,
+# que es la firma de un minificado. Este no lo es: son los textos del sitio en nueve
+# idiomas, escritos a mano, y son exactamente lo que hay que leer antes de aprobar.
+web/vuelamind.i18n.js linguist-generated=false
+
+# LOS .sh VIAJAN CON FINALES DE LINEA UNIX, SIEMPRE.
+# git para Windows trae `core.autocrlf = true` DE FABRICA: al clonar alli, estos
+# archivos llegan con CRLF —medido: 41, 60, 118 y 61 CRLF en los cuatro de docker/— y
+# un script con CRLF dentro de una imagen Linux falla con «bad interpreter» o «no such
+# file or directory», un error que no menciona ni a Windows ni a los saltos de linea.
+#
+# El Dockerfile ya los normaliza al copiarlos; esto lo evita antes, en el clon. Las dos
+# defensas se quedan: la de aqui no cubre a quien descargue los archivos sueltos.
+*.sh text eol=lf
