@@ -1,0 +1,3 @@
+# Tus claves de Vertex no son del canon: se quedan en tu maquina.
+# La plantilla viaja como vertex.env.ejemplo; la copia real se ignora.
+vertex.env
