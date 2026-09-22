@@ -42,6 +42,19 @@ echo
 printf '  %s\n' "$(d 'La segunda pregunta decide todo lo que sigue: si el dominio nace')"
 printf '  %s\n' "$(d 'aqui, o si esta maquina se suma a uno que ya vive.')"
 echo
+printf '  %s\n' "$(c '    vuelamind-puente')"
+printf '  %s\n' "$(d 'levanta el puente de sesiones y la entrevista se hace desde el')"
+printf '  %s\n' "$(d 'navegador, en http://127.0.0.1:8850 — el compose ya lo arranca asi.')"
+echo
+# Solo si el SDK se horneo: nombrar un comando que no existe manda a la gente
+# a buscar lo que no esta.
+if command -v gcloud >/dev/null 2>&1; then
+  printf '  %s\n' "$(c '    vuelamind-vertex')"
+  printf '  %s\n' "$(d 'autentica este contenedor contra Vertex (Model Garden) y lo comprueba')"
+  printf '  %s\n' "$(d 'pidiendole un turno al modelo. Es alternativa al login de Claude, no suma.')"
+  echo
+fi
+
 printf '  %s\n' "$(d 'El canon horneado no se actualiza solo: vuelamind-actualizar lo trae')"
 printf '  %s\n' "$(d 'fresco del repositorio y te dice que cambio.')"
 echo
