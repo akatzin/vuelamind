@@ -9,7 +9,28 @@ ARG VUELAMIND_REF=main
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
       git rsync curl ca-certificates less procps ripgrep \
+      python3 socat gnupg \
     && rm -rf /var/lib/apt/lists/*
+
+# gcloud, solo si se pide. Son ~1 GB y nadie que no autentique contra Vertex
+# tiene por que cargarlos: el login por cuenta de Claude no lo necesita.
+#   docker build --build-arg CON_GCLOUD=1 .
+# Hace falta cuando el CLI se autentica por Model Garden: la credencial de
+# usuario (ADC) se saca con `gcloud auth application-default login`, y ese
+# comando no existe si el SDK no esta dentro.
+ARG CON_GCLOUD=0
+RUN if [ "$CON_GCLOUD" = "1" ]; then \
+      curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+        | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg \
+      && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
+        > /etc/apt/sources.list.d/google-cloud-sdk.list \
+      && apt-get update \
+      && apt-get install -y --no-install-recommends google-cloud-cli \
+      && rm -rf /var/lib/apt/lists/* \
+      && gcloud --version; \
+    else \
+      echo "sin gcloud (CON_GCLOUD=$CON_GCLOUD)"; \
+    fi
 
 RUN npm install -g @anthropic-ai/claude-code
 
@@ -27,12 +48,21 @@ RUN usermod -g users node && mkdir -p /home/node/.claude && chown -R node:users 
 
 COPY bienvenida.sh /usr/local/bin/vuelamind-bienvenida
 COPY actualizar.sh /usr/local/bin/vuelamind-actualizar
-RUN chmod 755 /usr/local/bin/vuelamind-bienvenida /usr/local/bin/vuelamind-actualizar
+COPY puente.sh /usr/local/bin/vuelamind-puente
+COPY vertex.sh /usr/local/bin/vuelamind-vertex
+RUN chmod 755 /usr/local/bin/vuelamind-bienvenida /usr/local/bin/vuelamind-actualizar \
+                /usr/local/bin/vuelamind-puente /usr/local/bin/vuelamind-vertex
 
 USER node
 WORKDIR /trabajo
 ENV HOME=/home/node \
     VUELAMIND_CANON=/opt/vuelamind
+
+# El puerto del relevo, no el del puente: el puente sigue en su loopback. Es
+# documentacion — quien publica decide, y compose.yml lo hace solo al loopback
+# de la maquina anfitriona. Publicarlo a secas (-p 8850:8851) lo abre a la red,
+# y eso es otra decision (ver session_bridge.README.md).
+EXPOSE 8851
 
 # Sin ENTRYPOINT que envuelva: un contenedor que secuestra el comando es un
 # contenedor que no se puede depurar. La bienvenida se invoca, no se impone.

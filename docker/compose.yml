@@ -1,0 +1,81 @@
+# El contenedor con el metodo horneado Y el puente de sesiones arriba.
+#
+# Levantar:   docker compose up -d --build
+# Entrar:     docker compose exec vuelamind bash
+# Abrir:      http://127.0.0.1:8850
+# Apagar:     docker compose down     (el hogar persiste; /trabajo es tuyo)
+#
+# La primera vez hace falta autenticar el CLI DENTRO del contenedor — el login
+# de la maquina anfitriona no viaja (en macOS vive en el llavero del sistema):
+#   docker compose exec vuelamind claude
+# y seguir el login. Queda en el volumen `vuelamind-hogar`, asi que se hace una vez.
+
+services:
+  vuelamind:
+    build:
+      context: .
+      args:
+        VUELAMIND_REF: main
+        # El SDK de gcloud, ~1 GB. Hace falta SOLO si autenticas contra Vertex
+        # (Model Garden). Si usas el login por cuenta de Claude, pon "0" y la
+        # imagen baja de ~2.2 GB a ~1.2 GB.
+        CON_GCLOUD: "1"
+    image: vuelamind:horneado
+    command: vuelamind-puente
+
+    ports:
+      # ANFITRION 127.0.0.1:8850  ->  CONTENEDOR 8851 (relevo)  ->  8850 (puente).
+      #
+      # El "127.0.0.1:" del lado izquierdo NO es decorativo y no se quita: es el
+      # unico limite real. Sin el, Docker publica en todas las interfaces y el
+      # puente queda alcanzable desde la red — y el puente NO tiene token, y su
+      # nivel de permiso por omision ejecuta lo que le pidan. Quien lo abra a la
+      # red esta tomando una decision que el marco no toma por el.
+      #
+      # Los dos numeros de la izquierda tienen que ser el PORT de abajo: el puente
+      # valida Origin con puerto incluido. Cambiar uno sin el otro deja la pagina
+      # cargando y toda creacion de sesion en 403.
+      - "127.0.0.1:8850:8851"
+
+    environment:
+      PORT: "8850"
+      VUELAMIND_RELEVO: "8851"
+      BRIDGE_CWD: /trabajo
+      # `full` = bypassPermissions. En la maquina de uno eso es la razon de mas
+      # peso para no exponer el puente; AQUI el alcance es el contenedor y el
+      # /trabajo montado, que es justamente para lo que existe esta imagen: una
+      # entrevista headless no tiene quien apruebe permisos en vivo, y sin esto
+      # el dominio no puede nacer porque no puede escribir su vault.
+      BRIDGE_PERMISSION: full
+      # Donde vive el master del marco DENTRO del contenedor. Con esto, la pagina
+      # ofrece nacer un dominio con un clic, en el idioma que tenga puesto. Si la
+      # ruta no existe, el puente lo dice al arrancar y el boton no aparece: no hay
+      # forma de que ofrezca algo que no esta.
+      BRIDGE_MASTER: /opt/vuelamind/MARCO_Inicial.md
+
+    # Vertex / Model Garden: se configura en `vertex.env`, que NO es YAML — una
+    # clave, un igual, un valor. Editar este archivo a mano para poner un
+    # proyecto es pedir un error de indentacion, y llega disfrazado de
+    # "go-yaml load error in parser", que no dice que lo rompio fue el editor.
+    env_file:
+      - vertex.env
+
+    volumes:
+      # El dominio que nace. Es tuyo y vive fuera del contenedor a proposito:
+      # un vault que muere con `docker rm` no es un vault.
+      - ./trabajo:/trabajo
+      # El hogar del usuario `node`: login del CLI, registro de sesiones del puente,
+      # config y los transcripts de las conversaciones. Volumen nombrado para no
+      # repetir el login cada vez.
+      #
+      # Es DESECHABLE a proposito, y eso decide como se muda uno de maquina: lo que
+      # vale se escribe en el vault -para eso existe el cierre- y el agente se retoma
+      # con /vuelamind-load leyendo su propia carpeta. Mudarse es copiar ./trabajo y
+      # volver a entrar; lo unico que se queda es el historial de chat, que es
+      # material crudo ya destilado. El login no viaja, y eso es deliberado.
+      - vuelamind-hogar:/home/node
+
+    stop_grace_period: 10s
+
+volumes:
+  vuelamind-hogar:
