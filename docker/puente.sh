@@ -32,6 +32,30 @@ command -v python3 >/dev/null || { echo "Falta python3 en la imagen; el puente l
 command -v socat  >/dev/null || { echo "Falta socat en la imagen; es el relevo al espacio de red."; exit 1; }
 command -v claude >/dev/null || { echo "Falta el CLI de claude en la imagen."; exit 1; }
 
+# El directorio de trabajo tiene que ser ESCRIBIBLE por quien corre aqui dentro, y
+# se comprueba escribiendo: `test -w` mira permisos, y un montaje puede mentirle.
+#
+# Sin esto el fallo llega tardisimo y acusa a otro: en Linux con Engine, Docker crea
+# el ./trabajo que falta como root, dentro se corre como uid 1000, y todo funciona
+# -la pagina, el login, la primera pregunta- hasta que el agente intenta escribir su
+# vault. Para entonces la persona ya pago el login y media entrevista. En macOS no
+# pasa porque el montaje traduce los dueños, que es justo lo que hace que nadie lo
+# vea venir.
+if ! ( touch "$BRIDGE_CWD/.escritura-de-prueba" && rm -f "$BRIDGE_CWD/.escritura-de-prueba" ) 2>/dev/null; then
+  echo "NO PUEDO ESCRIBIR EN $BRIDGE_CWD — y sin eso ningun dominio puede nacer aqui."
+  echo
+  echo "  soy:      uid $(id -u), gid $(id -g)"
+  echo "  el dueño: uid $(stat -c '%u' "$BRIDGE_CWD" 2>/dev/null || echo '?'), gid $(stat -c '%g' "$BRIDGE_CWD" 2>/dev/null || echo '?')"
+  echo
+  echo "Suele pasar en Linux cuando Docker crea la carpeta que falta, como root."
+  echo "En la maquina anfitriona, junto al compose.yml:"
+  echo
+  echo "    mkdir -p trabajo && sudo chown -R $(id -u):$(id -g) trabajo"
+  echo
+  echo "Y vuelve a levantar. Prefiero parar aqui que fallar a media entrevista."
+  exit 1
+fi
+
 python3 "$PUENTE" &
 pid_puente=$!
 
