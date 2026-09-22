@@ -114,6 +114,23 @@ El manifiesto la sigue declarando con `acta:` — la clave no cambia, cambia a d
    > Se escribe **directo en el vault**, que es donde la v3.9 la quiere. Y ahí no hay riesgo
    > de duplicado: nunca hubo una primera.
    >
+   > **Y una reconstruida tiene que poder distinguirse de una original de un vistazo**, o
+   > dentro de un año alguien la citará como si fueran las palabras del fundador. La forma que
+   > funcionó, de quien la escribió primero:
+   >
+   > | En el frontmatter | Para qué |
+   > |---|---|
+   > | `estado: reconstruida` y su fecha | que no haya que deducirlo leyendo |
+   > | `fuente_primaria_intentada` | **se declara aunque no sirviera** — «el transcript ya no existe en esta máquina» es un dato, y sin él nadie sabe si se intentó |
+   > | `fuente_usada` | de dónde salió de verdad |
+   >
+   > Los seis bloques van en el orden de siempre, **cada uno citando su fuente ahí mismo**
+   > —nota y fecha—, y al final una sección de **Enmiendas** con fecha y motivo: un acta se
+   > enmienda, no se reescribe, y una reconstruida se enmienda más que ninguna.
+   >
+   > *Declarar la fuente que se intentó y falló es lo que separa una reconstrucción honesta de
+   > una que se hizo por el camino corto.*
+   >
    > *Encontrado en la PRIMERA corrida real de este upgrader, por una casa distinta de la que
    > lo escribió y el mismo día de publicarse: su dominio nació el 2026-08-04 y tuvo que
    > salirse de este documento para saber qué hacer. Un salto que asume un archivo que no
