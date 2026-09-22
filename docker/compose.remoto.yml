@@ -1,19 +1,29 @@
-# El contenedor con el metodo horneado Y el puente de sesiones arriba.
+# vuelamind en contenedor — LA VERSION DE UN SOLO ARCHIVO.
 #
-# Levantar:   docker compose up -d --build
-# Entrar:     docker compose exec vuelamind bash
-# Abrir:      http://127.0.0.1:8850
-# Apagar:     docker compose down     (el hogar persiste; /trabajo es tuyo)
+# Esto es todo lo que hace falta en tu disco. No se clona el repositorio: Docker
+# construye tomando como contexto SOLO la carpeta `docker/` del canon.
 #
-# La primera vez hace falta autenticar el CLI DENTRO del contenedor — el login
-# de la maquina anfitriona no viaja (en macOS vive en el llavero del sistema):
-#   docker compose exec vuelamind claude
-# y seguir el login. Queda en el volumen `vuelamind-hogar`, asi que se hace una vez.
+#   curl -fsSL -O https://raw.githubusercontent.com/akatzin/vuelamind/main/docker/compose.remoto.yml
+#   mkdir -p trabajo
+#   docker compose -f compose.remoto.yml up -d --build
+#   docker compose -f compose.remoto.yml exec vuelamind claude     # una vez: /login
+#   y abre http://127.0.0.1:8850
+#
+# EL `mkdir` NO SOBRA EN LINUX: si la carpeta no existe la crea Docker, y la crea como
+# root; dentro se corre como uid 1000. Quien clona el repositorio no lo necesita —ahi
+# la carpeta viaja hecha—, pero aqui no hay repositorio que la traiga.
+#
+# Para actualizar a lo ultimo del canon:  docker compose -f compose.remoto.yml build
+# (la referencia de la rama se comprueba en cada build; si el canon no avanzo, reusa cache)
+#
 
 services:
   vuelamind:
     build:
-      context: .
+      # EL CONTEXTO ES REMOTO: Docker toma SOLO la carpeta docker/ de este repositorio.
+      # Quien use este archivo no necesita clonar nada — el clon completo son 55 MB
+      # (19 solo de audio del sitio) y esta carpeta son 44 KB.
+      context: https://github.com/akatzin/vuelamind.git#main:docker
       args:
         VUELAMIND_REF: main
         # El SDK de gcloud, ~1 GB. Hace falta SOLO si autenticas contra Vertex
