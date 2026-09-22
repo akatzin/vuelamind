@@ -22,8 +22,17 @@ for k in CLAUDE_CODE_USE_VERTEX ANTHROPIC_VERTEX_PROJECT_ID CLOUD_ML_REGION; do
 done
 if [ -n "$falta" ]; then
   echo "Faltan variables en el entorno del contenedor:$falta"
-  echo "Van en el bloque environment: del compose.yml, y el contenedor se recrea"
-  echo "para que las tome (docker compose up -d)."
+  echo
+  echo "Van en el archivo \`vertex.env\`, junto al compose.yml. Si ya lo editaste, lo que"
+  echo "falta es RECREAR el contenedor: el que corre ahora arranco antes de tu cambio y"
+  echo "sigue con el entorno de entonces."
+  echo
+  echo "  1) comprueba que el archivo tiene las tres sin el # delante:"
+  echo "       grep -vE \"^#|^\\\$\" vertex.env"
+  echo "  2) recrea:   docker compose up -d"
+  echo "  3) vuelve a correr esto"
+  echo
+  echo "Si el paso 1 no muestra nada, el archivo que editaste no es el que lee el compose."
   exit 1
 fi
 
