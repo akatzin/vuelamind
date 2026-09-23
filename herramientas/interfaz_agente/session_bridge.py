@@ -152,40 +152,6 @@ def _dentro_de(hijo: str, padre: str) -> bool:
         return False
 
 
-def _vault_declarado(cwd: Path) -> tuple:
-    """Donde dice el manifiesto que vive el vault de este dominio.
-
-    El dominio lo declaro el dia que nacio. Hasta hoy el exportador no preguntaba:
-    empaquetaba la carpeta de trabajo y nada mas, asi que en un dominio cuyo vault
-    vive FUERA de esa carpeta el paquete salia con el manifiesto dentro --el papel que
-    dice donde esta el vault-- y sin el vault. MEDIDO en una casa real el 2026-09-23.
-
-    Devuelve (ruta o None, explicacion)."""
-    man = cwd / ".claude" / "vuelamind-commit.manifiesto.md"
-    if not man.is_file():
-        return None, "no hay manifiesto en .claude/, asi que no se sabe donde vive"
-    try:
-        texto = man.read_text(encoding="utf-8", errors="replace")
-    except OSError as e:
-        return None, f"no se pudo leer el manifiesto: {e}"
-
-    valor = ""
-    for linea in texto.splitlines():
-        m = (re.match(r"\s*\|\s*`?vault`?\s*\|\s*(.+?)\s*\|", linea)
-             or re.match(r"\s*vault\s*:\s*(.+?)\s*$", linea))
-        if m:
-            celda = m.group(1).strip()
-            # La celda puede traer prosa detras; la ruta es lo que va entre acentos.
-            entre = re.findall(r"`([^`]+)`", celda)
-            valor = (entre[0] if entre else celda).strip()
-            break
-
-    if not valor:
-        # Convencion del marco desde la v3.6: sin declarar, <proyecto>/vault/.
-        return cwd / "vault", "no declarado; convencion <proyecto>/vault/"
-    return Path(os.path.expanduser(valor)), f"declarado en el manifiesto: {valor}"
-
-
 def _clon(d: Path) -> dict | None:
     """Si `d` es un clon de git, devuelve de donde sale y en que commit esta. Se lee
     del disco y NO se invoca git: en la maquina destino puede no estar instalado, y un
@@ -984,6 +950,50 @@ class Handler(BaseHTTPRequestHandler):
                  "node_modules", "__pycache__", ".venv"}
     ZIP_FUERA_SUFIJOS = (".conf", ".env", ".pem", ".key", ".p12")
 
+    # Se le PREGUNTA al agente donde vive su vault. No se parsea el manifiesto.
+    #
+    # Por que: el manifiesto es prosa con estructura, y cada dominio la escribe a su
+    # manera -- fila de tabla, `clave: valor`, o una seccion `## vault` con la ruta en
+    # el cuerpo. MEDIDO el 2026-09-23: un lector que conocia dos de esas formas
+    # encontro la tercera y escribio "no declarado", que era FALSO y mandaba a la
+    # persona a escribir una clave que ya tenia.
+    #
+    # Un lector que solo conoce unas formas de algo no mide la ausencia de la cosa:
+    # mide la ausencia de su propio vocabulario. El agente lee su manifiesto entero y
+    # en el dialecto que sea, asi que la pregunta va a quien ya sabe.
+    PREGUNTA_VAULT = (
+        "Lee el manifiesto de reconciliacion de este dominio —normalmente "
+        "`.claude/vuelamind-commit.manifiesto.md`— y dime DONDE VIVE SU VAULT.\n\n"
+        "Contesta SOLO con una linea JSON, sin explicacion y sin bloque de codigo:\n"
+        '{\"vault\": \"<ruta absoluta>\"}\n'
+        "Si el manifiesto no lo declara en ningun sitio, contesta exactamente:\n"
+        '{\"vault\": null}'
+    )
+
+    def _preguntar_vault(self, cwd: Path) -> tuple:
+        """Devuelve (ruta o None, que paso). Lo que conteste el agente es una
+        AFIRMACION, no una medicion: quien llama la comprueba antes de usarla."""
+        try:
+            r = run_turn(self.PREGUNTA_VAULT, None, None, str(cwd), DEFAULT_MODEL, "safe")
+        except Exception as e:
+            return None, f"no se pudo preguntar al agente: {type(e).__name__}: {e}"
+        texto = (r.get("text") or "").strip()
+        if r.get("is_error"):
+            # El motivo suele venir en el TEXTO, no en raw_error -- una llamada puede
+            # fallar por cosas ajenas al dominio. Sin copiarlo aqui, el acta dice
+            # "turno con error" y no hay forma de saber si fue el agente, la red o el
+            # servicio: tres causas con arreglos distintos y la misma frase.
+            detalle = r.get("raw_error") or texto[:300] or "sin detalle"
+            return None, f"no se pudo preguntar al agente: {detalle}"
+        m = re.search(r'"vault"\s*:\s*(?:"([^"]*)"|null)', texto)
+        if not m:
+            return None, ("el agente no contesto una ruta legible. Dijo: "
+                          + (texto[:200] or "(nada)"))
+        valor = (m.group(1) or "").strip()
+        if not valor:
+            return None, "el agente dice que su manifiesto no declara el vault"
+        return Path(os.path.expanduser(valor)), f"lo dijo el agente: {valor}"
+
     @staticmethod
     def _carpeta_memoria(cwd: str) -> Path:
         """Donde el CLI guarda la memoria de un dominio: un directorio por proyecto,
@@ -1070,7 +1080,7 @@ class Handler(BaseHTTPRequestHandler):
                     fuera.append(f"{rel}  --  no se pudo leer: {e}")
             # EL VAULT, si el manifiesto dice que vive FUERA de esta carpeta. Es el
             # conocimiento: lo unico del dominio que no se reconstruye en el destino.
-            vault, por_que = _vault_declarado(destino)
+            vault, por_que = self._preguntar_vault(destino)
             vault_dentro, vault_info = 0, {"declarado": por_que, "viajo": False}
             if vault is None:
                 fuera.append(f"_vault/  --  {por_que}")
@@ -1098,8 +1108,17 @@ class Handler(BaseHTTPRequestHandler):
                             vault_dentro += 1
                         except OSError as e:
                             fuera.append(f"_vault/{rel_v}  --  no se pudo leer: {e}")
+                    # Lo que dijo el agente ya se uso; aqui se dice si ademas se
+                    # PARECE a un vault. No se rechaza por fallar --el agente sabe mas
+                    # que este chequeo-- pero el acta lleva las dos cosas al lado.
+                    panorama = bool(list(vault.glob("0_*.md")) or list(vault.glob("*/0_*.md")))
                     vault_info.update({"viajo": True, "en": "_vault/",
-                                       "ruta_origen": str(vault), "archivos": vault_dentro})
+                                       "ruta_origen": str(vault),
+                                       "archivos": vault_dentro,
+                                       "tiene_panorama": panorama})
+                    if not panorama:
+                        fuera.append(f"(aviso) {vault} viajo, pero no tiene panorama "
+                                     "`0_*.md`: comprueba que sea el vault")
 
             # LA MEMORIA, que vive FUERA de la carpeta y es la otra mitad de lo
             # irreducible. Sin ella el paquete se ve completo y el agente aterriza
