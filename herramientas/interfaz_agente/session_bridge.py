@@ -858,10 +858,13 @@ class Handler(BaseHTTPRequestHandler):
                     salida.append({"carpeta": d.name, "cwd": str(d), **ident})
             return self._json(200, {"agentes": salida, "base": str(base)})
 
-        # GET /agentes/<carpeta>/vault.zip -> el dominio entero, empaquetado, para
-        # bajarlo a la maquina de quien mira. El vault es suyo: vive fuera del
-        # contenedor a proposito, y esto es la otra mitad de esa frase.
-        mz = re.match(r"^/agentes/([^/]+)/vault\.zip$", self.path)
+        # GET /sessions/<name>/vault.zip -> el agente entero, empaquetado.
+        #
+        # Cuelga de la SESION y no de /agentes a proposito: /agentes solo ve dominios
+        # que son subcarpeta de la base, y un dominio puesto directamente en el
+        # directorio del puente -el caso de quien migra una maquina entera- no sale
+        # ahi. La sesion siempre sabe su cwd.
+        mz = re.match(r"^/sessions/([^/]+)/vault\.zip$", self.path)
         if mz:
             return self._vault_zip(unquote(mz.group(1)))
 
@@ -899,26 +902,34 @@ class Handler(BaseHTTPRequestHandler):
                  "node_modules", "__pycache__", ".venv"}
     ZIP_FUERA_SUFIJOS = (".conf", ".env", ".pem", ".key", ".p12")
 
-    def _vault_zip(self, carpeta: str) -> None:
-        """Empaqueta UN agente. No `/trabajo` entero: el dia que haya dos dominios,
-        un zip unico se lleva el de al lado sin que nadie lo pida."""
-        base = Path(DEFAULT_CWD)
-        # El nombre NO se usa para construir la ruta: se busca en lo ya enumerado,
-        # con el mismo filtro que /agentes. Asi el salto de directorio no se
-        # sanea — no llega a existir, porque no hay ruta que envenenar.
-        destino = None
-        if base.is_dir():
-            for d in sorted(base.iterdir()):
-                if (d.is_dir() and not d.name.startswith(".")
-                        and d.name == carpeta and _identidad(d)["panorama"]):
-                    destino = d
-                    break
-        if destino is None:
-            return self._json(404, {"error": f"no hay agente '{carpeta}'"})
+    @staticmethod
+    def _carpeta_memoria(cwd: str) -> Path:
+        """Donde el CLI guarda la memoria de un dominio: un directorio por proyecto,
+        nombrado con su ruta absoluta y todo lo que no sea alfanumerico vuelto `-`.
+        MEDIDO contra el disco el 2026-09-23.
+
+        Por eso la memoria NO se copia: se TRADUCE. El nombre depende de donde este
+        la carpeta, asi que en la maquina destino es otro — y una persona que ve dos
+        directorios asi no tiene como saber cual le toca."""
+        return (Path.home() / ".claude" / "projects"
+                / re.sub(r"[^A-Za-z0-9]", "-", str(Path(cwd).resolve())) / "memory")
+
+    def _vault_zip(self, nombre: str) -> None:
+        """Empaqueta UN agente: su carpeta Y su memoria, que es la unidad que de
+        verdad no se puede reconstruir en el destino. Todo lo demas -comandos del
+        ciclo, rutas, el nombre del directorio de memoria- se deriva alla."""
+        meta = load_registry().get(nombre)
+        if not meta:
+            return self._json(404, {"error": f"no hay sesión '{nombre}'"})
+        # La ruta sale del registro que escribio el puente, nunca de la peticion.
+        destino = Path(meta.get("cwd") or "")
+        if not destino.is_dir():
+            return self._json(404, {"error": f"la carpeta de '{nombre}' ya no existe"})
+        carpeta = destino.name or "vault"
 
         # En memoria: un vault son notas, y el de la casa mas grande medida no llega
         # a 2 MB. Si algun dia deja de ser cierto, esto se escribe a disco temporal.
-        fuera, dentro, buf = [], 0, io.BytesIO()
+        fuera, dentro, memoria, buf = [], 0, 0, io.BytesIO()
         with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
             for ruta in sorted(destino.rglob("*")):
                 rel = ruta.relative_to(destino)
@@ -937,10 +948,27 @@ class Handler(BaseHTTPRequestHandler):
                     dentro += 1
                 except OSError as e:
                     fuera.append(f"{rel}  --  no se pudo leer: {e}")
+            # LA MEMORIA, que vive FUERA de la carpeta y es la otra mitad de lo
+            # irreducible. Sin ella el paquete se ve completo y el agente aterriza
+            # sin nada de lo aprendido, sin que nada falle.
+            mem = self._carpeta_memoria(str(destino))
+            if mem.is_dir():
+                for ruta in sorted(mem.rglob("*")):
+                    if not ruta.is_file():
+                        continue
+                    try:
+                        z.write(ruta, str(Path(carpeta) / "_memoria"
+                                          / ruta.relative_to(mem)))
+                        memoria += 1
+                    except OSError as e:
+                        fuera.append(f"_memoria/{ruta.relative_to(mem)}  --  no se pudo leer: {e}")
+            else:
+                fuera.append(f"_memoria/  --  no hay memoria en {mem}")
+
             # Un paquete que calla lo que dejo fuera se lee como completo, y nadie
             # descubre el hueco hasta que lo necesita. Este lo dice SIEMPRE, tambien
             # cuando no falta nada: "vacio" y "no se miro" tienen que verse distinto.
-            acta = [f"vault de '{carpeta}'  ·  {dentro} archivos dentro",
+            acta = [f"vault de '{carpeta}'  ·  {dentro} archivos + {memoria} de memoria",
                     "", "Lo que quedo FUERA de este zip:", ""]
             acta += fuera if fuera else ["  (nada: no habia ningun archivo excluido)"]
             acta += ["", "La norma que los excluye vive en session_bridge.py,",

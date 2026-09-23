@@ -179,13 +179,7 @@
   .agente .quien{font-weight:600;font-size:13px}
   .agente .donde{font-size:11px;color:var(--dim)}
   .agente .sindecl{font-size:11px;color:var(--dim);font-style:italic}
-  /* El boton vive DENTRO de la tarjeta, que entera es un "hablale". Por eso no
-     hereda el cursor ni el click: bajar el vault no es abrir el agente. */
-  .agente{position:relative}
-  .agente .bajar{position:absolute;top:6px;right:6px;border:1px solid var(--line);
-       background:var(--bg);color:var(--dim);border-radius:5px;font-size:10px;
-       padding:2px 6px;cursor:pointer;line-height:1.4}
-  .agente .bajar:hover{color:var(--fg);border-color:var(--dim)}
+
   .chip .x{cursor:pointer;color:var(--dim);border:0;background:none;font-size:15px;padding:0 4px;line-height:1}
   .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
   .empty{margin:auto;color:var(--dim);text-align:center;padding:20px}
@@ -317,6 +311,8 @@
       <span class="sp"></span>
       <button id="guardar" class="ghost" hidden
               title="Manda /vuelamind-commit a esta sesión: mide, te enseña qué va a escribir y solo escribe con tu sí">Guardar</button>
+      <button id="exportar" class="ghost"
+              title="Baja este agente como .zip: su carpeta y su memoria. Sin llaves ni archivos de configuración; dentro va un _EXCLUIDO.txt que dice qué quedó fuera">Exportar agente</button>
       <button id="close" class="ghost danger" title="Detiene la sesión y la quita de esta página">Cerrar este chat</button>
     </div>
     <div class="log" id="log"><div class="empty">Elige o crea una sesión.</div></div>
@@ -365,8 +361,8 @@ const I18N={
   sin_master:"Esta máquina no tiene el marco a mano, así que no puedo hacer nacer un agente desde aquí.",
   sin_agentes:"Todavía no hay ningún agente aquí.",
   sin_declarar:"sin nombre declarado",
-  bajar_vault:"vault",
-  bajar_vault_ayuda:"Descargar el vault de este agente como .zip. No incluye llaves ni archivos de configuración; el zip trae dentro un _EXCLUIDO.txt que dice qué quedó fuera.",
+  exportar:"Exportar agente",
+  exportar_ayuda:"Baja este agente como .zip: su carpeta y su memoria. Sin llaves ni archivos de configuración; dentro va un _EXCLUIDO.txt que dice qué quedó fuera.",
   prompt_nacer:"Inicializa {m}\n\nPara qué es este agente, dicho antes de la primera pregunta: «{q}»",
   usage_tt:"contexto usado · tokens generados en el último turno",
   guardar:"Guardar",
@@ -408,8 +404,8 @@ const I18N={
   sin_master:"This machine does not have the framework at hand, so I cannot start an agent from here.",
   sin_agentes:"No agents here yet.",
   sin_declarar:"name not declared",
-  bajar_vault:"vault",
-  bajar_vault_ayuda:"Download this agent's vault as a .zip. Keys and config files are left out; the zip carries an _EXCLUIDO.txt naming what was skipped.",
+  exportar:"Export agent",
+  exportar_ayuda:"Download this agent as a .zip: its folder and its memory. No keys or config files; inside goes an _EXCLUIDO.txt naming what was skipped.",
   prompt_nacer:"Initialize {m}\n\nWhat this agent is for, said before the first question: «{q}»",
   usage_tt:"context used · tokens generated in the last turn",
   guardar:"Save",
@@ -455,6 +451,7 @@ const MARCAS=[
  ["#newModel","ph","modelo_ph"], ["#newModel","tt","modelo_tt"],
  ["#create","txt","crear"], ["#usage","tt","usage_tt"],
  ["#guardar","txt","guardar"], ["#guardar","tt","guardar_tt"],
+ ["#exportar","txt","exportar"], ["#exportar","tt","exportar_ayuda"],
  ["#close","txt","cerrar"], ["#close","tt","cerrar_tt"],
  ["#attach","tt","adjuntar_tt"], ["#input","ph","input_ph"], ["#send","txt","enviar"]
 ];
@@ -842,6 +839,13 @@ $("#close").onclick=closeSession;
 
 // Guardar es exactamente teclear el comando: mismo camino, misma protección, mismo panel de
 // progreso. No es un mecanismo aparte — serlo lo volvería otra cosa que mantener.
+// El agente se baja entero -carpeta y memoria-, que es lo unico que no se puede
+// reconstruir en la maquina destino. Lo demas se deriva alla.
+$("#exportar").onclick=()=>{
+  if(!state.current) return;
+  location.href="/sessions/"+encodeURIComponent(state.current)+"/vault.zip";
+};
+
 $("#guardar").onclick=()=>{
   if(!state.current || state.streams[state.current]) return;
   $("#input").value="/vuelamind-commit";
@@ -957,13 +961,6 @@ $("#btnAbrir").onclick=async()=>{
     if(a.asistente){ q.textContent=a.asistente; w.className="donde"; w.textContent=a.dominio||a.carpeta; }
     else { q.textContent=a.carpeta; w.className="sindecl"; w.textContent=T("sin_declarar"); }
     d.appendChild(q); d.appendChild(w);
-    // El vault es del usuario y vive fuera del contenedor a proposito. Esto es la
-    // otra mitad: poder llevarselo sin saber que existe `docker cp`.
-    const b=document.createElement("button"); b.type="button"; b.className="bajar";
-    b.textContent="\u2193 "+T("bajar_vault"); b.title=T("bajar_vault_ayuda");
-    b.onclick=(ev)=>{ ev.stopPropagation();
-      location.href="/agentes/"+encodeURIComponent(a.carpeta)+"/vault.zip"; };
-    d.appendChild(b);
     d.onclick=()=>abrirAgente(a);
     cont.appendChild(d);
   });
