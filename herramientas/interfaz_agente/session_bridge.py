@@ -55,8 +55,11 @@ import shutil
 import subprocess
 import sys
 import threading
+import io
+import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import unquote
 
 
 # ------------------------------------------------------ config por archivo (portable)
@@ -855,6 +858,13 @@ class Handler(BaseHTTPRequestHandler):
                     salida.append({"carpeta": d.name, "cwd": str(d), **ident})
             return self._json(200, {"agentes": salida, "base": str(base)})
 
+        # GET /agentes/<carpeta>/vault.zip -> el dominio entero, empaquetado, para
+        # bajarlo a la maquina de quien mira. El vault es suyo: vive fuera del
+        # contenedor a proposito, y esto es la otra mitad de esa frase.
+        mz = re.match(r"^/agentes/([^/]+)/vault\.zip$", self.path)
+        if mz:
+            return self._vault_zip(unquote(mz.group(1)))
+
         # GET /sessions/<name>/historial -> la conversacion, para una ventana que no la tiene
         mh = re.match(r"^/sessions/([^/]+)/historial(?:\?limite=(\d+))?$", self.path)
         if mh:
@@ -881,6 +891,73 @@ class Handler(BaseHTTPRequestHandler):
             resp["en_vuelo"] = esta_en_vuelo(nombre)
             return self._json(200, resp)
         return self._json(404, {"error": "ruta desconocida"})
+
+    # Lo que NUNCA entra al zip. No es una lista de comodidad: un paquete se manda
+    # por chat, por correo o a un disco ajeno, y lo que cruza ese borde no vuelve.
+    # Un `.llaves/` dentro de un zip es una credencial publicada.
+    ZIP_FUERA = {".git", ".llaves", ".ssh", ".instantanea-vault",
+                 "node_modules", "__pycache__", ".venv"}
+    ZIP_FUERA_SUFIJOS = (".conf", ".env", ".pem", ".key", ".p12")
+
+    def _vault_zip(self, carpeta: str) -> None:
+        """Empaqueta UN agente. No `/trabajo` entero: el dia que haya dos dominios,
+        un zip unico se lleva el de al lado sin que nadie lo pida."""
+        base = Path(DEFAULT_CWD)
+        # El nombre NO se usa para construir la ruta: se busca en lo ya enumerado,
+        # con el mismo filtro que /agentes. Asi el salto de directorio no se
+        # sanea — no llega a existir, porque no hay ruta que envenenar.
+        destino = None
+        if base.is_dir():
+            for d in sorted(base.iterdir()):
+                if (d.is_dir() and not d.name.startswith(".")
+                        and d.name == carpeta and _identidad(d)["panorama"]):
+                    destino = d
+                    break
+        if destino is None:
+            return self._json(404, {"error": f"no hay agente '{carpeta}'"})
+
+        # En memoria: un vault son notas, y el de la casa mas grande medida no llega
+        # a 2 MB. Si algun dia deja de ser cierto, esto se escribe a disco temporal.
+        fuera, dentro, buf = [], 0, io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+            for ruta in sorted(destino.rglob("*")):
+                rel = ruta.relative_to(destino)
+                motivo = ""
+                if set(rel.parts) & self.ZIP_FUERA:
+                    motivo = "carpeta excluida por norma"
+                elif ruta.name.endswith(self.ZIP_FUERA_SUFIJOS):
+                    motivo = "puede llevar un secreto"
+                if not ruta.is_file():
+                    continue
+                if motivo:
+                    fuera.append(f"{rel}  --  {motivo}")
+                    continue
+                try:
+                    z.write(ruta, str(Path(carpeta) / rel))
+                    dentro += 1
+                except OSError as e:
+                    fuera.append(f"{rel}  --  no se pudo leer: {e}")
+            # Un paquete que calla lo que dejo fuera se lee como completo, y nadie
+            # descubre el hueco hasta que lo necesita. Este lo dice SIEMPRE, tambien
+            # cuando no falta nada: "vacio" y "no se miro" tienen que verse distinto.
+            acta = [f"vault de '{carpeta}'  ·  {dentro} archivos dentro",
+                    "", "Lo que quedo FUERA de este zip:", ""]
+            acta += fuera if fuera else ["  (nada: no habia ningun archivo excluido)"]
+            acta += ["", "La norma que los excluye vive en session_bridge.py,",
+                     "en ZIP_FUERA y ZIP_FUERA_SUFIJOS.", ""]
+            z.writestr(str(Path(carpeta) / "_EXCLUIDO.txt"), "\n".join(acta))
+
+        datos = buf.getvalue()
+        # El nombre de archivo viaja en una cabecera entre comillas: se limpia lo que
+        # podria cerrarla antes de tiempo.
+        seguro = re.sub(r'[^A-Za-z0-9._-]', "_", carpeta) or "vault"
+        self.send_response(200)
+        self.send_header("Content-Type", "application/zip")
+        self.send_header("Content-Disposition",
+                         f'attachment; filename="{seguro}-vault.zip"')
+        self.send_header("Content-Length", str(len(datos)))
+        self.end_headers()
+        self.wfile.write(datos)
 
     def do_POST(self):
         if self._blocked(changing=True):
