@@ -905,9 +905,12 @@ class Handler(BaseHTTPRequestHandler):
         # que son subcarpeta de la base, y un dominio puesto directamente en el
         # directorio del puente -el caso de quien migra una maquina entera- no sale
         # ahi. La sesion siempre sabe su cwd.
-        mz = re.match(r"^/sessions/([^/]+)/vault\.zip$", self.path)
+        mz = re.match(r"^/sessions/([^/]+)/agente\.vma$", self.path)
         if mz:
-            return self._vault_zip(unquote(mz.group(1)))
+            # La contrasena viaja en una CABECERA, nunca en la URL: una URL se queda
+            # en el historial del navegador, en los logs y en el boton de atras.
+            return self._vault_zip(unquote(mz.group(1)),
+                                   self.headers.get("X-Vma-Passphrase") or "")
 
         # GET /sessions/<name>/historial -> la conversacion, para una ventana que no la tiene
         mh = re.match(r"^/sessions/([^/]+)/historial(?:\?limite=(\d+))?$", self.path)
@@ -1006,7 +1009,7 @@ class Handler(BaseHTTPRequestHandler):
         return (Path.home() / ".claude" / "projects"
                 / re.sub(r"[^A-Za-z0-9]", "-", str(Path(cwd).resolve())) / "memory")
 
-    def _vault_zip(self, nombre: str) -> None:
+    def _vault_zip(self, nombre: str, clave: str = "") -> None:
         """Empaqueta UN agente: su carpeta Y su memoria, que es la unidad que de
         verdad no se puede reconstruir en el destino. Todo lo demas -comandos del
         ciclo, rutas, el nombre del directorio de memoria- se deriva alla."""
@@ -1173,14 +1176,45 @@ class Handler(BaseHTTPRequestHandler):
                 "clones": {str(k): v for k, v in clones.items()},
             }, indent=2, ensure_ascii=False))
 
+        # CIFRADO, si se pidio. `zipfile` NO sabe cifrar al escribir -- su
+        # `setpassword` es solo para leer, y un zip "con contrasena" hecho asi sale en
+        # claro SIN dar error (MEDIDO 2026-09-23). Asi que el cifrado lo hace gpg
+        # simetrico (AES-256), que ya viaja en la imagen.
+        #
+        # Y si se pidio contrasena y no hay gpg, ESTO SE NIEGA. Entregar texto plano
+        # con nombre de cosa cifrada es peor que no cifrar: quien lo recibe lo trata
+        # como protegido.
+        if clave:
+            if not shutil.which("gpg"):
+                paquete.unlink(missing_ok=True)
+                return self._json(501, {"error": "pediste contraseña y aquí no hay gpg; "
+                                                 "me niego a entregarlo en claro"})
+            cifrado = paquete.with_suffix(".gpg")
+            try:
+                r = subprocess.run(
+                    ["gpg", "--batch", "--yes", "--symmetric", "--cipher-algo", "AES256",
+                     "--passphrase-fd", "0", "-o", str(cifrado), str(paquete)],
+                    input=clave, text=True, capture_output=True, timeout=300)
+            except Exception as e:
+                paquete.unlink(missing_ok=True)
+                return self._json(500, {"error": f"gpg no pudo correr: {e}"})
+            finally:
+                paquete.unlink(missing_ok=True)
+            if r.returncode != 0 or not cifrado.is_file():
+                cifrado.unlink(missing_ok=True)
+                return self._json(500, {"error": "gpg fallo al cifrar",
+                                        "detalle": (r.stderr or "")[:300]})
+            paquete = cifrado
+
         # El nombre de archivo viaja en una cabecera entre comillas: se limpia lo que
         # podria cerrarla antes de tiempo.
         seguro = re.sub(r'[^A-Za-z0-9._-]', "_", carpeta) or "vault"
         try:
             self.send_response(200)
-            self.send_header("Content-Type", "application/zip")
+            self.send_header("Content-Type", "application/octet-stream")
             self.send_header("Content-Disposition",
-                             f'attachment; filename="{seguro}-vault.zip"')
+                             f'attachment; filename="{seguro}.vma"')
+            self.send_header("X-Vma-Cifrado", "si" if clave else "no")
             self.send_header("Content-Length", str(paquete.stat().st_size))
             self.end_headers()
             # En trozos: el paquete puede pesar gigas y el punto de esta correccion es
