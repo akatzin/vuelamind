@@ -55,11 +55,10 @@ import shutil
 import subprocess
 import sys
 import threading
-import io
 import time
 import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
+from pathlib import Path, PurePath
 from urllib.parse import unquote
 
 
@@ -151,6 +150,47 @@ def _dentro_de(hijo: str, padre: str) -> bool:
         return h == pa or pa in h.parents
     except Exception:
         return False
+
+
+def _clon(d: Path) -> dict | None:
+    """Si `d` es un clon de git, devuelve de donde sale y en que commit esta. Se lee
+    del disco y NO se invoca git: en la maquina destino puede no estar instalado, y un
+    exportador que depende de un binario falla justo donde mas caro sale.
+
+    Sirve para DECLARARLO, no para tirarlo en silencio: un clon se rehace de su
+    remoto, pero solo si lo que tenia dentro estaba empujado — y eso no lo sabe nadie
+    mas que su dueno."""
+    g = d / ".git"
+    if not g.is_dir():
+        return None
+    url = ""
+    try:
+        for linea in (g / "config").read_text(encoding="utf-8", errors="replace").splitlines():
+            if linea.strip().startswith("url"):
+                url = linea.split("=", 1)[1].strip()
+                break
+    except OSError:
+        pass
+    commit = ""
+    try:
+        head = (g / "HEAD").read_text(encoding="utf-8").strip()
+        if head.startswith("ref: "):
+            ref = head[5:]
+            suelto = g / ref
+            if suelto.is_file():
+                commit = suelto.read_text(encoding="utf-8").strip()
+            else:
+                for linea in (g / "packed-refs").read_text(encoding="utf-8",
+                                                           errors="replace").splitlines():
+                    if linea.endswith(" " + ref):
+                        commit = linea.split(" ", 1)[0]
+                        break
+        else:
+            commit = head
+    except OSError:
+        pass
+    return {"url": url or "(sin remoto declarado)",
+            "commit": commit[:12] or "(no se pudo leer)"}
 
 
 def _identidad(d: Path) -> dict:
@@ -935,21 +975,59 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(404, {"error": f"la carpeta de '{nombre}' ya no existe"})
         carpeta = destino.name or "vault"
 
-        # En memoria: un vault son notas, y el de la casa mas grande medida no llega
-        # a 2 MB. Si algun dia deja de ser cierto, esto se escribe a disco temporal.
-        fuera, dentro, memoria, buf = [], 0, 0, io.BytesIO()
-        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+        # A DISCO, no a memoria. El paquete se lleva la carpeta entera y una carpeta
+        # entera no cabe en RAM: medido en una casa real, 1.7 GB de los cuales el
+        # vault eran 4 MB. Un exportador que solo funciona con dominios pequenos no
+        # es un exportador, y el tope que lo escondia era un numero inventado.
+        tmp = CONF_DIR / "exportaciones"
+        tmp.mkdir(parents=True, exist_ok=True)
+        limite = time.time() - 3600
+        for viejo in tmp.glob("*.zip"):
+            try:
+                if viejo.stat().st_mtime < limite:
+                    viejo.unlink()
+            except OSError:
+                pass
+        paquete = tmp / f"{os.urandom(8).hex()}.zip"
+
+        # Los clones se DECLARAN y no viajan: se rehacen de su remoto. Es lo unico
+        # prescindible que se puede demostrar, y aun asi el acta dice cual era y en
+        # que commit, por si alguien tenia trabajo sin empujar ahi dentro.
+        clones = {}
+        for d in sorted(destino.rglob("*")):
+            if d.is_dir() and (d / ".git").is_dir():
+                info = _clon(d)
+                if info:
+                    clones[d.relative_to(destino)] = info
+
+        # Lo excluido se cuenta POR CARPETA, no archivo por archivo. Un `.git` real
+        # son miles de objetos: listarlos uno a uno produce un acta tecnicamente
+        # completa que nadie puede leer, y un acta ilegible vale lo mismo que el
+        # silencio que vino a evitar.
+        fuera, fuera_dir, dentro, memoria = [], {}, 0, 0
+        with zipfile.ZipFile(paquete, "w", zipfile.ZIP_DEFLATED) as z:
             for ruta in sorted(destino.rglob("*")):
                 rel = ruta.relative_to(destino)
-                motivo = ""
-                if set(rel.parts) & self.ZIP_FUERA:
-                    motivo = "carpeta excluida por norma"
-                elif ruta.name.endswith(self.ZIP_FUERA_SUFIJOS):
-                    motivo = "puede llevar un secreto"
+                raiz_fuera, motivo = None, ""
+                for i, parte in enumerate(rel.parts):
+                    if parte in self.ZIP_FUERA:
+                        raiz_fuera = PurePath(*rel.parts[:i + 1])
+                        motivo = "carpeta excluida por norma"
+                        break
+                if not motivo:
+                    clon = next((c for c in clones if c in rel.parents), None)
+                    if clon is not None:
+                        raiz_fuera, motivo = clon, "clon de git — no viaja"
+                    elif ruta.name.endswith(self.ZIP_FUERA_SUFIJOS):
+                        motivo = "puede llevar un secreto"
                 if not ruta.is_file():
                     continue
                 if motivo:
-                    fuera.append(f"{rel}  --  {motivo}")
+                    if raiz_fuera is not None:
+                        clave = (str(raiz_fuera), motivo)
+                        fuera_dir[clave] = fuera_dir.get(clave, 0) + 1
+                    else:
+                        fuera.append(f"{rel}  --  {motivo}")
                     continue
                 try:
                     z.write(ruta, str(Path(carpeta) / rel))
@@ -978,7 +1056,15 @@ class Handler(BaseHTTPRequestHandler):
             # cuando no falta nada: "vacio" y "no se miro" tienen que verse distinto.
             acta = [f"vault de '{carpeta}'  ·  {dentro} archivos + {memoria} de memoria",
                     "", "Lo que quedo FUERA de este zip:", ""]
-            acta += fuera if fuera else ["  (nada: no habia ningun archivo excluido)"]
+            lineas = [f"{r}/  --  {n} archivo(s)  --  {m}"
+                      for (r, m), n in sorted(fuera_dir.items())] + fuera
+            acta += lineas if lineas else ["  (nada: no habia ningun archivo excluido)"]
+            if clones:
+                acta += ["", "CLONES DE GIT que no viajan — rehazlos en el destino:", ""]
+                for rel, info in sorted(clones.items()):
+                    acta += [f"  {rel}/", f"      {info['url']}", f"      commit {info['commit']}"]
+                acta += ["", "  Se rehacen de su remoto SOLO si lo que tenian dentro",
+                         "  estaba empujado. Eso no lo sabe este programa.", ""]
             acta += ["", "La norma que los excluye vive en session_bridge.py,",
                      "en ZIP_FUERA y ZIP_FUERA_SUFIJOS.", ""]
             z.writestr(str(Path(carpeta) / "_EXCLUIDO.txt"), "\n".join(acta))
@@ -992,20 +1078,29 @@ class Handler(BaseHTTPRequestHandler):
                 "carpeta": carpeta,
                 "archivos": dentro,
                 "memoria": memoria,
-                "excluidos": len(fuera),
+                "excluidos": len(fuera) + sum(fuera_dir.values()),
+                "clones": {str(k): v for k, v in clones.items()},
             }, indent=2, ensure_ascii=False))
 
-        datos = buf.getvalue()
         # El nombre de archivo viaja en una cabecera entre comillas: se limpia lo que
         # podria cerrarla antes de tiempo.
         seguro = re.sub(r'[^A-Za-z0-9._-]', "_", carpeta) or "vault"
-        self.send_response(200)
-        self.send_header("Content-Type", "application/zip")
-        self.send_header("Content-Disposition",
-                         f'attachment; filename="{seguro}-vault.zip"')
-        self.send_header("Content-Length", str(len(datos)))
-        self.end_headers()
-        self.wfile.write(datos)
+        try:
+            self.send_response(200)
+            self.send_header("Content-Type", "application/zip")
+            self.send_header("Content-Disposition",
+                             f'attachment; filename="{seguro}-vault.zip"')
+            self.send_header("Content-Length", str(paquete.stat().st_size))
+            self.end_headers()
+            # En trozos: el paquete puede pesar gigas y el punto de esta correccion es
+            # que en ningun momento este entero en memoria — ni al armarlo ni al darlo.
+            with open(paquete, "rb") as f:
+                shutil.copyfileobj(f, self.wfile, 64 * 1024)
+        finally:
+            try:
+                paquete.unlink()
+            except OSError:
+                pass
 
     def do_POST(self):
         if self._blocked(changing=True):
