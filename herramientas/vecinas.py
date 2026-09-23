@@ -46,7 +46,22 @@ import unicodedata
 
 
 def registro_de(vault: pathlib.Path) -> pathlib.Path:
-    return vault.parent / ".vecinas-uso.tsv"
+    """Un registro POR VAULT, con su nombre dentro.
+
+    Decia `.vecinas-uso.tsv` a secas, y eso hacia que **varios vaults que cuelgan del
+    mismo padre compartieran un solo registro**. Medido en una maquina con tres:
+    el `--informe` de una casa mostraba una corrida marcada «SI» que era de otra.
+
+    El daño no es cosmetico: la cifra que decide si este instrumento se queda es la
+    SUMA entre casas, y con registros compartidos las lineas se cuentan dos veces —
+    un unico «SI» ajeno puede salvar lo que ninguna casa habria salvado sola.
+
+    La regla, que vale mas que el arreglo: **un archivo de estado colocado «al lado»
+    de lo que describe hereda el espacio de nombres del PADRE, no la identidad del
+    hijo.** Se nota tarde, porque con un solo hijo funciona perfecto — y con un solo
+    hijo se prueba.
+    """
+    return vault.parent / f".vecinas-uso-{vault.name}.tsv"
 
 
 def anotar(vault: pathlib.Path, nota: str, entrantes: int, salientes: int) -> None:
