@@ -152,6 +152,40 @@ def _dentro_de(hijo: str, padre: str) -> bool:
         return False
 
 
+def _vault_declarado(cwd: Path) -> tuple:
+    """Donde dice el manifiesto que vive el vault de este dominio.
+
+    El dominio lo declaro el dia que nacio. Hasta hoy el exportador no preguntaba:
+    empaquetaba la carpeta de trabajo y nada mas, asi que en un dominio cuyo vault
+    vive FUERA de esa carpeta el paquete salia con el manifiesto dentro --el papel que
+    dice donde esta el vault-- y sin el vault. MEDIDO en una casa real el 2026-09-23.
+
+    Devuelve (ruta o None, explicacion)."""
+    man = cwd / ".claude" / "vuelamind-commit.manifiesto.md"
+    if not man.is_file():
+        return None, "no hay manifiesto en .claude/, asi que no se sabe donde vive"
+    try:
+        texto = man.read_text(encoding="utf-8", errors="replace")
+    except OSError as e:
+        return None, f"no se pudo leer el manifiesto: {e}"
+
+    valor = ""
+    for linea in texto.splitlines():
+        m = (re.match(r"\s*\|\s*`?vault`?\s*\|\s*(.+?)\s*\|", linea)
+             or re.match(r"\s*vault\s*:\s*(.+?)\s*$", linea))
+        if m:
+            celda = m.group(1).strip()
+            # La celda puede traer prosa detras; la ruta es lo que va entre acentos.
+            entre = re.findall(r"`([^`]+)`", celda)
+            valor = (entre[0] if entre else celda).strip()
+            break
+
+    if not valor:
+        # Convencion del marco desde la v3.6: sin declarar, <proyecto>/vault/.
+        return cwd / "vault", "no declarado; convencion <proyecto>/vault/"
+    return Path(os.path.expanduser(valor)), f"declarado en el manifiesto: {valor}"
+
+
 def _clon(d: Path) -> dict | None:
     """Si `d` es un clon de git, devuelve de donde sale y en que commit esta. Se lee
     del disco y NO se invoca git: en la maquina destino puede no estar instalado, y un
@@ -941,7 +975,7 @@ class Handler(BaseHTTPRequestHandler):
     # no entiende en vez de importarlo a medias. Un paquete que no se identifica se
     # puede leer con reglas equivocadas sin que nada falle, y eso solo se arregla
     # sellandolo desde el primer dia: a los zips ya hechos no se les puede anadir.
-    PAQUETE_FORMATO = 1
+    PAQUETE_FORMATO = 2
 
     # Lo que NUNCA entra al zip. No es una lista de comodidad: un paquete se manda
     # por chat, por correo o a un disco ajeno, y lo que cruza ese borde no vuelve.
@@ -1034,6 +1068,39 @@ class Handler(BaseHTTPRequestHandler):
                     dentro += 1
                 except OSError as e:
                     fuera.append(f"{rel}  --  no se pudo leer: {e}")
+            # EL VAULT, si el manifiesto dice que vive FUERA de esta carpeta. Es el
+            # conocimiento: lo unico del dominio que no se reconstruye en el destino.
+            vault, por_que = _vault_declarado(destino)
+            vault_dentro, vault_info = 0, {"declarado": por_que, "viajo": False}
+            if vault is None:
+                fuera.append(f"_vault/  --  {por_que}")
+            else:
+                try:
+                    vault = vault.resolve()
+                    fuera_del_arbol = not vault.is_relative_to(destino.resolve())
+                except OSError:
+                    fuera_del_arbol = True
+                if not vault.is_dir():
+                    # Declarado y ausente NO es lo mismo que no declarado, y confundir
+                    # los dos es lo que produce un paquete con cara de completo.
+                    fuera.append(f"_vault/  --  {por_que}, PERO ESA RUTA NO EXISTE AQUI: {vault}")
+                elif not fuera_del_arbol:
+                    vault_info["viajo"] = True   # ya iba dentro de la carpeta
+                else:
+                    for ruta in sorted(vault.rglob("*")):
+                        if not ruta.is_file():
+                            continue
+                        rel_v = ruta.relative_to(vault)
+                        if set(rel_v.parts) & self.ZIP_FUERA or ruta.name.endswith(self.ZIP_FUERA_SUFIJOS):
+                            continue
+                        try:
+                            z.write(ruta, str(Path(carpeta) / "_vault" / rel_v))
+                            vault_dentro += 1
+                        except OSError as e:
+                            fuera.append(f"_vault/{rel_v}  --  no se pudo leer: {e}")
+                    vault_info.update({"viajo": True, "en": "_vault/",
+                                       "ruta_origen": str(vault), "archivos": vault_dentro})
+
             # LA MEMORIA, que vive FUERA de la carpeta y es la otra mitad de lo
             # irreducible. Sin ella el paquete se ve completo y el agente aterriza
             # sin nada de lo aprendido, sin que nada falle.
@@ -1054,7 +1121,11 @@ class Handler(BaseHTTPRequestHandler):
             # Un paquete que calla lo que dejo fuera se lee como completo, y nadie
             # descubre el hueco hasta que lo necesita. Este lo dice SIEMPRE, tambien
             # cuando no falta nada: "vacio" y "no se miro" tienen que verse distinto.
-            acta = [f"vault de '{carpeta}'  ·  {dentro} archivos + {memoria} de memoria",
+            resumen = f"{dentro} archivos + {memoria} de memoria"
+            if vault_dentro:
+                resumen += f" + {vault_dentro} del vault (venia de fuera: {vault})"
+            acta = [f"agente '{carpeta}'  ·  {resumen}",
+                    "", f"El vault: {por_que}",
                     "", "Lo que quedo FUERA de este zip:", ""]
             lineas = [f"{r}/  --  {n} archivo(s)  --  {m}"
                       for (r, m), n in sorted(fuera_dir.items())] + fuera
@@ -1078,6 +1149,7 @@ class Handler(BaseHTTPRequestHandler):
                 "carpeta": carpeta,
                 "archivos": dentro,
                 "memoria": memoria,
+                "vault": vault_info,
                 "excluidos": len(fuera) + sum(fuera_dir.values()),
                 "clones": {str(k): v for k, v in clones.items()},
             }, indent=2, ensure_ascii=False))
