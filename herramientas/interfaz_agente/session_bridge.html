@@ -179,6 +179,14 @@
   .agente .quien{font-weight:600;font-size:13px}
   .agente .donde{font-size:11px;color:var(--dim)}
   .agente .sindecl{font-size:11px;color:var(--dim);font-style:italic}
+  /* El informe de importacion: lo ejecutable se ve distinto de lo que son datos. */
+  #informeImportar{font-size:11px;line-height:1.5;margin-top:8px}
+  #informeImportar .bloque{margin-bottom:7px}
+  #informeImportar .eti{color:var(--dim)}
+  #informeImportar .ejec{border:1px solid var(--line);border-left:3px solid #c98a3a;
+       border-radius:5px;padding:6px 8px;margin-top:5px;background:var(--field)}
+  #informeImportar .ejec code{font-size:10px;word-break:break-all}
+  #informeImportar .mal{color:#d06b6b}
 
   .chip .x{cursor:pointer;color:var(--dim);border:0;background:none;font-size:15px;padding:0 4px;line-height:1}
   .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
@@ -267,8 +275,16 @@
           <button id="confirmarCrear">Empezar</button>
         </div>
 
+        <button id="btnImportar" class="ghost">Importar agente</button>
+
         <div id="panelAbrir" hidden>
           <div id="listaAgentes"></div>
+        </div>
+
+        <div id="panelImportar" hidden>
+          <div class="hint" id="importarPie">Sube el .zip de un agente exportado.</div>
+          <input type="file" id="zipAgente" accept=".zip,application/zip">
+          <div id="informeImportar"></div>
         </div>
 
         <button type="button" class="cambiomodo" id="irAvz">Vista avanzada ›</button>
@@ -361,6 +377,24 @@ const I18N={
   sin_master:"Esta máquina no tiene el marco a mano, así que no puedo hacer nacer un agente desde aquí.",
   sin_agentes:"Todavía no hay ningún agente aquí.",
   sin_declarar:"sin nombre declarado",
+  btn_importar:"Importar agente",
+  importar_pie:"Sube el .zip de un agente exportado.",
+  imp_revisando:"Revisando el paquete\u2026",
+  imp_contenido:"Contenido",
+  imp_archivos:"{n} archivos",
+  imp_memoria:"{n} archivos de memoria",
+  imp_sin_memoria:"sin memoria \u2014 el agente llegar\u00e1 sin nada de lo aprendido",
+  imp_ejecutable:"Esto NO son datos: el arn\u00e9s lo ejecuta",
+  imp_ganchos:"Ganchos que correr\u00e1n solos:",
+  imp_comandos:"Comandos propios del dominio:",
+  imp_nada_ejec:"No trae configuraci\u00f3n ejecutable.",
+  imp_sin_sello:"El paquete no dice qui\u00e9n lo hizo \u2014 no lo gener\u00f3 este puente.",
+  imp_destino:"Quedar\u00e1 en",
+  imp_memoria_en:"y su memoria en",
+  imp_existe:"Ya existe una carpeta con ese nombre. No se escribe encima de un dominio vivo.",
+  imp_confirmar:"Importar",
+  imp_importando:"Importando\u2026",
+  imp_listo:"Importado: {n} archivos y {m} de memoria.",
   exportar:"Exportar agente",
   exportar_ayuda:"Baja este agente como .zip: su carpeta y su memoria. Sin llaves ni archivos de configuración; dentro va un _EXCLUIDO.txt que dice qué quedó fuera.",
   prompt_nacer:"Inicializa {m}\n\nPara qué es este agente, dicho antes de la primera pregunta: «{q}»",
@@ -404,6 +438,24 @@ const I18N={
   sin_master:"This machine does not have the framework at hand, so I cannot start an agent from here.",
   sin_agentes:"No agents here yet.",
   sin_declarar:"name not declared",
+  btn_importar:"Import agent",
+  importar_pie:"Upload the .zip of an exported agent.",
+  imp_revisando:"Checking the package\u2026",
+  imp_contenido:"Contents",
+  imp_archivos:"{n} files",
+  imp_memoria:"{n} memory files",
+  imp_sin_memoria:"no memory \u2014 the agent will arrive without anything it learned",
+  imp_ejecutable:"This is NOT data: the harness runs it",
+  imp_ganchos:"Hooks that will run on their own:",
+  imp_comandos:"The domain's own commands:",
+  imp_nada_ejec:"No executable configuration inside.",
+  imp_sin_sello:"The package does not say who made it \u2014 this bridge did not.",
+  imp_destino:"It will land in",
+  imp_memoria_en:"and its memory in",
+  imp_existe:"A folder with that name already exists. Nothing is written over a live domain.",
+  imp_confirmar:"Import",
+  imp_importando:"Importing\u2026",
+  imp_listo:"Imported: {n} files and {m} of memory.",
   exportar:"Export agent",
   exportar_ayuda:"Download this agent as a .zip: its folder and its memory. No keys or config files; inside goes an _EXCLUIDO.txt naming what was skipped.",
   prompt_nacer:"Initialize {m}\n\nWhat this agent is for, said before the first question: «{q}»",
@@ -441,6 +493,7 @@ const MARCAS=[
  ["#nuevaLbl","txt","nueva"], ["#newName","ph","nombre_ph"], ["#newPrompt","ph","prompt_ph"],
  ["#irAvz","txt","ir_avz"], ["#irNormal","txt","volver_simple"],
  ["#btnCrear","txt","btn_crear"], ["#btnAbrir","txt","btn_abrir"],
+ ["#btnImportar","txt","btn_importar"], ["#importarPie","txt","importar_pie"],
  ["#paraQueLbl","txt","para_que"], ["#paraQue","ph","para_que_ph"],
  ["#paraQuePie","txt","para_que_pie"], ["#confirmarCrear","txt","empezar"],
  ["#sugLbl","txt","sug_lbl"], ["#sugLoad","tt","sugload_tt"],
@@ -965,6 +1018,77 @@ $("#btnAbrir").onclick=async()=>{
     cont.appendChild(d);
   });
 };
+// ---- importar un agente: DOS pasos, y el primero no escribe nada ----------------
+// El paquete trae `.claude/` dentro, que no son datos: es configuracion que el arnes
+// ejecuta. Se ensena pieza por pieza ANTES de escribir, porque quien importa el agente
+// de otra persona esta a punto de ejecutar lo que esa persona escribio.
+$("#btnImportar").onclick=()=>{
+  $("#panelCrear").hidden=true; $("#panelAbrir").hidden=true;
+  const p=$("#panelImportar");
+  p.hidden=!p.hidden;
+  if(!p.hidden){ $("#informeImportar").innerHTML=""; $("#zipAgente").value=""; }
+};
+
+function fila(cont, etiqueta, valor, clase){
+  const d=document.createElement("div"); d.className="bloque "+(clase||"");
+  const e=document.createElement("span"); e.className="eti"; e.textContent=etiqueta+" ";
+  d.appendChild(e); d.appendChild(document.createTextNode(valor));
+  cont.appendChild(d); return d;
+}
+
+$("#zipAgente").onchange=(ev)=>{
+  const f=ev.target.files && ev.target.files[0]; if(!f) return;
+  const cont=$("#informeImportar"); cont.textContent=T("imp_revisando");
+  readB64(f, async (b64)=>{
+    if(b64===null){ cont.textContent="no se pudo leer el archivo"; return; }
+    let j;
+    try{ j=await api("POST","/importar/revisar",{zip:b64}); }
+    catch(e){ cont.innerHTML=""; fila(cont,"",e.message,"mal"); return; }
+    cont.innerHTML="";
+
+    fila(cont, T("imp_contenido")+":", j.carpeta+" — "+T("imp_archivos").replace("{n}",j.archivos));
+    if(j.memoria) fila(cont, "·", T("imp_memoria").replace("{n}",j.memoria));
+    else fila(cont, "·", T("imp_sin_memoria"), "mal");
+    if(j.sin_sello) fila(cont, "·", T("imp_sin_sello"), "mal");
+
+    // Lo ejecutable, aparte y con su propio marco: no se mezcla con el recuento.
+    if((j.ganchos||[]).length || (j.comandos||[]).length){
+      const caja=document.createElement("div"); caja.className="ejec";
+      const t=document.createElement("div"); t.innerHTML="<b>"+T("imp_ejecutable")+"</b>";
+      caja.appendChild(t);
+      if((j.ganchos||[]).length){
+        fila(caja, T("imp_ganchos"), "");
+        j.ganchos.forEach(g=>{ const c=document.createElement("div");
+          const k=document.createElement("code"); k.textContent=g; c.appendChild(k);
+          caja.appendChild(c); });
+      }
+      if((j.comandos||[]).length)
+        fila(caja, T("imp_comandos"), j.comandos.join(", "));
+      cont.appendChild(caja);
+    } else {
+      fila(cont, "·", T("imp_nada_ejec"));
+    }
+
+    fila(cont, T("imp_destino")+":", j.destino);
+    if(j.memoria) fila(cont, T("imp_memoria_en")+":", j.memoria_destino);
+
+    if(j.ya_existe){ fila(cont, "", T("imp_existe"), "mal"); return; }
+
+    const b=document.createElement("button"); b.textContent=T("imp_confirmar");
+    b.onclick=async()=>{
+      b.disabled=true; b.textContent=T("imp_importando");
+      let r;
+      try{ r=await api("POST","/importar/confirmar",{token:j.token}); }
+      catch(e){ b.remove(); fila(cont,"",e.message,"mal"); return; }
+      cont.innerHTML="";
+      fila(cont,"",T("imp_listo").replace("{n}",r.archivos).replace("{m}",r.memoria));
+      // Se abre solo: llegar y tener que buscarlo es media importacion.
+      abrirAgente({carpeta:r.carpeta, cwd:r.cwd});
+    };
+    cont.appendChild(b);
+  });
+};
+
 async function abrirAgente(a){
   const viva=(state.sesiones||[]).find(s=>s.cwd===a.cwd);
   if(viva){ $("#panelAbrir").hidden=true; select(viva.name); return; }

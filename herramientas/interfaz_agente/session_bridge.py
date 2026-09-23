@@ -59,7 +59,7 @@ import io
 import time
 import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from urllib.parse import unquote
 
 
@@ -151,6 +151,24 @@ def _dentro_de(hijo: str, padre: str) -> bool:
         return h == pa or pa in h.parents
     except Exception:
         return False
+
+
+def _ordenes(nodo, salida=None) -> list:
+    """Saca TODA cadena colgada de una clave `command` en la configuracion que viene
+    dentro del paquete. Recorre el arbol entero en vez de mirar la forma conocida: si
+    la forma cambia, esto las sigue encontrando, y un gancho que no se ensena es
+    exactamente el que importa."""
+    salida = [] if salida is None else salida
+    if isinstance(nodo, dict):
+        for clave, valor in nodo.items():
+            if clave == "command" and isinstance(valor, str):
+                salida.append(valor)
+            else:
+                _ordenes(valor, salida)
+    elif isinstance(nodo, list):
+        for x in nodo:
+            _ordenes(x, salida)
+    return salida
 
 
 def _identidad(d: Path) -> dict:
@@ -1007,9 +1025,176 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(datos)
 
+    # ------------------------------------------------------------ importar agente
+    #
+    # El conocimiento de un agente es lo unico irreducible: no se deriva de nada. El
+    # resto se reconstruye aqui -los comandos del ciclo salen del canon horneado, las
+    # rutas se derivan, el nombre del directorio de memoria se calcula-.
+    #
+    # PERO el paquete trae `.claude/` dentro, y eso NO son datos: es configuracion que
+    # el arnes ejecuta. Importar el agente de otra persona es ejecutar lo que esa
+    # persona escribio, en un puente cuyo permiso por omision no pregunta. Por eso son
+    # DOS pasos: se revisa y se ensena, y solo despues se escribe.
+
+    IMPORT_MAX = 64 * 1024 * 1024           # el .zip tal cual llega
+    IMPORT_MAX_ABIERTO = 256 * 1024 * 1024  # ya descomprimido: corta la bomba zip
+
+    @staticmethod
+    def _staging() -> Path:
+        d = CONF_DIR / "importaciones"
+        d.mkdir(parents=True, exist_ok=True)
+        # Lo que quedo a medias en una vez anterior no se acumula en silencio.
+        limite = time.time() - 3600
+        for viejo in d.glob("*.zip"):
+            try:
+                if viejo.stat().st_mtime < limite:
+                    viejo.unlink()
+            except OSError:
+                pass
+        return d
+
+    def _import_revisar(self, b64: str) -> None:
+        try:
+            datos = _base64.b64decode(b64 or "", validate=True)
+        except Exception:
+            return self._json(400, {"error": "eso no venia en base64"})
+        if not datos:
+            return self._json(400, {"error": "el archivo llego vacio"})
+        if len(datos) > self.IMPORT_MAX:
+            return self._json(413, {"error": f"el zip pasa de {self.IMPORT_MAX // (1024*1024)} MB"})
+        try:
+            z = zipfile.ZipFile(io.BytesIO(datos))
+        except zipfile.BadZipFile:
+            return self._json(400, {"error": "no es un zip que se pueda abrir"})
+
+        # --- lo que se RECHAZA, y no se ensena: un paquete asi no se importa de
+        #     ninguna forma, asi que preguntar seria ofrecer una opcion mala.
+        raiz, abierto, malos = None, 0, []
+        for info in z.infolist():
+            nombre = info.filename
+            if nombre.startswith("/") or (len(nombre) > 1 and nombre[1] == ":"):
+                malos.append(f"{nombre} -- ruta absoluta")
+                continue
+            partes = PurePosixPath(nombre).parts
+            if ".." in partes:
+                malos.append(f"{nombre} -- sale de su carpeta")
+                continue
+            if (info.external_attr >> 16) & 0o170000 == 0o120000:
+                malos.append(f"{nombre} -- es un enlace simbolico")
+                continue
+            abierto += info.file_size
+            if partes:
+                if raiz is None:
+                    raiz = partes[0]
+                elif partes[0] != raiz:
+                    malos.append(f"{nombre} -- el zip trae mas de una carpeta raiz")
+        if malos:
+            return self._json(422, {"error": "el paquete no se puede importar",
+                                    "rechazos": malos[:20]})
+        if abierto > self.IMPORT_MAX_ABIERTO:
+            return self._json(413, {"error": "descomprimido pasa de "
+                                             f"{self.IMPORT_MAX_ABIERTO // (1024*1024)} MB"})
+        if not raiz:
+            return self._json(400, {"error": "el zip esta vacio"})
+
+        # --- el sello. Un paquete de una version MAS NUEVA se rechaza entero: leerlo
+        #     con reglas viejas no falla, acierta en casi todo y se equivoca en lo que
+        #     nadie mira. Uno SIN sello se acepta -- es un zip hecho a mano, que es un
+        #     caso legitimo -- pero se dice, porque de el no se sabe la forma.
+        sello, sin_sello = {}, True
+        try:
+            sello = json.loads(z.read(f"{raiz}/_PAQUETE.json").decode("utf-8", "replace"))
+            sin_sello = False
+        except (KeyError, json.JSONDecodeError, UnicodeDecodeError):
+            pass
+        formato = sello.get("formato")
+        if isinstance(formato, int) and formato > self.PAQUETE_FORMATO:
+            return self._json(422, {"error": f"este paquete es de formato {formato} y aqui "
+                                             f"se entiende hasta el {self.PAQUETE_FORMATO}; "
+                                             "actualiza el puente antes de importarlo"})
+
+        # --- lo que se ENSENA. `.claude/` es ejecutable: se nombra pieza por pieza.
+        ganchos, comandos, memoria, archivos = [], [], 0, 0
+        for info in z.infolist():
+            if info.is_dir():
+                continue
+            partes = PurePosixPath(info.filename).relative_to(raiz).parts
+            if partes and partes[0] == "_memoria":
+                memoria += 1
+                continue
+            archivos += 1
+            if partes[:2] == (".claude", "commands") and len(partes) == 3:
+                comandos.append(partes[2])
+            elif list(partes) == [".claude", "settings.json"]:
+                try:
+                    conf = json.loads(z.read(info.filename).decode("utf-8", "replace"))
+                except (json.JSONDecodeError, KeyError, UnicodeDecodeError):
+                    ganchos.append("(settings.json no se pudo leer)")
+                else:
+                    ganchos.extend(_ordenes(conf))
+
+        token = os.urandom(12).hex()
+        (self._staging() / f"{token}.zip").write_bytes(datos)
+        destino = Path(DEFAULT_CWD) / raiz
+        return self._json(200, {
+            "token": token, "carpeta": raiz, "archivos": archivos,
+            "memoria": memoria, "comandos": sorted(comandos), "ganchos": ganchos,
+            "sin_sello": sin_sello, "sello": sello,
+            "destino": str(destino), "ya_existe": destino.exists(),
+            "memoria_destino": str(self._carpeta_memoria(str(destino)))})
+
+    def _import_escribir(self, token: str) -> None:
+        if not re.fullmatch(r"[0-9a-f]{24}", token or ""):
+            return self._json(400, {"error": "token invalido"})
+        paquete = self._staging() / f"{token}.zip"
+        if not paquete.is_file():
+            return self._json(409, {"error": "ese paquete ya no esta; vuelve a subirlo"})
+
+        z = zipfile.ZipFile(paquete)
+        raiz = PurePosixPath(z.infolist()[0].filename).parts[0]
+        destino = Path(DEFAULT_CWD) / raiz
+        # NUNCA encima de un dominio vivo: puede haber meses dentro, y un importador
+        # que sobreescribe no se distingue de uno que funciona hasta que es tarde.
+        if destino.exists():
+            return self._json(409, {"error": f"ya existe '{raiz}' aqui; muevelo o renombralo"})
+
+        mem_destino = self._carpeta_memoria(str(destino))
+        escritos, memoria = 0, 0
+        for info in z.infolist():
+            if info.is_dir():
+                continue
+            rel = PurePosixPath(info.filename).relative_to(raiz)
+            partes = rel.parts
+            # La memoria NO se copia donde venia: se TRADUCE al nombre que le toca en
+            # ESTA maquina, que depende de donde quedo la carpeta. Es la unica pieza
+            # del paquete que no se puede poner tal cual.
+            if partes and partes[0] == "_memoria":
+                salida = mem_destino.joinpath(*partes[1:])
+                memoria += 1
+            elif list(partes) in (["_EXCLUIDO.txt"], ["_PAQUETE.json"]):
+                continue          # son actas del exportador, no del dominio
+            else:
+                salida = destino.joinpath(*partes)
+                escritos += 1
+            salida.parent.mkdir(parents=True, exist_ok=True)
+            with z.open(info) as origen, open(salida, "wb") as f:
+                shutil.copyfileobj(origen, f)
+        z.close()
+        try:
+            paquete.unlink()
+        except OSError:
+            pass
+        return self._json(200, {"carpeta": raiz, "cwd": str(destino),
+                                "archivos": escritos, "memoria": memoria,
+                                "memoria_en": str(mem_destino)})
+
     def do_POST(self):
         if self._blocked(changing=True):
             return
+        if self.path == "/importar/revisar":
+            return self._import_revisar(self._body().get("zip") or "")
+        if self.path == "/importar/confirmar":
+            return self._import_escribir(self._body().get("token") or "")
         # POST /sessions  -> crear
         if self.path == "/sessions":
             b = self._body()
