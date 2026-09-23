@@ -55,8 +55,12 @@ import shutil
 import subprocess
 import sys
 import threading
+import io
+import time
+import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import unquote
 
 
 # ------------------------------------------------------ config por archivo (portable)
@@ -855,6 +859,16 @@ class Handler(BaseHTTPRequestHandler):
                     salida.append({"carpeta": d.name, "cwd": str(d), **ident})
             return self._json(200, {"agentes": salida, "base": str(base)})
 
+        # GET /sessions/<name>/vault.zip -> el agente entero, empaquetado.
+        #
+        # Cuelga de la SESION y no de /agentes a proposito: /agentes solo ve dominios
+        # que son subcarpeta de la base, y un dominio puesto directamente en el
+        # directorio del puente -el caso de quien migra una maquina entera- no sale
+        # ahi. La sesion siempre sabe su cwd.
+        mz = re.match(r"^/sessions/([^/]+)/vault\.zip$", self.path)
+        if mz:
+            return self._vault_zip(unquote(mz.group(1)))
+
         # GET /sessions/<name>/historial -> la conversacion, para una ventana que no la tiene
         mh = re.match(r"^/sessions/([^/]+)/historial(?:\?limite=(\d+))?$", self.path)
         if mh:
@@ -881,6 +895,117 @@ class Handler(BaseHTTPRequestHandler):
             resp["en_vuelo"] = esta_en_vuelo(nombre)
             return self._json(200, resp)
         return self._json(404, {"error": "ruta desconocida"})
+
+    # La version del FORMATO del paquete, no la del programa. Sube solo cuando lo que
+    # hay dentro cambia de forma, y existe para que quien lo abra pueda RECHAZAR lo que
+    # no entiende en vez de importarlo a medias. Un paquete que no se identifica se
+    # puede leer con reglas equivocadas sin que nada falle, y eso solo se arregla
+    # sellandolo desde el primer dia: a los zips ya hechos no se les puede anadir.
+    PAQUETE_FORMATO = 1
+
+    # Lo que NUNCA entra al zip. No es una lista de comodidad: un paquete se manda
+    # por chat, por correo o a un disco ajeno, y lo que cruza ese borde no vuelve.
+    # Un `.llaves/` dentro de un zip es una credencial publicada.
+    ZIP_FUERA = {".git", ".llaves", ".ssh", ".instantanea-vault",
+                 "node_modules", "__pycache__", ".venv"}
+    ZIP_FUERA_SUFIJOS = (".conf", ".env", ".pem", ".key", ".p12")
+
+    @staticmethod
+    def _carpeta_memoria(cwd: str) -> Path:
+        """Donde el CLI guarda la memoria de un dominio: un directorio por proyecto,
+        nombrado con su ruta absoluta y todo lo que no sea alfanumerico vuelto `-`.
+        MEDIDO contra el disco el 2026-09-23.
+
+        Por eso la memoria NO se copia: se TRADUCE. El nombre depende de donde este
+        la carpeta, asi que en la maquina destino es otro — y una persona que ve dos
+        directorios asi no tiene como saber cual le toca."""
+        return (Path.home() / ".claude" / "projects"
+                / re.sub(r"[^A-Za-z0-9]", "-", str(Path(cwd).resolve())) / "memory")
+
+    def _vault_zip(self, nombre: str) -> None:
+        """Empaqueta UN agente: su carpeta Y su memoria, que es la unidad que de
+        verdad no se puede reconstruir en el destino. Todo lo demas -comandos del
+        ciclo, rutas, el nombre del directorio de memoria- se deriva alla."""
+        meta = load_registry().get(nombre)
+        if not meta:
+            return self._json(404, {"error": f"no hay sesión '{nombre}'"})
+        # La ruta sale del registro que escribio el puente, nunca de la peticion.
+        destino = Path(meta.get("cwd") or "")
+        if not destino.is_dir():
+            return self._json(404, {"error": f"la carpeta de '{nombre}' ya no existe"})
+        carpeta = destino.name or "vault"
+
+        # En memoria: un vault son notas, y el de la casa mas grande medida no llega
+        # a 2 MB. Si algun dia deja de ser cierto, esto se escribe a disco temporal.
+        fuera, dentro, memoria, buf = [], 0, 0, io.BytesIO()
+        with zipfile.ZipFile(buf, "w", zipfile.ZIP_DEFLATED) as z:
+            for ruta in sorted(destino.rglob("*")):
+                rel = ruta.relative_to(destino)
+                motivo = ""
+                if set(rel.parts) & self.ZIP_FUERA:
+                    motivo = "carpeta excluida por norma"
+                elif ruta.name.endswith(self.ZIP_FUERA_SUFIJOS):
+                    motivo = "puede llevar un secreto"
+                if not ruta.is_file():
+                    continue
+                if motivo:
+                    fuera.append(f"{rel}  --  {motivo}")
+                    continue
+                try:
+                    z.write(ruta, str(Path(carpeta) / rel))
+                    dentro += 1
+                except OSError as e:
+                    fuera.append(f"{rel}  --  no se pudo leer: {e}")
+            # LA MEMORIA, que vive FUERA de la carpeta y es la otra mitad de lo
+            # irreducible. Sin ella el paquete se ve completo y el agente aterriza
+            # sin nada de lo aprendido, sin que nada falle.
+            mem = self._carpeta_memoria(str(destino))
+            if mem.is_dir():
+                for ruta in sorted(mem.rglob("*")):
+                    if not ruta.is_file():
+                        continue
+                    try:
+                        z.write(ruta, str(Path(carpeta) / "_memoria"
+                                          / ruta.relative_to(mem)))
+                        memoria += 1
+                    except OSError as e:
+                        fuera.append(f"_memoria/{ruta.relative_to(mem)}  --  no se pudo leer: {e}")
+            else:
+                fuera.append(f"_memoria/  --  no hay memoria en {mem}")
+
+            # Un paquete que calla lo que dejo fuera se lee como completo, y nadie
+            # descubre el hueco hasta que lo necesita. Este lo dice SIEMPRE, tambien
+            # cuando no falta nada: "vacio" y "no se miro" tienen que verse distinto.
+            acta = [f"vault de '{carpeta}'  ·  {dentro} archivos + {memoria} de memoria",
+                    "", "Lo que quedo FUERA de este zip:", ""]
+            acta += fuera if fuera else ["  (nada: no habia ningun archivo excluido)"]
+            acta += ["", "La norma que los excluye vive en session_bridge.py,",
+                     "en ZIP_FUERA y ZIP_FUERA_SUFIJOS.", ""]
+            z.writestr(str(Path(carpeta) / "_EXCLUIDO.txt"), "\n".join(acta))
+
+            # Quien hizo este paquete y con que forma. Va en JSON y no en prosa porque
+            # lo lee un programa antes de escribir nada.
+            z.writestr(str(Path(carpeta) / "_PAQUETE.json"), json.dumps({
+                "formato": self.PAQUETE_FORMATO,
+                "exportador": self.server_version,
+                "fecha": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "carpeta": carpeta,
+                "archivos": dentro,
+                "memoria": memoria,
+                "excluidos": len(fuera),
+            }, indent=2, ensure_ascii=False))
+
+        datos = buf.getvalue()
+        # El nombre de archivo viaja en una cabecera entre comillas: se limpia lo que
+        # podria cerrarla antes de tiempo.
+        seguro = re.sub(r'[^A-Za-z0-9._-]', "_", carpeta) or "vault"
+        self.send_response(200)
+        self.send_header("Content-Type", "application/zip")
+        self.send_header("Content-Disposition",
+                         f'attachment; filename="{seguro}-vault.zip"')
+        self.send_header("Content-Length", str(len(datos)))
+        self.end_headers()
+        self.wfile.write(datos)
 
     def do_POST(self):
         if self._blocked(changing=True):

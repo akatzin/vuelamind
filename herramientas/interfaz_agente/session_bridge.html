@@ -179,6 +179,7 @@
   .agente .quien{font-weight:600;font-size:13px}
   .agente .donde{font-size:11px;color:var(--dim)}
   .agente .sindecl{font-size:11px;color:var(--dim);font-style:italic}
+
   .chip .x{cursor:pointer;color:var(--dim);border:0;background:none;font-size:15px;padding:0 4px;line-height:1}
   .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
   .empty{margin:auto;color:var(--dim);text-align:center;padding:20px}
@@ -310,6 +311,8 @@
       <span class="sp"></span>
       <button id="guardar" class="ghost" hidden
               title="Manda /vuelamind-commit a esta sesión: mide, te enseña qué va a escribir y solo escribe con tu sí">Guardar</button>
+      <button id="exportar" class="ghost"
+              title="Baja este agente como .zip: su carpeta y su memoria. Sin llaves ni archivos de configuración; dentro va un _EXCLUIDO.txt que dice qué quedó fuera">Exportar agente</button>
       <button id="close" class="ghost danger" title="Detiene la sesión y la quita de esta página">Cerrar este chat</button>
     </div>
     <div class="log" id="log"><div class="empty">Elige o crea una sesión.</div></div>
@@ -358,6 +361,8 @@ const I18N={
   sin_master:"Esta máquina no tiene el marco a mano, así que no puedo hacer nacer un agente desde aquí.",
   sin_agentes:"Todavía no hay ningún agente aquí.",
   sin_declarar:"sin nombre declarado",
+  exportar:"Exportar agente",
+  exportar_ayuda:"Baja este agente como .zip: su carpeta y su memoria. Sin llaves ni archivos de configuración; dentro va un _EXCLUIDO.txt que dice qué quedó fuera.",
   prompt_nacer:"Inicializa {m}\n\nPara qué es este agente, dicho antes de la primera pregunta: «{q}»",
   usage_tt:"contexto usado · tokens generados en el último turno",
   guardar:"Guardar",
@@ -399,6 +404,8 @@ const I18N={
   sin_master:"This machine does not have the framework at hand, so I cannot start an agent from here.",
   sin_agentes:"No agents here yet.",
   sin_declarar:"name not declared",
+  exportar:"Export agent",
+  exportar_ayuda:"Download this agent as a .zip: its folder and its memory. No keys or config files; inside goes an _EXCLUIDO.txt naming what was skipped.",
   prompt_nacer:"Initialize {m}\n\nWhat this agent is for, said before the first question: «{q}»",
   usage_tt:"context used · tokens generated in the last turn",
   guardar:"Save",
@@ -444,6 +451,7 @@ const MARCAS=[
  ["#newModel","ph","modelo_ph"], ["#newModel","tt","modelo_tt"],
  ["#create","txt","crear"], ["#usage","tt","usage_tt"],
  ["#guardar","txt","guardar"], ["#guardar","tt","guardar_tt"],
+ ["#exportar","txt","exportar"], ["#exportar","tt","exportar_ayuda"],
  ["#close","txt","cerrar"], ["#close","tt","cerrar_tt"],
  ["#attach","tt","adjuntar_tt"], ["#input","ph","input_ph"], ["#send","txt","enviar"]
 ];
@@ -831,6 +839,13 @@ $("#close").onclick=closeSession;
 
 // Guardar es exactamente teclear el comando: mismo camino, misma protección, mismo panel de
 // progreso. No es un mecanismo aparte — serlo lo volvería otra cosa que mantener.
+// El agente se baja entero -carpeta y memoria-, que es lo unico que no se puede
+// reconstruir en la maquina destino. Lo demas se deriva alla.
+$("#exportar").onclick=()=>{
+  if(!state.current) return;
+  location.href="/sessions/"+encodeURIComponent(state.current)+"/vault.zip";
+};
+
 $("#guardar").onclick=()=>{
   if(!state.current || state.streams[state.current]) return;
   $("#input").value="/vuelamind-commit";
