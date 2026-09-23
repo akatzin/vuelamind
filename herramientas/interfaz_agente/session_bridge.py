@@ -56,6 +56,7 @@ import subprocess
 import sys
 import threading
 import io
+import time
 import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -895,6 +896,13 @@ class Handler(BaseHTTPRequestHandler):
             return self._json(200, resp)
         return self._json(404, {"error": "ruta desconocida"})
 
+    # La version del FORMATO del paquete, no la del programa. Sube solo cuando lo que
+    # hay dentro cambia de forma, y existe para que quien lo abra pueda RECHAZAR lo que
+    # no entiende en vez de importarlo a medias. Un paquete que no se identifica se
+    # puede leer con reglas equivocadas sin que nada falle, y eso solo se arregla
+    # sellandolo desde el primer dia: a los zips ya hechos no se les puede anadir.
+    PAQUETE_FORMATO = 1
+
     # Lo que NUNCA entra al zip. No es una lista de comodidad: un paquete se manda
     # por chat, por correo o a un disco ajeno, y lo que cruza ese borde no vuelve.
     # Un `.llaves/` dentro de un zip es una credencial publicada.
@@ -974,6 +982,18 @@ class Handler(BaseHTTPRequestHandler):
             acta += ["", "La norma que los excluye vive en session_bridge.py,",
                      "en ZIP_FUERA y ZIP_FUERA_SUFIJOS.", ""]
             z.writestr(str(Path(carpeta) / "_EXCLUIDO.txt"), "\n".join(acta))
+
+            # Quien hizo este paquete y con que forma. Va en JSON y no en prosa porque
+            # lo lee un programa antes de escribir nada.
+            z.writestr(str(Path(carpeta) / "_PAQUETE.json"), json.dumps({
+                "formato": self.PAQUETE_FORMATO,
+                "exportador": self.server_version,
+                "fecha": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "carpeta": carpeta,
+                "archivos": dentro,
+                "memoria": memoria,
+                "excluidos": len(fuera),
+            }, indent=2, ensure_ascii=False))
 
         datos = buf.getvalue()
         # El nombre de archivo viaja en una cabecera entre comillas: se limpia lo que
