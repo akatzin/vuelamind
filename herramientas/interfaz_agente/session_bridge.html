@@ -362,6 +362,11 @@ const I18N={
   sin_agentes:"Todavía no hay ningún agente aquí.",
   sin_declarar:"sin nombre declarado",
   exportar:"Exportar agente",
+  exp_clave:"Contraseña para cifrar el paquete (opcional — si la pierdes, el paquete se pierde con ella):",
+  exp_preguntando:"Preguntándole al agente dónde vive su vault\u2026",
+  exp_armando:"Armando el paquete\u2026",
+  exp_listo:"Descargado",
+  exp_falla:"No se pudo exportar: ",
   exportar_ayuda:"Baja este agente como .zip: su carpeta y su memoria. Sin llaves ni archivos de configuración; dentro va un _EXCLUIDO.txt que dice qué quedó fuera.",
   prompt_nacer:"Inicializa {m}\n\nPara qué es este agente, dicho antes de la primera pregunta: «{q}»",
   usage_tt:"contexto usado · tokens generados en el último turno",
@@ -405,6 +410,11 @@ const I18N={
   sin_agentes:"No agents here yet.",
   sin_declarar:"name not declared",
   exportar:"Export agent",
+  exp_clave:"Passphrase to encrypt the package (optional — if you lose it, the package goes with it):",
+  exp_preguntando:"Asking the agent where its vault lives\u2026",
+  exp_armando:"Building the package\u2026",
+  exp_listo:"Downloaded",
+  exp_falla:"Could not export: ",
   exportar_ayuda:"Download this agent as a .zip: its folder and its memory. No keys or config files; inside goes an _EXCLUIDO.txt naming what was skipped.",
   prompt_nacer:"Initialize {m}\n\nWhat this agent is for, said before the first question: «{q}»",
   usage_tt:"context used · tokens generated in the last turn",
@@ -839,11 +849,43 @@ $("#close").onclick=closeSession;
 
 // Guardar es exactamente teclear el comando: mismo camino, misma protección, mismo panel de
 // progreso. No es un mecanismo aparte — serlo lo volvería otra cosa que mantener.
-// El agente se baja entero -carpeta y memoria-, que es lo unico que no se puede
-// reconstruir en la maquina destino. Lo demas se deriva alla.
-$("#exportar").onclick=()=>{
+// El agente se baja entero -carpeta, vault y memoria-, que es lo unico que no se
+// puede reconstruir en la maquina destino. Lo demas se deriva alla.
+//
+// Con fetch y NO con location.href: el export le pregunta al agente donde vive su
+// vault, o sea que cuesta un turno -12 s medidos-. Una navegacion no da ninguna senal
+// durante ese rato, asi que el boton se ve igual que si no hubieras hecho clic y se
+// pulsa otra vez. El estado se ve, y mientras tanto no se puede repetir.
+$("#exportar").onclick=async()=>{
   if(!state.current) return;
-  location.href="/sessions/"+encodeURIComponent(state.current)+"/vault.zip";
+  const b=$("#exportar"), antes=b.textContent;
+  const clave=prompt(T("exp_clave"))||"";     // vacio = sin cifrar
+  b.disabled=true; b.textContent=T("exp_preguntando");
+  try{
+    const cab=hdrs();
+    if(clave) cab["X-Vma-Passphrase"]=clave;  // en cabecera: la URL se queda en el historial
+    const r=await fetch("/sessions/"+encodeURIComponent(state.current)+"/agente.vma",
+                        {method:"GET", headers:cab});
+    if(!r.ok){
+      const j=await r.json().catch(()=>({}));
+      throw new Error(j.error||("HTTP "+r.status));
+    }
+    b.textContent=T("exp_armando");
+    const blob=await r.blob();
+    const nom=(r.headers.get("Content-Disposition")||"").match(/filename="([^"]+)"/);
+    const a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=(nom&&nom[1])||(state.current+".vma");
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href), 30000);
+    b.textContent=T("exp_listo");
+    setDot(true);
+  }catch(e){
+    b.textContent=T("exp_falla")+e.message;
+    setDot(false);
+  }finally{
+    setTimeout(()=>{ b.disabled=false; b.textContent=antes; }, 4000);
+  }
 };
 
 $("#guardar").onclick=()=>{
