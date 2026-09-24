@@ -180,6 +180,15 @@
   .agente .donde{font-size:11px;color:var(--dim)}
   .agente .sindecl{font-size:11px;color:var(--dim);font-style:italic}
 
+  dialog#dlgClave{border:1px solid var(--line);border-radius:10px;background:var(--bg);
+       color:var(--fg);padding:16px 18px;min-width:300px;max-width:92vw}
+  dialog#dlgClave::backdrop{background:rgba(0,0,0,.45)}
+  dialog#dlgClave input{width:100%;margin:8px 0 4px;padding:7px 9px;border-radius:6px;
+       border:1px solid var(--line);background:var(--field);color:var(--fg);font-size:13px}
+  dialog#dlgClave #claveVma2{margin-top:0}
+  dialog#dlgClave .mal{color:#d06b6b;font-size:11px;margin:4px 0 0}
+  dialog#dlgClave menu button[disabled]{opacity:.45;cursor:not-allowed}
+  dialog#dlgClave menu{display:flex;gap:6px;padding:0;margin:12px 0 0;flex-wrap:wrap}
   .chip .x{cursor:pointer;color:var(--dim);border:0;background:none;font-size:15px;padding:0 4px;line-height:1}
   .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
   .empty{margin:auto;color:var(--dim);text-align:center;padding:20px}
@@ -326,6 +335,26 @@
     </div>
   </section>
 </main>
+
+<!-- La contraseña se pide en un modal y NO con prompt(): prompt la enseña EN CLARO
+     mientras se escribe, no admite enmascarado, y bloquea la pestaña entera. -->
+<dialog id="dlgClave">
+  <form method="dialog">
+    <div class="hint" id="dlgClaveLbl">Contraseña para cifrar el paquete</div>
+    <input type="password" id="claveVma" autocomplete="new-password" spellcheck="false">
+    <input type="password" id="claveVma2" autocomplete="new-password" spellcheck="false">
+    <div class="mal" id="dlgClaveErr" hidden></div>
+    <div class="hint" id="dlgClavePie">Opcional. Si la pierdes, el paquete se pierde con ella.</div>
+    <menu>
+      <!-- `type=button`: si fuera submit, el dialogo se cerraria ANTES de comprobar que
+           las dos coinciden, y una errata aqui deja el paquete ilegible para siempre. -->
+      <button type="button" id="dlgCifrar" disabled>Cifrar y exportar</button>
+      <button value="plano" id="dlgPlano" class="ghost">Sin contraseña</button>
+      <button value="cancelar" id="dlgCancelar" class="ghost">Cancelar</button>
+    </menu>
+  </form>
+</dialog>
+
 <script>
 const $ = s => document.querySelector(s);
 const state = { current: null, usage: {}, commands: [], skills: [], streams: {}, traido: {} };
@@ -362,7 +391,14 @@ const I18N={
   sin_agentes:"Todavía no hay ningún agente aquí.",
   sin_declarar:"sin nombre declarado",
   exportar:"Exportar agente",
-  exp_clave:"Contraseña para cifrar el paquete (opcional — si la pierdes, el paquete se pierde con ella):",
+  exp_clave:"Contraseña para cifrar el paquete",
+  exp_clave2:"Repítela",
+  exp_no_coinciden:"Las dos no coinciden.",
+  exp_clave_vacia:"Escribe una contraseña, o elige «Sin contraseña».",
+  exp_clave_pie:"Opcional. Si la pierdes, el paquete se pierde con ella — no se guarda en ningún sitio.",
+  exp_cifrar:"Cifrar y exportar",
+  exp_plano:"Sin contraseña",
+  exp_cancelar:"Cancelar",
   exp_preguntando:"Preguntándole al agente dónde vive su vault\u2026",
   exp_armando:"Armando el paquete\u2026",
   exp_listo:"Descargado",
@@ -410,7 +446,14 @@ const I18N={
   sin_agentes:"No agents here yet.",
   sin_declarar:"name not declared",
   exportar:"Export agent",
-  exp_clave:"Passphrase to encrypt the package (optional — if you lose it, the package goes with it):",
+  exp_clave:"Passphrase to encrypt the package",
+  exp_clave2:"Type it again",
+  exp_no_coinciden:"They do not match.",
+  exp_clave_vacia:"Type a passphrase, or choose \u00abNo passphrase\u00bb.",
+  exp_clave_pie:"Optional. If you lose it, the package goes with it — it is stored nowhere.",
+  exp_cifrar:"Encrypt and export",
+  exp_plano:"No passphrase",
+  exp_cancelar:"Cancel",
   exp_preguntando:"Asking the agent where its vault lives\u2026",
   exp_armando:"Building the package\u2026",
   exp_listo:"Downloaded",
@@ -462,6 +505,10 @@ const MARCAS=[
  ["#create","txt","crear"], ["#usage","tt","usage_tt"],
  ["#guardar","txt","guardar"], ["#guardar","tt","guardar_tt"],
  ["#exportar","txt","exportar"], ["#exportar","tt","exportar_ayuda"],
+ ["#dlgClaveLbl","txt","exp_clave"], ["#dlgClavePie","txt","exp_clave_pie"],
+ ["#claveVma2","ph","exp_clave2"],
+ ["#dlgCifrar","txt","exp_cifrar"], ["#dlgPlano","txt","exp_plano"],
+ ["#dlgCancelar","txt","exp_cancelar"],
  ["#close","txt","cerrar"], ["#close","tt","cerrar_tt"],
  ["#attach","tt","adjuntar_tt"], ["#input","ph","input_ph"], ["#send","txt","enviar"]
 ];
@@ -849,6 +896,51 @@ $("#close").onclick=closeSession;
 
 // Guardar es exactamente teclear el comando: mismo camino, misma protección, mismo panel de
 // progreso. No es un mecanismo aparte — serlo lo volvería otra cosa que mantener.
+// Devuelve la contrasena, "" si se exporta en claro, o null si se cancelo. El campo
+// se vacia SIEMPRE al salir: una contrasena que se queda en el DOM sigue ahi cuando
+// otra persona se sienta delante de la pantalla.
+function pedirClave(){
+  const d=$("#dlgClave"), campo=$("#claveVma"), campo2=$("#claveVma2"), err=$("#dlgClaveErr");
+  campo.value=""; campo2.value=""; err.hidden=true; d.returnValue="";
+  // Se comprueba AQUI y no al cifrar: despues del zip ya no hay forma de avisar, y una
+  // errata en la contrasena no se nota nunca -- se nota el dia que hace falta abrirlo.
+  const boton=$("#dlgCifrar");
+  // El estado se recalcula EN CADA TECLA: el boton no se puede pulsar hasta que las dos
+  // coinciden, asi que el error deja de ser algo que descubres al final. Y el aviso solo
+  // sale cuando ya hay algo escrito en el segundo campo -- gritar "no coinciden" contra
+  // un campo vacio es ruido, y un aviso que sale siempre deja de leerse.
+  const refrescar=()=>{
+    const iguales = !!campo.value && campo.value===campo2.value;
+    boton.disabled = !iguales;
+    const quejarse = !!campo2.value && !iguales;
+    err.textContent = quejarse ? T("exp_no_coinciden") : "";
+    err.hidden = !quejarse;
+  };
+  campo.oninput = campo2.oninput = refrescar;
+  refrescar();
+
+  // Se queda aunque el boton este deshabilitado: si el calculo de arriba se rompe algun
+  // dia, esto sigue impidiendo que salga un paquete cifrado con una contrasena distinta
+  // de la que su dueno cree. Es la red, no el camino.
+  const validar=()=>{
+    if(!campo.value){ err.textContent=T("exp_clave_vacia"); err.hidden=false; campo.focus(); return; }
+    if(campo.value!==campo2.value){ err.textContent=T("exp_no_coinciden"); err.hidden=false;
+                                    campo2.focus(); campo2.select(); return; }
+    d.close("cifrar");
+  };
+  boton.onclick=validar;
+  campo2.onkeydown=(e)=>{ if(e.key==="Enter"){ e.preventDefault(); validar(); } };
+  campo.onkeydown =(e)=>{ if(e.key==="Enter"){ e.preventDefault(); campo2.focus(); } };
+  d.showModal(); campo.focus();
+  return new Promise(res=>{
+    d.addEventListener("close", ()=>{
+      const v=campo.value; campo.value=""; campo2.value=""; err.hidden=true;
+      // `cancelar` y la tecla Esc -que deja returnValue vacio- son lo mismo: no exportar.
+      res(d.returnValue==="cifrar" ? v : d.returnValue==="plano" ? "" : null);
+    }, {once:true});
+  });
+}
+
 // El agente se baja entero -carpeta, vault y memoria-, que es lo unico que no se
 // puede reconstruir en la maquina destino. Lo demas se deriva alla.
 //
@@ -859,7 +951,8 @@ $("#close").onclick=closeSession;
 $("#exportar").onclick=async()=>{
   if(!state.current) return;
   const b=$("#exportar"), antes=b.textContent;
-  const clave=prompt(T("exp_clave"))||"";     // vacio = sin cifrar
+  const clave=await pedirClave();              // "" = sin cifrar
+  if(clave===null) return;                     // canceló: ni se pregunta al agente
   b.disabled=true; b.textContent=T("exp_preguntando");
   try{
     const cab=hdrs();
