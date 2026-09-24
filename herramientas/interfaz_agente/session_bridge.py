@@ -785,6 +785,12 @@ class Handler(BaseHTTPRequestHandler):
     server_version = "VuelamindSessionBridge/1.0"
 
     # --- utilidades
+    _cabeceras_enviadas = False
+
+    def end_headers(self):
+        self._cabeceras_enviadas = True
+        super().end_headers()
+
     def _json(self, code: int, payload: dict) -> None:
         body = json.dumps(payload).encode()
         self.send_response(code)
@@ -921,7 +927,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(404, {"error": f"no hay sesión '{nombre}'"})
             if not meta.get("session_id"):
                 return self._json(409, {"error": "esa sesión no tiene session_id todavía"})
-            return self._json(200, historial_del_transcript(meta["session_id"],
+            return self._json(200, historial_del_transcript(meta.get("session_id"),
                                                             max(1, min(lim, 500))))
         # GET /sessions/<name>/ultimo  -> RECUPERAR lo que el stream no alcanzo a traer
         mu = re.match(r"^/sessions/([^/]+)/ultimo$", self.path)
@@ -932,7 +938,7 @@ class Handler(BaseHTTPRequestHandler):
                 return self._json(404, {"error": f"no hay sesión '{nombre}'"})
             if not meta.get("session_id"):
                 return self._json(409, {"error": "esa sesión no tiene session_id todavía"})
-            resp = ultimo_del_transcript(meta["session_id"])
+            resp = ultimo_del_transcript(meta.get("session_id"))
             # Tres estados, no dos: sin esto, "todavía no" y "ya nunca" son la misma cosa
             # vistos desde el navegador, y la página se queda esperando para siempre.
             resp["en_vuelo"] = esta_en_vuelo(nombre)
@@ -1230,6 +1236,31 @@ class Handler(BaseHTTPRequestHandler):
     def do_POST(self):
         if self._blocked(changing=True):
             return
+        try:
+            return self._post()
+        except Exception as e:
+            # Un manejador que revienta despues de mandar las cabeceras deja al cliente
+            # con 200 y cuerpo VACIO: ni error, ni pista, y la traza solo en un log que
+            # nadie abre. Al usuario le llega una respuesta en blanco, que se lee como
+            # "el agente no dijo nada" en vez de como "esto se rompio". MEDIDO el
+            # 2026-09-24 con un registro sin `session_id`: KeyError, 200, y un mensaje
+            # vacio en pantalla.
+            #
+            # No se puede cambiar el codigo ya enviado, pero SI se puede decir algo: si
+            # el cuerpo ya empezo, se manda un evento de error por el mismo canal.
+            detalle = f"{type(e).__name__}: {e}"
+            try:
+                if getattr(self, "_cabeceras_enviadas", False):
+                    self.wfile.write((json.dumps({"kind": "error",
+                                                  "error": detalle}) + "\n").encode())
+                else:
+                    self._json(500, {"error": "el puente falló procesando la petición",
+                                     "detalle": detalle})
+            except Exception:
+                pass
+            raise
+
+    def _post(self):
         # POST /sessions  -> crear
         if self.path == "/sessions":
             b = self._body()
@@ -1370,7 +1401,7 @@ class Handler(BaseHTTPRequestHandler):
             if not meta:
                 return self._json(404, {"error": f"no hay sesión '{name}'"})
             started = threading.Event()
-            box = {"session_id": meta["session_id"], "error": None}
+            box = {"session_id": meta.get("session_id"), "error": None}
 
             def on_init(sid):
                 if sid:
@@ -1385,7 +1416,7 @@ class Handler(BaseHTTPRequestHandler):
             # el cliente cierre. No lo atamos a la vida de esta conexión HTTP.
             threading.Thread(
                 target=deliver_turn,
-                args=(msg, attachments, meta["session_id"],
+                args=(msg, attachments, meta.get("session_id"),
                       meta.get("cwd") or DEFAULT_CWD,
                       meta.get("model") or DEFAULT_MODEL,
                       meta.get("permission") or DEFAULT_PERMISSION,
@@ -1428,7 +1459,7 @@ class Handler(BaseHTTPRequestHandler):
 
             marcar_vivo(name, True)
             try:
-                res = stream_turn(msg, attachments, meta["session_id"],
+                res = stream_turn(msg, attachments, meta.get("session_id"),
                                   meta.get("cwd") or DEFAULT_CWD,
                                   meta.get("model") or DEFAULT_MODEL,
                                   meta.get("permission") or DEFAULT_PERMISSION, emit,
@@ -1438,7 +1469,7 @@ class Handler(BaseHTTPRequestHandler):
             finally:
                 marcar_vivo(name, False)
             guardar_ventana(name, res.get("window"))
-            if res.get("session_id") and res["session_id"] != meta["session_id"]:
+            if res.get("session_id") and res["session_id"] != meta.get("session_id"):
                 with _registry_lock:
                     reg = load_registry()
                     if name in reg:
@@ -1458,7 +1489,7 @@ class Handler(BaseHTTPRequestHandler):
             meta = reg.get(name)
             if not meta:
                 return self._json(404, {"error": f"no hay sesión '{name}'"})
-            res = run_turn(msg, attachments, meta["session_id"],
+            res = run_turn(msg, attachments, meta.get("session_id"),
                           meta.get("cwd") or DEFAULT_CWD,
                           meta.get("model") or DEFAULT_MODEL,
                           meta.get("permission") or DEFAULT_PERMISSION)
@@ -1467,7 +1498,7 @@ class Handler(BaseHTTPRequestHandler):
                                         "detail": res.get("raw_error"),
                                         "session_id": res["session_id"], "text": res.get("text")})
             # el sessionId puede rotar al continuar; lo actualizamos
-            if res["session_id"] and res["session_id"] != meta["session_id"]:
+            if res["session_id"] and res["session_id"] != meta.get("session_id"):
                 with _registry_lock:
                     reg = load_registry()
                     if name in reg:
