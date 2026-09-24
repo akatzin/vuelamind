@@ -187,6 +187,7 @@
        border:1px solid var(--line);background:var(--field);color:var(--fg);font-size:13px}
   dialog#dlgClave #claveVma2{margin-top:0}
   dialog#dlgClave .mal{color:#d06b6b;font-size:11px;margin:4px 0 0}
+  dialog#dlgClave menu button[disabled]{opacity:.45;cursor:not-allowed}
   dialog#dlgClave menu{display:flex;gap:6px;padding:0;margin:12px 0 0;flex-wrap:wrap}
   .chip .x{cursor:pointer;color:var(--dim);border:0;background:none;font-size:15px;padding:0 4px;line-height:1}
   .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
@@ -347,7 +348,7 @@
     <menu>
       <!-- `type=button`: si fuera submit, el dialogo se cerraria ANTES de comprobar que
            las dos coinciden, y una errata aqui deja el paquete ilegible para siempre. -->
-      <button type="button" id="dlgCifrar">Cifrar y exportar</button>
+      <button type="button" id="dlgCifrar" disabled>Cifrar y exportar</button>
       <button value="plano" id="dlgPlano" class="ghost">Sin contraseña</button>
       <button value="cancelar" id="dlgCancelar" class="ghost">Cancelar</button>
     </menu>
@@ -903,13 +904,31 @@ function pedirClave(){
   campo.value=""; campo2.value=""; err.hidden=true; d.returnValue="";
   // Se comprueba AQUI y no al cifrar: despues del zip ya no hay forma de avisar, y una
   // errata en la contrasena no se nota nunca -- se nota el dia que hace falta abrirlo.
+  const boton=$("#dlgCifrar");
+  // El estado se recalcula EN CADA TECLA: el boton no se puede pulsar hasta que las dos
+  // coinciden, asi que el error deja de ser algo que descubres al final. Y el aviso solo
+  // sale cuando ya hay algo escrito en el segundo campo -- gritar "no coinciden" contra
+  // un campo vacio es ruido, y un aviso que sale siempre deja de leerse.
+  const refrescar=()=>{
+    const iguales = !!campo.value && campo.value===campo2.value;
+    boton.disabled = !iguales;
+    const quejarse = !!campo2.value && !iguales;
+    err.textContent = quejarse ? T("exp_no_coinciden") : "";
+    err.hidden = !quejarse;
+  };
+  campo.oninput = campo2.oninput = refrescar;
+  refrescar();
+
+  // Se queda aunque el boton este deshabilitado: si el calculo de arriba se rompe algun
+  // dia, esto sigue impidiendo que salga un paquete cifrado con una contrasena distinta
+  // de la que su dueno cree. Es la red, no el camino.
   const validar=()=>{
     if(!campo.value){ err.textContent=T("exp_clave_vacia"); err.hidden=false; campo.focus(); return; }
     if(campo.value!==campo2.value){ err.textContent=T("exp_no_coinciden"); err.hidden=false;
                                     campo2.focus(); campo2.select(); return; }
     d.close("cifrar");
   };
-  $("#dlgCifrar").onclick=validar;
+  boton.onclick=validar;
   campo2.onkeydown=(e)=>{ if(e.key==="Enter"){ e.preventDefault(); validar(); } };
   campo.onkeydown =(e)=>{ if(e.key==="Enter"){ e.preventDefault(); campo2.focus(); } };
   d.showModal(); campo.focus();
