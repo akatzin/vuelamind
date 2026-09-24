@@ -12,7 +12,7 @@
 # Es el equivalente en contenedor de `/vuelamind-rc-update`, y comparte su regla:
 # reiniciar SOLO si cambio el backend. Un reinicio gratuito tira las sesiones en vuelo.
 #
-# Uso:  ./actualizar_puente.sh [--seco] [--contenedor <nombre>]
+# Uso:  ./updateSessionBridge.sh [--seco] [--contenedor <nombre>]
 #       --seco        mide y dice que haria, sin tocar nada.
 #       --contenedor  cual, si hay varios.
 #
@@ -28,7 +28,7 @@ while [ $# -gt 0 ]; do
   case "$1" in
     --seco) SECO=1 ;;
     --contenedor) shift; CONT="${1:-}" ;;
-    *) echo "uso: $0 [--seco] [--contenedor <nombre>]" >&2; exit 2 ;;
+    *) echo "uso: ./updateSessionBridge.sh [--seco] [--contenedor <nombre>]" >&2; exit 2 ;;
   esac
   shift
 done
