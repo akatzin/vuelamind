@@ -1071,8 +1071,14 @@ class Handler(BaseHTTPRequestHandler):
                     continue
                 if motivo:
                     if raiz_fuera is not None:
-                        clave = (str(raiz_fuera), motivo)
-                        fuera_dir[clave] = fuera_dir.get(clave, 0) + 1
+                        # OJO: esta llave NO puede llamarse `clave` -- asi se llama el
+                        # parametro de la contrasena, y llamarla igual la sombreaba. Con
+                        # una sola carpeta excluida, la contrasena vacia se volvia una
+                        # tupla, `if clave:` pasaba a ser cierto y el cifrado arrancaba
+                        # con basura. MEDIDO el 2026-09-24: 500 en TODA exportacion de un
+                        # vault con `.git` o `.llaves`, con y sin contrasena.
+                        agrupada = (str(raiz_fuera), motivo)
+                        fuera_dir[agrupada] = fuera_dir.get(agrupada, 0) + 1
                     else:
                         fuera.append(f"{rel}  --  {motivo}")
                     continue
@@ -1184,6 +1190,13 @@ class Handler(BaseHTTPRequestHandler):
         # Y si se pidio contrasena y no hay gpg, ESTO SE NIEGA. Entregar texto plano
         # con nombre de cosa cifrada es peor que no cifrar: quien lo recibe lo trata
         # como protegido.
+        # Se comprueba el TIPO ademas del valor. Si alguien vuelve a sombrear el
+        # parametro, esto falla diciendo que paso en vez de intentar cifrar con lo que
+        # sea que quedo dentro -- que fue justo el modo de fallo de este defecto.
+        if clave and not isinstance(clave, str):
+            paquete.unlink(missing_ok=True)
+            return self._json(500, {"error": "la contraseña llegó con un tipo que no es "
+                                             f"texto ({type(clave).__name__}); no se cifra"})
         if clave:
             if not shutil.which("gpg"):
                 paquete.unlink(missing_ok=True)
