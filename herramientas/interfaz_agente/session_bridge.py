@@ -55,11 +55,12 @@ import shutil
 import subprocess
 import sys
 import threading
+import unicodedata
 import time
 import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path, PurePath
-from urllib.parse import unquote
+from urllib.parse import parse_qs, unquote
 
 
 # ------------------------------------------------------ config por archivo (portable)
@@ -957,6 +958,19 @@ class Handler(BaseHTTPRequestHandler):
         # que son subcarpeta de la base, y un dominio puesto directamente en el
         # directorio del puente -el caso de quien migra una maquina entera- no sale
         # ahi. La sesion siempre sabe su cwd.
+        md = re.match(r"^/sessions/([^/]+)/deuda$", self.path)
+        if md:
+            return self._deuda(unquote(md.group(1)))
+
+        mn = re.match(r"^/sessions/([^/]+)/nota\?(.*)$", self.path)
+        if mn:
+            q = parse_qs(mn.group(2))
+            return self._nota(unquote(mn.group(1)), (q.get("ruta") or [""])[0])
+
+        mg = re.match(r"^/sessions/([^/]+)/grafo(?:\?(.*))?$", self.path)
+        if mg:
+            return self._grafo(unquote(mg.group(1)), "refrescar" in (mg.group(2) or ""))
+
         mz = re.match(r"^/sessions/([^/]+)/agente\.vma$", self.path)
         if mz:
             # La contrasena viaja en una CABECERA, nunca en la URL: una URL se queda
@@ -1060,6 +1074,170 @@ class Handler(BaseHTTPRequestHandler):
         directorios asi no tiene como saber cual le toca."""
         return (Path.home() / ".claude" / "projects"
                 / re.sub(r"[^A-Za-z0-9]", "-", str(Path(cwd).resolve())) / "memory")
+
+    # Donde vive el vault se le pregunta al agente y eso cuesta un turno, asi que se
+    # recuerda por carpeta. NO se cachea el grafo: ese se calcula en vivo cada vez.
+    # Un indice de relaciones es una segunda copia de algo derivable, y deja de nombrar
+    # una relacion en cuanto alguien edita una nota -- sin fallar, callando.
+    _vault_recordado: dict = {}
+
+    def _vault_de(self, destino: Path, refrescar: bool = False) -> tuple:
+        clave = str(destino)
+        if refrescar:
+            self._vault_recordado.pop(clave, None)
+        if clave not in self._vault_recordado:
+            self._vault_recordado[clave] = self._preguntar_vault(destino)
+        return self._vault_recordado[clave]
+
+    @staticmethod
+    def _clave_nota(texto: str) -> str:
+        """Compara como el validador del marco: NFC + casefold. Sin esto, una nota con
+        acento enlazada desde otra maquina se ve como dos notas distintas."""
+        return unicodedata.normalize("NFC", texto).strip().casefold()
+
+    def _deuda(self, nombre: str) -> None:
+        """Cuantas notas se tocaron desde la ultima conciliacion.
+
+        Se cuentan NOTAS TOCADAS y no turnos a proposito. Los turnos miden actividad,
+        no deuda: diez preguntando el estado no ensucian nada y uno que reescribe seis
+        notas si. Un contador de turnos grita cuando no pasa nada y calla en el caso
+        que importa.
+
+        Y sin marca previa NO se contesta cero: se dice que no hay referencia. \"Nada
+        pendiente\" y \"nunca se ha medido\" son estados opuestos con la misma cara."""
+        meta = load_registry().get(nombre)
+        if not meta:
+            return self._json(404, {"error": f"no hay sesión '{nombre}'"})
+        desde = meta.get("conciliado_en")
+        if not desde:
+            return self._json(200, {"hay_marca": False, "sin_conciliar": None,
+                                    "por_que": "todavía no hay referencia: concilia una vez y "
+                                               "a partir de ahí se cuenta"})
+        vault, por_que = self._vault_de(Path(meta.get("cwd") or ""))
+        if vault is None or not vault.is_dir():
+            return self._json(200, {"hay_marca": True, "sin_conciliar": None,
+                                    "por_que": f"no sé dónde vive el vault: {por_que}"})
+        tocadas = []
+        for f in vault.rglob("*.md"):
+            if set(f.relative_to(vault).parts) & self.ZIP_FUERA:
+                continue
+            try:
+                if f.stat().st_mtime > desde:
+                    tocadas.append(str(f.relative_to(vault)))
+            except OSError:
+                continue
+        tocadas.sort()
+        return self._json(200, {"hay_marca": True, "sin_conciliar": len(tocadas),
+                                "desde": time.strftime("%Y-%m-%d %H:%M", time.localtime(desde)),
+                                "notas": tocadas[:12]})
+
+    def _marcar_conciliado(self, nombre: str) -> None:
+        """Fija la referencia AL TERMINAR el turno de conciliacion, no al pedirlo: entre
+        una cosa y otra es cuando el ciclo escribe, y marcar antes daria por conciliado
+        justo lo que se acababa de escribir."""
+        with _registry_lock:
+            reg = load_registry()
+            if nombre not in reg:
+                return self._json(404, {"error": f"no hay sesión '{nombre}'"})
+            reg[nombre]["conciliado_en"] = time.time()
+            save_registry(reg)
+        return self._json(200, {"ok": True})
+
+    def _nota(self, nombre: str, rel: str) -> None:
+        """Sirve UNA nota del vault, para leerla desde el grafo.
+
+        La ruta llega de fuera, asi que se resuelve y se comprueba que caiga DENTRO del
+        vault: sin eso, un `../` cualquiera convierte esto en un lector de todo el
+        disco. Y se exige `.md` -- lo que hay en un vault son notas."""
+        meta = load_registry().get(nombre)
+        if not meta:
+            return self._json(404, {"error": f"no hay sesión '{nombre}'"})
+        destino = Path(meta.get("cwd") or "")
+        vault, por_que = self._vault_de(destino)
+        if vault is None or not vault.is_dir():
+            return self._json(409, {"error": "no sé dónde vive el vault", "detalle": por_que})
+        if not rel or not rel.endswith(".md"):
+            return self._json(400, {"error": "eso no es una nota"})
+        try:
+            f = (vault / rel).resolve()
+            dentro = f.is_relative_to(vault.resolve())
+        except OSError:
+            dentro = False
+        if not dentro or not f.is_file():
+            return self._json(404, {"error": f"no hay nota '{rel}' en este vault"})
+        try:
+            texto = f.read_text(encoding="utf-8", errors="replace")
+        except OSError as e:
+            return self._json(500, {"error": f"no se pudo leer: {e}"})
+        st = f.stat()
+        return self._json(200, {"ruta": rel, "texto": texto, "bytes": st.st_size,
+                                "modificada": time.strftime("%Y-%m-%d %H:%M",
+                                                            time.localtime(st.st_mtime))})
+
+    def _grafo(self, nombre: str, refrescar: bool = False) -> None:
+        """El grafo de la mente: que nota cita a cual, calculado EN VIVO.
+
+        Cuenta DOS formas de cita y las distingue en la salida:
+        wikilink `[[nota]]` y ruta de archivo `carpeta/nota.md`. La segunda esta aqui
+        por un caso medido (2026-09-23): una nota citaba a otra por ruta y el
+        instrumento que solo leia wikilinks la declaro aislada. Un grafo que solo lee
+        un formato no dibuja el vault: dibuja su propio vocabulario, y un dibujo
+        miente mas que una tabla porque se lee de un vistazo."""
+        meta = load_registry().get(nombre)
+        if not meta:
+            return self._json(404, {"error": f"no hay sesión '{nombre}'"})
+        destino = Path(meta.get("cwd") or "")
+        if not destino.is_dir():
+            return self._json(404, {"error": f"la carpeta de '{nombre}' ya no existe"})
+
+        vault, por_que = self._vault_de(destino, refrescar)
+        if vault is None or not vault.is_dir():
+            return self._json(409, {"error": "no sé dónde vive el vault de este agente",
+                                    "detalle": por_que})
+
+        notas, por_clave = {}, {}
+        for f in sorted(vault.rglob("*.md")):
+            if set(f.relative_to(vault).parts) & self.ZIP_FUERA:
+                continue
+            rel = str(f.relative_to(vault))
+            notas[rel] = f
+            por_clave.setdefault(self._clave_nota(f.stem), rel)
+            por_clave.setdefault(self._clave_nota(rel), rel)
+
+        aristas, vistas = [], set()
+        for rel, f in notas.items():
+            try:
+                texto = f.read_text(encoding="utf-8", errors="replace")
+            except OSError:
+                continue
+            destinos = [(self._clave_nota(m), "wikilink")
+                        for m in re.findall(r"\[\[([^\]|#]+)", texto)]
+            # Rutas: `carpeta/nota.md` o nota.md, con o sin acentos graves alrededor.
+            destinos += [(self._clave_nota(m), "ruta")
+                         for m in re.findall(r"[\w./\-]+\.md", texto)]
+            for clave, como in destinos:
+                otro = por_clave.get(clave) or por_clave.get(clave.rsplit("/", 1)[-1])
+                if not otro or otro == rel:
+                    continue
+                firma = (rel, otro, como)
+                if firma in vistas:
+                    continue
+                vistas.add(firma)
+                aristas.append({"de": rel, "a": otro, "como": como})
+
+        grado = {rel: 0 for rel in notas}
+        for a in aristas:
+            grado[a["de"]] += 1
+            grado[a["a"]] += 1
+        nodos = [{"id": rel, "titulo": Path(rel).stem, "grado": grado[rel],
+                  "peso": notas[rel].stat().st_size} for rel in notas]
+        return self._json(200, {
+            "nodos": nodos, "aristas": aristas, "vault": str(vault),
+            "vault_por_que": por_que,
+            # Que se conto, dicho en la salida: si algun dia se anade una forma, quien
+            # lea un grafo viejo sabe con que vocabulario se dibujo.
+            "cuenta": ["wikilink", "ruta"],
+            "aisladas": sum(1 for n in nodos if n["grado"] == 0)})
 
     # Los niveles los declara el CLI, y son cerrados: `--effort zzz` contesta
     # "Valid values: low, medium, high, xhigh, max". MEDIDO el 2026-09-24.
@@ -1350,6 +1528,9 @@ class Handler(BaseHTTPRequestHandler):
             raise
 
     def _post(self):
+        mc = re.match(r"^/sessions/([^/]+)/conciliado$", self.path)
+        if mc:
+            return self._marcar_conciliado(unquote(mc.group(1)))
         # POST /sessions/<name>/modelo -> recordar el modelo que la sesion eligio.
         #
         # Cada turno es un PROCESO NUEVO -`claude -p --resume`- y el puente le vuelve a
