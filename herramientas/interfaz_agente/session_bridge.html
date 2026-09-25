@@ -1236,7 +1236,11 @@ async function correrTurno(url, body, owner){
         if(!line) continue;
         let ev; try{ ev=JSON.parse(line); }catch{ continue; }
         handleEv(ev, panel);
-        if(ev.kind==="result"){ finalText=ev.text||""; isErr=!!ev.is_error; }
+        // `result` NO pisa lo que ya hay con vacio: cuando el turno falla, el servidor
+        // manda primero `error` con la causa y DESPUES `result` sin texto. Asignar a
+        // secas borraba la causa y dejaba "(error)" pelado -- el mensaje util llegaba
+        // y se tiraba una linea mas abajo.
+        if(ev.kind==="result"){ if(ev.text) finalText=ev.text; isErr=!!ev.is_error; }
         if(ev.kind==="error"){ isErr=true; if(!finalText) finalText=ev.error||"error"; }
       }
     }

@@ -606,6 +606,7 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
         emitir({"kind": "error", "error": str(e)})
         return {"session_id": sid, "text": None, "is_error": True}
 
+    motivo = ""
     stderr_buf: list = []
     drain = threading.Thread(
         target=lambda: stderr_buf.extend(proc.stderr or []), daemon=True)
@@ -659,6 +660,7 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
             elif t == "result":
                 final_text = ev.get("result")
                 is_error = bool(ev.get("is_error")) or ev.get("subtype") != "success"
+                motivo = ev.get("subtype") or ""
                 # cierre autoritativo, con cuidado: result.usage SUMA el input de
                 # cada llamada del turno (vista de facturación), NO la ocupación de
                 # la ventana. La ocupación real es el último input por paso (last_ctx);
@@ -678,9 +680,20 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
         if proc.poll() is None:
             proc.kill()
 
-    if final_text is None and proc.returncode not in (0, None):
+    # Se mira stderr cuando el turno ACABO MAL, no solo cuando el proceso murio mal.
+    #
+    # Antes la condicion era `returncode not in (0, None)`, y el CLI SALE CON 0 cuando
+    # reporta su error como evento: informa y termina limpio. Asi que la rama no entraba
+    # nunca, stderr se descartaba, y a la pagina le llegaba texto vacio -- que se pinta
+    # como "(error)" pelado. MEDIDO el 2026-09-24 con una sesion cuyo id ya no existe:
+    # el CLI decia "No conversation found with session ID: ..." por stderr y eso se
+    # tiraba a la basura. La causa estaba escrita y nadie la leia.
+    if final_text is None and (is_error or proc.returncode not in (0, None)):
         is_error = True
-        err = ("".join(stderr_buf) or "").strip()[:2000] or f"exit {proc.returncode}"
+        err = ("".join(stderr_buf) or "").strip()[:2000]
+        if not err:
+            # Sin stderr, al menos el subtipo del `result` dice de que clase fue.
+            err = motivo or f"exit {proc.returncode}"
         emitir({"kind": "error", "error": err})
     emitir({"kind": "result", "text": final_text, "is_error": is_error, "session_id": sid})
     return {"session_id": sid, "text": final_text, "is_error": is_error,
