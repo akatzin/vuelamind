@@ -67,8 +67,20 @@
   *{box-sizing:border-box}
   body{margin:0;font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
        background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column}
-  header{display:flex;gap:10px;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);background:var(--panel)}
-  header h1{font-size:15px;margin:0;font-weight:600;letter-spacing:-.01em}
+  /* La barra de arriba desaparecio: su contenido vive en la lateral, que ya se
+     pliega. Una franja fija que solo lleva el nombre y dos selectores se cobra
+     alto en TODAS las vistas, y el grafo es la que mas lo agradece. */
+  aside .marca{display:flex;gap:9px;align-items:center;padding:12px 14px;
+       border-bottom:1px solid var(--line)}
+  aside .marca h1{font-size:14px;margin:0;font-weight:600;letter-spacing:-.01em}
+  /* Un rotulo por selector. Sin el, el de tema mostraba "Claude" a secas -- que en esta
+     pagina se lee como cualquier cosa menos un tema de color. Un control que solo ensena
+     su valor obliga a abrirlo para saber que gobierna. */
+  aside .pie{display:grid;grid-template-columns:auto 1fr;gap:6px 8px;align-items:center;
+       padding:10px 12px;border-top:1px solid var(--line)}
+  aside .pie .rot{font-size:10px;color:var(--dim);text-align:right}
+  aside .pie .tema{width:100%}
+  aside .pie .hint{grid-column:1 / -1;font-size:10px}
   header .dot{width:9px;height:9px;border-radius:50%;background:var(--dim);flex:0 0 auto}
   header .dot.ok{background:var(--ok)}header .dot.bad{background:var(--bad)}
   header input{background:var(--field);border:1px solid var(--line);color:var(--ink);
@@ -110,7 +122,15 @@
        padding:6px 8px;border-radius:7px;font:inherit}
   aside .new textarea{resize:vertical;min-height:44px}
   section{flex:1;display:flex;flex-direction:column;min-width:0}
-  .chathead{display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--bg)}
+  .chathead{position:relative;display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--bg)}
+  /* El nombre va centrado en la BARRA, no entre sus vecinos: si fuera un elemento mas
+     del flujo, su centro dependeria de cuantos botones haya a la derecha y se moveria
+     al aparecer el contador de deuda o al ocultarse el de conciliar.
+     `pointer-events:none` porque flota por encima: sin eso, un nombre largo se comeria
+     el clic de los botones que tiene debajo. */
+  .chathead .cur{position:absolute;left:50%;transform:translateX(-50%);
+       font-weight:600;max-width:38%;white-space:nowrap;overflow:hidden;
+       text-overflow:ellipsis;pointer-events:none}
   /* Viven bajo el compositor y no en la cabecera: son de lo que vas a MANDAR, no de lo
      que la sesion es. Puestos arriba compiten con los botones que la gobiernan. */
   /* El compositor vive en una columna centrada de 780 px. Alinear estos al borde de
@@ -120,7 +140,6 @@
   .ajustes .ajuste{background:var(--field);border:1px solid var(--line);color:var(--dim);
        border-radius:6px;font-size:11px;padding:3px 5px;max-width:190px}
   .ajustes .ajuste:hover{color:var(--fg)}
-  .chathead .cur{font-weight:600}
   .chathead .sp{flex:1}
   /* Cerrar y borrar una sesión no puede ser el botón más llamativo de la pantalla. */
   button.danger{background:transparent;color:var(--danger);border:1px solid var(--danger-line)}
@@ -198,13 +217,54 @@
   dialog#dlgClave .mal{color:#d06b6b;font-size:11px;margin:4px 0 0}
   dialog#dlgClave menu button[disabled]{opacity:.45;cursor:not-allowed}
   dialog#dlgClave menu{display:flex;gap:6px;padding:0;margin:12px 0 0;flex-wrap:wrap}
+  #panelGrafo{flex:1;position:relative;overflow:hidden;background:var(--bg);min-width:0}
+  #lienzoGrafo{width:100%;height:100%;display:block;cursor:grab}
+  #buscaGrafo{position:absolute;top:10px;right:10px;width:210px;padding:6px 9px;
+       border:1px solid var(--line);border-radius:7px;background:var(--field);
+       color:var(--fg);font-size:12px}
+  /* La X es la salida estandar de un lector: esquina superior derecha del documento.
+     Va en posicion absoluta y NO dentro de la fila de la cabecera -- ahi dependia de
+     un separador `.sp` que solo esta definido para `header` y `.chathead`, asi que no
+     empujaba nada y la X acababa pegada al titulo, a la izquierda. */
+  #lectorX{position:absolute;top:8px;right:12px;z-index:2;border:0;background:none;
+       color:var(--dim);font-size:22px;line-height:1;padding:2px 6px;cursor:pointer}
+  #lectorX:hover{color:var(--fg)}
+  /* El lector sirve a DOS vistas y por eso vive fuera del grafo, no dentro:
+     superpuesto sobre el dibujo, o al lado del chat en la vista partida. */
+  .zona{flex:1;display:flex;min-height:0;position:relative}
+  .zona > .log{flex:1;min-width:0}
+  #lectorNota{background:var(--bg);display:flex;flex-direction:column;min-width:0}
+  #lectorNota.superpuesto{position:absolute;inset:0;z-index:3}
+  #lectorNota.allado{position:relative;flex:0 0 46%;border-left:1px solid var(--line)}
+  /* En la vista partida ya estas hablando de el: el boton no lleva a ningun sitio. */
+  #lectorNota.allado #lectorPreguntar{display:none}
+  /* El plegador va pegado al borde de la barra y se queda cuando ella se va. */
+  #plegar{position:absolute;left:250px;top:12px;z-index:5;width:18px;height:34px;
+       border:1px solid var(--line);border-left:0;border-radius:0 6px 6px 0;
+       background:var(--panel);color:var(--dim);cursor:pointer;font-size:12px;
+       line-height:1;padding:0}
+  #plegar:hover{color:var(--fg)}
+  body.plegado aside{display:none}
+  body.plegado #plegar{left:0}
+  #lectorNota .cab{display:flex;align-items:center;gap:8px;padding:8px 46px 8px 12px;
+       border-bottom:1px solid var(--line);font-size:12px}
+  #lectorNota .cab .sp{flex:1}
+  #lectorNota .cuerpo{flex:1;overflow:auto;padding:14px 18px;font-size:13px;
+       line-height:1.6;max-width:820px}
+  #leyendaGrafo{position:absolute;left:10px;bottom:10px;font-size:10px;line-height:1.6;
+       color:var(--dim);background:var(--field);border:1px solid var(--line);
+       border-radius:7px;padding:7px 9px;max-width:60%}
+  #leyendaGrafo b{color:var(--fg)}
+  #leyendaGrafo .trazo{display:inline-block;width:20px;border-top:1px solid var(--dim);
+       vertical-align:middle;margin-right:5px}
+  #leyendaGrafo .trazo.ruta{border-top-style:dashed}
   .chip .x{cursor:pointer;color:var(--dim);border:0;background:none;font-size:15px;padding:0 4px;line-height:1}
   .log.drop{outline:2px dashed var(--accent);outline-offset:-8px}
   .empty{margin:auto;color:var(--dim);text-align:center;padding:20px}
   .hint{font-size:11px;color:var(--dim)}
   .hint-traido{align-self:center;font-size:12px;color:var(--dim);border:1px dashed var(--line);
        border-radius:10px;padding:4px 10px;margin-bottom:6px}
-  header .tema{background:var(--field);border:1px solid var(--line);color:var(--dim);
+  aside .tema{background:var(--field);border:1px solid var(--line);color:var(--dim);
        font:inherit;font-size:12px;padding:3px 6px;border-radius:8px;cursor:pointer}
   /* medidor de contexto + gasto del turno (en la cabecera del chat) */
   .usage{font-size:11px;color:var(--dim);font-family:ui-monospace,SFMono-Regular,monospace;
@@ -255,23 +315,13 @@
 </style>
 </head>
 <body>
-<header>
-  <span class="dot" id="dot"></span>
-  <h1>Session Bridge · Vuelamind</h1>
-  <span class="sp"></span>
-  <select id="idioma" class="tema" title="Idioma">
-    <option value="es">Español</option>
-    <option value="en">English</option>
-  </select>
-  <select id="tema" class="tema" title="Tema de color — se recuerda en esta máquina">
-    <option value="claude">Claude</option>
-    <option value="magenta">Magenta</option>
-    <option value="blueprint">Blueprint</option>
-  </select>
-  <span class="hint">solo loopback · sin token</span>
-</header>
 <main>
+  <button type="button" id="plegar" title="Ocultar u mostrar la lista de agentes">‹</button>
   <aside>
+    <div class="marca">
+      <span class="dot" id="dot"></span>
+      <h1>Session Bridge · Vuelamind</h1>
+    </div>
     <div class="list" id="list"></div>
     <div class="new">
       <div id="vistaNormal">
@@ -321,20 +371,49 @@
       <button id="create">Crear sesión</button>
       </div>
     </div>
+    <div class="pie">
+      <label class="rot" for="idioma" id="rotIdioma">idioma</label>
+      <select id="idioma" class="tema" title="Idioma">
+        <option value="es">Español</option>
+        <option value="en">English</option>
+      </select>
+      <label class="rot" for="tema" id="rotTema">tema</label>
+      <select id="tema" class="tema" title="Tema de color — se recuerda en esta máquina">
+        <option value="claude">Claude</option>
+        <option value="magenta">Magenta</option>
+        <option value="blueprint">Blueprint</option>
+      </select>
+      <span class="hint">solo loopback · sin token</span>
+    </div>
   </aside>
   <section>
     <div class="chathead" id="chathead" style="display:none">
       <span class="cur" id="curname"></span>
       <span class="usage" id="usage" title="contexto usado · tokens generados en el último turno"></span>
       <span class="sp"></span>
+      <span id="deuda" class="usage" hidden></span>
       <button id="guardar" class="ghost" hidden
               title="Manda /vuelamind-commit a esta sesión: mide, te enseña qué va a escribir y solo escribe con tu sí">Guardar</button>
-
+      <button id="verGrafo" class="ghost"
+              title="Ver el grafo de la mente: qué nota cita a cuál, calculado en vivo">Grafo</button>
       <button id="exportar" class="ghost"
               title="Baja este agente como .zip: su carpeta y su memoria. Sin llaves ni archivos de configuración; dentro va un _EXCLUIDO.txt que dice qué quedó fuera">Exportar agente</button>
       <button id="close" class="ghost danger" title="Detiene la sesión y la quita de esta página">Cerrar este chat</button>
     </div>
-    <div class="log" id="log"><div class="empty">Elige o crea una sesión.</div></div>
+    <div class="zona" id="zona">
+      <div class="log" id="log"><div class="empty">Elige o crea una sesión.</div></div>
+      <div id="panelGrafo" hidden>
+        <canvas id="lienzoGrafo"></canvas>
+        <input id="buscaGrafo" type="search" placeholder="filtrar por título…" autocomplete="off">
+        <div id="leyendaGrafo"></div>
+      </div>
+      <div id="lectorNota" hidden>
+        <button type="button" id="lectorX" aria-label="Cerrar" title="Cerrar">&times;</button>
+        <div class="cab"><span id="lectorTit"></span><span class="sp"></span>
+          <button type="button" id="lectorPreguntar" class="ghost">Hablar de este documento</button></div>
+        <div class="cuerpo" id="lectorCuerpo"></div>
+      </div>
+    </div>
     <div class="attachbar" id="attachbar"></div>
     <div class="ajustes" id="ajustesPie">
       <select id="selModelo" class="ajuste" hidden title="Modelo de esta sesión — se aplica desde el turno siguiente">
@@ -424,8 +503,20 @@ const I18N={
   sin_master:"Esta máquina no tiene el marco a mano, así que no puedo hacer nacer un agente desde aquí.",
   sin_agentes:"Todavía no hay ningún agente aquí.",
   sin_declarar:"sin nombre declarado",
+  rot_idioma:"idioma", rot_tema:"tema",
   exportar:"Exportar agente",
   exp_clave:"Contraseña para cifrar el paquete",
+  deuda_notas:"{n} nota(s) sin conciliar",
+  deuda_sin_marca:"sin referencia — concilia una vez",
+  grafo:"Grafo", grafo_chat:"Chat",
+  grafo_buscar:"filtrar por título\u2026",
+  grafo_preguntar:"Hablar de este documento",
+  grafo_nada:"Ningún título coincide.",
+  grafo_coinciden:"{n} de {t} coinciden",
+  grafo_cargando:"Calculando el grafo\u2026",
+  grafo_pie:"{n} notas · {a} citas · {s} sin ninguna",
+  grafo_wikilink:"enlace de wiki", grafo_ruta:"ruta de archivo",
+  grafo_cuenta:"Solo se cuentan estas dos formas de cita. «Sin ninguna» significa sin ninguna DE ÉSTAS.",
   exp_clave2:"Repítela",
   exp_no_coinciden:"Las dos no coinciden.",
   exp_clave_vacia:"Escribe una contraseña, o elige «Sin contraseña».",
@@ -440,7 +531,7 @@ const I18N={
   exportar_ayuda:"Baja este agente como .zip: su carpeta y su memoria. Sin llaves ni archivos de configuración; dentro va un _EXCLUIDO.txt que dice qué quedó fuera.",
   prompt_nacer:"Inicializa {m}\n\nPara qué es este agente, dicho antes de la primera pregunta: «{q}»",
   usage_tt:"contexto usado · tokens generados en el último turno",
-  guardar:"Guardar",
+  guardar:"Conciliar",
   guardar_tt:"Manda /vuelamind-commit a esta sesión: mide, te enseña qué va a escribir y solo escribe con tu sí",
   cerrar:"Cerrar este chat", cerrar_tt:"Detiene la sesión y la quita de esta página",
   log_vacio:"Elige o crea una sesión.", sin_sesiones:"Sin sesiones aún.",
@@ -479,8 +570,20 @@ const I18N={
   sin_master:"This machine does not have the framework at hand, so I cannot start an agent from here.",
   sin_agentes:"No agents here yet.",
   sin_declarar:"name not declared",
+  rot_idioma:"language", rot_tema:"theme",
   exportar:"Export agent",
   exp_clave:"Passphrase to encrypt the package",
+  deuda_notas:"{n} note(s) unreconciled",
+  deuda_sin_marca:"no baseline — reconcile once",
+  grafo:"Graph", grafo_chat:"Chat",
+  grafo_buscar:"filter by title\u2026",
+  grafo_preguntar:"Talk about this document",
+  grafo_nada:"No title matches.",
+  grafo_coinciden:"{n} of {t} match",
+  grafo_cargando:"Computing the graph\u2026",
+  grafo_pie:"{n} notes · {a} citations · {s} with none",
+  grafo_wikilink:"wikilink", grafo_ruta:"file path",
+  grafo_cuenta:"Only these two citation forms are counted. «With none» means none OF THESE.",
   exp_clave2:"Type it again",
   exp_no_coinciden:"They do not match.",
   exp_clave_vacia:"Type a passphrase, or choose \u00abNo passphrase\u00bb.",
@@ -495,7 +598,7 @@ const I18N={
   exportar_ayuda:"Download this agent as a .zip: its folder and its memory. No keys or config files; inside goes an _EXCLUIDO.txt naming what was skipped.",
   prompt_nacer:"Initialize {m}\n\nWhat this agent is for, said before the first question: «{q}»",
   usage_tt:"context used · tokens generated in the last turn",
-  guardar:"Save",
+  guardar:"Reconcile",
   guardar_tt:"Sends /vuelamind-commit to this session: it measures, shows you what it would write, and writes only with your yes",
   cerrar:"Close this chat", cerrar_tt:"Stops the session and removes it from this page",
   log_vacio:"Pick or create a session.", sin_sesiones:"No sessions yet.",
@@ -524,7 +627,8 @@ const T=(k,vars)=>{
 // encontrarlos todos, y lo que se queda fuera de esta lista se queda en un idioma
 // sin que nada falle.
 const MARCAS=[
- ["#idioma","tt","idioma_tt"], ["#tema","tt","tema_tt"], ["header .hint","txt","loopback"],
+ ["#idioma","tt","idioma_tt"], ["#tema","tt","tema_tt"],
+ ["#rotIdioma","txt","rot_idioma"], ["#rotTema","txt","rot_tema"], ["aside .pie .hint","txt","loopback"],
  ["#nuevaLbl","txt","nueva"], ["#newName","ph","nombre_ph"], ["#newPrompt","ph","prompt_ph"],
  ["#irAvz","txt","ir_avz"], ["#irNormal","txt","volver_simple"],
  ["#btnCrear","txt","btn_crear"], ["#btnAbrir","txt","btn_abrir"],
@@ -538,6 +642,8 @@ const MARCAS=[
  ["#newModel","ph","modelo_ph"], ["#newModel","tt","modelo_tt"],
  ["#create","txt","crear"], ["#usage","tt","usage_tt"],
  ["#guardar","txt","guardar"], ["#guardar","tt","guardar_tt"],
+ ["#verGrafo","txt","grafo"], ["#buscaGrafo","ph","grafo_buscar"],
+ ["#lectorPreguntar","txt","grafo_preguntar"],
  ["#exportar","txt","exportar"], ["#exportar","tt","exportar_ayuda"],
  ["#dlgClaveLbl","txt","exp_clave"], ["#dlgClavePie","txt","exp_clave_pie"],
  ["#claveVma2","ph","exp_clave2"],
@@ -875,6 +981,30 @@ async function traerHistorial(name){
 // El botón solo existe si ESA sesión tiene el ciclo instalado — lo declara el evento `init`,
 // no se supone. Ofrecer un atajo a un comando que no está es peor que no ofrecerlo: falla
 // después de haber gastado un turno.
+// La deuda se PIDE, no se adivina: el servidor cuenta notas tocadas desde la ultima
+// conciliacion. Si no hay referencia lo dice con palabras en vez de contestar cero --
+// "nada pendiente" y "nunca se ha medido" son estados opuestos con la misma cara.
+async function refrescarDeuda(){
+  const e=$("#deuda");
+  if(!state.current || !$("#panelGrafo").hidden){ e.hidden=true; return; }
+  // El dueño se apunta ANTES del await y se vuelve a comprobar DESPUÉS. La primera
+  // consulta cuesta lo que tarde el agente en decir dónde vive su vault -12 s medidos-
+  // y en ese rato puedes haber cambiado de sesión o abierto el grafo. Comprobar solo
+  // al entrar deja el contador de una sesión colgado en la vista de otra: cierto al
+  // medir, falso al usar. MEDIDO aquí el 2026-09-24.
+  const duenio=state.current;
+  let j;
+  try{ j=await api("GET","/sessions/"+encodeURIComponent(duenio)+"/deuda"); }
+  catch{ e.hidden=true; return; }
+  if(duenio!==state.current || !$("#panelGrafo").hidden){ e.hidden=true; return; }
+  if(!j.hay_marca){ e.textContent=T("deuda_sin_marca"); e.title=j.por_que; e.hidden=false; return; }
+  if(j.sin_conciliar===null){ e.textContent="—"; e.title=j.por_que; e.hidden=false; return; }
+  if(!j.sin_conciliar){ e.hidden=true; return; }      // cero no se reporta: lo sano calla
+  e.textContent=T("deuda_notas").replace("{n}",j.sin_conciliar);
+  e.title=(j.notas||[]).join("\n")+(j.sin_conciliar>12?"\n…":"")+"\n\ndesde "+j.desde;
+  e.hidden=false;
+}
+
 // El modelo vigente se ENSENA: hasta ahora solo se elegia al crear la sesion y despues
 // no habia forma de saber con cual corria. Vacio significa "el que traiga el CLI", y eso
 // se dice con esas palabras en vez de dejar el hueco.
@@ -882,8 +1012,18 @@ async function traerHistorial(name){
 // no hay que sacarle el dato a la sesion ni adivinar con que corre -- se ve.
 function refrescarAjustes(){
   const sm=$("#selModelo"), se=$("#selEsfuerzo");
-  $("#ajustesPie").style.display = state.current ? "flex" : "none";
-  if(!state.current){ sm.hidden=true; se.hidden=true; return; }
+  // Los selectores son del COMPOSITOR: eligen con qué sale el turno siguiente. En la
+  // vista de grafo no hay compositor, así que quedarían flotando solos ofreciendo una
+  // decisión que ahí no se toma -- el mismo motivo por el que el contador de deuda
+  // también se esconde en el grafo.
+  //
+  // La condición se lee del COMPOSITOR y no del panel del grafo a propósito: `verGrafo`
+  // apaga el chat ANTES de destapar el panel, así que preguntarle al panel contestaba
+  // "todavía no" y el pie se quedaba puesto. MEDIDO aquí el 2026-09-24 -- y es el mismo
+  // fallo de orden dos veces: quien manda es el que ya cambió, no el que va a cambiar.
+  const hay = !!state.current && $(".composer").style.display !== "none";
+  $("#ajustesPie").style.display = hay ? "flex" : "none";
+  if(!hay){ sm.hidden=true; se.hidden=true; return; }
   const s=(state.sesiones||[]).find(x=>x.name===state.current) || {};
   const m=s.model || "";
   // Un modelo que no esta en la lista -un nombre completo, uno nuevo- NO se pierde:
@@ -946,6 +1086,8 @@ function select(name){
   state.current=name;
   $("#input").disabled=false; $("#send").disabled=false; $("#attach").disabled=false;
   $("#chathead").style.display="flex"; $("#curname").textContent=name;
+  chatVisible($("#panelGrafo").hidden);
+  refrescarDeuda();
   refrescarModelo();
   clearAtts(); acClose();
   state.usage[name]=loadUsage(name); renderUsage(name); refrescarGuardar();
@@ -982,6 +1124,7 @@ async function closeSession(){
     state.current=null;
     $("#input").disabled=true; $("#send").disabled=true; $("#attach").disabled=true;
     $("#chathead").style.display="none"; clearAtts();
+    chatVisible(true);        // ya no hay sesion: la caja se va con ella
     $("#log").innerHTML='<div class="empty">Sesión cerrada. Elige o crea otra.</div>';
     await refresh();
   }catch(e){ alert("No se pudo cerrar: "+e.message); }
@@ -991,6 +1134,354 @@ $("#close").onclick=closeSession;
 
 // Guardar es exactamente teclear el comando: mismo camino, misma protección, mismo panel de
 // progreso. No es un mecanismo aparte — serlo lo volvería otra cosa que mantener.
+// ---- la vista de grafo: la mente dibujada, calculada en vivo ---------------------
+//
+// Sin libreria: la pagina no trae ni una dependencia externa y esto no la estrena.
+// Son ~120 lineas de fuerzas a mano, que con vaults de este tamano sobra -- el de la
+// casa mas grande medida tiene 119 notas.
+const G = { datos:null, nodos:[], vivos:[], solas:[], aristas:[], filtro:"", sel:null,
+            anim:null, w:0, h:0,
+            // El encuadre: escala y desplazamiento. Vive aparte de las posiciones de
+            // los nodos -que son coordenadas del MUNDO- para que acercarse no mueva el
+            // dibujo ni pelee con las fuerzas.
+            k:1, px:0, py:0, tocado:false };
+
+function chatVisible(si){
+  // Sin sesion elegida tampoco hay donde escribir. Una caja de texto presente aunque
+  // este deshabilitada invita a escribir en ella, y no hay a quien mandarlo: el hueco
+  // se lee como "esta cargando" en vez de como "elige un agente".
+  const hay = si && !!state.current;
+  $("#log").style.display = si ? "" : "none";
+  $(".composer").style.display = hay ? "" : "none";
+  $("#attachbar").style.display = hay ? "" : "none";
+  $("#guardar").hidden = !hay;
+  if(!hay) $("#deuda").hidden = true;
+  refrescarAjustes();
+}
+
+function grafoParar(){ if(G.anim){ cancelAnimationFrame(G.anim); G.anim=null; } }
+
+async function verGrafo(){
+  const panel=$("#panelGrafo"), log=$("#log"), b=$("#verGrafo");
+  if(!panel.hidden){                       // volver al chat
+    grafoParar(); panel.hidden=true; log.style.display="";
+    chatVisible(true); b.textContent=T("grafo");
+    // Al chat se vuelve entero, salvo que se viniera a hablar de un documento.
+    if(!G.partida){ $("#lectorNota").hidden=true; G.leyendo=null; }
+    refrescarGuardar(); refrescarDeuda(); return;
+  }
+  // En grafo NO hay ventana de chat: ni el historial, ni la caja de escribir, ni los
+  // botones que mandan un turno. Dejar la caja abajo invita a escribir donde no se ve
+  // la conversacion, y la respuesta cae en una vista que no estas mirando.
+  chatVisible(false);
+  if(!state.current) return;
+  log.style.display="none"; panel.hidden=false; b.textContent=T("grafo_chat");
+  $("#leyendaGrafo").textContent=T("grafo_cargando");
+  let j;
+  try{ j=await api("GET","/sessions/"+encodeURIComponent(state.current)+"/grafo"); }
+  catch(e){ $("#leyendaGrafo").textContent=e.message; return; }
+  G.datos=j;
+  grafoMontar(j);
+}
+
+function grafoMontar(j){
+  const c=$("#lienzoGrafo"), r=c.getBoundingClientRect();
+  const dpr=window.devicePixelRatio||1;
+  G.w=c.width=Math.max(1,Math.floor(r.width*dpr)); G.h=c.height=Math.max(1,Math.floor(r.height*dpr));
+  const W=r.width, H=r.height;
+  // Posicion inicial en circulo: dos nodos en el mismo punto se repelen al infinito.
+  G.nodos=j.nodos.map((n,i)=>{
+    const ang=2*Math.PI*i/j.nodos.length, rad=Math.min(W,H)*0.35;
+    return {...n, x:W/2+rad*Math.cos(ang), y:H/2+rad*Math.sin(ang), vx:0, vy:0};
+  });
+  const idx={}; G.nodos.forEach((n,i)=>idx[n.id]=i);
+  G.vivos=G.nodos.filter(n=>n.grado>0);
+  G.solas=G.nodos.filter(n=>n.grado===0);
+  G.aristas=j.aristas.filter(a=>idx[a.de]!==undefined&&idx[a.a]!==undefined)
+                     .map(a=>({...a, i:idx[a.de], j:idx[a.a]}));
+  const leyenda=$("#leyendaGrafo");
+  leyenda.innerHTML =
+    "<b>"+T("grafo_pie").replace("{n}",j.nodos.length).replace("{a}",j.aristas.length)
+         .replace("{s}",j.aisladas)+"</b><br>"+
+    '<span class="trazo"></span>'+T("grafo_wikilink")+
+    " · "+j.aristas.filter(a=>a.como==="wikilink").length+"<br>"+
+    '<span class="trazo ruta"></span>'+T("grafo_ruta")+
+    " · "+j.aristas.filter(a=>a.como==="ruta").length+"<br>"+T("grafo_cuenta");
+  G.pieBase=leyenda.querySelector("b").textContent;
+  G.filtro=""; $("#buscaGrafo").value=""; G.sel=null;
+  G.k=1; G.px=0; G.py=0; G.tocado=false;
+  // El documento que estabas leyendo se reabre al volver: cerrar el grafo para mirar
+  // el chat y perder la nota obliga a buscarla otra vez en el dibujo. La X es la
+  // unica forma de cerrarla, que es lo que la hace una decision y no un efecto.
+  const seguia=G.leyendo;
+  $("#lectorNota").hidden=true; G.leyendo=null; G.partida=null;
+  if(seguia) abrirNota(seguia, "superpuesto");
+  // El lienzo se repinta CUANDO CAMBIA ALGO, no siempre. Antes el bucle se
+  // reprogramaba sin condicion: con el dibujo quieto seguia a 60 fps para siempre,
+  // gastando bateria y volviendo la pestana pesada sin que nada lo delatara -- se ve
+  // igual un grafo quieto que se repinta que uno que no.
+  //
+  // Mientras las fuerzas corren hay algo que cambiar. Despues, solo lo que tu haces:
+  // pasar el raton, filtrar, mover o acercar. Cada uno pide un fotograma.
+  let pasos=0;
+  const tick=()=>{
+    G.anim=null;
+    const moviendo = pasos++ < 400;
+    if(moviendo) grafoFuerzas(W,H);
+    grafoPintar(W,H,dpr);
+    if(moviendo || G.sucio){ G.sucio=false; G.anim=requestAnimationFrame(tick); }
+  };
+  G.repintar=()=>{ G.sucio=true; if(!G.anim) G.anim=requestAnimationFrame(tick); };
+  grafoParar(); G.sucio=false; tick();
+}
+
+// Fuerzas SOLO sobre lo conectado; las aisladas van en orbita, colocadas y no simuladas.
+//
+// Por que: una nota sin citas no tiene ningun resorte, solo empuja. Metidas en la
+// simulacion, 60 aisladas -el 50% de este vault- se reparten el lienzo, aplastan al
+// racimo contra una esquina y acaban pegadas al borde. MEDIDO: 48 de 119 contra el
+// marco, y el racimo conectado fuera del centro. Colocarlas cuesta menos y dice mejor
+// lo que son: lo que orbita sin tocar nada.
+function grafoFuerzas(W,H){
+  const N=G.vivos, k=Math.sqrt(W*H/Math.max(1,N.length));
+  for(let i=0;i<N.length;i++){
+    for(let j=i+1;j<N.length;j++){
+      let dx=N[j].x-N[i].x, dy=N[j].y-N[i].y;
+      let d2=dx*dx+dy*dy || 0.01, d=Math.sqrt(d2);
+      // Se limita la repulsion de cerca: sin tope, dos nodos casi pegados se disparan
+      // a la pared y el dibujo se convierte en un marco con el centro vacio.
+      const f=Math.min((k*k)/d2, k*0.55)*0.55;
+      dx/=d; dy/=d;
+      N[i].vx-=dx*f; N[i].vy-=dy*f; N[j].vx+=dx*f; N[j].vy+=dy*f;
+    }
+  }
+  for(const a of G.aristas){
+    const p=G.nodos[a.i], q=G.nodos[a.j];
+    let dx=q.x-p.x, dy=q.y-p.y, d=Math.hypot(dx,dy)||0.01;
+    const f=(d-k*0.55)/d*0.035;
+    p.vx+=dx*f; p.vy+=dy*f; q.vx-=dx*f; q.vy-=dy*f;
+  }
+  for(const n of N){
+    n.vx*=0.86; n.vy*=0.86;
+    n.x=Math.max(14,Math.min(W-14,n.x+n.vx));
+    n.y=Math.max(14,Math.min(H-14,n.y+n.vy));
+  }
+  // Recentrar por el CENTROIDE en vez de tirar de cada nodo hacia el medio. Un tiron
+  // por nodo compite con los resortes: las aisladas -que no tienen resorte- ganan el
+  // centro y empujan al racimo conectado a una esquina. MEDIDO al dibujar este vault:
+  // 60 aisladas ocupando el medio y las 59 conectadas apretadas abajo a la derecha.
+  if(G.tocado) return;      // si ya encuadraste tú, el automático no te lo quita
+  let cx=0, cy=0;
+  for(const n of N){ cx+=n.x; cy+=n.y; }
+  cx=cx/Math.max(1,N.length); cy=cy/Math.max(1,N.length);
+  for(const n of N){
+    n.x=Math.max(14,Math.min(W-14,n.x-cx+W/2));
+    n.y=Math.max(14,Math.min(H-14,n.y-cy+H/2));
+  }
+  // La orbita: radio justo fuera del racimo, repartidas en circulo y estables entre
+  // fotogramas -- no se mueven solas, que es lo que las hacia parecer vivas.
+  if(G.solas.length){
+    let rad=0;
+    for(const n of N) rad=Math.max(rad, Math.hypot(n.x-W/2, n.y-H/2));
+    rad=Math.min(Math.min(W,H)/2-18, rad+34);
+    const anillos=Math.ceil(G.solas.length/Math.max(8,Math.floor(2*Math.PI*rad/26)));
+    G.solas.forEach((n,i)=>{
+      const porAnillo=Math.ceil(G.solas.length/anillos);
+      const anillo=Math.floor(i/porAnillo), dentro=i%porAnillo;
+      const r=rad+anillo*22, ang=2*Math.PI*dentro/porAnillo + anillo*0.4;
+      n.x=Math.max(10,Math.min(W-10, W/2+r*Math.cos(ang)));
+      n.y=Math.max(10,Math.min(H-10, H/2+r*Math.sin(ang)));
+    });
+  }
+}
+
+function grafoPintar(W,H,dpr){
+  const c=$("#lienzoGrafo"), g=c.getContext("2d");
+  const css=getComputedStyle(document.documentElement);
+  const linea=css.getPropertyValue("--line").trim()||"#ddd";
+  const tinta=css.getPropertyValue("--fg").trim()||"#222";
+  const tenue=css.getPropertyValue("--dim").trim()||"#999";
+  g.setTransform(dpr,0,0,dpr,0,0);
+  g.clearRect(0,0,W,H);
+  g.translate(G.px,G.py); g.scale(G.k,G.k);
+  // El filtro por titulo NO quita nodos: los apaga. Quitarlos cambiaria el dibujo -las
+  // fuerzas se recolocan- y entonces buscar movería el mapa, que es justo lo que uno
+  // no quiere mientras busca. Apagados, el sitio de cada cosa se mantiene.
+  const f=G.filtro.trim().toLowerCase();
+  const casa=(n)=>!f || n.titulo.toLowerCase().includes(f) || n.id.toLowerCase().includes(f);
+  const vecinos=new Set();
+  if(G.sel!==null){
+    for(const a of G.aristas){
+      if(a.i===G.sel) vecinos.add(a.j);
+      if(a.j===G.sel) vecinos.add(a.i);
+    }
+  }
+  for(const a of G.aristas){
+    const p=G.nodos[a.i], q=G.nodos[a.j];
+    const toca = G.sel===null || a.i===G.sel || a.j===G.sel;
+    g.strokeStyle = toca ? (G.sel===null?linea:tinta) : linea;
+    g.globalAlpha = toca ? (G.sel===null?0.55:0.9) : 0.12;
+    g.lineWidth = (a.como==="ruta" ? 1 : 1.2)/G.k;
+    g.setLineDash(a.como==="ruta" ? [3/G.k,3/G.k] : []);
+    g.beginPath(); g.moveTo(p.x,p.y); g.lineTo(q.x,q.y); g.stroke();
+  }
+  g.setLineDash([]); g.globalAlpha=1;
+  for(let i=0;i<G.nodos.length;i++){
+    const n=G.nodos[i];
+    const r=3+Math.min(9,Math.sqrt(n.grado)*1.7);
+    const foco = (G.sel===null || i===G.sel || vecinos.has(i)) && casa(n);
+    g.globalAlpha = foco?1:(f&&!casa(n)?0.07:0.18);
+    // Las aisladas se pintan huecas: se ven, pero no se confunden con las conectadas.
+    g.beginPath(); g.arc(n.x,n.y,r,0,7);
+    if(n.grado===0){ g.strokeStyle=tenue; g.lineWidth=1.2/G.k; g.stroke(); }
+    else { g.fillStyle = i===G.sel ? tinta : tenue; g.fill(); }
+    // El umbral de etiqueta baja al acercarse: uno se acerca PARA LEER, y dejar los
+    // nodos pequenos mudos al 3x obliga a pasar el raton por cada uno.
+    const umbral = G.k>=2.4 ? 0 : G.k>=1.5 ? 2 : 4;
+    if(foco && (n.grado>=umbral || i===G.sel || (f && casa(n)))){
+      g.globalAlpha=foco?0.95:0.2;
+      g.fillStyle=tinta; g.font=(10/G.k)+"px ui-sans-serif,system-ui,sans-serif";
+      g.textAlign="center"; g.fillText(n.titulo, n.x, n.y-r-3/G.k);
+    }
+  }
+  g.globalAlpha=1;
+}
+
+function grafoNodoEn(ev){
+  const c=$("#lienzoGrafo"), r=c.getBoundingClientRect();
+  // De pantalla a mundo: sin deshacer el encuadre, acercarse dejaria de acertar los
+  // nodos y el fallo pareceria del dibujo y no del calculo.
+  const x=(ev.clientX-r.left-G.px)/G.k, y=(ev.clientY-r.top-G.py)/G.k;
+  let mejor=null, dmin=18/G.k;
+  G.nodos.forEach((n,i)=>{ const d=Math.hypot(n.x-x,n.y-y); if(d<dmin){ dmin=d; mejor=i; } });
+  return mejor;
+}
+
+// La barra de agentes se pliega, y se recuerda: en una pantalla pequena el grafo la
+// agradece, y quien trabaja con un solo agente no la necesita nunca.
+function plegar(si){
+  document.body.classList.toggle("plegado", si);
+  $("#plegar").textContent = si ? "›" : "‹";
+  try{ localStorage.setItem("bridge:plegado", si?"1":"0"); }catch{}
+  if(!$("#panelGrafo").hidden && G.datos) grafoMontar(G.datos);  // el lienzo cambio de ancho
+}
+$("#plegar").onclick=()=>plegar(!document.body.classList.contains("plegado"));
+try{ if(localStorage.getItem("bridge:plegado")==="1") plegar(true); }catch{}
+
+$("#verGrafo").onclick=verGrafo;
+
+// Buscar filtra en vivo y ademas dice CUANTAS coinciden: sin ese numero, "no se ve
+// nada" y "no hay ninguna" son la misma pantalla.
+$("#buscaGrafo").oninput=(ev)=>{
+  G.filtro=ev.target.value; if(G.repintar) G.repintar();
+  const f=G.filtro.trim().toLowerCase();
+  const pie=$("#leyendaGrafo").querySelector("b");
+  if(!pie) return;
+  if(!f){ pie.textContent=G.pieBase; return; }
+  const n=G.nodos.filter(x=>x.titulo.toLowerCase().includes(f)||x.id.toLowerCase().includes(f)).length;
+  pie.textContent = n ? T("grafo_coinciden").replace("{n}",n).replace("{t}",G.nodos.length)
+                      : T("grafo_nada");
+};
+
+// Abrir la nota: la sirve el puente, no el sistema de archivos del navegador. Dentro de
+// un contenedor el disco del anfitrion no existe, asi que "abrir" solo puede significar
+// leerla aqui.
+async function abrirNota(ruta, modo){
+  G.leyendo=ruta;
+  const l=$("#lectorNota");
+  l.classList.toggle("superpuesto", modo!=="allado");
+  l.classList.toggle("allado",      modo==="allado");
+  $("#lectorTit").textContent=ruta;
+  $("#lectorCuerpo").innerHTML="";
+  $("#lectorNota").hidden=false;
+  try{
+    const j=await api("GET","/sessions/"+encodeURIComponent(state.current)
+                           +"/nota?ruta="+encodeURIComponent(ruta));
+    // Puede haberse cerrado o haberse pedido otra mientras tanto.
+    if(G.leyendo!==ruta || $("#lectorNota").hidden) return;
+    $("#lectorTit").textContent=j.ruta+"  ·  "+fmtTok(j.bytes)+"B  ·  "+j.modificada;
+    $("#lectorCuerpo").innerHTML=mdToHtml(j.texto);
+  }catch(e){
+    if(G.leyendo!==ruta) return;
+    $("#lectorCuerpo").innerHTML='<div class="empty">'+escHtml(e.message)+"</div>";
+  }
+}
+
+// El raton RESALTA, el clic ABRE, el arrastre MUEVE y la rueda ACERCA. Antes el clic
+// hacia dos cosas y abrir la nota exigia un segundo gesto: dos pasos para lo que uno va
+// a hacer siempre.
+let arrastre=null;
+
+$("#lienzoGrafo").onmousedown=(ev)=>{
+  arrastre={x:ev.clientX, y:ev.clientY, px:G.px, py:G.py, movido:false};
+};
+$("#lienzoGrafo").onmousemove=(ev)=>{
+  if(arrastre){
+    const dx=ev.clientX-arrastre.x, dy=ev.clientY-arrastre.y;
+    // Umbral: un clic con la mano temblorosa no es un arrastre, y tratarlo como tal
+    // se come el gesto que de verdad se usa.
+    if(!arrastre.movido && Math.hypot(dx,dy)>4) arrastre.movido=true;
+    if(arrastre.movido){
+      G.px=arrastre.px+dx; G.py=arrastre.py+dy; G.tocado=true; if(G.repintar) G.repintar();
+      $("#lienzoGrafo").style.cursor="grabbing";
+      return;
+    }
+  }
+  const i=grafoNodoEn(ev);
+  G.sel=i; if(G.repintar) G.repintar();
+  $("#lienzoGrafo").style.cursor = i===null ? "grab" : "pointer";
+};
+window.addEventListener("mouseup", ()=>{
+  if(arrastre && arrastre.movido) G.traselArrastre=Date.now();
+  arrastre=null;
+});
+$("#lienzoGrafo").onmouseleave=()=>{ G.sel=null; if(G.repintar) G.repintar(); };
+
+$("#lienzoGrafo").onclick=(ev)=>{
+  // Tras arrastrar, el navegador manda un click igualmente: soltar el raton sobre un
+  // nodo abriria una nota que nadie pidio.
+  if(G.traselArrastre && Date.now()-G.traselArrastre<120) return;
+  const i=grafoNodoEn(ev);
+  if(i!==null) abrirNota(G.nodos[i].id);
+};
+
+// La rueda acerca SOBRE EL CURSOR, no sobre el centro: acercarse a un nodo concreto es
+// para lo que se usa, y centrar el zoom obliga a mover despues cada vez.
+$("#lienzoGrafo").onwheel=(ev)=>{
+  ev.preventDefault();
+  const r=$("#lienzoGrafo").getBoundingClientRect();
+  const cx=ev.clientX-r.left, cy=ev.clientY-r.top;
+  const antes=G.k;
+  G.k=Math.max(0.25, Math.min(6, G.k*(ev.deltaY<0?1.12:1/1.12)));
+  const f=G.k/antes;
+  G.px=cx-(cx-G.px)*f;
+  G.py=cy-(cy-G.py)*f;
+  G.tocado=true; if(G.repintar) G.repintar();
+};
+
+// Doble clic en hueco: vuelve al encuadre de salida. Sin una forma de volver, perderse
+// acercandose obliga a salir del grafo y montarlo otra vez.
+$("#lienzoGrafo").ondblclick=(ev)=>{
+  if(grafoNodoEn(ev)!==null) return;
+  G.k=1; G.px=0; G.py=0; G.tocado=false; if(G.repintar) G.repintar();
+};
+$("#lectorX").onclick=()=>{ $("#lectorNota").hidden=true; G.leyendo=null; G.partida=null; };
+
+// Preguntar: quien sabe LEER la nota es el agente; el dibujo solo sabe quien la cita.
+// Vive DENTRO del lector, que es cuando uno ya sabe de que nota habla.
+// Hablar de un documento NO lo cierra: abre la tercera vista, chat a la izquierda y el
+// documento a la derecha. Cerrar la nota justo cuando vas a hablar de ella obliga a
+// recordarla de memoria, que es lo contrario de tenerla abierta.
+$("#lectorPreguntar").onclick=()=>{
+  if(!G.leyendo) return;
+  const nota=G.leyendo;
+  $("#input").value = "Háblame de la nota `"+nota+"` de mi vault: qué dice y quién la cita.";
+  G.partida=nota;
+  verGrafo();                       // vuelve al chat
+  abrirNota(nota, "allado");
+  $("#input").focus();
+};
+
 // Devuelve la contrasena, "" si se exporta en claro, o null si se cancelo. El campo
 // se vacia SIEMPRE al salir: una contrasena que se queda en el DOM sigue ahi cuando
 // otra persona se sienta delante de la pantalla.
@@ -1079,7 +1570,7 @@ $("#exportar").onclick=async()=>{
 $("#guardar").onclick=()=>{
   if(!state.current || state.streams[state.current]) return;
   $("#input").value="/vuelamind-commit";
-  send();
+  send();   // la marca la pone send() al ver el comando, no este botón
 };
 
 
@@ -1231,13 +1722,13 @@ function marcarTrabajando(name, si){
   });
 }
 
-function startStream(owner){
+function startStream(owner, conciliando){
   const d=document.createElement("div"); d.className="msg asst stream";
   d.innerHTML=`<div class="who">${owner}</div>`;
   const status=document.createElement("div"); status.className="st-status"; d.appendChild(status);
   const steps=document.createElement("div"); steps.className="st-steps"; d.appendChild(steps);
   const t0=Date.now();
-  const p={el:d, status, steps, timer:null, usage:null, owner};
+  const p={el:d, status, steps, timer:null, usage:null, owner, conciliando:!!conciliando};
   state.streams[owner]=p;
   marcarTrabajando(owner, true);
   refrescarGuardar();
@@ -1287,6 +1778,12 @@ function endStream(p){
   if(p.timer) clearInterval(p.timer);
   if(p.el) p.el.remove();
   if(p.owner && state.streams[p.owner]===p) delete state.streams[p.owner];
+  if(p.conciliando){
+    // La referencia se fija AL TERMINAR, no al pedirlo: entre una cosa y otra es
+    // cuando el ciclo escribe, y marcar antes daria por conciliado lo recien escrito.
+    api("POST","/sessions/"+encodeURIComponent(p.owner)+"/conciliado",{})
+      .catch(()=>{}).then(refrescarDeuda);
+  } else { refrescarDeuda(); }
   if(p.owner) marcarTrabajando(p.owner, false);
   refrescarGuardar();
 }
@@ -1314,8 +1811,8 @@ async function recuperar(owner, panel){
 // ---- el motor de un turno en vivo, compartido por «enviar» y por «crear» ----
 // Crear era el unico camino que no pasaba por aqui: bloqueaba hasta el final, sin un solo
 // evento, y era ademas el ultimo turno que seguia muriendo con el cliente.
-async function correrTurno(url, body, owner){
-  const panel=startStream(owner);
+async function correrTurno(url, body, owner, conciliando){
+  const panel=startStream(owner, conciliando);
   let finalText="", isErr=false;
   try{
     const r=await fetch(url,{method:"POST", headers:hdrs(), body:JSON.stringify(body)});
@@ -1382,6 +1879,16 @@ async function send(){
   if((!t && !okAtts.length) || !state.current) return;
   const message=buildMessage(t);
   const attachments=buildAttachments();
+  // La referencia de la deuda se mueve cuando CORRE EL CICLO, no cuando se pulsa el
+  // botón: lo normal es teclearlo a mano, y marcarlo desde el botón dejaba fuera
+  // justo el caso frecuente. Se mira el comando, que es lo que los dos caminos
+  // comparten.
+  //
+  // LÍMITE, dicho porque no se ve: si el ciclo corre SIN que ese comando aparezca
+  // escrito -porque el agente lo arranca solo, o por un alias que este código no
+  // conoce- la referencia no se mueve y el contador sigue subiendo. Miente hacia
+  // arriba, que es el lado seguro: te dice que debes más, nunca menos.
+  const esConciliacion = /^\/(vuelamind-)?commit\b/i.test(t);
   const shown = t + (okAtts.length ? (t?"\n":"")+"📎 "+okAtts.map(a=>a.name).join(", ") : "");
   // EL DUEÑO DEL TURNO SE CAPTURA AQUÍ Y NO SE VUELVE A PREGUNTAR.
   // Antes todo esto leía state.current en vivo: si cambiabas de sesión mientras el turno
@@ -1391,7 +1898,7 @@ async function send(){
   $("#input").value=""; clearAtts(); $("#send").disabled=true;
   pushTx(owner,"user",shown); render();
   const cuerpo={message}; if(attachments.length) cuerpo.attachments=attachments;
-  await correrTurno(`/sessions/${encodeURIComponent(owner)}/stream`, cuerpo, owner);
+  await correrTurno(`/sessions/${encodeURIComponent(owner)}/stream`, cuerpo, owner, esConciliacion);
   render(); $("#send").disabled=false; $("#input").focus();
 }
 $("#send").onclick=send;
@@ -1461,6 +1968,7 @@ logEl.addEventListener("drop",e=>{
   if(state.current && e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
 });
 
+chatVisible(true);                 // sin sesion todavia: deja la caja fuera
 refresh(); setInterval(refresh, 8000);
 </script>
 </body>
