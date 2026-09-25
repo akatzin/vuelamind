@@ -1197,6 +1197,7 @@ function grafoMontar(j){
   const idx={}; G.nodos.forEach((n,i)=>idx[n.id]=i);
   G.vivos=G.nodos.filter(n=>n.grado>0);
   G.solas=G.nodos.filter(n=>n.grado===0);
+  G.gradoMax=G.nodos.reduce((m,n)=>Math.max(m,n.grado),0);
   G.aristas=j.aristas.filter(a=>idx[a.de]!==undefined&&idx[a.a]!==undefined)
                      .map(a=>({...a, i:idx[a.de], j:idx[a.a]}));
   const leyenda=$("#leyendaGrafo");
@@ -1223,16 +1224,76 @@ function grafoMontar(j){
   //
   // Mientras las fuerzas corren hay algo que cambiar. Despues, solo lo que tu haces:
   // pasar el raton, filtrar, mover o acercar. Cada uno pide un fotograma.
+  // Mas pasos cuando hay mas que acomodar: 400 bastaban con 40 notas y dejaban el
+  // dibujo a medio asentar con 130. No es proporcional -eso seria esperar de mas- sino
+  // un suelo que sube con la raiz del tamano.
+  const tope=Math.round(400+40*Math.sqrt(Math.max(0,G.vivos.length-40)));
   let pasos=0;
   const tick=()=>{
     G.anim=null;
-    const moviendo = pasos++ < 400;
+    const moviendo = pasos++ < tope;
     if(moviendo) grafoFuerzas(W,H);
+    // Al terminar de moverse, encuadrar lo dibujado dentro del lienzo QUE HAY AHORA.
+    //
+    // Sin esto, el dibujo solo cae bien si el lienzo mide lo mismo que cuando empezo la
+    // simulacion -- y no siempre: colapsar la barra de agentes o abrir el lector cambian
+    // su ancho SIN disparar un `resize` de ventana, asi que las fuerzas siguen
+    // acomodando contra un tamano que ya no existe y el resultado se ve apretado en una
+    // esquina con medio lienzo vacio. Encuadrar al final lo vuelve indiferente: da igual
+    // contra que tamano se acomodo, se enseña entero.
+    if(!moviendo && !G.encuadrado && !G.tocado){ G.encuadrado=true; grafoEncuadrar(); }
     grafoPintar(W,H,dpr);
     if(moviendo || G.sucio){ G.sucio=false; G.anim=requestAnimationFrame(tick); }
   };
   G.repintar=()=>{ G.sucio=true; if(!G.anim) G.anim=requestAnimationFrame(tick); };
-  grafoParar(); G.sucio=false; tick();
+  grafoParar(); G.sucio=false; G.encuadrado=false; tick();
+}
+
+// Encaja TODO lo dibujado -incluidas las aisladas en orbita- dentro del lienzo actual,
+// con un margen para que las etiquetas no queden cortadas contra el borde.
+function grafoEncuadrar(){
+  if(!G.nodos || !G.nodos.length) return;
+  const c=$("#lienzoGrafo"), r=c.getBoundingClientRect();
+  const W=r.width, H=r.height;
+  if(W<10||H<10) return;
+  let x0=Infinity, y0=Infinity, x1=-Infinity, y1=-Infinity;
+  for(const n of G.nodos){
+    const rad=grafoRadio(n);
+    x0=Math.min(x0,n.x-rad); y0=Math.min(y0,n.y-rad);
+    x1=Math.max(x1,n.x+rad); y1=Math.max(y1,n.y+rad);
+  }
+  const ancho=Math.max(1,x1-x0), alto=Math.max(1,y1-y0), margen=26;
+  // Nunca ALEJAR mas alla de 1: si el dibujo ya cabe, acercarlo lo unico que hace es
+  // convertir un grafo de doce notas en doce pelotas gigantes.
+  G.k=Math.min(1, Math.min((W-2*margen)/ancho, (H-2*margen)/alto));
+  G.px=W/2 - G.k*(x0+x1)/2;
+  G.py=H/2 - G.k*(y0+y1)/2;
+}
+
+// El radio de un nodo, RELATIVO al grafo que estas mirando y no a una escala fija.
+//
+// Antes era `3 + min(9, sqrt(grado)*1.7)`, y el tope estaba puesto para que un
+// concentrador no tapara a sus vecinos. El problema del tope es que no sabe de que
+// grafo se trata: **a partir de grado 28 todo vale 12**. En un vault de 40 notas eso no
+// se alcanza nunca y la formula se ve bien; en uno de 132 con concentradores de grado
+// 90, la cabeza entera de la distribucion se dibuja identica -- y el dibujo deja de
+// decir lo unico que un tamano puede decir. MEDIDO el 2026-09-24 en un banco de layout:
+// cuatro nodos de grado 95, 93, 93 y 86, los cuatro con r=12.0, y 16 radios distintos
+// para 132 nodos.
+//
+// Ahora la escala se estira contra el MAXIMO de este grafo: el mas citado siempre se ve
+// como el mas grande, tenga grado 9 o 900, y el suelo sigue siendo legible. Raiz y no
+// lineal porque el grado de un vault es de cola larga: en lineal, un solo indice que
+// cita a todo dejaria a los demas indistinguibles entre si. Y raiz y no logaritmo
+// porque el logaritmo aplasta justo el tramo que interesa -- con log, grado 16 y grado
+// 95 salian a 9.4 y 13.0; con raiz salen a 8.6 y 16.0, y eso se ve de un vistazo.
+//
+// Que los dos mas citados salgan casi iguales NO es el defecto: grado 93 y grado 95 SON
+// casi iguales. El defecto era que grado 16 y grado 95 salieran iguales.
+function grafoRadio(n){
+  const max=G.gradoMax||1;
+  if(!n.grado) return 3;
+  return 3.5 + 12.5*Math.sqrt(n.grado/max);
 }
 
 // Fuerzas SOLO sobre lo conectado; las aisladas van en orbita, colocadas y no simuladas.
@@ -1261,6 +1322,23 @@ function grafoFuerzas(W,H){
     const f=(d-k*0.55)/d*0.035;
     p.vx+=dx*f; p.vy+=dy*f; q.vx-=dx*f; q.vy-=dy*f;
   }
+  // Gravedad PROPORCIONAL AL GRADO hacia el centro del racimo. Sin esto, lo unico que
+  // acerca a un concentrador al medio son sus propios resortes, y eso solo funciona si
+  // sus vecinos lo rodean: cuando casi todos cuelgan de el, los resortes tiran parejo
+  // en todas direcciones, se cancelan, y el concentrador flota donde lo dejo la
+  // repulsion -- que con muchos nodos es contra la pared. Con la raiz del grado, el
+  // mas citado se hunde al centro y las hojas quedan fuera, que es lo que un grafo de
+  // notas tiene que DECIR de un vistazo: quien manda esta en medio.
+  //
+  // Raiz y no grado a secas: lineal, un nodo de grado 500 aplasta a todo lo demas
+  // contra el centro y el dibujo se vuelve un punto.
+  let gx=0, gy=0;
+  for(const n of N){ gx+=n.x; gy+=n.y; }
+  gx/=Math.max(1,N.length); gy/=Math.max(1,N.length);
+  for(const n of N){
+    const g=Math.sqrt(n.grado)*0.0045;
+    n.vx+=(gx-n.x)*g; n.vy+=(gy-n.y)*g;
+  }
   for(const n of N){
     n.vx*=0.86; n.vy*=0.86;
     n.x=Math.max(14,Math.min(W-14,n.x+n.vx));
@@ -1270,17 +1348,16 @@ function grafoFuerzas(W,H){
   // por nodo compite con los resortes: las aisladas -que no tienen resorte- ganan el
   // centro y empujan al racimo conectado a una esquina. MEDIDO al dibujar este vault:
   // 60 aisladas ocupando el medio y las 59 conectadas apretadas abajo a la derecha.
-  if(G.tocado) return;      // si ya encuadraste tú, el automático no te lo quita
   let cx=0, cy=0;
   for(const n of N){ cx+=n.x; cy+=n.y; }
   cx=cx/Math.max(1,N.length); cy=cy/Math.max(1,N.length);
-  for(const n of N){
+  if(!G.tocado) for(const n of N){    // si ya encuadraste tú, el automático no te lo quita
     n.x=Math.max(14,Math.min(W-14,n.x-cx+W/2));
     n.y=Math.max(14,Math.min(H-14,n.y-cy+H/2));
   }
   // La orbita: radio justo fuera del racimo, repartidas en circulo y estables entre
   // fotogramas -- no se mueven solas, que es lo que las hacia parecer vivas.
-  if(G.solas.length){
+  if(G.solas.length && !G.tocado){
     let rad=0;
     for(const n of N) rad=Math.max(rad, Math.hypot(n.x-W/2, n.y-H/2));
     rad=Math.min(Math.min(W,H)/2-18, rad+34);
@@ -1328,7 +1405,7 @@ function grafoPintar(W,H,dpr){
   g.setLineDash([]); g.globalAlpha=1;
   for(let i=0;i<G.nodos.length;i++){
     const n=G.nodos[i];
-    const r=3+Math.min(9,Math.sqrt(n.grado)*1.7);
+    const r=grafoRadio(n);
     const foco = (G.sel===null || i===G.sel || vecinos.has(i)) && casa(n);
     g.globalAlpha = foco?1:(f&&!casa(n)?0.07:0.18);
     // Las aisladas se pintan huecas: se ven, pero no se confunden con las conectadas.
@@ -1363,9 +1440,48 @@ function plegar(si){
   document.body.classList.toggle("plegado", si);
   $("#plegar").textContent = si ? "›" : "‹";
   try{ localStorage.setItem("bridge:plegado", si?"1":"0"); }catch{}
-  if(!$("#panelGrafo").hidden && G.datos) grafoMontar(G.datos);  // el lienzo cambio de ancho
+  // Reencuadrar DESPUES de que el navegador aplique el ancho nuevo, no en esta misma
+  // vuelta. Antes aqui se remontaba el grafo entero, y medir el lienzo en el mismo
+  // instante en que cambia la clase del `body` lo mide ANTES de que el ancho nuevo
+  // exista: la simulacion acomodaba contra un tamano que ya no era, y el dibujo salia
+  // apretado contra un lado con medio lienzo vacio. MEDIDO el 2026-09-24.
+  //
+  // Dos fotogramas: el primero aplica el estilo, el segundo ya puede medirlo. Y va
+  // ademas del observador de tamano -no en su lugar- porque el observador depende de
+  // que la pestana este pintando, y una pestana en segundo plano no pinta.
+  reencuadrarGrafo();
+}
+
+function reencuadrarGrafo(){
+  const hazlo=()=>{
+    if($("#panelGrafo").hidden || !G.nodos || !G.nodos.length || G.tocado) return;
+    grafoEncuadrar(); if(G.repintar) G.repintar();
+  };
+  // Dos veces: AHORA y en cuanto se vacie la cola de tareas.
+  //
+  // Ahora, porque el observador de tamano ya llega despues de que el navegador calculo
+  // el nuevo ancho, y ahi medir es correcto. En cuanto se vacie, porque plegar la barra
+  // llama a esto en la MISMA vuelta en que cambio la clase, y ahi el ancho nuevo todavia
+  // no existe.
+  //
+  // Y con `setTimeout` y no con fotogramas: un fotograma depende de que la pestana este
+  // pintando, y una pestana en segundo plano no pinta -- MEDIDO el 2026-09-24, el
+  // reencuadre no ocurria nunca con la ventana detras. La cola de tareas corre igual.
+  hazlo();
+  setTimeout(hazlo, 0);
 }
 $("#plegar").onclick=()=>plegar(!document.body.classList.contains("plegado"));
+
+// El lienzo cambia de tamano por mas cosas que un `resize` de ventana: plegar la barra
+// de agentes, abrir el lector en vista dividida, cerrarlo. Ninguna dispara `resize`, y
+// sin esto el dibujo se quedaba acomodado contra el tamano anterior.
+//
+// Reencuadra, NO vuelve a simular: las posiciones son buenas, lo que cambio es por
+// donde se mira. Volver a simular tiraria el acomodo -y lo que el ojo ya habia
+// aprendido de el- cada vez que abres una nota.
+try{
+  new ResizeObserver(()=>reencuadrarGrafo()).observe($("#panelGrafo"));
+}catch{}                          // navegador sin ResizeObserver: se queda como estaba
 try{ if(localStorage.getItem("bridge:plegado")==="1") plegar(true); }catch{}
 
 $("#verGrafo").onclick=verGrafo;
@@ -1394,6 +1510,7 @@ async function abrirNota(ruta, modo){
   $("#lectorTit").textContent=ruta;
   $("#lectorCuerpo").innerHTML="";
   $("#lectorNota").hidden=false;
+  reencuadrarGrafo();                                // el lienzo se estrecha al abrir
   try{
     const j=await api("GET","/sessions/"+encodeURIComponent(state.current)
                            +"/nota?ruta="+encodeURIComponent(ruta));
@@ -1465,7 +1582,8 @@ $("#lienzoGrafo").ondblclick=(ev)=>{
   if(grafoNodoEn(ev)!==null) return;
   G.k=1; G.px=0; G.py=0; G.tocado=false; if(G.repintar) G.repintar();
 };
-$("#lectorX").onclick=()=>{ $("#lectorNota").hidden=true; G.leyendo=null; G.partida=null; };
+$("#lectorX").onclick=()=>{ $("#lectorNota").hidden=true; G.leyendo=null; G.partida=null;
+                            reencuadrarGrafo(); };   // el lienzo recupera su ancho
 
 // Preguntar: quien sabe LEER la nota es el agente; el dibujo solo sabe quien la cita.
 // Vive DENTRO del lector, que es cuando uno ya sabe de que nota habla.
