@@ -111,6 +111,15 @@
   aside .new textarea{resize:vertical;min-height:44px}
   section{flex:1;display:flex;flex-direction:column;min-width:0}
   .chathead{display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--bg)}
+  /* Viven bajo el compositor y no en la cabecera: son de lo que vas a MANDAR, no de lo
+     que la sesion es. Puestos arriba compiten con los botones que la gobiernan. */
+  /* El compositor vive en una columna centrada de 780 px. Alinear estos al borde de
+     la ventana los dejaba flotando lejos de todo: mismo padding, misma columna. */
+  .ajustes{display:flex;gap:6px;align-items:center;justify-content:flex-end;
+       padding:0 max(20px, calc((100% - 780px) / 2)) 6px}
+  .ajustes .ajuste{background:var(--field);border:1px solid var(--line);color:var(--dim);
+       border-radius:6px;font-size:11px;padding:3px 5px;max-width:190px}
+  .ajustes .ajuste:hover{color:var(--fg)}
   .chathead .cur{font-weight:600}
   .chathead .sp{flex:1}
   /* Cerrar y borrar una sesión no puede ser el botón más llamativo de la pantalla. */
@@ -320,12 +329,37 @@
       <span class="sp"></span>
       <button id="guardar" class="ghost" hidden
               title="Manda /vuelamind-commit a esta sesión: mide, te enseña qué va a escribir y solo escribe con tu sí">Guardar</button>
+
       <button id="exportar" class="ghost"
               title="Baja este agente como .zip: su carpeta y su memoria. Sin llaves ni archivos de configuración; dentro va un _EXCLUIDO.txt que dice qué quedó fuera">Exportar agente</button>
       <button id="close" class="ghost danger" title="Detiene la sesión y la quita de esta página">Cerrar este chat</button>
     </div>
     <div class="log" id="log"><div class="empty">Elige o crea una sesión.</div></div>
     <div class="attachbar" id="attachbar"></div>
+    <div class="ajustes" id="ajustesPie">
+      <select id="selModelo" class="ajuste" hidden title="Modelo de esta sesión — se aplica desde el turno siguiente">
+        <option value="">modelo: el del CLI</option>
+        <option value="default">default</option>
+        <option value="best">best</option>
+        <option value="opus">opus</option>
+        <option value="opus[1m]">opus[1m]</option>
+        <option value="opusplan">opusplan</option>
+        <option value="sonnet">sonnet</option>
+        <option value="sonnet[1m]">sonnet[1m]</option>
+        <option value="fable">fable</option>
+        <option value="fable[1m]">fable[1m]</option>
+        <option value="haiku">haiku</option>
+        <option value="__otro">otro…</option>
+      </select>
+      <select id="selEsfuerzo" class="ajuste" hidden title="Nivel de esfuerzo — se aplica desde el turno siguiente">
+        <option value="">esfuerzo</option>
+        <option value="low">low</option>
+        <option value="medium">medium</option>
+        <option value="high">high</option>
+        <option value="xhigh">xhigh</option>
+        <option value="max">max</option>
+      </select>
+    </div>
     <div class="composer">
       <div class="ac" id="ac" hidden></div>
       <input type="file" id="file" multiple hidden>
@@ -567,7 +601,8 @@ function saveUsage(name,u){ try{ localStorage.setItem("usage:"+name,JSON.stringi
 function loadUsage(name){ try{ return JSON.parse(localStorage.getItem("usage:"+name))||null }catch{ return null } }
 
 // ---- autocompletar de skills / comandos "/" (lista que llega en el init) ----
-function saveCommands(cmds, skills){
+function saveCommands(cmds, skills, modelo){
+  if(modelo){ state.modeloEfectivo=modelo; refrescarAjustes(); }
   if(Array.isArray(cmds)&&cmds.length){
     state.commands=cmds;
     setTimeout(refrescarGuardar, 0);   // la lista llega con el primer `init` del turno
@@ -840,6 +875,65 @@ async function traerHistorial(name){
 // El botón solo existe si ESA sesión tiene el ciclo instalado — lo declara el evento `init`,
 // no se supone. Ofrecer un atajo a un comando que no está es peor que no ofrecerlo: falla
 // después de haber gastado un turno.
+// El modelo vigente se ENSENA: hasta ahora solo se elegia al crear la sesion y despues
+// no habia forma de saber con cual corria. Vacio significa "el que traiga el CLI", y eso
+// se dice con esas palabras en vez de dejar el hueco.
+// Los selectores mandan: lo que este elegido es lo que viaja en el turno siguiente. Asi
+// no hay que sacarle el dato a la sesion ni adivinar con que corre -- se ve.
+function refrescarAjustes(){
+  const sm=$("#selModelo"), se=$("#selEsfuerzo");
+  $("#ajustesPie").style.display = state.current ? "flex" : "none";
+  if(!state.current){ sm.hidden=true; se.hidden=true; return; }
+  const s=(state.sesiones||[]).find(x=>x.name===state.current) || {};
+  const m=s.model || "";
+  // Un modelo que no esta en la lista -un nombre completo, uno nuevo- NO se pierde:
+  // se le hace su opcion. Un selector que no sabe representar lo que hay lo borraria
+  // al primer cambio, y nadie vería que lo borro.
+  if(m && ![...sm.options].some(o=>o.value===m)){
+    const op=document.createElement("option"); op.value=m; op.textContent=m;
+    sm.insertBefore(op, sm.querySelector('option[value="__otro"]'));
+  }
+  // La opcion "sin elegir" NO se queda en "el del CLI": se le pone el modelo EFECTIVO
+  // que el propio CLI reporto en su `init`. "El del CLI" es cierto y no dice nada --
+  // quien mira quiere saber cual, y es justo el caso de una sesion recien creada.
+  // Tres fuentes, y cada una se dice: lo que el CLI reporto en su `init` es exacto;
+  // lo que hay en settings.json es lo configurado y puede quedar desmentido; y si no
+  // hay ninguna de las dos, se admite que no se sabe en vez de rellenar el hueco.
+  const cero=sm.querySelector('option[value=""]');
+  const def=s.modelo_defecto || {};
+  cero.textContent = state.modeloEfectivo ? state.modeloEfectivo + " · en uso"
+                   : def.valor            ? def.valor + " · configurado"
+                   : "sin elegir — lo pone el CLI";
+  // El esfuerzo SI tiene omision del puente, y se dice cual: dejarlo en "el del CLI"
+  // ocultaba que este puente ya estaba pidiendo uno concreto en cada turno.
+  const ce=se.querySelector('option[value=""]');
+  ce.textContent = s.esfuerzo_defecto ? s.esfuerzo_defecto + " · por omisión"
+                                      : "esfuerzo: el del CLI";
+  sm.value=m; se.value=s.effort || "";
+  sm.hidden=false; se.hidden=false;
+}
+
+async function guardarAjustes(){
+  const sm=$("#selModelo"), se=$("#selEsfuerzo");
+  if(!state.current) return;
+  let modelo=sm.value;
+  if(modelo==="__otro"){
+    modelo=(prompt("Nombre completo del modelo (p. ej. claude-opus-5):")||"").trim();
+    if(!modelo){ refrescarAjustes(); return; }
+  }
+  try{
+    await api("POST","/sessions/"+encodeURIComponent(state.current)+"/ajustes",
+              {modelo, esfuerzo:se.value});
+    const s=(state.sesiones||[]).find(x=>x.name===state.current);
+    if(s){ s.model=modelo; s.effort=se.value; }
+    refrescarAjustes();
+  }catch(e){ alert(e.message); refrescarAjustes(); }
+}
+$("#selModelo").onchange=guardarAjustes;
+$("#selEsfuerzo").onchange=guardarAjustes;
+
+const refrescarModelo=refrescarAjustes;   // el nombre viejo sigue sirviendo
+
 function refrescarGuardar(){
   const hay = (state.commands||[]).some(c => /^vuelamind-commit$/i.test(c));
   const b = $("#guardar");
@@ -852,6 +946,7 @@ function select(name){
   state.current=name;
   $("#input").disabled=false; $("#send").disabled=false; $("#attach").disabled=false;
   $("#chathead").style.display="flex"; $("#curname").textContent=name;
+  refrescarModelo();
   clearAtts(); acClose();
   state.usage[name]=loadUsage(name); renderUsage(name); refrescarGuardar();
   document.querySelectorAll(".sess").forEach(e=>e.classList.toggle("on",e.querySelector(".n").textContent===name));
@@ -1171,7 +1266,7 @@ function updUsage(ev, owner){
 }
 function handleEv(ev, p){
   if(ev.kind==="init"){
-    saveCommands(ev.commands, ev.skills);
+    saveCommands(ev.commands, ev.skills, ev.model);
   } else if(ev.kind==="tool"){
     addStep(p, TOOL_ICON[ev.name]||"🔧", ev.name+(ev.brief?": "+ev.brief:""));
   } else if(ev.kind==="text"){
@@ -1246,6 +1341,18 @@ async function correrTurno(url, body, owner){
     }
     endStream(panel);
     pushTx(owner, isErr?"err":"asst", finalText || (isErr?"(error)":""));
+    // Si el turno fue un `/model X` Y EL CLI CONFIRMA QUE LO PUSO, se recuerda. Cada
+    // turno es un proceso nuevo, asi que sin esto el cambio dura uno solo.
+    //
+    // Se mira la RESPUESTA y no el comando: `/model opus-5` contesta "not found", y
+    // guardar eso a ciegas romperia todos los turnos siguientes. Si la frase del CLI
+    // cambia algun dia, esto deja de recordar -- que es no hacer nada, el lado seguro.
+    const pedido = (body && body.message || "").trim().match(/^\/model\s+(\S+)/i);
+    if(pedido && !isErr && /^\s*Set model to/i.test(finalText)){
+      api("POST","/sessions/"+encodeURIComponent(owner)+"/ajustes",{modelo:pedido[1]})
+        .then(()=>{ refresh().then(refrescarAjustes); })
+        .catch(()=>{});
+    }
     // Reconciliar la lista AHORA: al terminar, esta página deja de marcar la fila pero el
     // servidor puede seguir reportando `busy` unos segundos, y el refresco periódico la
     // volvería a encender. Un parpadeo pequeño, pero es una señal diciendo dos cosas.

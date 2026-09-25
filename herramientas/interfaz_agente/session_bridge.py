@@ -121,6 +121,15 @@ if sys.stderr is None or sys.stdout is None:
 HOST = "127.0.0.1"                                   # loopback SIEMPRE; salir por túnel SSH
 PORT = int(os.environ.get("PORT", "8850"))   # canonico del marco; 8787 colisiona
 DEFAULT_MODEL = os.environ.get("BRIDGE_MODEL", "")   # vacio = el default del CLI.
+
+# El esfuerzo SI trae un valor por omision, y es `high`. No es lo mismo que el modelo:
+# ahi un id fijo revienta donde no este aprovisionado, y los niveles de esfuerzo son
+# una lista cerrada que el CLI declara igual en todas partes.
+#
+# Se puede bajar con BRIDGE_EFFORT, porque cuanto se piensa cada turno es una decision
+# de cada despliegue -- cuesta tiempo y dinero-- y no algo que el canon deba imponer.
+ESFUERZOS_VALIDOS = ("low", "medium", "high", "xhigh", "max")
+DEFAULT_EFFORT = os.environ.get("BRIDGE_EFFORT", "high").strip()
 # El canon NO congela un id de modelo: "solo opus" fue un hecho del Model Garden de
 # origen, no del marco, y un id fijo revienta donde no este aprovisionado.
 DEFAULT_CWD = os.environ.get("BRIDGE_CWD", str(Path(__file__).resolve().parent.parent))
@@ -489,7 +498,8 @@ def permission_args(level: str | None) -> list:
 
 
 def run_turn(text: str, attachments: list | None, session_id: str | None,
-             cwd: str, model: str, permission: str | None = None) -> dict:
+             cwd: str, model: str, permission: str | None = None,
+             esfuerzo: str = "") -> dict:
     """Corre un turno headless (entrada stream-json) y devuelve
     {session_id, text, is_error, raw_error}. Soporta adjuntos multimedia y
     un nivel de permiso (full|tools|safe)."""
@@ -499,6 +509,10 @@ def run_turn(text: str, attachments: list | None, session_id: str | None,
             ]
     if model:
         args += ["--model", model]
+    # El esfuerzo viaja igual que el modelo y por la misma razon: cada turno es un
+    # proceso nuevo, asi que lo que no se le pase aqui no existe alli.
+    if esfuerzo:
+        args += ["--effort", esfuerzo]
     args += permission_args(permission)
     if session_id:
         args += ["--resume", session_id]
@@ -552,7 +566,7 @@ def _tool_brief(name: str, inp: dict | None) -> str:
 
 def stream_turn(text: str, attachments: list | None, session_id: str | None,
                 cwd: str, model: str, permission: str | None, emit,
-                ventana: int | None = None) -> dict:
+                ventana: int | None = None, esfuerzo: str = "") -> dict:
     """Corre un turno headless y llama emitir(dict) por cada evento de UI, en vivo.
     Emite: init / tool / text / result / error. Devuelve {session_id, text, is_error}.
 
@@ -569,6 +583,10 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
             ]
     if model:
         args += ["--model", model]
+    # El esfuerzo viaja igual que el modelo y por la misma razon: cada turno es un
+    # proceso nuevo, asi que lo que no se le pase aqui no existe alli.
+    if esfuerzo:
+        args += ["--effort", esfuerzo]
     args += permission_args(permission)
     if session_id:
         args += ["--resume", session_id]
@@ -632,7 +650,11 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
                 # autocomplete. Son del install entero, iguales para toda sesión.
                 emitir({"kind": "init", "session_id": sid,
                       "commands": ev.get("slash_commands") or [],
-                      "skills": ev.get("skills") or []})
+                      "skills": ev.get("skills") or [],
+                      # El modelo EFECTIVO, que solo lo sabe el CLI. Sin esto, una
+                      # sesion sin modelo elegido se describe como "el del CLI" -- que
+                      # es cierto y no dice nada: quien mira quiere saber CUAL.
+                      "model": ev.get("model") or ""})
             elif t == "system" and ev.get("subtype") == "compact_boundary":
                 # el turno cruzó el umbral y claude compactó el contexto en caliente
                 cm = ev.get("compact_metadata") or {}
@@ -702,7 +724,7 @@ def stream_turn(text: str, attachments: list | None, session_id: str | None,
 
 def deliver_turn(text: str, attachments: list | None, session_id: str | None,
                  cwd: str, model: str, permission: str | None,
-                 name: str, on_init, on_error) -> None:
+                 name: str, on_init, on_error, esfuerzo: str = "") -> None:
     """Entrega-y-suelta: corre un turno headless DESACOPLADO de la conexión HTTP.
 
     Llama on_init(sid) EN CUANTO el turno arranca (evento 'init' = el aviso llegó);
@@ -718,6 +740,10 @@ def deliver_turn(text: str, attachments: list | None, session_id: str | None,
             ]
     if model:
         args += ["--model", model]
+    # El esfuerzo viaja igual que el modelo y por la misma razon: cada turno es un
+    # proceso nuevo, asi que lo que no se le pase aqui no existe alli.
+    if esfuerzo:
+        args += ["--effort", esfuerzo]
     args += permission_args(permission)
     if session_id:
         args += ["--resume", session_id]
@@ -893,6 +919,13 @@ class Handler(BaseHTTPRequestHandler):
                 merged.append({"name": name, "session_id": meta.get("session_id"),
                                "cwd": meta.get("cwd"), "created": meta.get("created"),
                                "permission": meta.get("permission") or DEFAULT_PERMISSION,
+                               # El modelo se expone para poder ENSENARLO: hasta ahora
+                               # solo se elegia al crear y despues no habia forma de
+                               # saber con cual corria la sesion.
+                               "model": meta.get("model") or DEFAULT_MODEL,
+                               "modelo_defecto": _modelo_por_defecto(),
+                               "esfuerzo_defecto": DEFAULT_EFFORT,
+                               "effort": meta.get("effort") or "",
                                "live_state": a.get("state") or a.get("status")})
             # Se comprueba AQUI y no al arrancar: el master puede llegar en un
             # montaje posterior, y un dato cacheado del arranque mentiria sin fallar.
@@ -1027,6 +1060,36 @@ class Handler(BaseHTTPRequestHandler):
         directorios asi no tiene como saber cual le toca."""
         return (Path.home() / ".claude" / "projects"
                 / re.sub(r"[^A-Za-z0-9]", "-", str(Path(cwd).resolve())) / "memory")
+
+    # Los niveles los declara el CLI, y son cerrados: `--effort zzz` contesta
+    # "Valid values: low, medium, high, xhigh, max". MEDIDO el 2026-09-24.
+    ESFUERZOS = ESFUERZOS_VALIDOS
+
+    def _ajustes(self, nombre, modelo, esfuerzo) -> None:
+        """Guarda modelo y esfuerzo de una sesion. Cadena vacia = quitarlo, o sea
+        volver al del CLI: hace falta poder DESHACER una eleccion, no solo cambiarla."""
+        # El nombre del modelo lo resuelve el CLI, no esto: aqui solo se comprueba que
+        # tenga forma de nombre. Validarlo contra una lista propia la dejaria caduca el
+        # dia que el CLI acepte uno nuevo, y entonces este puente rechazaria algo bueno.
+        if modelo and not re.fullmatch(r"[A-Za-z0-9._\[\]-]{1,64}", modelo):
+            return self._json(400, {"error": "eso no tiene forma de nombre de modelo"})
+        # El esfuerzo SI se valida contra la lista, porque el CLI la declara cerrada y
+        # un valor invalido no falla: avisa y sigue con el de por omision. O sea que
+        # sin esta comprobacion, la sesion diria `max` y correria en el normal.
+        if esfuerzo and esfuerzo not in self.ESFUERZOS:
+            return self._json(400, {"error": f"esfuerzo desconocido: {esfuerzo}",
+                                    "validos": list(self.ESFUERZOS)})
+        with _registry_lock:
+            reg = load_registry()
+            if nombre not in reg:
+                return self._json(404, {"error": f"no hay sesión '{nombre}'"})
+            if modelo is not None:
+                reg[nombre]["model"] = modelo
+            if esfuerzo is not None:
+                reg[nombre]["effort"] = esfuerzo
+            save_registry(reg)
+            m, e = reg[nombre].get("model") or "", reg[nombre].get("effort") or ""
+        return self._json(200, {"modelo": m, "esfuerzo": e})
 
     def _vault_zip(self, nombre: str, clave: str = "") -> None:
         """Empaqueta UN agente: su carpeta Y su memoria, que es la unidad que de
@@ -1287,6 +1350,25 @@ class Handler(BaseHTTPRequestHandler):
             raise
 
     def _post(self):
+        # POST /sessions/<name>/modelo -> recordar el modelo que la sesion eligio.
+        #
+        # Cada turno es un PROCESO NUEVO -`claude -p --resume`- y el puente le vuelve a
+        # imponer el modelo de este registro. Asi que un `/model` tecleado dentro del
+        # chat vale exactamente un turno: el CLI contesta "Set model to X", el proceso
+        # muere, y el siguiente arranca con lo de aqui. MEDIDO el 2026-09-24: se puso
+        # opus[1m] y el `/context` del turno siguiente reporto claude-sonnet-5.
+        #
+        # No falla, que es lo que lo hace malo: el comando confirma y no queda puesto.
+        mm = re.match(r"^/sessions/([^/]+)/ajustes$", self.path)
+        if mm:
+            b = self._body()
+            # `None` = no venia en la peticion; `""` = venia vacia, o sea QUITARLO.
+            # Sin esa distincion, mandar solo el modelo borraria el esfuerzo en
+            # silencio -- y el detector de `/model` manda solo el modelo.
+            def _q(k):
+                v = b.get(k)
+                return None if v is None else str(v).strip()
+            return self._ajustes(unquote(mm.group(1)), _q("modelo"), _q("esfuerzo"))
         # POST /sessions  -> crear
         if self.path == "/sessions":
             b = self._body()
@@ -1489,7 +1571,8 @@ class Handler(BaseHTTPRequestHandler):
                                   meta.get("cwd") or DEFAULT_CWD,
                                   meta.get("model") or DEFAULT_MODEL,
                                   meta.get("permission") or DEFAULT_PERMISSION, emit,
-                                  ventana=meta.get("context_window"))
+                                  ventana=meta.get("context_window"),
+                                  esfuerzo=meta.get("effort") or DEFAULT_EFFORT)
             except (BrokenPipeError, ConnectionResetError):
                 return   # el cliente se fue; el turno NO: sigue drenándose hasta terminar
             finally:
@@ -1518,7 +1601,8 @@ class Handler(BaseHTTPRequestHandler):
             res = run_turn(msg, attachments, meta.get("session_id"),
                           meta.get("cwd") or DEFAULT_CWD,
                           meta.get("model") or DEFAULT_MODEL,
-                          meta.get("permission") or DEFAULT_PERMISSION)
+                          meta.get("permission") or DEFAULT_PERMISSION,
+                          esfuerzo=meta.get("effort") or DEFAULT_EFFORT)
             if res["is_error"]:
                 return self._json(502, {"error": "claude falló al continuar",
                                         "detail": res.get("raw_error"),
@@ -1556,12 +1640,39 @@ class Handler(BaseHTTPRequestHandler):
         return self._json(200, {"deleted": name, "stopped_short_id": short})
 
 
+def _modelo_por_defecto() -> dict:
+    """Con que corre una sesion que NO eligio modelo, sin gastar un turno.
+
+    El evento `init` lo dice exacto, pero solo llega cuando ya se mando algo: una
+    sesion recien creada se quedaba con \"el del CLI\", que es cierto y no dice nada.
+    El ajuste del usuario si se puede leer del disco, y se DECLARA de donde sale --
+    no es lo mismo saberlo que suponerlo, y el `init` puede desmentirlo.
+
+    No se cachea: el archivo lo edita una persona y una copia vieja mentiria sin fallar.
+    """
+    f = Path.home() / ".claude" / "settings.json"
+    try:
+        m = (json.loads(f.read_text(encoding="utf-8")) or {}).get("model")
+    except (OSError, json.JSONDecodeError):
+        return {"valor": "", "de": "no se pudo leer la configuración"}
+    if not isinstance(m, str) or not m:
+        return {"valor": "", "de": "la configuración no declara modelo"}
+    return {"valor": m, "de": "settings.json"}
+
+
 def _now() -> str:
     import datetime
     return datetime.datetime.now().isoformat(timespec="seconds")
 
 
 def main():
+    # Se valida al ARRANCAR y no al usarlo: el CLI ignora un esfuerzo invalido con un
+    # aviso y sigue con el normal (MEDIDO), asi que una errata en el `.env` correria
+    # todos los turnos en el nivel equivocado sin que nada fallara ni nadie lo viera.
+    if DEFAULT_EFFORT and DEFAULT_EFFORT not in ESFUERZOS_VALIDOS:
+        sys.exit(f"BRIDGE_EFFORT={DEFAULT_EFFORT!r} no es un nivel valido.\n"
+                 f"  Validos: {', '.join(ESFUERZOS_VALIDOS)}  (o vacio para el del CLI)")
+
     if not Path(CLAUDE).exists() and not shutil.which(CLAUDE):
         sys.exit(f"no encuentro el binario claude en: {CLAUDE}")
     # El `cwd` se comprueba AL ARRANCAR. MEDIDO el 2026-09-11 en Windows: con un
