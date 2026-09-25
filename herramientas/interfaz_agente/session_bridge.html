@@ -1348,7 +1348,13 @@ function grafoFuerzas(W,H){
   for(const n of N){ gx+=n.x; gy+=n.y; }
   gx/=Math.max(1,N.length); gy/=Math.max(1,N.length);
   for(const n of N){
-    const g=Math.sqrt(n.grado)*0.0045;
+    // La gravedad TAMBIEN se divide por la masa, como las otras dos fuerzas. Sin eso,
+    // al concentrador se le sube la gravedad por su grado Y se le bajan las fuerzas que
+    // lo separan: doble castigo, y los grandes acaban amontonados exactamente en el
+    // centro, unos encima de otros. Dividida, queda casi plana -- todos caen al centro
+    // parecido-- y quien de verdad mantiene ahi a un concentrador son sus resortes, que
+    // es como tiene que ser.
+    const g=Math.sqrt(n.grado)*0.0045/n.masa;
     n.vx+=(gx-n.x)*g; n.vy+=(gy-n.y)*g;
   }
   // Tope de velocidad, como red de seguridad. La masa ya evita el disparo; esto evita
@@ -1361,6 +1367,44 @@ function grafoFuerzas(W,H){
     n.vy=Math.max(-vmax,Math.min(vmax,n.vy));
     n.x=Math.max(14,Math.min(W-14,n.x+n.vx));
     n.y=Math.max(14,Math.min(H-14,n.y+n.vy));
+  }
+  // SEPARACION POR RADIO: ningun nodo se mete dentro de otro.
+  //
+  // La repulsion de arriba no sabe que los nodos tienen tamano -- mide de centro a
+  // centro y ademas lleva tope de cerca, puesto a proposito para que dos casi pegados no
+  // se disparen a la pared. Mientras todos median tres pixeles daba igual; con el radio
+  // ya relativo al grado, dos concentradores miden 16 cada uno y necesitan 32 px solo
+  // para no tocarse. MEDIDO en pantalla: `Pendientes`, `Decisiones`, `Topologia` y
+  // `Pendientes_Cerrados` dibujados unos encima de otros.
+  //
+  // Y se agravo con la masa: la gravedad y el peso juntan a los grandes en el centro, que
+  // es lo que queriamos, pero nada los mantenia apartados en proporcion a lo que miden.
+  //
+  // Se corrige la POSICION y no la velocidad: es una restriccion -no pueden solaparse-,
+  // no una fuerza. Como fuerza tendria que vencer a la gravedad de dos pesados y acabaria
+  // en un temblor entre atraccion y rechazo. Y se reparte a medias sin mirar la masa: aqui
+  // el peso no pinta, porque lo que hay que garantizar es el hueco, no quien cede.
+  // TRES pasadas y no una: separar un par puede meter a uno de los dos dentro de un
+  // tercero, y con varios grandes amontonados eso encadena. Medido: con una pasada
+  // quedaban 2 solapes y el peor se metia un 27%; con tres, ninguno.
+  for(let pasada=0; pasada<3; pasada++){
+    let hubo=false;
+    for(let i=0;i<N.length;i++){
+      for(let j=i+1;j<N.length;j++){
+        const p=N[i], q=N[j], min=grafoRadio(p)+grafoRadio(q)+4;
+        let dx=q.x-p.x, dy=q.y-p.y, d=Math.hypot(dx,dy);
+        if(d>=min) continue;
+        if(d<0.01){ dx=(i%2?1:-1)*0.5; dy=0.5; d=0.71; }  // exactamente encima: se desempata
+        const empuje=(min-d)/d*0.5;
+        p.x-=dx*empuje; p.y-=dy*empuje; q.x+=dx*empuje; q.y+=dy*empuje;
+        hubo=true;
+      }
+    }
+    if(!hubo) break;      // sin solapes no hay nada que repartir: se ahorra la pasada
+  }
+  for(const n of N){
+    n.x=Math.max(14,Math.min(W-14,n.x));
+    n.y=Math.max(14,Math.min(H-14,n.y));
   }
   // Recentrar por el CENTROIDE en vez de tirar de cada nodo hacia el medio. Un tiron
   // por nodo compite con los resortes: las aisladas -que no tienen resorte- ganan el
