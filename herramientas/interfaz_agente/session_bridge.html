@@ -1198,6 +1198,16 @@ function grafoMontar(j){
   G.vivos=G.nodos.filter(n=>n.grado>0);
   G.solas=G.nodos.filter(n=>n.grado===0);
   G.gradoMax=G.nodos.reduce((m,n)=>Math.max(m,n.grado),0);
+  // MASA por grado. Cada arista empuja igual, asi que un nodo con 164 aristas recibe 164
+  // veces la fuerza de uno con una -- y sin masa, esa fuerza se convierte entera en
+  // velocidad: el concentrador sale disparado, se pasa del centro, rebota contra el
+  // borde y se queda ahi cuando se acaban los pasos. MEDIDO en un banco de layout: con
+  // 132 notas todavia no pasa, con 200 y dos concentradores de grado 164 y 155 los dos
+  // acaban a 1.96 del centro -- o sea contra la esquina-- con el resto a 0.33.
+  //
+  // Un concentrador es PESADO: lo mueven muchos, pero le cuesta moverse. Es la misma
+  // fisica que ya hace el dibujo legible, no un tope arbitrario.
+  G.nodos.forEach(n=>{ n.masa = 1 + Math.sqrt(n.grado); });
   G.aristas=j.aristas.filter(a=>idx[a.de]!==undefined&&idx[a.a]!==undefined)
                      .map(a=>({...a, i:idx[a.de], j:idx[a.a]}));
   const leyenda=$("#leyendaGrafo");
@@ -1313,14 +1323,16 @@ function grafoFuerzas(W,H){
       // a la pared y el dibujo se convierte en un marco con el centro vacio.
       const f=Math.min((k*k)/d2, k*0.55)*0.55;
       dx/=d; dy/=d;
-      N[i].vx-=dx*f; N[i].vy-=dy*f; N[j].vx+=dx*f; N[j].vy+=dy*f;
+      const fi=f/N[i].masa, fj=f/N[j].masa;
+      N[i].vx-=dx*fi; N[i].vy-=dy*fi; N[j].vx+=dx*fj; N[j].vy+=dy*fj;
     }
   }
   for(const a of G.aristas){
     const p=G.nodos[a.i], q=G.nodos[a.j];
     let dx=q.x-p.x, dy=q.y-p.y, d=Math.hypot(dx,dy)||0.01;
     const f=(d-k*0.55)/d*0.035;
-    p.vx+=dx*f; p.vy+=dy*f; q.vx-=dx*f; q.vy-=dy*f;
+    const fp=f/p.masa, fq=f/q.masa;
+    p.vx+=dx*fp; p.vy+=dy*fp; q.vx-=dx*fq; q.vy-=dy*fq;
   }
   // Gravedad PROPORCIONAL AL GRADO hacia el centro del racimo. Sin esto, lo unico que
   // acerca a un concentrador al medio son sus propios resortes, y eso solo funciona si
@@ -1339,8 +1351,14 @@ function grafoFuerzas(W,H){
     const g=Math.sqrt(n.grado)*0.0045;
     n.vx+=(gx-n.x)*g; n.vy+=(gy-n.y)*g;
   }
+  // Tope de velocidad, como red de seguridad. La masa ya evita el disparo; esto evita
+  // que un caso que no previmos lo cruce el lienzo entero en un paso y acabe clavado
+  // contra el borde, que es el estado del que un nodo ya no vuelve.
+  const vmax=k*0.25;
   for(const n of N){
     n.vx*=0.86; n.vy*=0.86;
+    n.vx=Math.max(-vmax,Math.min(vmax,n.vx));
+    n.vy=Math.max(-vmax,Math.min(vmax,n.vy));
     n.x=Math.max(14,Math.min(W-14,n.x+n.vx));
     n.y=Math.max(14,Math.min(H-14,n.y+n.vy));
   }
