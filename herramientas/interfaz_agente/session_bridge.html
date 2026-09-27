@@ -67,6 +67,12 @@
   *{box-sizing:border-box}
   body{margin:0;font:14px/1.5 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
        background:var(--bg);color:var(--ink);height:100vh;display:flex;flex-direction:column}
+  /* `dvh` es el alto REAL: en un navegador de movil la barra de direcciones aparece y
+     desaparece al hacer scroll, y `100vh` mide como si nunca estuviera -- asi que el
+     compositor queda debajo del borde justo cuando vas a escribir. Se deja `100vh`
+     arriba como respaldo para el navegador que no conozca `dvh`. */
+  @supports (height:100dvh){ body{height:100dvh} }
+
   /* La barra de arriba desaparecio: su contenido vive en la lateral, que ya se
      pliega. Una franja fija que solo lleva el nombre y dos selectores se cobra
      alto en TODAS las vistas, y el grafo es la que mas lo agradece. */
@@ -84,7 +90,7 @@
   header .dot{width:9px;height:9px;border-radius:50%;background:var(--dim);flex:0 0 auto}
   header .dot.ok{background:var(--ok)}header .dot.bad{background:var(--bad)}
   header input{background:var(--field);border:1px solid var(--line);color:var(--ink);
-       padding:6px 8px;border-radius:7px;font:inherit;width:230px}
+       padding:6px 8px;border-radius:7px;font:inherit;width:230px;max-width:100%}
   header .sp{flex:1}
   button{background:var(--accent);color:var(--accent-ink);
        border:0;padding:7px 14px;border-radius:9px;font:inherit;font-weight:500;cursor:pointer;
@@ -122,21 +128,55 @@
        padding:6px 8px;border-radius:7px;font:inherit}
   aside .new textarea{resize:vertical;min-height:44px}
   section{flex:1;display:flex;flex-direction:column;min-width:0}
-  .chathead{position:relative;display:flex;align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--bg)}
-  /* El nombre va centrado en la BARRA, no entre sus vecinos: si fuera un elemento mas
-     del flujo, su centro dependeria de cuantos botones haya a la derecha y se moveria
-     al aparecer el contador de deuda o al ocultarse el de conciliar.
-     `pointer-events:none` porque flota por encima: sin eso, un nombre largo se comeria
-     el clic de los botones que tiene debajo. */
-  .chathead .cur{position:absolute;left:50%;transform:translateX(-50%);
-       font-weight:600;max-width:38%;white-space:nowrap;overflow:hidden;
-       text-overflow:ellipsis;pointer-events:none}
+  /* REJILLA de tres columnas: informativo | nombre | acciones.
+     El nombre queda centrado en la BARRA -no entre sus vecinos-, que era el motivo de
+     centrarlo en absoluto; pero al ser una celda de verdad y no un elemento flotante,
+     OCUPA sitio y ya no puede encimarse con los botones.
+     El centrado absoluto aguantaba mientras sobrara ancho y fallaba en cuanto faltaba:
+     MEDIDO en una captura a 768 px, el nombre del agente escrito encima del boton de
+     grafo. Y no lo cazaba la auditoria -- encimarse no es recortarse, y el chequeo
+     miraba recortes. Lo vio el ojo, no la tabla. */
+  /* `hidden` y no `style.display`: un estilo EN LINEA le gana a toda la hoja, asi que
+     escribir `display:flex` desde el codigo dejaba la rejilla sin efecto -- y sin efecto
+     en silencio, porque la barra se veia bien igual. MEDIDO: `getComputedStyle` decia
+     `flex` con la regla de rejilla escrita tres pantallas mas arriba. Quien enseña y
+     esconde es el codigo; quien distribuye es la hoja. */
+  .chathead[hidden]{display:none}
+  /* Columnas laterales IGUALES -- `1fr auto 1fr` --, que es lo que hace que el nombre
+     quede centrado en la BARRA y no solo dentro de su celda. Con lados de distinto
+     tamaño la celda del medio se desplaza: MEDIDO a 1280, el nombre a 68 px del centro
+     real. El `auto` del medio deja que el nombre ocupe lo que necesite y ni un pixel mas. */
+  .chathead{position:relative;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);
+       align-items:center;gap:8px;padding:10px 18px;border-bottom:1px solid var(--line);background:var(--bg)}
+  /* La columna informativa CEDE y recorta con puntos suspensivos. Sin esto, el texto
+     largo del contador de deuda -«15 nota(s) sin conciliar»- se salia de su celda y se
+     escribia encima del nombre: MEDIDO a 768 y 820, 21 y 23 px de solape. Una celda de
+     rejilla no recorta a sus hijos por si sola; hay que pedirselo. */
+  .chathead .cabIzq{display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden}
+  /* Por debajo de 1024 el contador de deuda se retira: es informativo, y con el puesto
+     el nombre del agente se quedaba en «v…». Entre saber COMO SE LLAMA lo que tienes
+     abierto y saber cuantas notas van sin conciliar, lo primero es identidad y lo
+     segundo es un dato que sigue estando a un turno de distancia. */
+  @media (max-width:1023px){ .chathead .cabIzq{display:none} }
+  .chathead .cabIzq .usage{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .chathead .cabDer{display:flex;align-items:center;gap:8px;min-width:0;flex-wrap:wrap;justify-content:flex-end}
+  /* Columna EXPLICITA para cada uno. Sin esto, cuando la columna informativa se
+     esconde por debajo de 1024 deja de generar caja, los dos que quedan se corren a las
+     columnas 1 y 2, y el nombre aterriza a la izquierda: MEDIDO a 768, 213 px fuera del
+     centro. Colocar a mano vale para cualquier numero de piezas visibles. */
+  .chathead .cabIzq{grid-column:1}
+  .chathead .cabDer{grid-column:3}
+  .chathead .cur{grid-column:2;justify-self:center;font-weight:600;max-width:100%;min-width:0;
+       white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   /* Viven bajo el compositor y no en la cabecera: son de lo que vas a MANDAR, no de lo
      que la sesion es. Puestos arriba compiten con los botones que la gobiernan. */
   /* El compositor vive en una columna centrada de 780 px. Alinear estos al borde de
      la ventana los dejaba flotando lejos de todo: mismo padding, misma columna. */
+  /* DEBAJO del compositor, no encima. Son de lo que vas a mandar, asi que viven junto
+     al boton de mandar y no entre la conversacion y la caja -- ahi partian el hilo de
+     lectura entre lo que el agente dijo y lo que estas escribiendo. */
   .ajustes{display:flex;gap:6px;align-items:center;justify-content:flex-end;
-       padding:0 max(20px, calc((100% - 780px) / 2)) 6px}
+       padding:0 max(20px, calc((100% - 780px) / 2)) 14px}
   .ajustes .ajuste{background:var(--field);border:1px solid var(--line);color:var(--dim);
        border-radius:6px;font-size:11px;padding:3px 5px;max-width:190px}
   .ajustes .ajuste:hover{color:var(--fg)}
@@ -164,7 +204,7 @@
        white-space:pre-wrap;word-break:break-word;border-left:2px solid var(--line);padding-left:10px}
   .msg.stream{align-self:stretch}
   .composer{display:flex;gap:8px;align-items:flex-end;background:var(--bg);border-top:0;
-       padding:8px max(20px, calc((100% - 780px) / 2)) 20px}
+       padding:8px max(20px, calc((100% - 780px) / 2)) 6px}
   .composer textarea{flex:1;background:var(--field);border:1px solid var(--line);color:var(--ink);
        padding:12px 14px;border-radius:var(--radio);font:inherit;resize:none;min-height:52px;max-height:200px;
        box-shadow:0 1px 2px rgba(0,0,0,.04)}
@@ -312,6 +352,94 @@
   .msg .md pre{position:relative}
   .msg .md pre .copy{position:absolute;top:6px;right:6px;margin:0;background:var(--panel);opacity:0;transition:opacity .12s}
   .msg .md pre:hover .copy{opacity:1}
+  /* --- Objetivos tactiles: 24 px de lado minimo, WCAG 2.2 AA (2.5.8) -------
+     No es una regla de movil: un raton impreciso, un trackpad o una mano que
+     tiembla sufren igual en un escritorio de 1920. MEDIDO antes de ponerlo, en
+     las once resoluciones del banco: el plegador media 18 px, los dos selectores
+     del pie 22 y el boton de copiar 23 -- los cuatro fallaban en TODAS, incluida
+     la pantalla grande, que es donde nadie lo habria mirado. */
+  #plegar{min-width:24px}
+  .ajustes .ajuste{min-height:24px}
+  .copy{min-height:24px}
+  #sugLoad{min-height:24px}
+
+  /* ========================================================================
+     RESPONSIVE — dos cortes, y cada uno resuelve un problema distinto
+     ------------------------------------------------------------------------
+     Hasta hoy el puente no tenia NI UNA media query de ancho. MEDIDO antes de
+     tocarlo, cargando la pagina en viewports exactos: de 768 para arriba pasaba;
+     en las tres resoluciones de movil fallaba igual y feo -- entre 331 y 385 px
+     de scroll horizontal, la cabecera entera fuera de pantalla, y la caja de
+     escribir reducida a 30 px. La causa es una sola: `aside{width:250px}` fijo,
+     que en un telefono de 360 se lleva el 70% del ancho.
+     ======================================================================== */
+
+  /* --- CORTE 1 · <=720px: la barra de agentes deja de robar ancho ---------
+     Por encima de esto la barra convive con el chat. Por debajo no caben los
+     dos, y la barra es lo que se consulta a ratos mientras el chat es donde
+     vives: pasa a ser un CAJON que se superpone y se va.
+     720 y no 900: el iPad en retrato son 768, y con la barra puesta le quedan
+     518 px de chat -- que MEDIDO pasaba sin una queja. Un corte en 900 le
+     quitaba la barra a una pantalla donde si cabe, que es arreglar lo que no
+     estaba roto. El corte se pone donde empieza a doler, no antes. */
+  @media (max-width:720px){
+    aside{position:fixed;left:0;top:0;bottom:0;width:min(84vw,300px);z-index:40;
+         transform:translateX(-100%);transition:transform .18s ease;
+         box-shadow:0 0 0 100vmax rgba(0,0,0,.38)}
+    body.plegado aside{display:flex;transform:translateX(-100%);box-shadow:none}
+    body:not(.plegado) aside{transform:none}
+    /* El plegador se queda pegado al borde de la pantalla, no al de la barra:
+       si siguiera a la barra se iria con ella y no habria como volver a abrirla. */
+    #plegar{left:0;z-index:41}
+    body:not(.plegado) #plegar{left:min(84vw,300px)}
+  }
+  @media (prefers-reduced-motion: reduce){
+    aside{transition:none}
+  }
+
+  /* --- CORTE 2 · <=640px: telefono ---------------------------------------
+     Aqui ya no basta con quitar la barra: la cabecera lleva cuatro botones con
+     etiquetas largas que suman mas que el ancho de la pantalla. */
+  @media (max-width:640px){
+    /* El nombre deja de ir centrado en ABSOLUTO y pasa a ser su propia fila.
+       Centrado absoluto flota por encima de los botones: mientras sobra ancho no
+       se nota, y en cuanto falta se leen encima unos de otros. */
+    /* En telefono no caben tres columnas: el nombre se lleva su propia fila entera. */
+    .chathead{grid-template-columns:1fr;justify-items:stretch;padding:8px 12px;gap:6px}
+    .chathead .cur{grid-column:1;order:-1;text-align:center;justify-self:stretch}
+    .chathead .cabDer{grid-column:1}
+    .chathead .cabIzq{display:none}     /* informativo: cede sitio a lo accionable */
+    /* El boton se queda sin texto propio y lo pone el atributo. Se cambia el TEXTO,
+       no el boton: el `title` sigue siendo el largo, asi que no se pierde significado. */
+    .chathead button[data-corto]{font-size:0}
+    .chathead button[data-corto]::after{content:attr(data-corto);font-size:12px;
+         letter-spacing:.02em;text-transform:none}
+    .chathead button{flex:1 1 auto;min-height:32px}
+
+    /* El compositor recupera el ancho que la columna centrada le quitaba. */
+    .composer,.attachbar,.ajustes{padding-left:12px;padding-right:12px}
+    #send{padding:0 12px}
+    #input{font-size:16px}   /* menos de 16px y iOS hace zoom solo al enfocar */
+
+    /* El lector al lado no cabe: el 46% de 360 son 165 px, que no es una columna
+       de texto sino una tira. Pasa a superponerse, como en la vista de grafo. */
+    #lectorNota.allado{position:absolute;inset:0;flex:none;border-left:0;z-index:3}
+    #lectorNota.allado #lectorPreguntar{display:inline-block}
+
+    .msg.user{max-width:92%}
+    .msg.stream{max-width:100%}
+
+    /* Objetivos tactiles: WCAG 2.2 AA pide 24px de lado minimo. */
+    #plegar{width:26px;height:44px}
+    .ajustes .ajuste{min-height:26px}
+    .sug button,.copy{min-height:26px}
+  }
+
+  /* --- Apaisado bajito: un telefono de lado deja 360px de alto ------------- */
+  @media (max-height:480px){
+    .chathead{padding-top:4px;padding-bottom:4px}
+    #input{max-height:96px}
+  }
 </style>
 </head>
 <body>
@@ -387,11 +515,13 @@
     </div>
   </aside>
   <section>
-    <div class="chathead" id="chathead" style="display:none">
+    <div class="chathead" id="chathead" hidden>
+      <div class="cabIzq">
+        <span class="usage" id="usage" title="contexto usado · tokens generados en el último turno"></span>
+        <span id="deuda" class="usage" hidden></span>
+      </div>
       <span class="cur" id="curname"></span>
-      <span class="usage" id="usage" title="contexto usado · tokens generados en el último turno"></span>
-      <span class="sp"></span>
-      <span id="deuda" class="usage" hidden></span>
+      <div class="cabDer">
       <button id="guardar" class="ghost" hidden
               title="Manda /vuelamind-commit a esta sesión: mide, te enseña qué va a escribir y solo escribe con tu sí">Guardar</button>
       <button id="verGrafo" class="ghost"
@@ -399,6 +529,7 @@
       <button id="exportar" class="ghost"
               title="Baja este agente como .zip: su carpeta y su memoria. Sin llaves ni archivos de configuración; dentro va un _EXCLUIDO.txt que dice qué quedó fuera">Exportar agente</button>
       <button id="close" class="ghost danger" title="Detiene la sesión y la quita de esta página">Cerrar este chat</button>
+      </div>
     </div>
     <div class="zona" id="zona">
       <div class="log" id="log"><div class="empty">Elige o crea una sesión.</div></div>
@@ -415,6 +546,13 @@
       </div>
     </div>
     <div class="attachbar" id="attachbar"></div>
+    <div class="composer">
+      <div class="ac" id="ac" hidden></div>
+      <input type="file" id="file" multiple hidden>
+      <button id="attach" class="ghost attach" title="Adjuntar archivo(s) de texto — o pega / arrastra al chat" disabled>📎</button>
+      <textarea id="input" placeholder="Escribe un mensaje…" disabled></textarea>
+      <button id="send" disabled>Enviar</button>
+    </div>
     <div class="ajustes" id="ajustesPie">
       <select id="selModelo" class="ajuste" hidden title="Modelo de esta sesión — se aplica desde el turno siguiente">
         <option value="">modelo: el del CLI</option>
@@ -438,13 +576,6 @@
         <option value="xhigh">xhigh</option>
         <option value="max">max</option>
       </select>
-    </div>
-    <div class="composer">
-      <div class="ac" id="ac" hidden></div>
-      <input type="file" id="file" multiple hidden>
-      <button id="attach" class="ghost attach" title="Adjuntar archivo(s) de texto — o pega / arrastra al chat" disabled>📎</button>
-      <textarea id="input" placeholder="Escribe un mensaje…  (Enter envía · Shift+Enter salto · 📎 pega o arrastra texto/imágenes/PDF)" disabled></textarea>
-      <button id="send" disabled>Enviar</button>
     </div>
   </section>
 </main>
@@ -504,7 +635,7 @@ const I18N={
   sin_agentes:"Todavía no hay ningún agente aquí.",
   sin_declarar:"sin nombre declarado",
   rot_idioma:"idioma", rot_tema:"tema",
-  exportar:"Exportar agente",
+  exportar:"Exportar agente", exportar_corto:"Exportar",
   exp_clave:"Contraseña para cifrar el paquete",
   deuda_notas:"{n} nota(s) sin conciliar",
   deuda_sin_marca:"sin referencia — concilia una vez",
@@ -533,10 +664,11 @@ const I18N={
   usage_tt:"contexto usado · tokens generados en el último turno",
   guardar:"Conciliar",
   guardar_tt:"Manda /vuelamind-commit a esta sesión: mide, te enseña qué va a escribir y solo escribe con tu sí",
-  cerrar:"Cerrar este chat", cerrar_tt:"Detiene la sesión y la quita de esta página",
+  cerrar:"Cerrar este chat", cerrar_corto:"Cerrar", cerrar_tt:"Detiene la sesión y la quita de esta página",
   log_vacio:"Elige o crea una sesión.", sin_sesiones:"Sin sesiones aún.",
   adjuntar_tt:"Adjuntar archivo(s) de texto — o pega / arrastra al chat",
-  input_ph:"Escribe un mensaje…  (Enter envía · Shift+Enter salto · 📎 pega o arrastra texto/imágenes/PDF)",
+  input_ph:"Escribe un mensaje…",
+  input_tt:"Enter envía · Shift+Enter salto de línea · pega o arrastra texto, imágenes o PDF",
   enviar:"Enviar", copiar:"Copiar", copiar_codigo:"Copiar el código", quitar:"quitar",
   tu:"tú", trabajando:"⏳ trabajando… ",
   falta:"Falta nombre o primer mensaje",
@@ -571,7 +703,7 @@ const I18N={
   sin_agentes:"No agents here yet.",
   sin_declarar:"name not declared",
   rot_idioma:"language", rot_tema:"theme",
-  exportar:"Export agent",
+  exportar:"Export agent", exportar_corto:"Export",
   exp_clave:"Passphrase to encrypt the package",
   deuda_notas:"{n} note(s) unreconciled",
   deuda_sin_marca:"no baseline — reconcile once",
@@ -600,10 +732,11 @@ const I18N={
   usage_tt:"context used · tokens generated in the last turn",
   guardar:"Reconcile",
   guardar_tt:"Sends /vuelamind-commit to this session: it measures, shows you what it would write, and writes only with your yes",
-  cerrar:"Close this chat", cerrar_tt:"Stops the session and removes it from this page",
+  cerrar:"Close this chat", cerrar_corto:"Close", cerrar_tt:"Stops the session and removes it from this page",
   log_vacio:"Pick or create a session.", sin_sesiones:"No sessions yet.",
   adjuntar_tt:"Attach text file(s) — or paste / drop them into the chat",
-  input_ph:"Write a message…  (Enter sends · Shift+Enter newline · 📎 paste or drop text/images/PDF)",
+  input_ph:"Write a message…",
+  input_tt:"Enter sends · Shift+Enter newline · paste or drop text, images or PDF",
   enviar:"Send", copiar:"Copy", copiar_codigo:"Copy the code", quitar:"remove",
   tu:"you", trabajando:"⏳ working… ",
   falta:"Name or first message is missing",
@@ -644,13 +777,13 @@ const MARCAS=[
  ["#guardar","txt","guardar"], ["#guardar","tt","guardar_tt"],
  ["#verGrafo","txt","grafo"], ["#buscaGrafo","ph","grafo_buscar"],
  ["#lectorPreguntar","txt","grafo_preguntar"],
- ["#exportar","txt","exportar"], ["#exportar","tt","exportar_ayuda"],
+ ["#exportar","txt","exportar"], ["#exportar","tt","exportar_ayuda"], ["#exportar","corto","exportar_corto"],
  ["#dlgClaveLbl","txt","exp_clave"], ["#dlgClavePie","txt","exp_clave_pie"],
  ["#claveVma2","ph","exp_clave2"],
  ["#dlgCifrar","txt","exp_cifrar"], ["#dlgPlano","txt","exp_plano"],
  ["#dlgCancelar","txt","exp_cancelar"],
- ["#close","txt","cerrar"], ["#close","tt","cerrar_tt"],
- ["#attach","tt","adjuntar_tt"], ["#input","ph","input_ph"], ["#send","txt","enviar"]
+ ["#close","txt","cerrar"], ["#close","tt","cerrar_tt"], ["#close","corto","cerrar_corto"],
+ ["#attach","tt","adjuntar_tt"], ["#input","ph","input_ph"], ["#input","tt","input_tt"], ["#send","txt","enviar"]
 ];
 function aplicarIdioma(l){
   LANG=IDIOMAS.includes(l)?l:"es";
@@ -659,6 +792,11 @@ function aplicarIdioma(l){
   for(const [sel,tipo,clave] of MARCAS){
     const el=document.querySelector(sel); if(!el) continue;
     if(tipo==="txt") el.textContent=T(clave);
+    // La etiqueta corta viaja como ATRIBUTO y no como texto. Tiene que ser asi: el
+    // traductor escribe `textContent`, que arrasa con cualquier marca de dentro -- mi
+    // primer intento fueron dos `<span>` y el idioma se los comia al arrancar, sin
+    // fallar y sin decir nada. Un atributo sobrevive, y ademas se traduce igual.
+    else if(tipo==="corto") el.setAttribute("data-corto", T(clave));
     else if(tipo==="ph") el.placeholder=T(clave);
     else if(tipo==="tt") el.title=T(clave);
   }
@@ -1084,8 +1222,11 @@ function refrescarGuardar(){
 
 function select(name){
   state.current=name;
+  // En movil el cajon se cierra al elegir: taparia la conversacion recien abierta.
+  if(window.matchMedia("(max-width:720px)").matches &&
+     !document.body.classList.contains("plegado")) plegar(true, false);
   $("#input").disabled=false; $("#send").disabled=false; $("#attach").disabled=false;
-  $("#chathead").style.display="flex"; $("#curname").textContent=name;
+  $("#chathead").hidden=false; $("#curname").textContent=name;
   chatVisible($("#panelGrafo").hidden);
   refrescarDeuda();
   refrescarModelo();
@@ -1123,7 +1264,7 @@ async function closeSession(){
     delete state.usage[name]; $("#usage").textContent="";
     state.current=null;
     $("#input").disabled=true; $("#send").disabled=true; $("#attach").disabled=true;
-    $("#chathead").style.display="none"; clearAtts();
+    $("#chathead").hidden=true; clearAtts();
     chatVisible(true);        // ya no hay sesion: la caja se va con ella
     $("#log").innerHTML='<div class="empty">Sesión cerrada. Elige o crea otra.</div>';
     await refresh();
@@ -1498,10 +1639,14 @@ function grafoNodoEn(ev){
 
 // La barra de agentes se pliega, y se recuerda: en una pantalla pequena el grafo la
 // agradece, y quien trabaja con un solo agente no la necesita nunca.
-function plegar(si){
+// `guardar` distingue lo que TU decides de lo que hace la pantalla por su tamano.
+// Sin esa distincion, plegarse solo en un telefono escribia la preferencia, y al abrir
+// luego en el escritorio te recibia la barra escondida sin que nadie la hubiera
+// escondido -- una decision de nadie que se hereda y no se puede rastrear.
+function plegar(si, guardar=true){
   document.body.classList.toggle("plegado", si);
   $("#plegar").textContent = si ? "›" : "‹";
-  try{ localStorage.setItem("bridge:plegado", si?"1":"0"); }catch{}
+  if(guardar){ try{ localStorage.setItem("bridge:plegado", si?"1":"0"); }catch{} }
   // Reencuadrar DESPUES de que el navegador aplique el ancho nuevo, no en esta misma
   // vuelta. Antes aqui se remontaba el grafo entero, y medir el lienzo en el mismo
   // instante en que cambia la clase del `body` lo mide ANTES de que el ancho nuevo
@@ -1544,7 +1689,25 @@ $("#plegar").onclick=()=>plegar(!document.body.classList.contains("plegado"));
 try{
   new ResizeObserver(()=>reencuadrarGrafo()).observe($("#panelGrafo"));
 }catch{}                          // navegador sin ResizeObserver: se queda como estaba
-try{ if(localStorage.getItem("bridge:plegado")==="1") plegar(true); }catch{}
+// En pantalla estrecha la barra arranca PLEGADA salvo que tu hayas dicho lo
+// contrario. Es el mismo cajon de cualquier aplicacion de movil: se abre cuando
+// lo pides, no te recibe tapando el chat. Lo que hayas elegido tu manda siempre.
+try{
+  const guardado = localStorage.getItem("bridge:plegado");
+  if(guardado === "1") plegar(true);
+  else if(guardado === null && window.matchMedia("(max-width:720px)").matches) plegar(true, false);
+}catch{
+  if(window.matchMedia && window.matchMedia("(max-width:720px)").matches) plegar(true, false);
+}
+
+// Y al elegir agente en movil, el cajon se va solo: ya conseguiste lo que venias
+// a buscar, y dejarlo abierto tapa justo la conversacion que acabas de abrir.
+window.matchMedia("(max-width:720px)").addEventListener?.("change", e=>{
+  // Al girar el telefono o cambiar de ventana: si se estrecha y nunca elegiste,
+  // se pliega; si se ensancha, se devuelve la barra.
+  let guardado=null; try{ guardado=localStorage.getItem("bridge:plegado"); }catch{}
+  if(guardado===null) plegar(e.matches, false);
+});
 
 $("#verGrafo").onclick=verGrafo;
 
@@ -1772,7 +1935,7 @@ async function arrancarSesion(cuerpo, boton, etiquetaOcupado){
   pushTx(name,"user",cuerpo.prompt);
   state.current=name;
   $("#input").disabled=false; $("#send").disabled=true; $("#attach").disabled=false;
-  $("#chathead").style.display="flex"; $("#curname").textContent=name;
+  $("#chathead").hidden=false; $("#curname").textContent=name;
   render();
   const ok=await correrTurno("/sessions/crear", cuerpo, name);
   await refresh();
