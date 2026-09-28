@@ -51,6 +51,42 @@ solo NO basta contra el navegador, así que hay dos candados:
 
 Lo que queda expuesto —y se asume— es **otro usuario/proceso LOCAL** en la máquina.
 
+### La puerta: alcanzarlo sin túnel (opcional, para servicio)
+
+Los dos candados de arriba asumen **un único humano de confianza en la máquina**, y lo
+que hace cierta esa premisa es el túnel SSH. Para un servicio eso no sirve: nadie se
+suscribe a algo que exige abrir un túnel antes de escribir.
+
+Se puede declarar un **origen público**, y entonces el puente exige identidad de
+[IAP](https://cloud.google.com/iap) en **toda** petición salvo `/health`:
+
+```sh
+BRIDGE_PUBLIC_ORIGIN=https://agente.ejemplo.com BRIDGE_IAP_AUDIENCE=/projects/<numero>/global/backendServices/<id> python3 session_bridge.py
+```
+
+> [!important] Las dos variables son una sola pieza
+> Declarar el origen público **quita** el candado de loopback. Por eso, sin
+> `BRIDGE_IAP_AUDIENCE` el servicio **no arranca** — igual que no arranca sin
+> `BRIDGE_PERMISSION`. No hay combinación que abra la puerta sin poner la cerradura
+> nueva, y tampoco arranca si el origen no es `https` (el JWT viaja en una cabecera) ni
+> si falta `openssl` (la puerta que no puede comprobar, no abre).
+
+**Verificar es verificar**: firma ES256 contra las claves públicas de Google, `aud`
+exacto, emisor y caducidad. Una cabecera que cualquiera puede escribir no autentica a
+nadie. Opcionalmente, `BRIDGE_IAP_EMAILS` restringe además **a quién** —defensa en
+profundidad sobre lo que IAP ya decidió—.
+
+**Se comprueba corriéndolo**, y lo que cuenta son los negativos:
+
+```sh
+python3 probar_puerta.py ./session_bridge.py python3 /tmp/reg.json /tmp/vacio.env
+```
+
+Genera claves ES256 de verdad, sirve un JWKS local y ejerce quince casos: sin cabecera,
+con cabecera **fabricada con otra clave**, con `aud` ajeno, caducada, de otro emisor, de
+otra identidad… y que la instalación local **sigue entrando sin nada**. Si el caso de la
+cabecera fabricada pasara, no habría puerta: habría un cartel de puerta.
+
 ## API
 
 | Método | Ruta | Cuerpo | Devuelve |
@@ -168,5 +204,9 @@ el nivel se fija al crearla (campo `permission`, o el selector en la web). Defau
 `BRIDGE_DELIVER_INIT_TIMEOUT`, `BRIDGE_CONTEXT_WINDOW` (default `200000`; solo el
 valor mientras el turno corre — el `result` trae el real), `BRIDGE_CLAUDE_BIN`,
 `BRIDGE_REGISTRY`.
+
+De la puerta: `BRIDGE_PUBLIC_ORIGIN`, `BRIDGE_IAP_AUDIENCE` (obligatoria con la
+anterior), `BRIDGE_IAP_EMAILS`, y para pruebas `BRIDGE_IAP_JWKS_URL` y
+`BRIDGE_IAP_ISSUER`.
 </content>
 </invoke>

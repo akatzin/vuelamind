@@ -48,19 +48,22 @@ trabajo ajeno de duración no acotada. Desacopla despertar de completar; el turn
 corre hasta el final aunque el cliente cierre la conexión.
 """
 
+import base64
 import json
 import os
 import re
 import shutil
 import subprocess
 import sys
+import tempfile
 import threading
 import unicodedata
 import time
+import urllib.request
 import zipfile
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path, PurePath
-from urllib.parse import parse_qs, unquote
+from urllib.parse import parse_qs, unquote, urlparse
 
 
 # ------------------------------------------------------ config por archivo (portable)
@@ -263,6 +266,179 @@ REGISTRY_FILE = Path(os.environ.get("BRIDGE_REGISTRY", CONF_DIR / "vuelamind-bri
 # candados que sustituyen al token (ver docstring). Host y Origin permitidos.
 _LOCAL_HOSTS = {"127.0.0.1", "localhost", "::1", "[::1]"}
 SAME_ORIGINS = {f"http://127.0.0.1:{PORT}", f"http://localhost:{PORT}"}
+
+# ============================================================================
+# LA PUERTA  ·  alcanzar el puente sin tunel, sin abrir un puerto
+# ----------------------------------------------------------------------------
+# Hasta aqui el puente tiene UNA cerradura: solo escucha en loopback y solo acepta
+# Host de loopback. No hay token, ni sesion, ni usuario -- todo el modelo asume un
+# unico humano de confianza en la maquina, y el tunel SSH es lo que hace cierta esa
+# premisa.
+#
+# Para un servicio eso no vale: nadie se suscribe a algo que exige abrir un tunel
+# antes de escribir un mensaje. Asi que se puede declarar un origen publico... pero
+# entonces la unica cerradura desaparece, y lo que queda es un puerto alcanzable
+# desde internet que ejecuta lo que le pidan.
+#
+# POR ESO LAS DOS PIEZAS SON UNA SOLA: declarar el origen publico ENCIENDE la
+# verificacion del JWT de IAP, y sin `BRIDGE_IAP_AUDIENCE` el servicio NO ARRANCA.
+# No hay combinacion de variables que abra la puerta sin poner la cerradura nueva.
+# Es la misma doctrina de BRIDGE_PERMISSION: falla cerrado en vez de suponer.
+PUBLIC_ORIGIN = os.environ.get("BRIDGE_PUBLIC_ORIGIN", "").strip().rstrip("/")
+IAP_AUDIENCE = os.environ.get("BRIDGE_IAP_AUDIENCE", "").strip()
+IAP_JWKS_URL = os.environ.get(
+    "BRIDGE_IAP_JWKS_URL", "https://www.gstatic.com/iap/verify/public_key-jwk").strip()
+IAP_ISSUER = os.environ.get("BRIDGE_IAP_ISSUER", "https://cloud.google.com/iap").strip()
+# Segunda barrera, opcional: aunque IAP ya decide quien entra, un contenedor por
+# persona puede ademas declarar DE QUIEN es. Defensa en profundidad barata.
+IAP_EMAILS = {e.strip().lower() for e in os.environ.get("BRIDGE_IAP_EMAILS", "").split(",")
+              if e.strip()}
+IAP_HEADER = "x-goog-iap-jwt-assertion"
+
+if PUBLIC_ORIGIN:
+    _pu = urlparse(PUBLIC_ORIGIN)
+    SAME_ORIGINS.add(PUBLIC_ORIGIN)
+    if _pu.hostname:
+        _LOCAL_HOSTS.add(_pu.hostname)
+
+
+def _b64url(dato: str) -> bytes:
+    """Base64 de JWT: sin relleno y con alfabeto seguro para URL."""
+    return base64.urlsafe_b64decode(dato + "=" * (-len(dato) % 4))
+
+
+def _der_entero(n: bytes) -> bytes:
+    """Un INTEGER de DER: sin ceros delante, y con un 0x00 si el bit alto esta puesto
+    -- que si no, DER lo lee como numero negativo."""
+    n = n.lstrip(b"\x00") or b"\x00"
+    if n[0] & 0x80:
+        n = b"\x00" + n
+    return b"\x02" + bytes([len(n)]) + n
+
+
+def _firma_a_der(cruda: bytes) -> bytes:
+    """ES256 firma con R||S crudos de 32 bytes cada uno; openssl espera DER."""
+    if len(cruda) != 64:
+        raise ValueError(f"firma ES256 de {len(cruda)} bytes, se esperaban 64")
+    cuerpo = _der_entero(cruda[:32]) + _der_entero(cruda[32:])
+    return b"\x30" + bytes([len(cuerpo)]) + cuerpo
+
+
+# Prefijo DER de una clave publica P-256 en SubjectPublicKeyInfo. Es constante: lo
+# unico que cambia es el punto (0x04 || X || Y) que va detras.
+_P256_SPKI = bytes.fromhex("3059301306072a8648ce3d020106082a8648ce3d030107034200")
+
+
+def _jwk_a_pem(jwk: dict) -> bytes:
+    x, y = _b64url(jwk["x"]), _b64url(jwk["y"])
+    if len(x) != 32 or len(y) != 32:
+        raise ValueError("la clave no es P-256")
+    der = _P256_SPKI + b"\x04" + x + y
+    linea = base64.b64encode(der).decode()
+    cuerpo = "\n".join(linea[i:i + 64] for i in range(0, len(linea), 64))
+    return f"-----BEGIN PUBLIC KEY-----\n{cuerpo}\n-----END PUBLIC KEY-----\n".encode()
+
+
+_jwks_cache: dict = {"claves": {}, "cuando": 0.0}
+_jwks_lock = threading.Lock()
+
+
+def _jwks(kid: str, forzar: bool = False):
+    """La clave publica de IAP por su `kid`, cacheada.
+
+    Se recarga cuando el `kid` no esta -- que es como se entera uno de una rotacion --
+    pero no mas de una vez por minuto, para que un `kid` inventado no se convierta en
+    una forma de hacernos pedir el JWKS en bucle."""
+    with _jwks_lock:
+        clave = _jwks_cache["claves"].get(kid)
+        if clave and not forzar:
+            return clave
+        if time.time() - _jwks_cache["cuando"] < 60 and not forzar:
+            return None
+        try:
+            with urllib.request.urlopen(IAP_JWKS_URL, timeout=10) as r:
+                datos = json.loads(r.read().decode())
+        except Exception as e:
+            sys.stderr.write(f"[puerta] no pude traer el JWKS: {type(e).__name__}: {e}\n")
+            return None
+        _jwks_cache["cuando"] = time.time()
+        _jwks_cache["claves"] = {}
+        for k in datos.get("keys", []):
+            if k.get("kid"):
+                try:
+                    _jwks_cache["claves"][k["kid"]] = _jwk_a_pem(k)
+                except Exception:
+                    continue          # una clave rara no invalida las demas
+        return _jwks_cache["claves"].get(kid)
+
+
+def verificar_iap(assertion: str):
+    """Devuelve (ok, motivo, email). VERIFICA de verdad: firma contra la clave
+    publica de Google, `aud` exacto, emisor y caducidad.
+
+    Mirar solo que la cabecera exista no autentica a NADIE -- cualquiera puede
+    escribir una cabecera. Por eso la prueba de esto no es que la pagina cargue,
+    son los dos negativos: sin cabecera, 403; con una cabecera fabricada, 403."""
+    if not assertion:
+        return False, "falta la cabecera de IAP", None
+    partes = assertion.split(".")
+    if len(partes) != 3:
+        return False, "el JWT no tiene tres partes", None
+    try:
+        cab = json.loads(_b64url(partes[0]))
+        cuerpo = json.loads(_b64url(partes[1]))
+        firma = _b64url(partes[2])
+    except Exception:
+        return False, "el JWT no se puede decodificar", None
+
+    if cab.get("alg") != "ES256":
+        return False, f"algoritmo no aceptado: {cab.get('alg')!r}", None
+    kid = cab.get("kid")
+    if not kid:
+        return False, "el JWT no dice con que clave se firmo", None
+    pem = _jwks(kid) or _jwks(kid, forzar=True)
+    if not pem:
+        return False, "no conozco esa clave de firma", None
+
+    firmado = ".".join(partes[:2]).encode()
+    try:
+        der = _firma_a_der(firma)
+    except ValueError as e:
+        return False, str(e), None
+
+    # openssl y no una libreria: el puente no tiene dependencias y no se las va a
+    # poner por esto. Firmar a mano una curva eliptica seria peor que las dos cosas.
+    tmp = tempfile.mkdtemp(prefix="iap-")
+    try:
+        fk, ff, fd = Path(tmp) / "k.pem", Path(tmp) / "f.der", Path(tmp) / "d.bin"
+        fk.write_bytes(pem); ff.write_bytes(der); fd.write_bytes(firmado)
+        r = subprocess.run(["openssl", "dgst", "-sha256", "-verify", str(fk),
+                            "-signature", str(ff), str(fd)],
+                           capture_output=True, text=True, timeout=10)
+        if r.returncode != 0:
+            return False, "la firma no cuadra", None
+    except FileNotFoundError:
+        # Sin openssl NO se deja pasar: la puerta que no puede comprobar, no abre.
+        return False, "no hay openssl para verificar la firma", None
+    except Exception as e:
+        return False, f"no se pudo verificar la firma: {type(e).__name__}", None
+    finally:
+        shutil.rmtree(tmp, ignore_errors=True)
+
+    if cuerpo.get("iss") != IAP_ISSUER:
+        return False, f"emisor inesperado: {cuerpo.get('iss')!r}", None
+    if cuerpo.get("aud") != IAP_AUDIENCE:
+        return False, "el token no es para este servicio", None
+    ahora = time.time()
+    if float(cuerpo.get("exp", 0)) < ahora:
+        return False, "el token caduco", None
+    if float(cuerpo.get("iat", 0)) > ahora + 60:
+        return False, "el token viene del futuro", None
+
+    email = (cuerpo.get("email") or "").lower()
+    if IAP_EMAILS and email not in IAP_EMAILS:
+        return False, "esa identidad no esta dada de alta en este agente", None
+    return True, "", email
 
 _registry_lock = threading.Lock()
 NAME_RE = re.compile(r"^[A-Za-z0-9._-]{1,64}$")        # nombres seguros para direccionar
@@ -854,10 +1030,24 @@ class Handler(BaseHTTPRequestHandler):
         return origin is None or origin in SAME_ORIGINS
 
     def _blocked(self, changing: bool = False) -> bool:
-        """True (y ya respondió 403) si la petición no pasa los candados locales."""
+        """True (y ya respondió 403) si la petición no pasa los candados.
+
+        `/health` no pasa por aquí a propósito: no lee nada, no dice nada y es lo que
+        sondea el balanceador. Todo lo demás sí, incluida la página."""
         if not self._host_ok():
-            self._json(403, {"error": "host no permitido (solo loopback)"})
+            permitidos = "loopback" + (f" o {PUBLIC_ORIGIN}" if PUBLIC_ORIGIN else "")
+            self._json(403, {"error": f"host no permitido (solo {permitidos})"})
             return True
+        # La puerta. Cuando hay origen público declarado, la cerradura de loopback ya
+        # no cubre nada, así que la identidad se exige SIEMPRE -- no solo cuando el
+        # Host viene de fuera. Distinguir por Host seria dejar la llave bajo el felpudo:
+        # bastaria con mandar `Host: 127.0.0.1` para saltarse la comprobacion.
+        if PUBLIC_ORIGIN:
+            ok, motivo, email = verificar_iap(self.headers.get(IAP_HEADER, ""))
+            if not ok:
+                self._json(403, {"error": "no autenticado", "detalle": motivo})
+                return True
+            self._iap_email = email
         if changing and not self._origin_ok():
             self._json(403, {"error": "origen no permitido"})
             return True
@@ -1853,6 +2043,30 @@ def main():
     if DEFAULT_EFFORT and DEFAULT_EFFORT not in ESFUERZOS_VALIDOS:
         sys.exit(f"BRIDGE_EFFORT={DEFAULT_EFFORT!r} no es un nivel valido.\n"
                  f"  Validos: {', '.join(ESFUERZOS_VALIDOS)}  (o vacio para el del CLI)")
+
+    # LA PUERTA: declarar un origen publico QUITA la unica cerradura que hay, asi que
+    # aqui se comprueba que la nueva este puesta ANTES de escuchar en ningun sitio.
+    # No se avisa y se sigue: se sale. Un servicio que arranca a medias con la puerta
+    # abierta es exactamente lo que este bloque existe para impedir.
+    if PUBLIC_ORIGIN:
+        if not IAP_AUDIENCE:
+            sys.exit("BRIDGE_PUBLIC_ORIGIN esta puesto y BRIDGE_IAP_AUDIENCE no.\n"
+                     "  Declarar un origen publico desactiva el candado de loopback, asi\n"
+                     "  que sin la audiencia de IAP esto seria un puerto abierto que\n"
+                     "  ejecuta lo que le pidan. Las dos van juntas o no va ninguna.\n"
+                     "  La audiencia es del backend de IAP:\n"
+                     "    /projects/<numero>/global/backendServices/<id>")
+        if not shutil.which("openssl"):
+            sys.exit("BRIDGE_PUBLIC_ORIGIN necesita `openssl` para verificar la firma\n"
+                     "  del JWT de IAP, y no lo encuentro. La puerta que no puede\n"
+                     "  comprobar no abre.")
+        if not PUBLIC_ORIGIN.startswith("https://"):
+            sys.exit(f"BRIDGE_PUBLIC_ORIGIN={PUBLIC_ORIGIN!r} no es https.\n"
+                     "  El JWT de IAP viaja en una cabecera: sin TLS se lee y se copia\n"
+                     "  por el camino, y entonces la puerta no cierra nada.")
+        print(f"puerta:              {PUBLIC_ORIGIN}  (IAP obligatorio)")
+        if IAP_EMAILS:
+            print(f"                     solo para: {', '.join(sorted(IAP_EMAILS))}")
 
     if not Path(CLAUDE).exists() and not shutil.which(CLAUDE):
         sys.exit(f"no encuentro el binario claude en: {CLAUDE}")
