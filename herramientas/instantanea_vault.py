@@ -78,18 +78,65 @@ def diff(vault: Path, copia: Path) -> int:
 
     actuales = notas(vault)
     nuevas = [r for r in actuales if not (copia / r).exists()]
-    if nuevas:
-        # aparte, porque una nota nueva NO TIENE con qué compararse: mezclarla con las
-        # modificadas la colaría como si estuviera revisada
-        print("== NOTAS NUEVAS — no tienen con qué compararse, nadie las ha releído ==")
-        for r in nuevas:
-            print(f"  {r}")
-        print()
 
     borradas = [r for r in notas(copia) if not (vault / r).exists()]
+
+    # UNA MUDANZA NO ES UNA BAJA MÁS UN ALTA, aunque desde aquí se vean igual.
+    #
+    # Una nota que cambia de carpeta no cambia por dentro, así que el diff de contenido
+    # no tiene nada que decir de ella, y los wikilinks -que van por NOMBRE y no por ruta-
+    # sobreviven a la mudanza: no queda un solo enlace roto que la delate. El validador
+    # sale verde y todo queda coherente.
+    #
+    # Reportarla como «una nota nueva y otra que ya no está» es literalmente cierto y no
+    # dice lo que pasó. Para quien lee, son cosas completamente distintas: una baja pide
+    # preguntarse qué se perdió; una mudanza, quién la movió y por qué.
+    #
+    # Cruzando las dos listas por huella sale la respuesta sin coste: mismo contenido en
+    # otra ruta. APORTADO por la casa que lo sufrió -- una nota suya se mudó sola y nadie
+    # se enteró en DOS DÍAS; lo destapó una casualidad, que su validador cuadraba un
+    # conteo que vivía dentro del archivo movido. Sin ese número, nada se habría enterado
+    # nunca.
+    def _huella(p):
+        try:
+            return hashlib.sha256(p.read_bytes()).hexdigest()
+        except OSError:
+            return None
+
+    mudadas = []
+    if nuevas and borradas:
+        por_huella = {}
+        for r in borradas:
+            h = _huella(copia / r)
+            if h:
+                por_huella.setdefault(h, []).append(r)
+        for r in list(nuevas):
+            h = _huella(vault / r)
+            origen = por_huella.get(h) if h else None
+            if origen:
+                antes = origen.pop(0)
+                mudadas.append((antes, r))
+                nuevas.remove(r)
+                borradas.remove(antes)
+
+    if mudadas:
+        print("== NOTAS QUE SE MUDARON — mismo contenido, otra ruta ==")
+        for antes, ahora in mudadas:
+            print(f"  {antes}  ->  {ahora}")
+        print()
+
     if borradas:
         print("== NOTAS QUE YA NO ESTÁN ==")
         for r in borradas:
+            print(f"  {r}")
+        print()
+
+    if nuevas:
+        # aparte, porque una nota nueva NO TIENE con qué compararse: mezclarla con las
+        # modificadas la colaría como si estuviera revisada. Y se imprime DESPUÉS del
+        # cruce de mudanzas: lo que se mudó ya no es un alta y no debe salir dos veces.
+        print("== NOTAS NUEVAS — no tienen con qué compararse, nadie las ha releído ==")
+        for r in nuevas:
             print(f"  {r}")
         print()
 
@@ -106,7 +153,7 @@ def diff(vault: Path, copia: Path) -> int:
         hubo = True
         sys.stdout.writelines(difflib.unified_diff(a, b, f"antes/{rel}", f"ahora/{rel}"))
         print()
-    if not hubo and not nuevas and not borradas:
+    if not hubo and not nuevas and not borradas and not mudadas:
         print("  (nada: no se ha escrito nada desde el cierre anterior)")
     return 0
 
