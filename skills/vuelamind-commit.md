@@ -24,12 +24,47 @@ Declara, como mínimo:
 | `vault` | dónde vive el conocimiento en esta máquina. **Opcional desde la v3.6**: sin declarar, `<proyecto>/vault/`. Declararla gana sobre la convención |
 | `validador` | el script de comprobaciones mecánicas, con su ruta — o `—` si el dominio no tiene, y entonces los chequeos se hacen a mano y se dice |
 | `acceso_vivo` | cómo se llega a los sistemas que hay que verificar |
-| `notas:` `cola` · `archivo` · `panorama` · `decisiones` · `bitacora` · `arranque` | los nombres reales de las seis notas del ciclo |
+| `notas:` `cola` · `archivo` · `panorama` · `decisiones` · `bitacora` · `arranque` | los nombres reales de las seis notas del ciclo. **Son el mínimo, no el censo** — ver abajo |
+| `notas_leidas:` | **opcional y de forma libre**: las notas de papel fijo que el dominio **lee para comprobar** y que no están entre las seis. Cada una con su nombre y **para qué se toca** |
 | `marco` | dónde vive la copia local del método y sus parches |
 | `canon` | **de qué repositorio se jala el método.** Por omisión el oficial; declararlo gana — un espejo, un derivado, o una copia bajo otra cuenta. **Quien declare uno distinto declara también quién lo sincroniza y cada cuánto** |
 | `antes_de_medir` | enganche opcional: qué correr antes del paso 0 (desbloquear una llave, montar algo) |
 | `despues_de_escribir` | enganche opcional: qué correr tras el paso 4 (un empuje manual, si el transporte lo pide) |
 | `avisos_del_dominio` | lista corta de trampas propias que el motor debe respetar al escribir |
+
+> [!important] Las seis claves preguntan por lo que el cierre ESCRIBE, y el ciclo también LEE
+> Las seis nombran las notas del **ciclo de escritura**: lo que el cierre redacta. Pero un
+> validador necesita además notas que **lee para comprobar**, y hasta ahora no tenían dónde
+> declararse. Quien las necesitaba las escribía a mano en su instrumento, y ahí es donde el
+> defecto se queda a vivir.
+>
+> **MEDIDO en dos dominios que no comparten una línea de código**, 2026-09-28. Uno exige una
+> nota de desmontajes que su manifiesto **nombra en prosa pero no declara**; el otro exige una
+> nota de skills que su manifiesto **no menciona en absoluto** — ni clave, ni prosa, ni
+> comentario. En el segundo caso, **el único sitio del mundo donde consta que el ciclo
+> necesita esa nota es el propio script**.
+>
+> Y eso tiene una consecuencia que no da síntoma: **si alguien reescribe el instrumento, la
+> exigencia desaparece sin dejar rastro.** No es hipotético — en una de las dos casas, un
+> guion reescrito en otro lenguaje había perdido una comprobación entera, y nadie se enteró
+> porque lo que falta es algo que nunca se imprime.
+>
+> **Por eso la pregunta del contrato cambia de forma.** No es *«¿cuáles son tus seis notas?»*
+> sino **«¿qué notas de papel fijo toca tu ciclo, y cómo?»**. Las seis siguen siendo
+> obligatorias porque el motor las necesita por nombre; `notas_leidas` recoge el resto, y su
+> valor no es que el motor las use —no las usa— sino que **la exigencia quede escrita fuera
+> del guion que la impone**.
+
+> [!warning] Y lo que NO se declara: la forma del canon
+> Un instrumento nombra también rutas que son del **método**, no del dominio: el inventario de
+> skills, la carpeta de parches, el README. **Ésas se quedan escritas en el instrumento.**
+>
+> Declararlas sería repartir un dato del canon entre todos los manifiestos, y entonces el día
+> que el canon mueva algo habría que corregirlo en treinta sitios en vez de en uno. Es el
+> mismo defecto de esta regla **con el signo cambiado**.
+>
+> La prueba para separarlas: *si el canon lo mueve, ¿lo arregla el instrumento o lo arregla
+> cada casa?* Lo primero se queda dentro; lo segundo se declara.
 
 **Si el manifiesto no existe, detente y dilo.** Ofrece generarlo desde este contrato preguntando las claves una a una — no inventes rutas ni corras un checkpoint "genérico" sin él: reconciliar el vault equivocado es peor que no reconciliar.
 
