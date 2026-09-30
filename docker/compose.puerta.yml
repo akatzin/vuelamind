@@ -74,8 +74,12 @@ services:
       # El http sin TLS se queda en el loopback DEL PROXY y no se publica.
       OAUTH2_PROXY_HTTP_ADDRESS: 127.0.0.1:4180
       OAUTH2_PROXY_COOKIE_SECURE: "true"
+    # El puerto que se publica en la maquina. 443 por omision; si el 443 ya lo ocupa otro
+    # servicio, Cloudflare con proxy tambien acepta 8443 (y 2053, 2083, 2087, 2096):
+    #   PUERTA_PUERTO=8443 docker compose -f compose.yml -f compose.puerta.yml up -d
+    # Dentro del contenedor el proxy sigue en 443; solo cambia lo de fuera.
     ports:
-      - "443:443"
+      - "${PUERTA_PUERTO:-443}:443"
     volumes:
       - ./puerta.tls:/tls:ro
     restart: unless-stopped
