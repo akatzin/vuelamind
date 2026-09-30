@@ -27,6 +27,43 @@ working»*, y el modelo lo incorpora antes de terminar. El puente no tiene ese c
 **El cerrojo está en el cliente, y un cerrojo en el cliente es una convención.** El
 servidor es el único sitio donde «un turno por sesión» puede ser verdad.
 
+## Segundo síntoma, mismo día: el botón de reconciliar se queda muerto
+
+Tras el caso de arriba, la sesión termina —el agente se despide, avisa de que hay trabajo
+sin reconciliar— y el botón **Reconcile** de la página está deshabilitado. MEDIDO sobre
+`main`:
+
+- El botón es `#guardar`. `refrescarGuardar()` lo deshabilita mientras
+  `state.streams[sesión]` esté puesto (l. 1220); su `onclick` vuelve a mirarlo (l. 1914).
+- Esa bandera se pone al arrancar un stream (l. 2075) y se quita en `endStream()` **solo
+  si la entrada sigue siendo ese mismo panel** (l. 2123). Con dos turnos sobre la misma
+  sesión, el segundo pisa al primero; el primero ya no puede borrarla.
+- `endStream()` corre en el camino feliz y en el `catch` (l. 2182 y 2206). **Pero en el
+  `catch` va después de `await recuperar()`, sin proteger**: si `recuperar` lanza —un
+  `/ultimo` que no contesta, un cuerpo que no es JSON—, la bandera no se quita nunca.
+- Y aunque se quitara siempre: la bandera es **una segunda copia** de algo que el servidor
+  ya sabe (`esta_en_vuelo`). La página lo *recuerda* en vez de *preguntarlo*. El propio
+  puente tiene escrita la regla: un índice es una segunda copia de algo derivable, y deja
+  de decir la verdad en cuanto alguien cambia lo de abajo sin avisar.
+
+**Dos causas posibles y una medición que las separa**, en la máquina donde corre ese
+puente:
+
+```sh
+curl -s -H 'Host: 127.0.0.1:8850' http://127.0.0.1:8850/sessions/<nombre>/ultimo
+```
+
+- `"en_vuelo": true` → el servidor sigue drenando un turno huérfano —el segundo proceso
+  del caso de arriba— y el botón está deshabilitado **con razón**. Recargar la página lo
+  habilitaría y el siguiente envío sería un tercer proceso concurrente.
+- `"en_vuelo": false` → el turno acabó y la página se quedó con la bandera: el botón
+  **miente**. Recargar lo cura, y no cura nada.
+
+**Regla que sale de aquí:** *el servidor es la única fuente de «hay un turno en vuelo»; la
+página lo pregunta, no lo recuerda.* `refrescarGuardar()` y la fila «trabajando» de la
+lista se alimentan de `en_vuelo`, y `state.streams` queda como lo que es: el panel que
+esta pestaña está pintando, no el estado de la sesión.
+
 ## Tres capas, y solo dos son del puente
 
 1. **Que la corrección llegue a tiempo** — antes de que el turno propague. Es transporte.
@@ -85,6 +122,9 @@ No basta con que la corrección «funcione». Los negativos:
 
 1. dos POST a la misma sesión con 200 ms de diferencia → **un solo** proceso `claude`
    vivo, medido con `ps`, no con el log;
+0. el botón de reconciliar y la fila «trabajando» siguen a `en_vuelo` del servidor:
+   con un turno huérfano drenando, deshabilitado aunque la página se recargue; sin
+   turno, habilitado aunque `state.streams` tenga basura;
 2. el segundo POST, con A, → `409` y el cuerpo dice *turno en vuelo*;
 3. con C, el segundo mensaje aparece en el transcript **dentro** del turno del primero,
    antes de su `result`, y no como turno aparte;
