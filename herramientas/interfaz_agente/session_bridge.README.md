@@ -71,10 +71,38 @@ BRIDGE_PUBLIC_ORIGIN=https://agente.ejemplo.com BRIDGE_IAP_AUDIENCE=/projects/<n
 > nueva, y tampoco arranca si el origen no es `https` (el JWT viaja en una cabecera) ni
 > si falta `openssl` (la puerta que no puede comprobar, no abre).
 
-**Verificar es verificar**: firma ES256 contra las claves públicas de Google, `aud`
-exacto, emisor y caducidad. Una cabecera que cualquiera puede escribir no autentica a
-nadie. Opcionalmente, `BRIDGE_IAP_EMAILS` restringe además **a quién** —defensa en
-profundidad sobre lo que IAP ya decidió—.
+**Verificar es verificar**: firma contra las claves públicas del emisor (su JWKS), `aud`
+exacto, emisor exacto y caducidad. Una cabecera que cualquiera puede escribir no autentica
+a nadie. Opcionalmente, `BRIDGE_IAP_EMAILS` restringe además **a quién** —defensa en
+profundidad sobre lo que el emisor ya decidió—.
+
+**El algoritmo y la cabecera se declaran, no se adivinan del token.** `BRIDGE_IAP_ALG`
+(`ES256` por omisión, como IAP; o `RS256`) fija el único `alg` que se acepta: un token con
+otro, aunque su firma sea válida y su clave esté en el JWKS, sale 403. Aceptar «el que
+diga el token» es la confusión de algoritmo clásica. Fuera de esa lista —`HS256` y
+familia— **no arranca**: con un JWKS público, un HMAC es una firma que cualquiera fabrica.
+`BRIDGE_IAP_HEADER` (`x-goog-iap-jwt-assertion` por omisión) fija la única cabecera que se
+lee; si trae el prefijo `Bearer `, se le quita.
+
+#### Con Auth0 detrás de `oauth2-proxy` (o cualquier OIDC)
+
+Cuando la puerta no es IAP sino un proxy que autentica contra un OIDC y pasa el **ID
+token** al puente en `Authorization: Bearer …`:
+
+```sh
+BRIDGE_PUBLIC_ORIGIN=https://agente.ejemplo.com \
+BRIDGE_IAP_ALG=RS256 BRIDGE_IAP_HEADER=authorization \
+BRIDGE_IAP_ISSUER=https://TU-TENANT.us.auth0.com/ \
+BRIDGE_IAP_JWKS_URL=https://TU-TENANT.us.auth0.com/.well-known/jwks.json \
+BRIDGE_IAP_AUDIENCE=<client_id de la aplicación> \
+python3 session_bridge.py
+```
+
+Auth0 emite el `iss` **con barra final** y el puente compara exacto. El `aud` de un ID
+token es el `client_id`; si viene como lista, basta con que lo contenga. El apilado de
+contenedores que pone el proxy delante está en `docker/compose.puerta.yml`, con sus dos
+archivos de entorno de ejemplo — y **hasta la fecha no se ha ejercido contra un Auth0
+real**: lo probado con claves de verdad es el puente, no el proxy.
 
 **Se comprueba corriéndolo**, y lo que cuenta son los negativos:
 
@@ -82,9 +110,11 @@ profundidad sobre lo que IAP ya decidió—.
 python3 probar_puerta.py ./session_bridge.py python3 /tmp/reg.json /tmp/vacio.env
 ```
 
-Genera claves ES256 de verdad, sirve un JWKS local y ejerce quince casos: sin cabecera,
-con cabecera **fabricada con otra clave**, con `aud` ajeno, caducada, de otro emisor, de
-otra identidad… y que la instalación local **sigue entrando sin nada**. Si el caso de la
+Genera claves ES256 **y RS256** de verdad, sirve un JWKS local con las dos y ejerce
+veintiocho casos: sin cabecera, con cabecera **fabricada con otra clave**, con `aud`
+ajeno, caducada, de otro emisor, de otra identidad, en la cabecera equivocada, y la
+**confusión de algoritmo en los dos sentidos** —token válido del otro tipo, con su clave
+en el JWKS—… y que la instalación local **sigue entrando sin nada**. Si el caso de la
 cabecera fabricada pasara, no habría puerta: habría un cartel de puerta.
 
 ## API
@@ -206,7 +236,9 @@ valor mientras el turno corre — el `result` trae el real), `BRIDGE_CLAUDE_BIN`
 `BRIDGE_REGISTRY`.
 
 De la puerta: `BRIDGE_PUBLIC_ORIGIN`, `BRIDGE_IAP_AUDIENCE` (obligatoria con la
-anterior), `BRIDGE_IAP_EMAILS`, y para pruebas `BRIDGE_IAP_JWKS_URL` y
-`BRIDGE_IAP_ISSUER`.
+anterior), `BRIDGE_IAP_ALG` (`ES256` | `RS256`), `BRIDGE_IAP_HEADER`, `BRIDGE_IAP_ISSUER`,
+`BRIDGE_IAP_JWKS_URL` y `BRIDGE_IAP_EMAILS`. Los nombres conservan `IAP` porque la puerta
+nació para IAP; con otro emisor el significado es el mismo: el JWT firmado que llega en
+una cabecera.
 </content>
 </invoke>

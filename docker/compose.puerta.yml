@@ -1,0 +1,81 @@
+# LA PUERTA delante del contenedor: oauth2-proxy con Auth0 (o cualquier OIDC).
+#
+# Se APILA sobre compose.yml, no lo sustituye:
+#   docker compose -f compose.yml -f compose.puerta.yml up -d --build
+#
+# Que cambia respecto de la instalacion local, y por que:
+#   - el puente deja de publicarse en el loopback del anfitrion. En una maquina de
+#     servicio, «loopback» es cualquiera con una shell en ella: seria una entrada que
+#     se salta la puerta, sin registro. Aqui la UNICA entrada es el proxy.
+#   - el puente exige identidad en toda peticion (BRIDGE_PUBLIC_ORIGIN + BRIDGE_IAP_*):
+#     verifica por su cuenta el ID token que el proxy le pasa, contra el JWKS del
+#     emisor. El proxy autentica; el puente NO se fia del proxy, lo comprueba. Si
+#     alguien alcanzara el relevo por dentro sin pasar por el proxy, sigue en 403.
+#   - `full` no existe en el modo gestionado. El techo es `tools`.
+#
+# Dos archivos de entorno, a proposito:
+#   puerta.env           lo que pueden saber los dos contenedores (origen, emisor, ids)
+#   puerta.secretos.env  SOLO el proxy: client_secret y cookie_secret. El puente corre un
+#                        agente con permiso de ejecutar python; un secreto en su entorno
+#                        es un secreto que ese agente puede leer.
+# Sin cualquiera de los dos, no arranca (required: true). Copiar de los .ejemplo.
+#
+# TLS lo termina el propio proxy: certificado y llave en ./puerta.tls/ (fullchain.pem y
+# privkey.pem). De donde salgan —certbot, un certificado de origen de Cloudflare— es
+# decision de quien despliega; sin ellos el proxy no levanta y lo dice.
+#
+# LO QUE ESTO NO ES: no es multi-inquilino. Un contenedor por persona significa que
+# esta puerta prueba que quien entra es ESA persona (BRIDGE_IAP_EMAILS). Que contenedor
+# le toca a cada identidad es trabajo del encaminador de delante, no de este archivo.
+#
+# ESTADO (2026-09-30): el puente esta probado contra RS256 con claves reales en el banco
+# (probar_puerta.py). Este apilado esta validado en sintaxis (`docker compose config`) y
+# NO ejercido todavia contra un Auth0 real. Hasta que eso se mida, es diseno.
+
+services:
+  vuelamind:
+    # Se retira la publicacion 127.0.0.1:8850 de compose.yml. Sin `!override`, Compose
+    # SUMA las listas de puertos y el loopback seguiria abierto.
+    ports: !override []
+    env_file:
+      - path: vertex.env
+        required: false
+      - path: puerta.env
+        required: true
+    environment:
+      BRIDGE_PERMISSION: tools
+      BRIDGE_IAP_ALG: RS256
+      BRIDGE_IAP_HEADER: authorization
+
+  puerta:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.15.4
+    depends_on:
+      - vuelamind
+    env_file:
+      - path: puerta.env
+        required: true
+      - path: puerta.secretos.env
+        required: true
+    environment:
+      OAUTH2_PROXY_PROVIDER: oidc
+      # El puente escucha en el loopback del contenedor; `vuelamind:8851` es su relevo
+      # (ver puente.sh). Es la misma pareja que compose.yml publicaba al anfitrion.
+      OAUTH2_PROXY_UPSTREAMS: http://vuelamind:8851
+      # El ID token viaja al puente como `Authorization: Bearer ...`; es lo que el
+      # puente verifica (BRIDGE_IAP_HEADER=authorization).
+      OAUTH2_PROXY_PASS_AUTHORIZATION_HEADER: "true"
+      # El Host original llega al puente, que lo compara con BRIDGE_PUBLIC_ORIGIN.
+      OAUTH2_PROXY_PASS_HOST_HEADER: "true"
+      # Quien puede entrar lo decide el puente por correo; aqui no se filtra por dominio.
+      OAUTH2_PROXY_EMAIL_DOMAINS: "*"
+      OAUTH2_PROXY_HTTPS_ADDRESS: 0.0.0.0:443
+      OAUTH2_PROXY_TLS_CERT_FILE: /tls/fullchain.pem
+      OAUTH2_PROXY_TLS_KEY_FILE: /tls/privkey.pem
+      # El http sin TLS se queda en el loopback DEL PROXY y no se publica.
+      OAUTH2_PROXY_HTTP_ADDRESS: 127.0.0.1:4180
+      OAUTH2_PROXY_COOKIE_SECURE: "true"
+    ports:
+      - "443:443"
+    volumes:
+      - ./puerta.tls:/tls:ro
+    restart: unless-stopped

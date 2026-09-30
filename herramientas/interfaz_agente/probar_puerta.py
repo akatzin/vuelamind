@@ -3,13 +3,18 @@
 
     python3 probar_puerta.py <ruta/session_bridge.py> <python3> <registro.json> <env>
 
-Genera pares de claves ES256 DE VERDAD con openssl, sirve un JWKS local y ejerce los
-casos contra un puente levantado de verdad. Lo unico simulado es de donde salen las
-claves publicas: la firma, la verificacion y los 403 son reales.
+Genera pares de claves DE VERDAD con openssl —ES256 como IAP, RS256 como Auth0—, sirve
+un JWKS local con las dos y ejerce los casos contra un puente levantado de verdad. Lo
+unico simulado es de donde salen las claves publicas: la firma, la verificacion y los
+403 son reales.
 
 LO QUE IMPORTA SON LOS NEGATIVOS. Que la pagina cargue con un token bueno no demuestra
 nada -- lo demuestra que NO cargue con uno fabricado. Si el caso de la cabecera firmada
 con otra clave pasara, no habria puerta: habria un cartel de puerta.
+
+Y desde que la puerta acepta dos algoritmos, el negativo que mas importa es el de la
+CONFUSION: un token firmado con una clave que SI esta en el JWKS, con firma valida, pero
+de un algoritmo distinto al declarado. Tiene que salir 403 en los dos sentidos.
 """
 import base64, json, os, re, signal, socket, subprocess, sys, tempfile, threading, time, urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -29,6 +34,17 @@ def par_de_claves(nombre):
     return k, {"kty":"EC","crv":"P-256","alg":"ES256","kid":nombre,
                "x": b64u(raw[1:33]), "y": b64u(raw[33:])}
 
+def par_rsa(nombre):
+    k = TMP / f"{nombre}.pem"
+    sh("openssl", "genrsa", "-out", str(k), "2048")
+    txt = sh("openssl", "rsa", "-in", str(k), "-noout", "-text").stdout
+    hexs = re.search(r"modulus:\s*((?:\s*[0-9a-f]{2}:?)+)", txt).group(1)
+    n = bytes.fromhex(re.sub(r"[\s:]", "", hexs)).lstrip(b"\x00")
+    e = int(re.search(r"publicExponent:\s*(\d+)", txt).group(1))
+    assert len(n) == 256, f"modulo raro: {len(n)} bytes"
+    return k, {"kty":"RSA","alg":"RS256","use":"sig","kid":nombre,
+               "n": b64u(n), "e": b64u(e.to_bytes((e.bit_length()+7)//8, "big"))}
+
 def der_a_crudo(der):
     i = 2
     if der[1] & 0x80: i += der[1] & 0x7F
@@ -37,20 +53,25 @@ def der_a_crudo(der):
     r = r.lstrip(b"\x00").rjust(32, b"\x00"); s = s.lstrip(b"\x00").rjust(32, b"\x00")
     return r + s
 
-def jwt(clave, kid, cuerpo):
-    cab = b64u(json.dumps({"alg":"ES256","typ":"JWT","kid":kid}).encode())
+def jwt(clave, kid, cuerpo, alg="ES256"):
+    cab = b64u(json.dumps({"alg":alg,"typ":"JWT","kid":kid}).encode())
     cue = b64u(json.dumps(cuerpo).encode())
     dato = TMP / "d.bin"; dato.write_bytes(f"{cab}.{cue}".encode())
-    der = subprocess.run(["openssl","dgst","-sha256","-sign",str(clave),str(dato)],
-                         capture_output=True).stdout
-    return f"{cab}.{cue}.{b64u(der_a_crudo(der))}"
+    firma = subprocess.run(["openssl","dgst","-sha256","-sign",str(clave),str(dato)],
+                           capture_output=True).stdout
+    if alg == "ES256":
+        firma = der_a_crudo(firma)
+    return f"{cab}.{cue}.{b64u(firma)}"
 
 BUENA, JWK_BUENA = par_de_claves("la-buena")
 MALA,  _         = par_de_claves("la-mala")
+RSA_BUENA, JWK_RSA_BUENA = par_rsa("rsa-buena")
+RSA_MALA,  _             = par_rsa("rsa-mala")
 
 class JWKS(BaseHTTPRequestHandler):
     def do_GET(self):
-        b = json.dumps({"keys":[JWK_BUENA]}).encode()
+        # Un JWKS real trae varias claves y de mas de un tipo; las dos buenas conviven.
+        b = json.dumps({"keys":[JWK_BUENA, JWK_RSA_BUENA]}).encode()
         self.send_response(200); self.send_header("Content-Type","application/json")
         self.send_header("Content-Length", str(len(b))); self.end_headers(); self.wfile.write(b)
     def log_message(self, *a): pass
@@ -103,7 +124,13 @@ caso("origen publico sin https -> no arranca", p.poll() is not None, True)
 if salida: print("        dice:", salida.strip().split("\n")[0][:90])
 p.kill()
 
-print("\n=== CON LA PUERTA PUESTA ===")
+p, salida = arranca(8897, {"BRIDGE_PUBLIC_ORIGIN": "https://agente.ejemplo.com",
+                           "BRIDGE_IAP_AUDIENCE": AUD, "BRIDGE_IAP_ALG": "HS256"})
+caso("algoritmo fuera de la lista (HS256) -> no arranca", p.poll() is not None, True)
+if salida: print("        dice:", salida.strip().split("\n")[0][:90])
+p.kill()
+
+print("\n=== CON LA PUERTA PUESTA (ES256, como IAP) ===")
 p, _ = arranca(8893, {"BRIDGE_PUBLIC_ORIGIN": "https://agente.ejemplo.com",
                       "BRIDGE_IAP_AUDIENCE": AUD}, espera=6)
 if p.poll() is not None:
@@ -124,7 +151,47 @@ try:
     caso("firma valida pero otro emisor",
          pedir(8893, {"x-goog-iap-jwt-assertion": jwt(BUENA,"la-buena",val(iss="https://malo"))})[0], 403)
     caso("basura en la cabecera", pedir(8893, {"x-goog-iap-jwt-assertion":"no.soy.jwt"})[0], 403)
+    cod, cuerpo = pedir(8893, {"x-goog-iap-jwt-assertion": jwt(RSA_BUENA,"rsa-buena",val(),alg="RS256")})
+    caso("CONFUSION · RS256 valido, clave en el JWKS, puerta declara ES256 -> fuera", cod, 403)
+    print("        dice:", cuerpo[:120])
     caso("POSITIVO · token bueno", pedir(8893, {"x-goog-iap-jwt-assertion": jwt(BUENA,"la-buena",val())})[0], 200)
+finally:
+    p.kill()
+
+print("\n=== RS256 EN AUTHORIZATION (Auth0 detras de oauth2-proxy) ===")
+ISS0 = "https://casa.ejemplo.auth0.com/"     # Auth0 emite con barra final
+CID  = "aB3dE5fG7hI9jK1lM3nO5pQ7rS9tU1vW"    # el aud de un ID token es el client_id
+p, salida = arranca(8896, {"BRIDGE_PUBLIC_ORIGIN": "https://agente.ejemplo.com",
+                           "BRIDGE_IAP_AUDIENCE": CID, "BRIDGE_IAP_ALG": "RS256",
+                           "BRIDGE_IAP_HEADER": "authorization",
+                           "BRIDGE_IAP_ISSUER": ISS0}, espera=6)
+if p.poll() is not None:
+    print("  el puente no levanto:", (salida or p.stdout.read())[:400]); sys.exit(1)
+try:
+    ahora = int(time.time())
+    v0 = lambda **k: dict({"iss":ISS0,"aud":CID,"email":"quien@ejemplo.com",
+                           "exp":ahora+600,"iat":ahora}, **k)
+    bearer = lambda t: {"Authorization": f"Bearer {t}"}
+    caso("POSITIVO · Bearer RS256 bueno", pedir(8896, bearer(jwt(RSA_BUENA,"rsa-buena",v0(),alg="RS256")))[0], 200)
+    caso("sin el prefijo Bearer tambien entra",
+         pedir(8896, {"Authorization": jwt(RSA_BUENA,"rsa-buena",v0(),alg="RS256")})[0], 200)
+    caso("NEGATIVO · sin cabecera", pedir(8896)[0], 403)
+    cod, cuerpo = pedir(8896, bearer(jwt(RSA_MALA,"rsa-buena",v0(),alg="RS256")))
+    caso("NEGATIVO · RS256 fabricado (firmado con otra clave RSA)", cod, 403)
+    print("        dice:", cuerpo[:120])
+    cod, cuerpo = pedir(8896, bearer(jwt(BUENA,"la-buena",v0())))
+    caso("CONFUSION · ES256 valido, clave en el JWKS, puerta declara RS256 -> fuera", cod, 403)
+    print("        dice:", cuerpo[:120])
+    caso("token perfecto pero en la cabecera de IAP, no en la declarada -> fuera",
+         pedir(8896, {"x-goog-iap-jwt-assertion": jwt(RSA_BUENA,"rsa-buena",v0(),alg="RS256")})[0], 403)
+    caso("kid que el JWKS no tiene -> fuera",
+         pedir(8896, bearer(jwt(RSA_BUENA,"rsa-desconocida",v0(),alg="RS256")))[0], 403)
+    caso("aud en lista que incluye el client_id -> entra",
+         pedir(8896, bearer(jwt(RSA_BUENA,"rsa-buena",v0(aud=[CID,"otra-api"]),alg="RS256")))[0], 200)
+    caso("aud en lista SIN el client_id -> fuera",
+         pedir(8896, bearer(jwt(RSA_BUENA,"rsa-buena",v0(aud=["otra-api"]),alg="RS256")))[0], 403)
+    caso("emisor sin la barra final de Auth0 -> fuera (exacto, no parecido)",
+         pedir(8896, bearer(jwt(RSA_BUENA,"rsa-buena",v0(iss=ISS0.rstrip("/")),alg="RS256")))[0], 403)
 finally:
     p.kill()
 

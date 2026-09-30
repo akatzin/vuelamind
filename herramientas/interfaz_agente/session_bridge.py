@@ -293,7 +293,19 @@ IAP_ISSUER = os.environ.get("BRIDGE_IAP_ISSUER", "https://cloud.google.com/iap")
 # persona puede ademas declarar DE QUIEN es. Defensa en profundidad barata.
 IAP_EMAILS = {e.strip().lower() for e in os.environ.get("BRIDGE_IAP_EMAILS", "").split(",")
               if e.strip()}
-IAP_HEADER = "x-goog-iap-jwt-assertion"
+# La puerta no es solo IAP. Delante puede ir cualquier cosa que ponga un JWT firmado en
+# una cabecera: IAP lo pone en `x-goog-iap-jwt-assertion` firmado ES256; un oauth2-proxy
+# con Auth0 (u otro OIDC) lo pone en `Authorization: Bearer ...` firmado RS256. Son dos
+# perillas, y las dos se DECLARAN, no se adivinan del token:
+#   - el algoritmo se fija aqui y el `alg` del token tiene que ser ESE. Aceptar «el que
+#     diga el token» es la confusion de algoritmo clasica: una clave del JWKS sirve para
+#     verificar una firma de otro tipo, y cuela. Fuera de la lista, no arranca.
+#   - la cabecera se fija aqui y se lee SOLO esa. Un token perfecto en otra cabecera no
+#     es un token: es una cabecera.
+IAP_ALG = os.environ.get("BRIDGE_IAP_ALG", "ES256").strip().upper() or "ES256"
+IAP_ALGS_VALIDOS = ("ES256", "RS256")
+IAP_HEADER = (os.environ.get("BRIDGE_IAP_HEADER", "").strip().lower()
+              or "x-goog-iap-jwt-assertion")
 
 if PUBLIC_ORIGIN:
     _pu = urlparse(PUBLIC_ORIGIN)
@@ -329,14 +341,53 @@ def _firma_a_der(cruda: bytes) -> bytes:
 _P256_SPKI = bytes.fromhex("3059301306072a8648ce3d020106082a8648ce3d030107034200")
 
 
-def _jwk_a_pem(jwk: dict) -> bytes:
-    x, y = _b64url(jwk["x"]), _b64url(jwk["y"])
-    if len(x) != 32 or len(y) != 32:
-        raise ValueError("la clave no es P-256")
-    der = _P256_SPKI + b"\x04" + x + y
+def _pem(der: bytes) -> bytes:
     linea = base64.b64encode(der).decode()
     cuerpo = "\n".join(linea[i:i + 64] for i in range(0, len(linea), 64))
     return f"-----BEGIN PUBLIC KEY-----\n{cuerpo}\n-----END PUBLIC KEY-----\n".encode()
+
+
+def _der_largo(n: int) -> bytes:
+    """Longitud DER: un byte hasta 127; mas alla, 0x80|k seguido de k bytes. Una clave
+    RSA de 2048 bits mide 256 bytes, asi que aqui la forma corta no alcanza."""
+    if n < 0x80:
+        return bytes([n])
+    b = n.to_bytes((n.bit_length() + 7) // 8, "big")
+    return bytes([0x80 | len(b)]) + b
+
+
+def _der_tlv(etiqueta: int, contenido: bytes) -> bytes:
+    return bytes([etiqueta]) + _der_largo(len(contenido)) + contenido
+
+
+# OID rsaEncryption (1.2.840.113549.1.1.1) con su NULL, ya en DER.
+_RSA_ALGID = bytes.fromhex("300d06092a864886f70d0101010500")
+
+
+def _jwk_rsa_a_pem(jwk: dict) -> bytes:
+    """SubjectPublicKeyInfo de RSA: SEQ { algid, BIT STRING { SEQ { INTEGER n, INTEGER e } } }."""
+    n, e = _b64url(jwk["n"]), _b64url(jwk["e"])
+    if len(n.lstrip(b"\x00")) < 256:
+        raise ValueError("la clave RSA es menor de 2048 bits")
+
+    def entero(b: bytes) -> bytes:
+        b = b.lstrip(b"\x00") or b"\x00"
+        if b[0] & 0x80:
+            b = b"\x00" + b
+        return _der_tlv(0x02, b)
+
+    clave = _der_tlv(0x30, entero(n) + entero(e))
+    return _pem(_der_tlv(0x30, _RSA_ALGID + _der_tlv(0x03, b"\x00" + clave)))
+
+
+def _jwk_a_pem(jwk: dict) -> bytes:
+    """De JWK a PEM sin librerias: solo las dos formas que la puerta acepta."""
+    if jwk.get("kty") == "RSA":
+        return _jwk_rsa_a_pem(jwk)
+    x, y = _b64url(jwk["x"]), _b64url(jwk["y"])
+    if len(x) != 32 or len(y) != 32:
+        raise ValueError("la clave no es P-256")
+    return _pem(_P256_SPKI + b"\x04" + x + y)
 
 
 _jwks_cache: dict = {"claves": {}, "cuando": 0.0}
@@ -372,6 +423,16 @@ def _jwks(kid: str, forzar: bool = False):
         return _jwks_cache["claves"].get(kid)
 
 
+def _token_de(valor: str) -> str:
+    """Lo que hay en la cabecera, sin el `Bearer ` si viene con el. Un oauth2-proxy con
+    `--pass-authorization-header` manda `Authorization: Bearer <id_token>`; IAP manda el
+    token pelado. Solo se quita el prefijo: no se busca el token en otra cabecera."""
+    valor = valor.strip()
+    if valor[:7].lower() == "bearer ":
+        return valor[7:].strip()
+    return valor
+
+
 def verificar_iap(assertion: str):
     """Devuelve (ok, motivo, email). VERIFICA de verdad: firma contra la clave
     publica de Google, `aud` exacto, emisor y caducidad.
@@ -391,8 +452,8 @@ def verificar_iap(assertion: str):
     except Exception:
         return False, "el JWT no se puede decodificar", None
 
-    if cab.get("alg") != "ES256":
-        return False, f"algoritmo no aceptado: {cab.get('alg')!r}", None
+    if cab.get("alg") != IAP_ALG:
+        return False, f"algoritmo no aceptado: {cab.get('alg')!r} (esta puerta exige {IAP_ALG})", None
     kid = cab.get("kid")
     if not kid:
         return False, "el JWT no dice con que clave se firmo", None
@@ -402,7 +463,9 @@ def verificar_iap(assertion: str):
 
     firmado = ".".join(partes[:2]).encode()
     try:
-        der = _firma_a_der(firma)
+        # ES256 trae R||S crudos y openssl quiere DER; RS256 (PKCS#1 v1.5) ya viene
+        # como openssl lo espera.
+        der = _firma_a_der(firma) if IAP_ALG == "ES256" else firma
     except ValueError as e:
         return False, str(e), None
 
@@ -427,7 +490,10 @@ def verificar_iap(assertion: str):
 
     if cuerpo.get("iss") != IAP_ISSUER:
         return False, f"emisor inesperado: {cuerpo.get('iss')!r}", None
-    if cuerpo.get("aud") != IAP_AUDIENCE:
+    # `aud` es una cadena en un ID token y puede ser lista en un access token. Se exige
+    # que la audiencia declarada este -- no que «alguna» este.
+    aud = cuerpo.get("aud")
+    if not (aud == IAP_AUDIENCE or (isinstance(aud, list) and IAP_AUDIENCE in aud)):
         return False, "el token no es para este servicio", None
     ahora = time.time()
     if float(cuerpo.get("exp", 0)) < ahora:
@@ -1043,7 +1109,7 @@ class Handler(BaseHTTPRequestHandler):
         # Host viene de fuera. Distinguir por Host seria dejar la llave bajo el felpudo:
         # bastaria con mandar `Host: 127.0.0.1` para saltarse la comprobacion.
         if PUBLIC_ORIGIN:
-            ok, motivo, email = verificar_iap(self.headers.get(IAP_HEADER, ""))
+            ok, motivo, email = verificar_iap(_token_de(self.headers.get(IAP_HEADER, "")))
             if not ok:
                 self._json(403, {"error": "no autenticado", "detalle": motivo})
                 return True
@@ -2054,8 +2120,13 @@ def main():
                      "  Declarar un origen publico desactiva el candado de loopback, asi\n"
                      "  que sin la audiencia de IAP esto seria un puerto abierto que\n"
                      "  ejecuta lo que le pidan. Las dos van juntas o no va ninguna.\n"
-                     "  La audiencia es del backend de IAP:\n"
-                     "    /projects/<numero>/global/backendServices/<id>")
+                     "  La audiencia es lo que el emisor escribe en `aud`:\n"
+                     "    IAP:    /projects/<numero>/global/backendServices/<id>\n"
+                     "    Auth0:  el client_id de la aplicacion (ID token via oauth2-proxy)")
+        if IAP_ALG not in IAP_ALGS_VALIDOS:
+            sys.exit(f"BRIDGE_IAP_ALG={IAP_ALG!r} no es un algoritmo que esta puerta acepte.\n"
+                     f"  Validos: {', '.join(IAP_ALGS_VALIDOS)}. HS256 y familia quedan fuera a\n"
+                     "  proposito: con un JWKS publico, un HMAC es una firma que cualquiera fabrica.")
         if not shutil.which("openssl"):
             sys.exit("BRIDGE_PUBLIC_ORIGIN necesita `openssl` para verificar la firma\n"
                      "  del JWT de IAP, y no lo encuentro. La puerta que no puede\n"
@@ -2064,7 +2135,8 @@ def main():
             sys.exit(f"BRIDGE_PUBLIC_ORIGIN={PUBLIC_ORIGIN!r} no es https.\n"
                      "  El JWT de IAP viaja en una cabecera: sin TLS se lee y se copia\n"
                      "  por el camino, y entonces la puerta no cierra nada.")
-        print(f"puerta:              {PUBLIC_ORIGIN}  (IAP obligatorio)")
+        print(f"puerta:              {PUBLIC_ORIGIN}  (identidad obligatoria)")
+        print(f"                     {IAP_ALG} en `{IAP_HEADER}` · emisor {IAP_ISSUER}")
         if IAP_EMAILS:
             print(f"                     solo para: {', '.join(sorted(IAP_EMAILS))}")
 

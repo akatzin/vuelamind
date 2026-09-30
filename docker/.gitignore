@@ -1,3 +1,8 @@
 # Tus claves de Vertex no son del canon: se quedan en tu maquina.
 # La plantilla viaja como vertex.env.ejemplo; la copia real se ignora.
 vertex.env
+# La puerta: la configuracion real y sus secretos se quedan en la maquina que despliega.
+# Las plantillas viajan como *.ejemplo; el certificado y su llave, nunca.
+puerta.env
+puerta.secretos.env
+puerta.tls/
