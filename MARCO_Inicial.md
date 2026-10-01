@@ -535,7 +535,7 @@ En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —ident
 >
 > **La vía conocida es un contenedor Linux**: correr el asistente dentro de uno —por ejemplo con Docker— y trabajar ahí, montando las carpetas del dominio. Todo lo que el marco necesita existe dentro del contenedor y el sistema anfitrión deja de importar.
 >
-> **Y eso está MEDIDO desde el 2026-08-13**, no inferido: se construyó la imagen y se corrió. La carpeta `docker/` del repositorio la trae, con el método ya horneado dentro. Ahí se ejercitaron de punta a punta los cuatro cuadrantes de la Pregunta 1 —nacer y sumarse, cruzados con carpeta vacía y con contenido— y el asistente se detuvo donde debía detenerse.
+> **Y eso está MEDIDO desde el 2026-08-13**, no inferido: se construyó la imagen y se corrió, con el método ya horneado dentro. **Desde el 2026-10-01 esa imagen ya no vive en este repositorio**: cualquier contenedor Linux con el asistente instalado y el canon clonado dentro cumple la misma función. En aquella prueba se ejercitaron de punta a punta los cuatro cuadrantes de la Pregunta 1 —nacer y sumarse, cruzados con carpeta vacía y con contenido— y el asistente se detuvo donde debía detenerse.
 >
 > **Lo que esa prueba NO cubrió:** alcanzar sistemas vivos desde dentro del contenedor. Una máquina que lee el vault pero no alcanza lo que documenta sigue siendo una instancia legítima — solo tiene que decirlo.
 >

@@ -15,8 +15,8 @@
 | aportar | `vuelamind-learn` |
 | sumar una máquina | `vuelamind-join` |
 | catálogo de lo instalado | `vuelamind-help` |
-| control remoto local | `vuelamind-rc` |
-| poner al día ese control remoto | `vuelamind-rc-update` |
+
+**El control remoto (`vuelamind-rc`, `vuelamind-rc-update`) salió del canon el 2026-10-01**, con el puente y la imagen de contenedor: viven en un repositorio aparte. Ver `UPGRADE.md`.
 
 **Nacer no está en la tabla porque no es un comando**: se pega el master, y es él quien instala el ciclo. Antes esta lista lo nombraba como si fuera un skill más.
 

@@ -54,19 +54,6 @@ scars you could not.
   curl -fsSL https://claude.ai/install.sh | bash
   ```
 
-- **Windows (or anywhere without installs)** — Docker, with the method already baked into
-  the image. Two commands, sharing the two folders that persist your work:
-
-  ```
-  docker build -t vuelamind docker/
-  docker run -it -v "%USERPROFILE%\vuelamind:/trabajo" -v "%USERPROFILE%\vuelamind-claude:/home/node/.claude" vuelamind
-  ```
-
-  `/trabajo` is your domain's folder; `/home/node/.claude` keeps the assistant's own setup
-  between runs. Inside, `vuelamind-bienvenida` tells you what is there and what to do next,
-  and `vuelamind-actualizar` refreshes the baked canon — the image is a snapshot of its
-  build day. *(Tested on macOS with `-v "$HOME/..."`; on Windows, `%USERPROFILE%` is the
-  equivalent — if your shell is PowerShell, use `$env:USERPROFILE`.)*
 
 With an assistant in hand, both paths start the same way — with the file, not with a command:
 
@@ -130,10 +117,12 @@ and POSIX paths. The known way around it is running your assistant **inside a Li
 container** (Docker, for instance) and working there — everything the framework needs lives
 inside the container, and the host stops mattering.
 
-That container route is **measured, not inferred** — as of 2026-08-13. It was built and run:
-`docker/` in this repository holds the image, with the method already baked into
-`/opt/vuelamind`. Inside it, the four quadrants of the birth/join question were exercised
-end to end, and the assistant stopped where it should stop.
+That container route is **measured, not inferred** — as of 2026-08-13. It was built and run
+with an image this repository used to carry, with the method baked into `/opt/vuelamind`.
+Inside it, the four quadrants of the birth/join question were exercised end to end, and the
+assistant stopped where it should stop. **Since 2026-10-01 that image no longer lives here**:
+any Linux container with the assistant installed and this repository cloned inside serves the
+same purpose.
 
 What that test did **not** cover: reaching live systems from inside the container. A machine
 that can read the vault but cannot reach what it documents is still a legitimate instance —

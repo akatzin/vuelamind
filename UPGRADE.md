@@ -107,3 +107,31 @@ documento que promete una pieza que no está instalada.
 | v3.5 → v3.7 | `UPGRADE_v3.7.md` | **Liberado** — la regla dura de fechas. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye la v3.6 |
 | v3.5 → v3.8 | `UPGRADE_v3.8.md` | **Liberado** — cinco defectos de coherencia del propio master. Menor. **Requiere los artefactos de la v3.5**; no cambia ninguna regla ni ningún skill |
 | v3.5 → v3.9 | `UPGRADE_v3.9.md` | **Liberado** — la señal cero (el nombre con el que llegó la carpeta), la identidad declarada en el frontmatter del panorama, y el acta de nacimiento mudada dentro del vault. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.8. **Único salto menor que pide tocar el vault de un dominio ya nacido**: dos claves y un archivo que se mueve |
+
+## Fuera de la cadena: lo que salió del canon
+
+### 2026-10-01 · El control remoto y la imagen de contenedor salen del canon
+
+**No es un salto de versión, y no cambia el master.** Salen del canon tres cosas, que pasan a un
+repositorio aparte y privado:
+
+- el puente de sesiones (`herramientas/interfaz_agente/`);
+- la imagen de contenedor (`docker/`);
+- los dos skills que los instalan, **`vuelamind-rc` y `vuelamind-rc-update`**. El canon pasa de
+  **trece skills a once**.
+
+**Si tu dominio los tenía instalados:**
+
+- Lo instalado **sigue funcionando**. Un servicio que ya corre no depende de que el canon lo
+  conserve.
+- `herramientas/comprobar_skills.py` los va a reportar como **instalados y fuera del canon**. Es
+  correcto, no es una avería.
+- Lo que se pierde son **las actualizaciones**. Para quitarlos:
+  `rm ~/.claude/commands/vuelamind-rc.md ~/.claude/commands/vuelamind-rc-update.md` (o la ruta
+  de skills que use tu instalación).
+
+**Windows:** la vía sigue siendo la misma, un contenedor Linux, pero el canon ya no trae una
+imagen hecha. Sirve cualquiera que tenga el asistente instalado y el canon clonado dentro.
+
+**La historia no se pierde:** cada archivo sigue en el historial de este repositorio, hasta el
+commit anterior a su salida.
