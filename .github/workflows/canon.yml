@@ -1,8 +1,9 @@
 name: Coherencia del canon
 
 # config.yml declara donde vive el canon. Los archivos estaticos no pueden
-# leerlo al vuelo, asi que las copias de esa URL siguen existiendo en el README,
-# sus nueve traducciones y el i18n del micrositio.
+# leerlo al vuelo, asi que las copias de esa URL siguen existiendo en el README y
+# sus nueve traducciones. (La pagina tambien la cita, pero desde el 2026-10-01 vive en su
+# propio repo, akatzin/vuelamind-web, y se comprueba alli contra este config.yml.)
 #
 # Este chequeo es lo que impide que esas copias se aparten en silencio. Es la
 # misma disciplina que el marco predica: no puedes evitar que haya copias, pero
@@ -66,14 +67,6 @@ jobs:
           n=$(grep -rloE 'github\.com/[A-Za-z0-9._-]+/vuelamind' \
                 --include='*.md' --include='*.js' --include='*.html' . | wc -l)
           [ "$n" -ge 10 ] || { echo "esperaba 10 archivos o mas citando el canon, encontre $n — sospecha del patron antes que del repo"; exit 1; }
-
-      - name: El dominio del sitio coincide con el CNAME
-        run: |
-          sitio="${{ steps.cfg.outputs.sitio }}"
-          esperado="${sitio#*//}"; esperado="${esperado%/}"
-          real=$(tr -d '[:space:]' < web/CNAME)
-          [ "$esperado" = "$real" ] || { echo "config.yml dice '$esperado' y web/CNAME dice '$real'"; exit 1; }
-          echo "sitio coherente: $real"
 
       - name: La plantilla remite a config.yml en vez de repetir la URL
         run: |

@@ -4,7 +4,8 @@
 # parches. Todo lo demás lo referencia en vez de repetirlo.
 #
 # Por qué existe: la URL del repositorio estaba escrita a mano en once lugares
-# —el README, sus nueve traducciones y el archivo de textos del micrositio— y
+# —el README, sus nueve traducciones y el archivo de textos del micrositio (que desde el
+# 2026-10-01 vive en su propio repo, akatzin/vuelamind-web, y se mide allí contra éste)— y
 # nada las comparaba. Once copias de un dato que nadie mide es exactamente el
 # modo de fallo que este método existe para no repetir.
 #
@@ -23,7 +24,7 @@ canon:
   rama: main
   sitio: https://vuelamind.ai
 
-  # La línea exacta que aparece en los readmes y en la guía del micrositio.
+  # La línea exacta que aparece en los readmes y en la guía del micrositio (repo aparte).
   # Si cambia aquí, tiene que cambiar allá — y el chequeo lo obliga.
   clonar: git clone https://github.com/akatzin/vuelamind.git
 
