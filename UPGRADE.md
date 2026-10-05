@@ -80,8 +80,14 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
   v3.0 ──┬── v3.4  el canal        ORTOGONAL: no requiere ningún salto,
          │                          y ningún salto lo requiere a él
          │
-         └── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9
+         └── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1
 ```
+
+> [!important] Las versiones se comparan por segmentos, como enteros — nunca como decimales
+> `3.9 < 3.9.1 < 3.10`. Leída como número, `3.10` es `3.1`: menor que `3.9`, y además choca con la
+> «v3.1» revertida del linaje. Ningún código del marco compara versiones —lo hace quien lee—, así
+> que la regla se escribe aquí. Y en el frontmatter, una versión con dos puntos (`3.9.1`) se lee
+> como texto, que es lo que se quiere.
 
 **Por qué la v3.4 cuelga suelta:** los masters de la v3.6 en adelante **no nombran el canal ni
 una vez**. Es una capacidad que vive en sus propios archivos.
@@ -107,6 +113,7 @@ documento que promete una pieza que no está instalada.
 | v3.5 → v3.7 | `UPGRADE_v3.7.md` | **Liberado** — la regla dura de fechas. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye la v3.6 |
 | v3.5 → v3.8 | `UPGRADE_v3.8.md` | **Liberado** — cinco defectos de coherencia del propio master. Menor. **Requiere los artefactos de la v3.5**; no cambia ninguna regla ni ningún skill |
 | v3.5 → v3.9 | `UPGRADE_v3.9.md` | **Liberado** — la señal cero (el nombre con el que llegó la carpeta), la identidad declarada en el frontmatter del panorama, y el acta de nacimiento mudada dentro del vault. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.8. **Único salto menor que pide tocar el vault de un dominio ya nacido**: dos claves y un archivo que se mueve |
+| v3.5 → v3.9.1 | `UPGRADE_v3.9.1.md` | **Liberado** — el cierre usa `vecinas.py` para el radio, la instantánea deja la carpeta temporal y distingue mudanzas, y el control remoto sale del canon. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.9. **Pide reinstalar un skill** |
 
 ## Fuera de la cadena: lo que salió del canon
 
