@@ -162,6 +162,15 @@ Y lo mismo hacia dentro del juicio: **fusionar no es juzgar.** Un watcher puede 
 veredicto sobre todo y capacidad de fusionar sobre nada; separarlo no le quita autoridad,
 se la da — porque su firma vale por la razón que escribe, no por el botón que aprieta.
 
+**Y la identidad concedida no incluye el poder de cambiar a quien lo vigila.** La integración
+continua que comprueba el canon es parte de lo que vigila al propio watcher: si su credencial
+pudiera reescribirla, podría apagar el chequeo que lo acusa, y esa puerta no tiene síntoma —el
+chequeo apagado sale en verde—. Por eso se le concede lo justo para **proponer** (ramas y pull
+requests) y **no** el permiso de tocar los flujos de la integración continua: los cambios ahí
+cruzan por la mano del responsable. Medido en la instancia de origen: la plataforma rechaza
+cualquier cambio a esos flujos hecho con una credencial que no tiene ese permiso, y es exactamente
+lo que se quiere — un rechazo que no depende de que el watcher se acuerde.
+
 ## Qué NO es un watcher
 
 - **No administra el repositorio.** No gobierna releases, ni infraestructura, ni el sitio.
