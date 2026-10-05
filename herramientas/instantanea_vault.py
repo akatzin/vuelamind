@@ -31,6 +31,7 @@ puede ejecutar no es una herramienta del ciclo.
 
 import difflib
 import hashlib
+import os
 import shutil
 import sys
 import tempfile
@@ -48,10 +49,33 @@ def notas(vault: Path):
     )
 
 
+def base() -> Path:
+    """Donde vive la copia: un sitio que el sistema NO borra solo.
+
+    La carpeta temporal se limpia sola (macOS borra lo que lleva días sin usarse; Linux
+    vacía /tmp al reiniciar o a los ~10 días; en un contenedor se pierde al recrearlo), y
+    sin copia el cierre no puede releer. Orden: XDG_CACHE_HOME, %LOCALAPPDATA% en Windows,
+    ~/.cache."""
+    xdg = os.environ.get("XDG_CACHE_HOME")
+    if xdg:
+        return Path(xdg) / "vuelamind"
+    if os.name == "nt" and os.environ.get("LOCALAPPDATA"):
+        return Path(os.environ["LOCALAPPDATA"]) / "vuelamind"
+    return Path.home() / ".cache" / "vuelamind"
+
+
 def donde(vault: Path) -> Path:
-    """Una copia por vault: dos dominios en la misma máquina no se pisan."""
+    """Una copia por vault: dos dominios en la misma máquina no se pisan.
+
+    Si la copia todavía está donde la dejaban las versiones anteriores (la carpeta
+    temporal), se mueve aquí, para que el primer cierre tras el cambio no salga vacío."""
     sello = hashlib.sha256(str(vault).encode()).hexdigest()[:12]
-    return Path(tempfile.gettempdir()) / f"vuelamind-instantanea-{sello}"
+    copia = base() / f"instantanea-{sello}"
+    vieja = Path(tempfile.gettempdir()) / f"vuelamind-instantanea-{sello}"
+    if not copia.exists() and vieja.exists():
+        copia.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(vieja), str(copia))
+    return copia
 
 
 def tomar(vault: Path, copia: Path, verbo: str) -> int:
