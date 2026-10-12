@@ -77,10 +77,10 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 ### La cadena de los saltos menores de la línea base v3
 
 ```
-  v3.0 ──┬── v3.4  el canal        RETIRADO el 2026-10-12 — ver «Fuera de la cadena»
+  v3.0 ──┬── v3.4  el canal        RETIRADO en la v3.9.2 (2026-10-12)
          │
          │
-         └── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1
+         └── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2
 ```
 
 > [!important] Las versiones se comparan por segmentos, como enteros — nunca como decimales
@@ -107,38 +107,16 @@ documento que promete una pieza que no está instalada.
 | Salto | Documento | Estado |
 |---|---|---|
 | v2 → v3 | `UPGRADE_v3.md` | **Liberado y EJECUTADO** (2026-08-16). El primer salto real lo corrió el caso duro —huella huérfana derivada de un borrador nunca liberado— y pagó su deuda en la moneda prometida: tres defectos de instrumento encontrados corriéndolo, ninguno leyéndolo, los tres corregidos en la misma jornada. El preflight abortó dos veces y las dos tuvo razón |
-| v3.0 → v3.4 | `UPGRADE_v3.4.md` | **Retirado el 2026-10-12** — el canal entre instancias se depreca y su código salió del canon. **No se corre**: instala piezas que ya no están. Ver *«Fuera de la cadena»* |
+| v3.0 → v3.4 | `UPGRADE_v3.4.md` | **Retirado en la v3.9.2** (2026-10-12) — el canal entre instancias se depreca y su código salió del canon. **No se corre**: instala piezas que ya no están |
 | v3.0 → v3.5 | `UPGRADE_v3.5.md` | **Liberado** — el buzón de aprendizaje; retira el ciclo de parches por pull request. Menor. **No requiere la v3.4** |
 | v3.5 → v3.6 | `UPGRADE_v3.6.md` | **Liberado** — la entrevista de nacimiento pasa de 25 preguntas a 15. Menor. **Requiere los artefactos de la v3.5** |
 | v3.5 → v3.7 | `UPGRADE_v3.7.md` | **Liberado** — la regla dura de fechas. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye la v3.6 |
 | v3.5 → v3.8 | `UPGRADE_v3.8.md` | **Liberado** — cinco defectos de coherencia del propio master. Menor. **Requiere los artefactos de la v3.5**; no cambia ninguna regla ni ningún skill |
 | v3.5 → v3.9 | `UPGRADE_v3.9.md` | **Liberado** — la señal cero (el nombre con el que llegó la carpeta), la identidad declarada en el frontmatter del panorama, y el acta de nacimiento mudada dentro del vault. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.8. **Único salto menor que pide tocar el vault de un dominio ya nacido**: dos claves y un archivo que se mueve |
 | v3.5 → v3.9.1 | `UPGRADE_v3.9.1.md` | **Liberado** — el cierre usa `vecinas.py` para el radio, la instantánea deja la carpeta temporal y distingue mudanzas, y el control remoto sale del canon. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.9. **Pide reinstalar un skill** |
+| v3.5 → v3.9.2 | `UPGRADE_v3.9.2.md` | **Liberado** — la mensajería entre instancias se depreca: sale `canal/` y el skill `vuelamind-mensajeria` (de 11 skills a 10), y el master marca la nota de la v3.4 como retirada. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.9.1 |
 
 ## Fuera de la cadena: lo que salió del canon
-
-### 2026-10-12 · La mensajería entre instancias se depreca y sale del canon
-
-**No es un salto de versión, y no cambia el master**: los masters de la v3.6 en adelante no
-nombran el canal. Sale el código de `canal/` (servidor, cliente, disparador, instalador y su
-ejemplo) y el skill **`vuelamind-mensajeria`**. El canon pasa de **once skills a diez**. El salto
-`UPGRADE_v3.4.md` queda **retirado**: instala piezas que ya no están.
-
-**Si tu dominio usaba el canal:**
-
-- **El servicio ya no está en pie.** Lo que tengas instalado no tiene a quién hablar.
-- **Desarma tu disparador** (el `launchd`, `systemd` o tarea programada que lo corre) y quita los
-  ganchos de arranque que consulten el canal: fallarán en cada turno.
-- **Las llaves del canal** se pueden borrar: solo servían para él.
-- `herramientas/comprobar_skills.py` va a reportar `vuelamind-mensajeria` como **instalado y
-  fuera del canon**. Para quitarlo: `rm ~/.claude/commands/vuelamind-mensajeria.md` (o la ruta de
-  skills que use tu instalación).
-
-**Lo que no se va:** el buzón de aprendizaje (`/vuelamind-learn`) es otra pieza, sin relación con
-el canal, y sigue igual.
-
-**La historia no se pierde:** cada archivo sigue en el historial de este repositorio, hasta el
-commit anterior a su salida.
 
 ### 2026-10-01 · El control remoto y la imagen de contenedor salen del canon
 
