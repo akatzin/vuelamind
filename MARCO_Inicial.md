@@ -1,9 +1,13 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.9.1
+version: 3.9.2
 
 > [!note] v3.4 (2026-09-05) — el canal entre instancias, y lo que NO trae
+> **RETIRADO en la v3.9.2 (2026-10-12): la mensajería entre instancias se deprecó** y su
+> código pasó a `deprecated/`. Lo que sigue es historia; qué hacer si lo tenías instalado, en
+> `UPGRADE_v3.9.2.md`.
+>
 > Entra la comunicación entre instancias: servicio, cliente, disparador e instalador, más el
 > skill que los pone en pie. Cada casa tiene identidad propia con su llave, y el alta viaja
 > **fuera de banda** — el canal no puede transportar su propia llave.
