@@ -11,12 +11,13 @@
 | identidad | `vuelamind-whoiam` |
 | alma | `vuelamind-soul` |
 | reintentar | `vuelamind-accidente` |
-| comunicar | `vuelamind-mensajeria` |
 | aportar | `vuelamind-learn` |
 | sumar una máquina | `vuelamind-join` |
 | catálogo de lo instalado | `vuelamind-help` |
 
 **El control remoto (`vuelamind-rc`, `vuelamind-rc-update`) salió del canon el 2026-10-01**, con el puente y la imagen de contenedor: viven en un repositorio aparte. Ver `UPGRADE.md`.
+
+**La mensajería entre instancias (`vuelamind-mensajeria` y el código de `canal/`) salió del canon el 2026-10-12**: se depreca. Ver `UPGRADE.md`.
 
 **Nacer no está en la tabla porque no es un comando**: se pega el master, y es él quien instala el ciclo. Antes esta lista lo nombraba como si fuera un skill más.
 
