@@ -13,8 +13,8 @@ para: dominios en la línea base v3 — NO depende de ningún otro salto, y ning
 # UPGRADE a v3.4 — el canal entre instancias
 
 > [!danger] RETIRADO en la v3.9.2 (2026-10-12) — no lo corras
-> La mensajería entre instancias se deprecó y su código salió del canon: `canal/` y el skill
-> `vuelamind-mensajeria` ya no están. Este documento se conserva como historia. Qué hacer si lo
+> La mensajería entre instancias se deprecó: `canal/` y el skill `vuelamind-mensajeria` se
+> movieron a `deprecated/`, como historia, y no se instalan. Este documento se conserva como historia. Qué hacer si lo
 > tenías instalado: `UPGRADE_v3.9.2.md`.
 
 > [!important] ESTE SALTO ES OPCIONAL, y esa es la primera cosa que hay que decir

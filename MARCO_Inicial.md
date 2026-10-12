@@ -5,7 +5,7 @@ version: 3.9.2
 
 > [!note] v3.4 (2026-09-05) — el canal entre instancias, y lo que NO trae
 > **RETIRADO en la v3.9.2 (2026-10-12): la mensajería entre instancias se deprecó** y su
-> código salió del canon. Lo que sigue es historia; qué hacer si lo tenías instalado, en
+> código pasó a `deprecated/`. Lo que sigue es historia; qué hacer si lo tenías instalado, en
 > `UPGRADE_v3.9.2.md`.
 >
 > Entra la comunicación entre instancias: servicio, cliente, disparador e instalador, más el

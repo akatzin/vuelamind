@@ -20,8 +20,8 @@ para: dominios en v3.5 o posterior — REQUIERE los artefactos de la v3.5
 
 | Pieza | Cambio | Qué te toca |
 |---|---|---|
-| `canal/` | Sale entero: servidor, cliente, disparador, instalador y su ejemplo | Si lo usabas, desarmarlo (paso 2) |
-| `skills/vuelamind-mensajeria.md` | Sale. El canon pasa de **11 skills a 10** | Quitarlo, o declararlo local |
+| `canal/` | Se mueve entero a `deprecated/canal/`: servidor, cliente, disparador, instalador y su ejemplo | Si lo usabas, desarmarlo (paso 2) |
+| `skills/vuelamind-mensajeria.md` | Se mueve a `deprecated/skills/`. El canon pasa de **11 skills a 10** | Quitarlo, o declararlo local |
 | `UPGRADE_v3.4.md` | Retirado: **no se corre**, porque instala piezas que ya no están | Nada |
 | `MARCO_Inicial.md` | `version: 3.9.2`. La nota de la v3.4 dice que se retiró | Traerlo |
 
@@ -55,5 +55,5 @@ grep -m1 '^version:' MARCO_Inicial.md      # version: 3.9.2
 python3 herramientas/comprobar_skills.py   # sin deriva, y sin vuelamind-mensajeria
 ```
 
-**La historia no se pierde:** cada archivo sigue en el historial de este repositorio, hasta el
-commit anterior a su salida.
+**Nada se borró:** todo sigue en `deprecated/`, como experiencia para un rediseño futuro. **No se
+instala ni se corre desde ahí**: el servicio con el que hablaba ya no existe.

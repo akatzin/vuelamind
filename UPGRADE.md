@@ -107,14 +107,14 @@ documento que promete una pieza que no está instalada.
 | Salto | Documento | Estado |
 |---|---|---|
 | v2 → v3 | `UPGRADE_v3.md` | **Liberado y EJECUTADO** (2026-08-16). El primer salto real lo corrió el caso duro —huella huérfana derivada de un borrador nunca liberado— y pagó su deuda en la moneda prometida: tres defectos de instrumento encontrados corriéndolo, ninguno leyéndolo, los tres corregidos en la misma jornada. El preflight abortó dos veces y las dos tuvo razón |
-| v3.0 → v3.4 | `UPGRADE_v3.4.md` | **Retirado en la v3.9.2** (2026-10-12) — el canal entre instancias se depreca y su código salió del canon. **No se corre**: instala piezas que ya no están |
+| v3.0 → v3.4 | `UPGRADE_v3.4.md` | **Retirado en la v3.9.2** (2026-10-12) — el canal entre instancias se depreca y su código pasó a `deprecated/`. **No se corre**: instala piezas que ya no están |
 | v3.0 → v3.5 | `UPGRADE_v3.5.md` | **Liberado** — el buzón de aprendizaje; retira el ciclo de parches por pull request. Menor. **No requiere la v3.4** |
 | v3.5 → v3.6 | `UPGRADE_v3.6.md` | **Liberado** — la entrevista de nacimiento pasa de 25 preguntas a 15. Menor. **Requiere los artefactos de la v3.5** |
 | v3.5 → v3.7 | `UPGRADE_v3.7.md` | **Liberado** — la regla dura de fechas. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye la v3.6 |
 | v3.5 → v3.8 | `UPGRADE_v3.8.md` | **Liberado** — cinco defectos de coherencia del propio master. Menor. **Requiere los artefactos de la v3.5**; no cambia ninguna regla ni ningún skill |
 | v3.5 → v3.9 | `UPGRADE_v3.9.md` | **Liberado** — la señal cero (el nombre con el que llegó la carpeta), la identidad declarada en el frontmatter del panorama, y el acta de nacimiento mudada dentro del vault. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.8. **Único salto menor que pide tocar el vault de un dominio ya nacido**: dos claves y un archivo que se mueve |
 | v3.5 → v3.9.1 | `UPGRADE_v3.9.1.md` | **Liberado** — el cierre usa `vecinas.py` para el radio, la instantánea deja la carpeta temporal y distingue mudanzas, y el control remoto sale del canon. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.9. **Pide reinstalar un skill** |
-| v3.5 → v3.9.2 | `UPGRADE_v3.9.2.md` | **Liberado** — la mensajería entre instancias se depreca: sale `canal/` y el skill `vuelamind-mensajeria` (de 11 skills a 10), y el master marca la nota de la v3.4 como retirada. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.9.1 |
+| v3.5 → v3.9.2 | `UPGRADE_v3.9.2.md` | **Liberado** — la mensajería entre instancias se depreca: `canal/` y el skill `vuelamind-mensajeria` pasan a `deprecated/` (de 11 skills a 10), y el master marca la nota de la v3.4 como retirada. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.9.1 |
 
 ## Fuera de la cadena: lo que salió del canon
 

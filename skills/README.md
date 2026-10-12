@@ -17,7 +17,7 @@
 
 **El control remoto (`vuelamind-rc`, `vuelamind-rc-update`) salió del canon el 2026-10-01**, con el puente y la imagen de contenedor: viven en un repositorio aparte. Ver `UPGRADE.md`.
 
-**La mensajería entre instancias (`vuelamind-mensajeria` y el código de `canal/`) salió del canon en la v3.9.2 (2026-10-12)**: se depreca. Ver `UPGRADE_v3.9.2.md`.
+**La mensajería entre instancias (`vuelamind-mensajeria` y el código de `canal/`) se deprecó en la v3.9.2 (2026-10-12)**: vive en `deprecated/`, como historia. Ver `UPGRADE_v3.9.2.md`.
 
 **Nacer no está en la tabla porque no es un comando**: se pega el master, y es él quien instala el ciclo. Antes esta lista lo nombraba como si fuera un skill más.
 
