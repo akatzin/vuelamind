@@ -388,26 +388,20 @@ distintas las declara en su manifiesto, que gana siempre sobre la convención.
 | Qué se comparte entre dominios | **nada: los vaults son personales, siempre** |
 | Proponer lo aprendido | **apagado.** Lo enciende correr `/vuelamind-learn`, no la entrevista |
 
-> [!danger] `<proyecto>` es donde se abren las sesiones — y nunca es el canon
-> El vault y el andamiaje van **junto a** la copia del canon, jamás **dentro**. Si el método llegó
-> a la carpeta de trabajo como clon o como zip descomprimido, es una carpeta más **al lado** del
-> dominio, no su raíz.
+> [!danger] El dominio nunca vive dentro de la copia del canon
+> `<proyecto>` es **la carpeta donde se abrió la sesión**, no aquella a la que el asistente se
+> haya movido. El vault y el andamiaje van ahí, **junto a** la copia del canon —clon o zip
+> descomprimido—, nunca dentro: ponerla al día la reemplaza, y lo que viva dentro se pierde sin
+> aviso.
 >
-> **Por qué:** la copia del canon es una caché del método, y ponerla al día —jalar, reclonar,
-> descomprimir el zip nuevo— **la reemplaza**. Lo que viva dentro se va con ella, sin un error y
-> sin un aviso.
+> - Si la sesión se abrió en la copia del canon misma, el dominio nace en una **carpeta hermana**
+>   con su nombre.
+> - Antes del primer archivo, el asistente comprueba que el vault no queda bajo la carpeta que
+>   contiene `MARCO_Inicial.md` y `skills/`. Si queda, lo corrige él: no se le pregunta a la
+>   persona.
+> - Al terminar, dice en llano dónde quedó el dominio y que ahí se abren las próximas sesiones.
 >
-> **La regla, sin preguntarle nada técnico a nadie:** la raíz es **la carpeta en la que se abrió
-> la sesión**, no la que el asistente tenga delante después de moverse. Si esa carpeta es la
-> copia del canon misma, el dominio nace **en una carpeta hermana** con su nombre, al lado.
-> Antes de escribir el primer archivo, el asistente comprueba que la ruta del vault **no queda
-> bajo** la carpeta que contiene `MARCO_Inicial.md` y `skills/`; si quedara, la corrige él.
->
-> Y al terminar se lo dice a la persona **en llano y una sola vez**: *«tu dominio quedó en
-> `<carpeta>`; abre ahí tus próximas sesiones»*.
->
-> *(Medido en un nacimiento real, 2026-10-14: el dominio nació dentro de la copia del canon,
-> y el manifiesto lejos de la carpeta donde se abrían las sesiones.)*
+> *(2026-10-14: un dominio nació dentro de la copia del canon por un `cd` del asistente.)*
 
 > [!important] `canon` manda sobre esta convención
 > La clave `canon` del manifiesto declara **de qué repositorio se jala el método**, y admite un
