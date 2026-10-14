@@ -388,6 +388,27 @@ distintas las declara en su manifiesto, que gana siempre sobre la convención.
 | Qué se comparte entre dominios | **nada: los vaults son personales, siempre** |
 | Proponer lo aprendido | **apagado.** Lo enciende correr `/vuelamind-learn`, no la entrevista |
 
+> [!danger] `<proyecto>` es donde se abren las sesiones — y nunca es el canon
+> El vault y el andamiaje van **junto a** la copia del canon, jamás **dentro**. Si el método llegó
+> a la carpeta de trabajo como clon o como zip descomprimido, es una carpeta más **al lado** del
+> dominio, no su raíz.
+>
+> **Por qué:** la copia del canon es una caché del método, y ponerla al día —jalar, reclonar,
+> descomprimir el zip nuevo— **la reemplaza**. Lo que viva dentro se va con ella, sin un error y
+> sin un aviso.
+>
+> **La regla, sin preguntarle nada técnico a nadie:** la raíz es **la carpeta en la que se abrió
+> la sesión**, no la que el asistente tenga delante después de moverse. Si esa carpeta es la
+> copia del canon misma, el dominio nace **en una carpeta hermana** con su nombre, al lado.
+> Antes de escribir el primer archivo, el asistente comprueba que la ruta del vault **no queda
+> bajo** la carpeta que contiene `MARCO_Inicial.md` y `skills/`; si quedara, la corrige él.
+>
+> Y al terminar se lo dice a la persona **en llano y una sola vez**: *«tu dominio quedó en
+> `<carpeta>`; abre ahí tus próximas sesiones»*.
+>
+> *(Medido en un nacimiento real, 2026-10-14: el dominio nació dentro de la copia del canon,
+> y el manifiesto lejos de la carpeta donde se abrían las sesiones.)*
+
 > [!important] `canon` manda sobre esta convención
 > La clave `canon` del manifiesto declara **de qué repositorio se jala el método**, y admite un
 > espejo o un derivado. **La convención de arriba es el valor por omisión, no una atadura.**
