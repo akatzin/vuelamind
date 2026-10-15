@@ -388,6 +388,21 @@ distintas las declara en su manifiesto, que gana siempre sobre la convención.
 | Qué se comparte entre dominios | **nada: los vaults son personales, siempre** |
 | Proponer lo aprendido | **apagado.** Lo enciende correr `/vuelamind-learn`, no la entrevista |
 
+> [!danger] El dominio nunca vive dentro de la copia del canon
+> `<proyecto>` es **la carpeta donde se abrió la sesión**, no aquella a la que el asistente se
+> haya movido. El vault y el andamiaje van ahí, **junto a** la copia del canon —clon o zip
+> descomprimido—, nunca dentro: ponerla al día la reemplaza, y lo que viva dentro se pierde sin
+> aviso.
+>
+> - Si la sesión se abrió en la copia del canon misma, el dominio nace en una **carpeta hermana**
+>   con su nombre.
+> - Antes del primer archivo, el asistente comprueba que el vault no queda bajo la carpeta que
+>   contiene `MARCO_Inicial.md` y `skills/`. Si queda, lo corrige él: no se le pregunta a la
+>   persona.
+> - Al terminar, dice en llano dónde quedó el dominio y que ahí se abren las próximas sesiones.
+>
+> *(2026-10-14: un dominio nació dentro de la copia del canon por un `cd` del asistente.)*
+
 > [!important] `canon` manda sobre esta convención
 > La clave `canon` del manifiesto declara **de qué repositorio se jala el método**, y admite un
 > espejo o un derivado. **La convención de arriba es el valor por omisión, no una atadura.**
