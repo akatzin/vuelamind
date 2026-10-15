@@ -180,6 +180,14 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 > veces mientras tres preguntas seguían abiertas; el asistente hizo lo correcto por
 > instinto — esta regla existe para que no haga falta el instinto.)*
 
+> [!important] Una pregunta por mensaje
+> La presentación termina en la pregunta del nombre, sola. Cada pregunta de la entrevista va en
+> su propio mensaje y lo cierra; los ejemplos, si van, son tres como mucho y cortos. Quien
+> contesta varias cosas a la vez no se corrige: se toma lo que dio y se pregunta lo que falte.
+>
+> *(2026-10-14: un nacimiento juntó en un mensaje el nombre y tres preguntas con ejemplos, y las
+> respuestas llegaron en una palabra cada una.)*
+
 > [!important] Aquí se está escribiendo el acta de nacimiento
 > Lo que se conteste queda como la identidad del dominio, con las palabras de quien lo funda. Por eso el asistente **no parafrasea al escribirla**, y por eso conviene contestar en corto y en llano en vez de bonito.
 
