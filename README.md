@@ -75,7 +75,7 @@ domain being born here, or is this machine joining one that already lives?
 > published to. Everything else references that file instead of repeating it, and a check
 > fails the build if any copy drifts away from it.
 
-- **Being born** — answer the interview. About twenty minutes, and you can pause. It generates
+- **Being born** — answer the interview. From twenty minutes to an hour and a half, depending on how much you tell it, and you can pause. It generates
   the vault, the scaffolding and the cycle commands.
 - **Joining** — no interview and nothing generated. It reaches the existing vault, checks it
   arrived whole, installs the cycle from the canon, and hands over to `/vuelamind-join`.

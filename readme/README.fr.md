@@ -34,7 +34,7 @@ Les deux chemins commencent pareil — par le fichier, pas par une commande :
 
 La première question est votre langue. **La deuxième décide de tout le reste :** ce domaine naît-il ici, ou cette machine rejoint-elle un domaine qui vit déjà ?
 
-- **Naître** — vous répondez à l'entretien. Une vingtaine de minutes, avec pauses possibles. Il génère le vault, l'échafaudage et les commandes du cycle.
+- **Naître** — vous répondez à l'entretien. De vingt minutes à une heure et demie, selon ce que vous voulez raconter, avec pauses possibles. Il génère le vault, l'échafaudage et les commandes du cycle.
 - **Rejoindre** — pas d'entretien, rien de généré. Il atteint le vault existant, vérifie qu'il est arrivé entier, installe le cycle depuis le canon et passe la main à `/vuelamind-join`.
 
 L'assistant ne s'en tient pas à votre parole : il regarde le dossier de destination et **s'arrête** si vous avez dit *naître* et qu'il y trouve des mois de travail — ou si vous avez dit *rejoindre* et qu'il n'y trouve rien.
