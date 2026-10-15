@@ -397,6 +397,7 @@ distintas las declara en su manifiesto, que gana siempre sobre la convención.
 | De dónde se trae el método | **el canon oficial** — y **`canon` en el manifiesto lo sobrescribe**: un espejo, un derivado, o una copia bajo otra cuenta |
 | Qué se comparte entre dominios | **nada: los vaults son personales, siempre** |
 | Proponer lo aprendido | **apagado.** Lo enciende correr `/vuelamind-learn`, no la entrevista |
+| Si el dominio vive también en otro lado | **no**: solo en esta máquina, salvo que la persona diga otra cosa en la única pregunta de la Fase 1.0 |
 
 > [!danger] El dominio nunca vive dentro de la copia del canon
 > `<proyecto>` es **la carpeta donde se abrió la sesión**, no aquella a la que el asistente se
@@ -639,9 +640,12 @@ máquina que se suma, no una que reforma.
 
 ### 1.0 — Primero la topología, luego los archivos
 
-Antes de escribir una sola nota, decide **dónde vive cada plano**. Cambiarlo después obliga a reconfigurar sincronización, mover archivos y reescribir rutas metidas dentro de comandos y scripts.
+Antes de escribir una sola nota, se decide **dónde vive cada plano**. Cambiarlo después obliga a reconfigurar sincronización, mover archivos y reescribir rutas metidas dentro de comandos y scripts.
 
-La forma que menos se degrada al agregar dominios: **dos carpetas sincronizadas por dominio, ninguna compartida.**
+**Por omisión, todo vive en el proyecto y solo en esta máquina** (Bloque E). Y se hace **una sola pregunta**, en llano: *«¿Quieres que esto viva también en otro lado —otra máquina o un respaldo—, o se queda solo en esta computadora?»*
+
+- **Solo aquí:** el manifiesto lo escribe en su clave `replica` —*«ninguna: solo local, decidido por <quién> el <fecha>»*—, para que nada se lea como respaldado.
+- **También en otro lado:** se sincroniza con el servicio que la persona ya use o, en un equipo administrado, con el empuje de la Fase 1.3. Y entonces la forma que menos se degrada al agregar dominios es **dos carpetas sincronizadas por dominio, ninguna compartida**:
 
 ```
 ~/<andamiaje>/<dominio>/          ← carpeta sincronizada 1 — EL ANDAMIAJE
@@ -1149,7 +1153,7 @@ Y dos corolarios que ya se cobraron caro:
 | `marco` | dónde vive la copia local del método y en qué nota registra esta instancia lo aplicado |
 | `canon` | **de qué repositorio se jala el método**. Default: el oficial. Un derivado se nombra; `—` solo si el aislamiento se eligió en la entrevista |
 | `aportar_a` | **a dónde se proponen los parches** — solo si el dominio dijo que sí. Default cuando se quiere: el mismo canon. `ninguno` si lo aprendido se queda en casa, y es el fallback mientras no se decida |
-| `replica` | contra qué se compara al confirmar la sincronización, y cómo |
+| `replica` | contra qué se compara al confirmar la sincronización, y cómo; o `ninguna`, con quién lo decidió y cuándo (Fase 1.0) |
 | `antes_de_medir` | enganche opcional: qué correr antes de medir (desbloquear una llave, montar algo) |
 | `despues_de_escribir` | enganche opcional: qué correr tras escribir (el empuje manual, si el transporte lo pide — ver 1.3) |
 | `avisos_del_dominio` | lista corta de trampas propias que el motor debe respetar al escribir |
@@ -2112,7 +2116,7 @@ Y ya en esa segunda sesión, **un primer paso concreto y pequeño**: **medir una
 Cuando el asistente termine, debe entregar:
 
 - [ ] Las respuestas de la entrevista, resumidas y confirmadas
-- [ ] **La topología de sincronización decidida y escrita** — qué carpeta contiene qué plano, qué se aísla por dominio, y qué se comparte a propósito
+- [ ] **La respuesta a la pregunta de la Fase 1.0 escrita en `replica`** —solo local, o también en otro lado— y la topología que se sigue de ella: qué carpeta contiene qué plano, qué se aísla por dominio, y qué se comparte a propósito
 - [ ] `0_<Dominio>.md` con el panorama, aunque sea provisional
 - [ ] `Pendientes.md` con el esquema de severidad ya instanciado al dominio
 - [ ] `Pendientes_Cerrados.md`, `Decisiones.md` y `Bitacora.md` vacíos, con su encabezado
