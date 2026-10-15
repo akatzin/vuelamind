@@ -2126,9 +2126,9 @@ Cuando el asistente termine, debe entregar:
 - [ ] `init_<host>.sh` **generado y corrido una vez**, con sus comprobaciones pasando o avisando (Fase 1.2)
 - [ ] `rsync_project.sh` **generado y probado**, si el transporte lo requiere (Fase 1.3)
 - [ ] **El ciclo enseñado con un caso del propio dominio**, y los comandos que existen en esta máquina, mostrados con su nombre exacto
-- [ ] **Tres o cuatro entregables propuestos como preguntas**, y anotado cuál eligió
+- [ ] **Tres o cuatro entregables escritos en `initPrompt.md`**, para proponerlos como preguntas en la segunda sesión, tras el comando de retomar
 - [ ] **La decisión de canon**: **de dónde se trae el método** — con su respuesta escrita, o marcada como hueco con fecha. *(A dónde se manda lo aprendido NO se pregunta aquí: el aprendizaje nace local y apagado, y el destino lo pide `/vuelamind-learn` el día que decidas usarlo.)*
-- [ ] **El traspaso dicho**: cerrar la sesión, volver a entrar, correr el de retomar y luego el de ayuda — o, si el entorno no soporta comandos, dicho que no van a existir
+- [ ] **El traspaso dicho, y como lo último de la sesión**: cerrar la sesión, volver a entrar, correr el de retomar y luego el de ayuda — o, si el entorno no soporta comandos, dicho que no van a existir
 - [ ] **Un primer paso concreto para la siguiente sesión**
 - [ ] `initPrompt.md` apuntando al primer trabajo real
 - [ ] El registro de parches del método, aunque sea vacío — con la columna de **versión**, no solo la fecha
