@@ -158,7 +158,7 @@ preguntarlas produce una segunda versión de la verdad.
 
 Tres cosas, en tres líneas, antes de la primera pregunta:
 
-1. **Cuánto dura.** Son seis bloques y toma alrededor de veinte minutos. **Se puede pausar y retomar**: lo respondido no se pierde.
+1. **Cuánto dura.** Son seis bloques y toma de veinte minutos a hora y media, según cuánto quiera contar. **Se puede pausar y retomar**: lo respondido no se pierde. *(APORTADO, 2026-10-14: con respuestas a fondo dura de una hora a hora y media.)*
 2. **Que puede preguntar, siempre.** Y en concreto que tiene tres salidas en cualquier momento — decirlo explícito, porque nadie las usa si no se las ofrecen:
    - **«dame un ejemplo»** — el asistente lo da, y de un dominio parecido al suyo.
    - **«¿por qué me preguntas esto?»** — toda pregunta de aquí tiene una consecuencia en el vault; el asistente la explica.
@@ -2066,7 +2066,7 @@ Los actos —**nacer** (ya ocurrió: fue pegar el archivo), **sumarse** cuando s
 
 Con lo que salió de la entrevista, **ofrece tres o cuatro entregables concretos**: una lista priorizada de algo, un mapa de cómo se relacionan las piezas, un directorio de quién sabe qué, un inventario de lo que nadie ha verificado nunca.
 
-**En forma de pregunta, no de anuncio**: *"¿te serviría…?"*, no *"te voy a armar…"*. El asistente lleva veinte minutos conociendo el dominio, y es el momento de mayor tentación de inventar con seguridad. Que la persona elija es además lo que confirma que la entrevista sirvió: si ninguna de las cuatro le suena, algo no se entendió y **eso es el hallazgo**, no un fracaso.
+**En forma de pregunta, no de anuncio**: *"¿te serviría…?"*, no *"te voy a armar…"*. El asistente lleva la entrevista entera conociendo el dominio, y es el momento de mayor tentación de inventar con seguridad. Que la persona elija es además lo que confirma que la entrevista sirvió: si ninguna de las cuatro le suena, algo no se entendió y **eso es el hallazgo**, no un fracaso.
 
 Tres o cuatro. Diez es un catálogo, y un catálogo no se elige: se hojea.
 
@@ -2076,7 +2076,7 @@ Tres o cuatro. Diez es un catálogo, y un catálogo no se elige: se hojea.
 > **La sesión que instala los comandos no puede usarlos.** Se resuelven al arrancar, así que
 > los que acaba de escribir la Fase 1.5 están en disco y **esta sesión no los ve**. Quien
 > teclee el de ayuda ahora mismo recibe *«no es un comando reconocido»* después de haber
-> contestado veinte minutos de entrevista, y no tiene modo de saber que eso es normal.
+> contestado la entrevista entera, y no tiene modo de saber que eso es normal.
 >
 > *(Pasó en la primera prueba con un usuario real, 2026-08-13. El aviso ya existía en la Fase
 > 1.4 — escrito **para el asistente**. Nadie se lo dijo a él.)*

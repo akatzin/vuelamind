@@ -34,7 +34,7 @@ Os dois caminhos começam igual — pelo arquivo, não por um comando:
 
 A primeira pergunta é o seu idioma. **A segunda decide tudo o que vem depois:** este domínio nasce aqui, ou esta máquina se soma a um que já vive?
 
-- **Nasce** — você responde à entrevista. Cerca de vinte minutos, e dá para pausar. Gera o vault, o andaime e os comandos do ciclo.
+- **Nasce** — você responde à entrevista. De vinte minutos a uma hora e meia, conforme o quanto você quiser contar, e dá para pausar. Gera o vault, o andaime e os comandos do ciclo.
 - **Soma-se** — sem entrevista e sem gerar nada. Chega ao vault existente, confirma que chegou inteiro, instala o ciclo a partir do cânone e passa o bastão para `/vuelamind-join`.
 
 O assistente não fica só na sua palavra: olha a pasta de destino e **para** se você disse *nasce* e encontrou meses de trabalho lá dentro — ou se disse *soma-se* e não encontrou nada.

@@ -34,7 +34,7 @@ Beide Wege beginnen gleich — mit der Datei, nicht mit einem Befehl:
 
 Die erste Frage ist deine Sprache. **Die zweite entscheidet alles Weitere:** wird diese Domäne hier geboren, oder schließt sich diese Maschine einer an, die bereits lebt?
 
-- **Geboren** — du beantwortest das Interview. Etwa zwanzig Minuten, mit Pausen. Es erzeugt den Vault, das Gerüst und die Zyklus-Befehle.
+- **Geboren** — du beantwortest das Interview. Zwischen zwanzig Minuten und anderthalb Stunden, je nachdem, wie viel du erzählst, mit Pausen. Es erzeugt den Vault, das Gerüst und die Zyklus-Befehle.
 - **Anschließen** — kein Interview, nichts wird erzeugt. Es erreicht den vorhandenen Vault, prüft, dass er vollständig ankam, installiert den Zyklus aus dem Kanon und übergibt an `/vuelamind-join`.
 
 Der Assistent verlässt sich nicht auf dein Wort: er schaut in den Zielordner und **hält an**, wenn du *geboren* gesagt hast und dort Monate an Arbeit liegen — oder wenn du *anschließen* gesagt hast und nichts da ist.
