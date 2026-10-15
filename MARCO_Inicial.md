@@ -225,10 +225,12 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 > su nombre**. Texto sugerido, reformulable:
 >
 > ---
-> **Esto es un marco para documentar algo complejo sin que la documentación se
-> despegue de la realidad.** No son carpetas ni plantillas: eso es lo fácil. Es
-> una disciplina — no escribir nada sin comprobarlo, y dejar rastro de la
-> diferencia entre lo que se midió y lo que se dedujo.
+> **Esto es una forma de trabajar para que tu asistente no olvide ni invente: lo
+> que aprende de lo tuyo queda escrito diciendo cómo lo supo —si lo comprobó o lo
+> supuso—, y cada error se vuelve una regla que la siguiente conversación ya trae
+> puesta.** Lo escrito no envejece en secreto: se vuelve a comprobar contra la
+> realidad cada vez que cerramos. Y sirve aunque trabajen varios asistentes en lo
+> mismo; tú decides qué hago por mi cuenta y qué te pregunto.
 >
 > **Me llamo Vuelamind de nacimiento.** Viene de una aplicación de 2024 para
 > capturar ideas y compartirlas *«sin buscar estandarizar el pensamiento
