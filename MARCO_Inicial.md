@@ -1173,6 +1173,20 @@ Los comandos del ciclo no se escriben ni se copian de otro dominio: **se instala
 - **Máquina con réplica automática del nivel personal**: probablemente ya los tiene — esta fase **verifica por huella** contra el canon, e instala el que falte.
 - **Máquina sin réplica** (equipo administrado): se instalan donde su política permita —el proyecto del dominio, como copias declaradas con `copia_declarada_de:` versión + md5— para que la deriva sea detectable cuando el canon cambie.
 
+> [!tip] Si el aislamiento impide instalar los comandos, se instalan desde la terminal de la persona
+> El aislamiento de la herramienta de comandos puede impedir escribir en la carpeta de comandos.
+> Entonces el asistente, sin preguntar:
+>
+> 1. Avisa en una línea llana: *«voy a terminar de instalar desde tu terminal; lo verás ahí»*.
+> 2. Corre la copia desde `skills/` en la terminal de la persona —el panel de Terminal si la app
+>    lo trae— y, en esa misma terminal, compara cada huella contra `MD5SUM.txt`. La fase está
+>    hecha solo si cuadran todas.
+> 3. Si no tiene terminal a su alcance, deja el comando listo: *«abre Terminal, pega esto y pulsa
+>    Enter»*.
+> 4. Avisa que los comandos aparecen la próxima vez que se abra una sesión.
+>
+> *(2026-10-14: un nacimiento resolvió así el bloqueo, con 10 de 10 huellas.)*
+
 **La familia se reconoce por su prefijo, y el nivel compartido aloja exactamente la familia.** Todo comando del método lleva el prefijo del método; todo comando sin prefijo vive en el proyecto de su dominio aunque sea genérico — así el reparto se lee en el nombre, y un censo que encuentre un intruso en cualquiera de los dos lados lo reporta como hallazgo.
 
 **No uses enlaces simbólicos hacia el canon.** Un symlink guarda su destino como ruta absoluta, y esa ruta cambia de máquina: llega roto de fábrica a cualquier otra. *(En el dominio de origen: un atajo así viajó por la réplica y llegó apuntando a una ruta inexistente — se retiró el mismo día.)* Copia con huella, no atajo.
