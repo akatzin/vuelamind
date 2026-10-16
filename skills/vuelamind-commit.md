@@ -1,5 +1,5 @@
 ---
-description: Motor genérico de reconciliación — lee el manifiesto del dominio actual y ejecuta el ciclo completo: medir, confirmar, escribir, sincronizar, reportar
+description: Motor genérico de reconciliación — lee el manifiesto del dominio actual y ejecuta el ciclo completo: medir, confirmar, escribir, reportar
 ---
 
 # /vuelamind-commit — reconciliar el dominio actual con la realidad
@@ -247,11 +247,7 @@ Es un `grep` por fecha, no una lectura: por cada remisión con la fecha de hoy, 
 
 Si el manifiesto declara `despues_de_escribir`, córrelo ahora.
 
-## 5. Confirmar la réplica
-
-Que el vault local y su réplica coincidan — **por huella, no por fe**. El cómo lo da el manifiesto (su `acceso_vivo` y la ruta remota). **Esperar a que coincida antes de reportar**: dar por sincronizado lo que no se midió es exactamente lo que este método intenta evitar. Si no hay forma de comprobar, reportar *"escrito, réplica no verificada"* — nunca darla por buena.
-
-## 6. Reportar
+## 5. Reportar
 
 **Qué se corrigió y qué se dejó igual**, separando cambios de documentación de cambios en sistemas — son actos con reversibilidad distinta. Si algo se afirmó antes sin verificar y resultó falso, decirlo explícitamente en vez de corregirlo en silencio.
 
@@ -267,7 +263,7 @@ Que el vault local y su réplica coincidan — **por huella, no por fe**. El có
 
 Si no había nada que corregir, decir eso: es un resultado válido y significa que el marco se está manteniendo solo.
 
-## 7. Presentar los parches sin aportar
+## 6. Presentar los parches sin aportar
 
 **El último acto, después de reportar.** Un dominio que delegó la publicación en su responsable necesita un **momento** en que la decisión se le ponga enfrente; sin él, la decisión no se rechaza — **no se toma nunca**, y los borradores se acumulan sin que nada falle ni nadie los vea. Ese momento es éste, y por eso vive en el orden y no en una clave del manifiesto: si fuera declarable, el dominio que no lo declarara volvería a quedarse sin ninguno.
 

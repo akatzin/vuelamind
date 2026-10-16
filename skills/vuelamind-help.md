@@ -52,4 +52,4 @@ Para cada uno: **el nombre exacto que se teclea**, una línea de qué hace, y �
 - **No repite la documentación de cada comando.** Una línea por cada uno; quien quiera el detalle, abre el comando.
 
 > [!note] Si no hay ninguno
-> Puede pasar en una máquina donde el marco no se instaló, o donde la carpeta personal no se replica. **Dilo tal cual** y señala de dónde se instalan —el canon del método—, en vez de listar de memoria comandos que aquí no existen.
+> Puede pasar en una máquina donde el marco no se instaló. **Dilo tal cual** y señala de dónde se instalan —el canon del método—, en vez de listar de memoria comandos que aquí no existen.

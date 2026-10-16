@@ -27,7 +27,7 @@ No en diagonal. Ese archivo suele traer las reglas de trabajo del dominio, los h
 
 ### 3. Correr el validador del dominio
 
-Cada dominio tiene el suyo. Reporta lo que envejeció desde la última sesión: conteos descuadrados, enlaces rotos, sincronización pendiente.
+Cada dominio tiene el suyo. Reporta lo que envejeció desde la última sesión: conteos descuadrados, enlaces rotos.
 
 **El `initPrompt` describe un estado que puede tener días; el validador mide el de ahora.** Cuando se contradigan, gana el validador — y esa contradicción es material para el checkpoint.
 
@@ -143,6 +143,6 @@ A diferencia del comando de reconciliación —que trae dentro las rutas y los n
 > reconciliación. Ver el parche `2026-08-04-alias-vive-con-su-principal`, que
 > documenta exactamente ese error cometido con `/commit`.
 
-## En máquinas sin réplica automática
+## En equipos administrados
 
-Este comando viaja por la carpeta sincronizada de comandos, así que llega solo a las máquinas de casa. **Un dominio en equipo administrado no lo recibe**: hay que copiarlo a mano a su carpeta de comandos, o pedirlo como parche.
+Este comando se instala en el nivel personal de cada máquina. **Un equipo administrado que no deja instalar ahí no lo recibe**: hay que copiarlo a mano a la carpeta de comandos del dominio.

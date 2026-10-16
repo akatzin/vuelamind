@@ -520,6 +520,11 @@ no tres semanas después. Las tres se contestan **en frío**; el cierre viene al
 
 ---
 
+> [!important] Al terminar la entrevista, una nota para la persona: dónde vive esto
+> Se dice en llano, una vez: *«Lo que escribimos vive solo en esta computadora. Si quieres que
+> esté también en otro lado —otra máquina o un respaldo—, eso corre por tu cuenta, con lo que ya
+> uses.»* El método no replica ni respalda nada.
+
 ### El acta — la entrevista no se evapora
 
 Al terminar los seis bloques, **las respuestas se escriben tal cual** en `vuelamind-entrevista.acta.md`, **dentro del vault**, y el manifiesto la declara igual (clave `acta:`).
@@ -560,7 +565,7 @@ En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —ident
 **Se instala con el andamiaje** (Fase 1.5, junto a los comandos del canon), no se genera. El comando `vuelamind-soul` la muestra. Y no hace falta leerla entera para arrancar un dominio: cobra sentido cuando ya hay errores acumulados y quizá una segunda instancia.
 
 > [!warning] Sistema operativo: no es compatible con Windows nativo
-> **El método necesita un shell tipo Unix.** Los scripts que las fases 1.2 y 1.3 generan —arranque de sesión, empuje de la réplica— y los validadores que cada dominio escribe asumen `sh`/`bash`, rutas con `/` y utilidades POSIX. En Windows nativo **no corren**, y no tiene sentido fingir lo contrario.
+> **El método necesita un shell tipo Unix.** El script que la fase 1.2 genera —el arranque de sesión— y los validadores que cada dominio escribe asumen `sh`/`bash`, rutas con `/` y utilidades POSIX. En Windows nativo **no corren**, y no tiene sentido fingir lo contrario.
 >
 > **La vía conocida es un contenedor Linux**: correr el asistente dentro de uno —por ejemplo con Docker— y trabajar ahí, montando las carpetas del dominio. Todo lo que el marco necesita existe dentro del contenedor y el sistema anfitrión deja de importar.
 >
@@ -639,28 +644,26 @@ máquina que se suma, no una que reforma.
 
 ### 1.0 — Primero la topología, luego los archivos
 
-Antes de escribir una sola nota, decide **dónde vive cada plano**. Cambiarlo después obliga a reconfigurar sincronización, mover archivos y reescribir rutas metidas dentro de comandos y scripts.
+Antes de escribir una sola nota, decide **dónde vive cada plano**. Cambiarlo después obliga a mover archivos y reescribir rutas metidas dentro de comandos y scripts.
 
-La forma que menos se degrada al agregar dominios: **dos carpetas sincronizadas por dominio, ninguna compartida.**
+Todo vive en el proyecto (Bloque E), y nada se comparte entre dominios:
 
 ```
-~/<andamiaje>/<dominio>/          ← carpeta sincronizada 1 — EL ANDAMIAJE
-├── .claude/commands/           ← comandos de ESTE dominio, no globales
+<proyecto>/                     ← donde se abren las sesiones: EL ANDAMIAJE
+├── .claude/                    ← el manifiesto y los comandos de ESTE dominio, no globales
 ├── memory/                     ← la memoria del asistente, real, aquí
 ├── init_<host>.sh              ← arranque de sesión, uno por máquina
 ├── validar_<dominio>.sh        ← el validador mecánico de la Fase 3
-└── MARCO_Inicial.md            ← esta plantilla, para el siguiente dominio
-
-~/<vault>/<Dominio>/            ← carpeta sincronizada 2 — EL CONOCIMIENTO
-├── 0_<Dominio>.md
-├── Pendientes.md
-├── Pendientes_Cerrados.md
-├── Decisiones.md
-├── Errores.md
-├── Bitacora.md
-├── initPrompt.md
-├── Entidades/
-└── borradores/                 ← el taller: ideas y features en progreso, con su índice
+└── vault/                      ← EL CONOCIMIENTO
+    ├── 0_<Dominio>.md
+    ├── Pendientes.md
+    ├── Pendientes_Cerrados.md
+    ├── Decisiones.md
+    ├── Errores.md
+    ├── Bitacora.md
+    ├── initPrompt.md
+    ├── Entidades/
+    └── borradores/             ← el taller: ideas y features en progreso, con su índice
 ```
 
 **Las cuatro reglas que hacen que esto escale:**
@@ -688,7 +691,7 @@ La forma que menos se degrada al agregar dominios: **dos carpetas sincronizadas 
    nacer es pegar este archivo.)* La prueba de que uno pertenece arriba es que se
    pueda leer entero sin encontrar una sola ruta o nombre de archivo particular;
    el día que la necesite, baja.
-2. **Si la herramienta exige que la memoria esté en una ruta suya, apúntala hacia acá**, no muevas la carpeta sincronizada allá. Un enlace simbólico desde la ruta que la herramienta espera hacia `memory/` deja el archivo real en territorio que tú controlas. *(Verifica que la herramienta siga el enlace: es una suposición hasta que lo pruebes — ver la lección 4.)*
+2. **Si la herramienta exige que la memoria esté en una ruta suya, apúntala hacia acá**, no muevas la carpeta allá. Un enlace simbólico desde la ruta que la herramienta espera hacia `memory/` deja el archivo real en territorio que tú controlas. *(Verifica que la herramienta siga el enlace: es una suposición hasta que lo pruebes — ver la lección 4.)*
 3. **Nada se comparte entre dominios por default.** Si algo debe compartirse —una convención, una plantilla— se copia a propósito y se anota en `Decisiones.md` que ahora existe en dos lados y hay que mantener los dos.
 4. **Los borradores viven EN el vault, y se referencian.** El material a medio hacer —el
    diseño de un feature, la idea que aún no es folio, el cuerpo de una propuesta— existe
@@ -703,59 +706,12 @@ La forma que menos se degrada al agregar dominios: **dos carpetas sincronizadas 
    y una búsqueda desde el nodo correcto falló — 43 de 50 borradores estaban huérfanos.)*
 
 > [!warning] Lo que pasa si te saltas esto
-> El vault de origen llegó a **cuatro carpetas sincronizadas** para un solo
+> El vault de origen llegó a **cuatro carpetas** para un solo
 > dominio: el vault, los scripts, la memoria y los comandos — estos dos
 > últimos en rutas que la herramienta impone. Funciona perfecto con un
 > dominio. Con el segundo, los comandos chocan (son globales), la memoria
 > necesita una carpeta nueva porque su ruta lleva el nombre del proyecto
 > adentro, y de pronto administras siete carpetas para dos dominios.
-
-### 1.0.b — Cuando no se puede instalar nada en la máquina
-
-Hay un caso frecuente que rompe el diseño de arriba: **un equipo administrado por otro** —de la empresa, prestado, con política de software— donde no se puede instalar un cliente de sincronización.
-
-**Hay dos salidas, y no son equivalentes.**
-
-#### La buena: disco local + un script propio que empuja
-
-Se trabaja en local, como siempre, y un `rsync_project.sh` del propio dominio empuja al destino remoto. **Conserva lo único que de verdad importa —que el vault no se edite sobre un montaje— sin instalar nada.**
-
-El costo es real pero acotado: hay un script que mantener, y la sincronización pasa de ser un servicio a ser **un acto** — alguien o algo tiene que dispararla, y el checkpoint es el lugar natural.
-
-> [!important] Ese script lo genera el instalador, no viene hecho
-> Es la **Fase 1.3**, más abajo. No puede venir escrito de antemano porque sus
-> rutas, su llave y su destino salen de la entrevista — y por la regla operativa
-> tiene que vivir **en la carpeta del proyecto**, para que viaje con él.
-
-**Cuatro requisitos, ninguno opcional:**
-
-1. **Por SSH con llave dedicada, no sobre el montaje.** Si vas a evitar el recurso de red para editar, no lo reintroduzcas para sincronizar.
-2. **Guard del origen antes de cualquier `--delete`.** Si el origen no existe o viene vacío, **abortar**. Un origen vacío con `--delete` borra el destino entero, y es el error más caro que puede cometer un script de respaldo: destruye justo lo que venía a proteger.
-3. **Dirección explícita, nunca adivinada.** `push` por defecto, `pull` solo si se pide. Un espejo bidireccional automático con `--delete` es la forma más rápida de perder trabajo.
-4. **Verificar que llegó** — comparar huellas o contar archivos del otro lado. Que el comando salga con 0 no dice que el contenido esté.
-
-#### La mala, si la primera no es posible: editar sobre el recurso montado
-
-Es legítima solo cuando no hay ninguna vía de empuje. Tiene un costo que hay que escribir antes de empezar, no después:
-
-| Lo que se pierde | Por qué importa |
-|---|---|
-| **La copia local** | Un vault de notas editado sobre un recurso de red puede corromperse. Es un modo de fallo real, no teórico |
-| **El aviso de que el montaje murió** | Un montaje puede quedar *stale*: sigue apareciendo, `ls` responde desde la caché, y toda escritura falla. El sistema lo reporta como activo |
-| **La memoria del asistente** | Si vive sobre el montaje, un montaje muerto la borra del mapa **sin decirlo**: la sesión arranca como si nunca hubiera habido historia |
-
-**Las tres compensaciones mínimas**, si se elige este camino:
-
-1. **El checkpoint empieza escribiendo y releyendo un archivo de prueba.** Si falla, no se escribe nada: se avisa. Es la única señal temprana que existe.
-2. **No confíes en un solo guard.** `[ -d ruta ]` devuelve verdadero con el montaje muerto. Y lo que sí lo atrapa **depende de dónde murió el handle**: si es la raíz del recurso, una comprobación de punto de montaje falla; si es más abajo, solo escribir lo detecta. Comprobar una sola de las dos no valida nada.
-3. **Decide qué pasa si la memoria no sobrevive al montaje.** Dejarla local y aceptar que no viaje es peor que sincronizarla, pero mucho mejor que una memoria intermitente: lo que se sabe limitado se compensa; lo que falla a ratos, no.
-
-> [!note] Y esto va a `Decisiones.md`, no a una nota al pie
-> Es exactamente el tipo de elección que el marco pide registrar: había una
-> alternativa defendible, se descartó por una razón externa y de peso, y el
-> costo es real. Escribe qué se descartó y **qué haría cambiar de opinión** —
-> aquí suele ser: una corrupción atribuible al montaje, o que se autorice
-> instalar el cliente.
 
 ### 1.1 — Los archivos
 
@@ -926,8 +882,7 @@ la sesión de trabajo:
 1. **Desbloquea los accesos** que la sesión va a necesitar — típicamente llaves
    SSH dentro de un agente.
 2. **Comprueba lo que falla en silencio.** Un dominio puede arrancar perfectamente
-   con la memoria desenlazada, la llave sin cargar y el respaldo muerto hace tres
-   semanas, y no enterarse hasta que importe.
+   con la memoria desenlazada o una llave sin cargar, y no enterarse hasta que importe.
 3. **Lanza el asistente**, heredando lo desbloqueado en el paso 1.
 
 **El paso 3 no es comodidad: es lo que hace obligatorio el paso 2.** Un guion que
@@ -954,9 +909,7 @@ trabajo.
 | Orden | Qué | Por qué primero |
 |---|---|---|
 | 1 | El enlace de la memoria | Si está roto, la sesión arranca **sin historia** y nadie se entera |
-| 2 | La llave del transporte | Si no está cargada, el respaldo fallará al final, cuando ya no hay tiempo |
-| 3 | Frescura del último respaldo confirmado | El modo de falla clásico: parece respaldado durante semanas |
-| 4 | Estado del vault | Pendientes abiertos, para saber dónde se retoma |
+| 2 | Estado del vault | Pendientes abiertos, para saber dónde se retoma |
 
 > [!danger] La regla que hace que sirva: nunca reportar verde por no haber podido
 > Si una comprobación **no se pudo hacer** —el destino no responde, falta un
@@ -1017,87 +970,6 @@ como se coló este defecto la primera vez.
   traen algunos sistemas de fábrica. Si el guion arma argumentos en un array,
   hace falta un guard por cantidad antes de expandirlo.
 
-> [!note] Si el mismo vault se trabaja desde más de una máquina
-> Conviene un **marcador de última sesión** en la carpeta sincronizada: qué host
-> trabajó al final. Si coincide con el actual, retomar es seguro; si no, arrancar
-> limpio — así se evita actuar sobre un estado que ya cambió del otro lado.
-> **Con una sola máquina no hace falta**, pero el día que aparezca la segunda,
-> este es el mecanismo.
-
-### 1.3 — Generar `rsync_project.sh` *(solo si el transporte es local + empuje)*
-
-Va en la **carpeta del proyecto**, junto al validador, para que viaje con el dominio. El asistente lo escribe con las rutas reales que salieron de la entrevista — esta es la forma, no un archivo para copiar tal cual:
-
-```bash
-#!/bin/bash
-# rsync_project.sh — empuja el vault local al destino remoto.
-# Generado al inicializar el marco. Vive en la carpeta del proyecto.
-set -u
-
-ORIGEN="<ruta del vault local>"          # sin barra final: se agrega abajo
-DEST_SSH="<usuario>@<host>"
-DEST="<ruta remota del vault>"
-LLAVE="$HOME/.ssh/<llave dedicada>"
-LOG="$(dirname "$0")/rsync_project.log"
-MIN_ARCHIVOS=5                           # ajústalo al tamaño real del vault
-
-log() { echo "[$(date '+%F %T')] $*" >> "$LOG"; }
-SSH_CMD="ssh -i $LLAVE -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=10"
-MODO="${1:-push}"
-
-# --- Guard del origen: lo único que impide que --delete borre el destino ---
-if [ ! -d "$ORIGEN" ]; then
-    log "ERROR: el origen no existe. Abortando."; exit 1
-fi
-N=$(find "$ORIGEN" -type f ! -path '*/.*' | wc -l | tr -d ' ')
-if [ "$N" -lt "$MIN_ARCHIVOS" ]; then
-    log "ERROR: el origen tiene $N archivos (mínimo $MIN_ARCHIVOS). ¿Montaje caído? Abortando."
-    exit 1
-fi
-
-case "$MODO" in
-  push)
-    rsync -az --delete -e "$SSH_CMD" "$ORIGEN/" "$DEST_SSH:$DEST/" >>"$LOG" 2>&1 \
-      || { log "ERROR: falló el envío."; exit 1; }
-    # Verificar que llegó: contar del otro lado, no confiar en el código de salida
-    R=$($SSH_CMD "$DEST_SSH" "find '$DEST' -type f ! -path '*/.*' | wc -l" 2>/dev/null | tr -d ' ')
-    [ "$R" = "$N" ] && log "OK: $N archivos, confirmados en destino." \
-                    || log "AVISO: local=$N remoto=$R — revisar."
-    ;;
-  pull)
-    # Sin --delete: traer nunca debe borrar lo local. Se pide a propósito.
-    rsync -az -e "$SSH_CMD" "$DEST_SSH:$DEST/" "$ORIGEN/" >>"$LOG" 2>&1 \
-      && log "OK: traído desde el destino." || { log "ERROR: falló la traída."; exit 1; }
-    ;;
-  *) echo "Uso: $0 [push|pull]"; exit 2 ;;
-esac
-```
-
-**Las tres decisiones del diseño, por si hay que apartarse de ellas:**
-
-- **`--delete` solo en `push`.** La dirección que borra es la que va del origen confiable al respaldo. Traer nunca debe borrar lo local: si el remoto se vacía, `pull --delete` destruye el trabajo.
-- **El guard cuenta archivos, no solo comprueba que la carpeta exista.** Un directorio vacío existe. Es la diferencia entre detectar el fallo y ejecutarlo.
-- **La verificación cuenta del otro lado.** El código de salida de `rsync` dice que el proceso terminó, no que el contenido esté.
-
-**Engánchalo al checkpoint**, en su paso de sincronización — y que el checkpoint no reporte "sincronizado" hasta que el conteo remoto cuadre.
-
-> [!danger] El empuje se ejecuta AL FINAL, después del último paso que escribe
-> Si el paso de sincronización no es el último, **el artefacto más fresco del
-> ciclo es el único que no viaja** — y suele ser el documento de arranque, que es
-> lo primero que se lee al abrir la sesión siguiente. La copia remota queda con
-> **un ciclo de retraso permanente**, y eso se ve idéntico a estar al día si solo
-> se mira en local.
->
-> No lo atrapa ningún chequeo, y no por descuido: el validador compara el vault
-> consigo mismo, y el guion de empuje verifica que el destino cuadre con lo que
-> había **al momento de empujar**. Los dos salen en verde. **La incoherencia no
-> está dentro de ninguno de los dos, sino en el orden entre ellos.**
->
-> Si conviene conservar otro orden de *lectura* —porque la revisión de contenido
-> se piensa antes de escribir nada—, déjalo numerado donde esté pero **marca que
-> la ejecución va al final**. Importa el orden de ejecución, no el de la lista.
-
----
 
 ### 1.4 — Generar el **manifiesto de reconciliación** del dominio
 
@@ -1149,9 +1021,8 @@ Y dos corolarios que ya se cobraron caro:
 | `marco` | dónde vive la copia local del método y en qué nota registra esta instancia lo aplicado |
 | `canon` | **de qué repositorio se jala el método**. Default: el oficial. Un derivado se nombra; `—` solo si el aislamiento se eligió en la entrevista |
 | `aportar_a` | **a dónde se proponen los parches** — solo si el dominio dijo que sí. Default cuando se quiere: el mismo canon. `ninguno` si lo aprendido se queda en casa, y es el fallback mientras no se decida |
-| `replica` | contra qué se compara al confirmar la sincronización, y cómo |
 | `antes_de_medir` | enganche opcional: qué correr antes de medir (desbloquear una llave, montar algo) |
-| `despues_de_escribir` | enganche opcional: qué correr tras escribir (el empuje manual, si el transporte lo pide — ver 1.3) |
+| `despues_de_escribir` | enganche opcional: qué correr tras escribir |
 | `avisos_del_dominio` | lista corta de trampas propias que el motor debe respetar al escribir |
 | `acta` | dónde vive el acta de la entrevista inicial — la fuente de `vuelamind-whoiam` |
 | `alma` | dónde se instaló `ALMA.md` en este dominio —el texto canónico del marco más las atestiguaciones locales—, la fuente de `vuelamind-soul` |
@@ -1161,7 +1032,7 @@ Y dos corolarios que ya se cobraron caro:
 El motor, ante un manifiesto ausente, **se detiene y ofrece generarlo** — nunca corre "genérico", porque reconciliar el vault equivocado es peor que no reconciliar. Ante una clave faltante, **reporta el hueco** y sigue con lo declarado.
 
 > [!warning] Si la máquina no puede tener el motor, se copia el método completo — y se anota
-> Un equipo administrado sin la carpeta personal sincronizada no recibe
+> Un equipo administrado que no deja instalar en el nivel personal no recibe
 > `/vuelamind-commit`. Ahí —y solo ahí— el dominio genera su comando de cierre
 > completo copiando la Fase 3, y **deja escrito que es una copia**: dejó de
 > recibir mejoras del motor, así que sus divergencias hay que buscarlas a mano
@@ -1180,8 +1051,8 @@ Los comandos del ciclo no se escriben ni se copian de otro dominio: **se instala
 
 **Y con ellos se copia `ALMA.md`**, el texto canónico del alma, a la nota que el manifiesto declare en su clave `alma`. Se **copia**, no se genera: su contenido es igual en todos los dominios y solo crece por abajo, en las atestiguaciones locales. Un dominio que la reescriba a su manera se queda con una definición propia de qué es el marco.
 
-- **Máquina con réplica automática del nivel personal**: probablemente ya los tiene — esta fase **verifica por huella** contra el canon, e instala el que falte.
-- **Máquina sin réplica** (equipo administrado): se instalan donde su política permita —el proyecto del dominio, como copias declaradas con `copia_declarada_de:` versión + md5— para que la deriva sea detectable cuando el canon cambie.
+- **Máquina que ya tiene los comandos del método**: esta fase **verifica por huella** contra el canon, e instala el que falte.
+- **Equipo administrado** que no deja escribir en el nivel personal: se instalan donde su política permita —el proyecto del dominio, como copias declaradas con `copia_declarada_de:` versión + md5— para que la deriva sea detectable cuando el canon cambie.
 
 > [!tip] Si el aislamiento impide instalar los comandos, se instalan desde la terminal de la persona
 > El aislamiento de la herramienta de comandos puede impedir escribir en la carpeta de comandos.
@@ -2112,14 +1983,13 @@ Y ya en esa segunda sesión, **un primer paso concreto y pequeño**: **medir una
 Cuando el asistente termine, debe entregar:
 
 - [ ] Las respuestas de la entrevista, resumidas y confirmadas
-- [ ] **La topología de sincronización decidida y escrita** — qué carpeta contiene qué plano, qué se aísla por dominio, y qué se comparte a propósito
+- [ ] **La topología escrita** — qué carpeta contiene qué plano y qué se aísla por dominio
 - [ ] `0_<Dominio>.md` con el panorama, aunque sea provisional
 - [ ] `Pendientes.md` con el esquema de severidad ya instanciado al dominio
 - [ ] `Pendientes_Cerrados.md`, `Decisiones.md` y `Bitacora.md` vacíos, con su encabezado
 - [ ] `Errores.md` con la semilla heredada
 - [ ] `Entidades/` con una nota por pieza, aunque sea de tres líneas
 - [ ] `init_<host>.sh` **generado y corrido una vez**, con sus comprobaciones pasando o avisando (Fase 1.2)
-- [ ] `rsync_project.sh` **generado y probado**, si el transporte lo requiere (Fase 1.3)
 - [ ] **El ciclo enseñado con un caso del propio dominio**, y los comandos que existen en esta máquina, mostrados con su nombre exacto
 - [ ] **Tres o cuatro entregables propuestos como preguntas**, y anotado cuál eligió
 - [ ] **La decisión de canon**: **de dónde se trae el método** — con su respuesta escrita, o marcada como hueco con fecha. *(A dónde se manda lo aprendido NO se pregunta aquí: el aprendizaje nace local y apagado, y el destino lo pide `/vuelamind-learn` el día que decidas usarlo.)*
