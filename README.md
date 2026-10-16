@@ -179,16 +179,13 @@ it says so explicitly rather than quietly correcting it.
 ## How it improves
 
 The method learns through **patches**: lessons with a real case, a date, and a way to
-verify them. Since v3.5 you **send** them to an open inbox — no account, no keys, no
-sign-up — and a watcher does the ceremony. See `CONTRIBUTING.md`.
+verify them. **They stay in the domain that learned them**: the canon does not take
+contributions, and its owner maintains it.
 
-The only admission test is genericity: *rewrite your lesson with every proper noun removed
-— does it survive?* Whoever reviews **does not judge whether your case is true** (they
-cannot; it happened in your domain). Each instance that adopts a patch judges it against
-its own evidence, with three possible verdicts — and **discarding with a reason is worth
-more than adopting out of courtesy**.
+Each instance that adopts a patch judges it against its own evidence, with three possible
+verdicts — and **discarding with a reason is worth more than adopting out of courtesy**.
 
-Someone has to judge what arrives. That role has a name and a definition of its own —
+Someone judges what enters the canon. That role has a name and a definition of its own —
 what it watches, what it measures, how it judges, and what is none of its business — in
 `WATCHER.md`. It watches **what enters the canon, never who uses it**: there is no
 registry of installations, and there will not be one.

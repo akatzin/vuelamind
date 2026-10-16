@@ -10,13 +10,12 @@
 | censar | `vuelamind-skills` |
 | identidad | `vuelamind-whoiam` |
 | alma | `vuelamind-soul` |
-| aportar | `vuelamind-learn` |
 | sumar una máquina | `vuelamind-join` |
 | catálogo de lo instalado | `vuelamind-help` |
 
 **El control remoto (`vuelamind-rc`, `vuelamind-rc-update`) salió del canon el 2026-10-01**, con el puente y la imagen de contenedor: viven en un repositorio aparte. Ver `UPGRADE.md`.
 
-**`vuelamind-accidente` se retiró el 2026-10-16**: vive en `deprecated/skills/` y no se instala.
+**`vuelamind-accidente` y `vuelamind-learn` se retiraron el 2026-10-16**: viven en `deprecated/skills/` y no se instalan. El aprendizaje es local.
 
 **La mensajería entre instancias (`vuelamind-mensajeria` y el código de `canal/`) se deprecó en la v3.9.2 (2026-10-12)**: vive en `deprecated/`, como historia. Ver `UPGRADE_v3.9.2.md`.
 

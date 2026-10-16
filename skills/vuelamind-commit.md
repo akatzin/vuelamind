@@ -142,37 +142,11 @@ En los **tres** sitios: el registro de decisiones, la nota del componente y **el
 > [!danger] Esto no es un recordatorio: es un paso con salida obligatoria
 > Un paso cuyo resultado **no aparece en el reporte** es un paso opcional, por mucho que el texto diga *siempre*. Si saltárselo produce una salida idéntica a haberlo hecho, **se va a saltar** — no por mala fe, sino porque nada lo distingue.
 >
-> Por eso el cierre **no está completo** sin la línea del método en el paso 6. La diferencia entre *«no hubo nada del método»* y *«no lo miré»* es toda, y solo se ve si se escribe.
+> Por eso el cierre **no está completo** sin la línea del método en el paso 5. La diferencia entre *«no hubo nada del método»* y *«no lo miré»* es toda, y solo se ve si se escribe.
 
 **Se recorren los hallazgos de la sesión uno por uno**, no en bloque ni de memoria: cada corrección, cada error propio, cada regla que se descubrió a medio trabajar. La prueba: reescribe el hallazgo sustituyendo **todos** los nombres propios por genéricos. ¿Sigue siendo cierto y útil? Si sí, es del método → **es un parche**. Ante la duda, se escribe: uno de más cuesta un archivo; uno de menos cuesta que otra instancia repita el error meses después.
 
-**Y entonces mira el manifiesto, que dice adónde se aporta** — la clave es
-**`buzon_aprendizaje`**, y **no es `aportar_a`**: aquélla nombra un repositorio git y ésta un
-endpoint HTTP. Un dominio puede tener las dos declaradas y no se pisan.
-
-| `buzon_aprendizaje` | Qué se hace con el parche |
-|---|---|
-| Un buzón de aprendizaje | Se escribe el archivo y **se aporta con `/vuelamind-learn`**, que lo criba, lo anonimiza, te lo enseña y lo manda. Es la vía del marco desde la v3.5 |
-| `ninguno` | Se escribe igual y se queda en casa. **No se omite**: un dominio aislado también necesita su libro de errores, y si algún día se conecta, ya lo tiene |
-| Sin declarar | **Es un hueco, no un permiso.** Se escribe el parche, se reporta que no hay destino declarado y se pregunta una vez — no se asume ni que sí ni que no |
-
-**Lo que no cambia según el destino:** el parche se escribe siempre. Adónde va es una decisión de transporte; **escribirlo es una decisión de honestidad**.
-
-> [!important] Desde la v3.5 tu casa NO propone parches al canon: los aporta al buzón
-> El ciclo anterior pedía a cada dominio abrir un pull request con su parche: escribirlo con
-> el frontmatter correcto, anonimizarlo como conjunto, tener cuenta en el repositorio y
-> seguir el hilo de la revisión. **Costaba más de lo que devolvía**, y el precio lo pagaba
-> entero la casa que había cometido el error.
->
-> Ahora el reparto es otro: **tú escribes tus lecciones y las mandas; el vigía del canon
-> hace la ceremonia** — juzgar, armonizar contra el master, publicar. **No hace falta cuenta,
-> ni llaves, ni saber la forma de un parche.** Baja tanto la barrera que un dominio que nunca
-> pudo aportar ahora puede, y por eso el marco cambió de vía y no solo de herramienta.
->
-> **Lo que llega al canon sigue pasando por una persona.** El buzón recibe; no publica nada.
-
-> [!danger] Aplicar un parche no termina en la instancia
-> Termina cuando la plantilla del master es coherente con él **y eso está publicado**. Es un solo acto y no se escala al usuario. Cuatro movimientos: corregir la instancia; mapear a qué sección de la plantilla toca; **traer el master fresco justo antes de editarlo** —otro dominio pudo publicarlo en medio, y pisar su versión no dispara ninguna alarma—, respaldar, publicar y **verificar por huella del otro lado**; y anotar la fila con su versión. Añadir también la fila al índice del README de parches, **comparando por nombre y no por conteo**.
+**El parche se escribe siempre, en el vault del dominio, y ahí se queda**: no hay camino al canon. Un dominio necesita su libro de errores aunque nadie más lo lea.
 
 ### Cómo se pide la confirmación
 
@@ -255,60 +229,13 @@ Si el manifiesto declara `despues_de_escribir`, córrelo ahora.
 
 | Lo que pasó | Qué se reporta |
 |---|---|
-| Salió un parche | Cuál, qué corrige, y **dónde quedó**: propuesto, guardado en casa, o pendiente de proponer |
+| Salió un parche | Cuál, qué corrige, y en qué nota del vault quedó |
 | No salió ninguno | **«Del método, nada esta vez»** — es un resultado válido y el más frecuente |
 | Hubo dudas y no se resolvieron | Cuál fue la duda. **Ante la duda se escribe el parche**: uno de más cuesta un archivo, uno de menos cuesta que otra instancia repita el error meses después |
 
 **Un reporte sin esa línea es un cierre incompleto**, y quien lo lea debe poder notarlo. Es la única forma de distinguir un dominio que no produjo lecciones de uno que dejó de buscarlas.
 
 Si no había nada que corregir, decir eso: es un resultado válido y significa que el marco se está manteniendo solo.
-
-## 6. Presentar los parches sin aportar
-
-**El último acto, después de reportar.** Un dominio que delegó la publicación en su responsable necesita un **momento** en que la decisión se le ponga enfrente; sin él, la decisión no se rechaza — **no se toma nunca**, y los borradores se acumulan sin que nada falle ni nadie los vea. Ese momento es éste, y por eso vive en el orden y no en una clave del manifiesto: si fuera declarable, el dominio que no lo declarara volvería a quedarse sin ninguno.
-
-Lo gobierna la clave que ya existe:
-
-| `buzon_aprendizaje` | Qué se hace al final |
-|---|---|
-| Un buzón de aprendizaje | **Presentar uno a uno los parches sin aportar** —qué corrige cada uno— y **pedir confirmación de mandarlos**. Que mandar sea barato no lo vuelve automático: **lo que sale del dominio sale para siempre**, y esa decisión es del responsable. Si el manifiesto declara `learning_en_cierre: si`, aquí se encadena `/vuelamind-learn` (ver abajo) |
-| `ninguno` | **No se presenta nada.** No hay decisión que pedir: el parche se queda en casa por diseño, y preguntarlo cada cierre es ruido que enseña a contestar que no sin mirar |
-| Sin declarar | Se pregunta **una vez** por el destino — no se asume ni que sí ni que no |
-
-### Si el dominio lo pidió, el cierre encadena el envío
-
-El manifiesto puede declarar **`learning_en_cierre: si`**. Entonces este paso no solo
-presenta: **invoca `/vuelamind-learn`** con lo que salió de la sesión, y el ciclo termina con
-la lección aportada en vez de anotada.
-
-**Por qué existe la opción.** Un parche que espera a que alguien se acuerde de correr un
-comando **espera para siempre** — es el mismo defecto que este método ya documentó con las
-decisiones delegadas: sin un momento definido de ponerlas enfrente, no se rechazan, **no se
-toman nunca**. Encadenarlo aquí le da ese momento.
-
-> [!important] Encadenar NO es automatizar, y la diferencia es toda
-> `learning_en_cierre` decide **cuándo se te pregunta**, no **si** se te pregunta. El skill
-> sigue cribando por generalidad, sigue enseñando el texto final y **sigue exigiendo un sí
-> antes de mandar**. Quien quita las preguntas es `learning_modo`, que es otra clave, otra
-> decisión y otro riesgo.
->
-> **Y si no está declarada, es `no`.** Un cierre que empieza a mandar cosas fuera porque
-> nadie dijo lo contrario es exactamente el tipo de permiso que este método no concede por
-> omisión.
-
-**Dos estados, porque en un listado se ven idénticos:**
-
-> **`nunca presentado`** — se re-ofrece en **cada** cierre hasta que haya decisión.
-> **`decidido no publicar`** — con su motivo escrito; **no vuelve a ofrecerse**.
-
-> [!danger] Confirmar el checkpoint no es confirmar una publicación
-> El visto bueno del paso 3 autoriza **escribir en el vault**. Publicar cruza el
-> borde de salida del dominio y es irreversible, así que se pide **aparte y
-> explícito**, con la misma ceremonia: `AskUserQuestion`, y **nada sale de la
-> máquina hasta el sí**. Un parche que espera no pierde validez — lleva fecha,
-> caso y forma de verificarse desde el día que se escribió.
-
-*(Parche `los-parches-por-proponer-se-quedan-sin-presentar`.)*
 
 ---
 
