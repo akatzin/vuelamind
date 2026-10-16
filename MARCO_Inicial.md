@@ -565,7 +565,7 @@ En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —ident
 **Se instala con el andamiaje** (Fase 1.5, junto a los comandos del canon), no se genera. El comando `vuelamind-soul` la muestra. Y no hace falta leerla entera para arrancar un dominio: cobra sentido cuando ya hay errores acumulados y quizá una segunda instancia.
 
 > [!warning] Sistema operativo: no es compatible con Windows nativo
-> **El método necesita un shell tipo Unix.** El script que la fase 1.2 genera —el arranque de sesión— y los validadores que cada dominio escribe asumen `sh`/`bash`, rutas con `/` y utilidades POSIX. En Windows nativo **no corren**, y no tiene sentido fingir lo contrario.
+> **El método necesita un shell tipo Unix.** El script que la fase 1.2 genera —el arranque de sesión— y los validadores que cada dominio escribe asumen `sh`/`bash`, rutas con `/` y utilidades POSIX. En Windows nativo **no corren**.
 >
 > **La vía conocida es un contenedor Linux**: correr el asistente dentro de uno —por ejemplo con Docker— y trabajar ahí, montando las carpetas del dominio. Todo lo que el marco necesita existe dentro del contenedor y el sistema anfitrión deja de importar.
 >
