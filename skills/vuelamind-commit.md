@@ -146,7 +146,7 @@ En los **tres** sitios: el registro de decisiones, la nota del componente y **el
 
 **Se recorren los hallazgos de la sesión uno por uno**, no en bloque ni de memoria: cada corrección, cada error propio, cada regla que se descubrió a medio trabajar. La prueba: reescribe el hallazgo sustituyendo **todos** los nombres propios por genéricos. ¿Sigue siendo cierto y útil? Si sí, es del método → **es un parche**. Ante la duda, se escribe: uno de más cuesta un archivo; uno de menos cuesta que otra instancia repita el error meses después.
 
-**El parche se escribe siempre, en el vault del dominio, y ahí se queda**: no hay camino al canon. Un dominio necesita su libro de errores aunque nadie más lo lea.
+**El parche se escribe siempre, en el vault del dominio, y ahí se queda**: no hay camino al canon.
 
 ### Cómo se pide la confirmación
 

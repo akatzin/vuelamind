@@ -17,8 +17,7 @@ version: 3.9.2
 
 > [!important] El aprendizaje es local
 > Cada dominio escribe sus lecciones en su propio vault —el libro de errores, las decisiones y
-> los parches— y ahí se quedan: **no hay camino de vuelta al canon**. Ese corpus es el método
-> para ese dominio: sirve para releer, para enseñar a la siguiente instancia y para no repetir.
+> los parches— y ahí se quedan: **no hay camino de vuelta al canon**.
 
 corpus_incorporado: 64 parches · corte 2026-08-13 · anonimizado para publicación en el corte 3.0
 canon: declarado en config.yml — de ahí sale el repositorio, la rama y el sitio. Los parches no se proponen ahí: se escriben en tu propio vault y ahí se quedan
