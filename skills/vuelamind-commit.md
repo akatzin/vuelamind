@@ -28,7 +28,7 @@ Declara, como mínimo:
 | `marco` | dónde vive la copia local del método y sus parches |
 | `canon` | **de qué repositorio se jala el método.** Por omisión el oficial; declararlo gana — un espejo, un derivado, o una copia bajo otra cuenta. **Quien declare uno distinto declara también quién lo sincroniza y cada cuánto** |
 | `antes_de_medir` | enganche opcional: qué correr antes del paso 0 (desbloquear una llave, montar algo) |
-| `despues_de_escribir` | enganche opcional: qué correr tras el paso 4 (un empuje manual, si el transporte lo pide) |
+| `despues_de_escribir` | enganche opcional: qué correr tras el paso 4 |
 | `avisos_del_dominio` | lista corta de trampas propias que el motor debe respetar al escribir |
 
 **Si el manifiesto no existe, detente y dilo.** Ofrece generarlo desde este contrato preguntando las claves una a una — no inventes rutas ni corras un checkpoint "genérico" sin él: reconciliar el vault equivocado es peor que no reconciliar.
