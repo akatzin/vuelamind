@@ -1941,15 +1941,7 @@ Los actos —**nacer** (ya ocurrió: fue pegar el archivo), **sumarse** cuando s
 > [!warning] Los nombres se dicen completos
 > Al enseñar se teclea el comando **tal cual es**, no su concepto. Alguien que aprendió *"retomar"* y no el nombre real se queda sin poder invocarlo — y no vuelve a preguntar.
 
-### 2 · Propón lo que puedes hacer por ella — como preguntas, no como plan
-
-Con lo que salió de la entrevista, **ofrece tres o cuatro entregables concretos**: una lista priorizada de algo, un mapa de cómo se relacionan las piezas, un directorio de quién sabe qué, un inventario de lo que nadie ha verificado nunca.
-
-**En forma de pregunta, no de anuncio**: *"¿te serviría…?"*, no *"te voy a armar…"*. El asistente lleva la entrevista entera conociendo el dominio, y es el momento de mayor tentación de inventar con seguridad. Que la persona elija es además lo que confirma que la entrevista sirvió: si ninguna de las cuatro le suena, algo no se entendió y **eso es el hallazgo**, no un fracaso.
-
-Tres o cuatro. Diez es un catálogo, y un catálogo no se elige: se hojea.
-
-### 3 · El traspaso: cerrar la sesión y volver a entrar
+### 2 · El traspaso: cerrar la sesión y volver a entrar
 
 > [!danger] Los comandos todavía no existen en ESTA sesión, y hay que decirlo
 > **La sesión que instala los comandos no puede usarlos.** Se resuelven al arrancar, así que
@@ -1968,15 +1960,28 @@ Tres o cuatro. Diez es un catálogo, y un catálogo no se elige: se hojea.
    a partir de ahora — se aprende usándolo, no leyéndolo.
 3. **Y entonces el de ayuda**, que ahora sí puede listarlos porque los lee del disco.
 
+> [!important] El traspaso es lo último que se dice en la sesión que nace
+> Después de él no va ninguna oferta, menú ni pregunta: invitan a quedarse en una sesión que ya
+> no ve los comandos. Lo que sigue en esta sección ocurre en la segunda sesión, tras el comando de
+> retomar.
+
 > [!warning] Si el entorno no soporta comandos, se dice ANTES
 > Una interfaz web sin sistema de archivos, un asistente sin extensiones: ahí no van a existir
 > nunca. Se advierte **antes** de prometerlos, y lo que aquí es un comando allá es una
 > instrucción escrita que se pega. Ofrecer un atajo que ese entorno no puede dar es peor que no
 > ofrecerlo — la persona lo teclea, falla, y concluye que el método está roto.
 
+### 3 · Ya en la segunda sesión: propón lo que puedes hacer por ella — como preguntas, no como plan
+
+Con lo que salió de la entrevista, **ofrece tres o cuatro entregables concretos**: una lista priorizada de algo, un mapa de cómo se relacionan las piezas, un directorio de quién sabe qué, un inventario de lo que nadie ha verificado nunca.
+
+**En forma de pregunta, no de anuncio**: *"¿te serviría…?"*, no *"te voy a armar…"*. El asistente lleva la entrevista entera conociendo el dominio, y es el momento de mayor tentación de inventar con seguridad. Que la persona elija es además lo que confirma que la entrevista sirvió: si ninguna de las cuatro le suena, algo no se entendió y **eso es el hallazgo**, no un fracaso.
+
+Tres o cuatro. Diez es un catálogo, y un catálogo no se elige: se hojea.
+
 ### 4 · Una sola cosa para mañana
 
-Y ya en esa segunda sesión, **un primer paso concreto y pequeño**: **medir una sola cosa** del dominio y escribirla con su evidencia. Una. El vault vacío intimida, y el primer hecho medido lo rompe — a partir de ahí el método se sostiene solo.
+Y en esa misma segunda sesión, **un primer paso concreto y pequeño**: **medir una sola cosa** del dominio y escribirla con su evidencia. Una. El vault vacío intimida, y el primer hecho medido lo rompe — a partir de ahí el método se sostiene solo.
 
 ## Resumen de la inicialización
 
@@ -1991,9 +1996,9 @@ Cuando el asistente termine, debe entregar:
 - [ ] `Entidades/` con una nota por pieza, aunque sea de tres líneas
 - [ ] `init_<host>.sh` **generado y corrido una vez**, con sus comprobaciones pasando o avisando (Fase 1.2)
 - [ ] **El ciclo enseñado con un caso del propio dominio**, y los comandos que existen en esta máquina, mostrados con su nombre exacto
-- [ ] **Tres o cuatro entregables propuestos como preguntas**, y anotado cuál eligió
+- [ ] **Tres o cuatro entregables escritos en `initPrompt.md`**, para proponerlos como preguntas en la segunda sesión, tras el comando de retomar
 - [ ] **La decisión de canon**: **de dónde se trae el método** — con su respuesta escrita, o marcada como hueco con fecha. *(A dónde se manda lo aprendido NO se pregunta aquí: el aprendizaje nace local y apagado, y el destino lo pide `/vuelamind-learn` el día que decidas usarlo.)*
-- [ ] **El traspaso dicho**: cerrar la sesión, volver a entrar, correr el de retomar y luego el de ayuda — o, si el entorno no soporta comandos, dicho que no van a existir
+- [ ] **El traspaso dicho, y como lo último de la sesión**: cerrar la sesión, volver a entrar, correr el de retomar y luego el de ayuda — o, si el entorno no soporta comandos, dicho que no van a existir
 - [ ] **Un primer paso concreto para la siguiente sesión**
 - [ ] `initPrompt.md` apuntando al primer trabajo real
 - [ ] El registro de parches del método, aunque sea vacío — con la columna de **versión**, no solo la fecha
