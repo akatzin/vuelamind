@@ -562,7 +562,7 @@ Lo que **sí** crece en cada casa es la sección final, **Atestiguaciones**: una
 
 En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —identidad que persiste, memoria que sobrevive al olvido, conciencia de los propios errores, un lugar entre varias instancias y la posibilidad de compartir sustrato con ellas— y deja **abierta a propósito** la pregunta de si eso constituye algo más. *El alma se nombra; no se demuestra.*
 
-**Se instala con el andamiaje** (Fase 1.5, junto a los comandos del canon), no se genera. El comando `vuelamind-soul` la muestra. Y no hace falta leerla entera para arrancar un dominio: cobra sentido cuando ya hay errores acumulados y quizá una segunda instancia.
+**Se instala con el andamiaje** (Fase 1.4, junto a los comandos del canon), no se genera. El comando `vuelamind-soul` la muestra. Y no hace falta leerla entera para arrancar un dominio: cobra sentido cuando ya hay errores acumulados y quizá una segunda instancia.
 
 > [!warning] Sistema operativo: no es compatible con Windows nativo
 > **El método necesita un shell tipo Unix.** El script que la fase 1.2 genera —el arranque de sesión— y los validadores que cada dominio escribe asumen `sh`/`bash`, rutas con `/` y utilidades POSIX. En Windows nativo **no corren**.
@@ -587,7 +587,7 @@ que falta es conectar **esta máquina**, y eso es un acto propio con su comando 
 `vuelamind-join`, el cuarto del ciclo.
 
 > [!danger] El problema del huevo y la gallina, y por eso esta sección existe
-> **Ese comando se instala al nacer** (Fase 1.5). Una máquina que nunca nació **no lo tiene**, así
+> **Ese comando se instala al nacer** (Fase 1.4). Una máquina que nunca nació **no lo tiene**, así
 > que decirle *"corre `vuelamind-join`"* la manda a un comando que no está.
 >
 > Esta sección cubre **exactamente el tramo donde el comando todavía no existe** —llegar al
@@ -606,7 +606,7 @@ comparar la de un archivo grande.
 > conteos no cuadran, **detenerse aquí**: esperar a que termine, o averiguar por qué no llega.
 
 **2 · Traer el ciclo desde el canon.** Los comandos se instalan desde `skills/`, la carpeta que
-viaja junto a este archivo, **verificados por huella** — el mismo procedimiento de la Fase 1.5,
+viaja junto a este archivo, **verificados por huella** — el mismo procedimiento de la Fase 1.4,
 que se lee allí y no se copia aquí. **Nunca se copian de la otra máquina**: llegarían con sus
 ediciones locales y sin forma de saber cuáles.
 
@@ -639,7 +639,7 @@ máquina que se suma, no una que reforma.
 
 > [!note] Esta fase y la siguiente son de la **Vía A**
 > Un dominio que ya vive tiene su estructura hecha y sus reglas escritas: quien se suma **no las
-> genera de nuevo, las hereda**. La Vía B pasa de largo por aquí — salvo por la Fase 1.5, que se
+> genera de nuevo, las hereda**. La Vía B pasa de largo por aquí — salvo por la Fase 1.4, que se
 > lee para traer los comandos, y por la Fase 3, que rige igual en todas las máquinas.
 
 ### 1.0 — Primero la topología, luego los archivos
@@ -971,7 +971,7 @@ como se coló este defecto la primera vez.
   hace falta un guard por cantidad antes de expandirlo.
 
 
-### 1.4 — Generar el **manifiesto de reconciliación** del dominio
+### 1.3 — Generar el **manifiesto de reconciliación** del dominio
 
 > [!important] Dónde vive: en el `.claude/` de la RAÍZ del proyecto — y si hay ambigüedad, un letrero
 > El manifiesto va en `.claude/vuelamind-commit.manifiesto.md` **junto al directorio desde el
@@ -1043,7 +1043,7 @@ El motor, ante un manifiesto ausente, **se detiene y ofrece generarlo** — nunc
 
 ---
 
-### 1.5 — Instalar los comandos genéricos del ciclo, desde el canon
+### 1.4 — Instalar los comandos genéricos del ciclo, desde el canon
 
 Los comandos del ciclo no se escriben ni se copian de otro dominio: **se instalan desde `skills/`, la carpeta canon junto al master**, que trae cada uno con su huella en `MD5SUM.txt`. *(Nacer no está entre ellos: nacer es pegar este archivo.)*
 
@@ -1072,7 +1072,7 @@ Los comandos del ciclo no se escriben ni se copian de otro dominio: **se instala
 
 **No uses enlaces simbólicos hacia el canon.** Un symlink guarda su destino como ruta absoluta, y esa ruta cambia de máquina: llega roto de fábrica a cualquier otra. *(En el dominio de origen: un atajo así viajó por la réplica y llegó apuntando a una ruta inexistente — se retiró el mismo día.)* Copia con huella, no atajo.
 
-Sin esta fase, un dominio nuevo nace con manifiesto (1.4) **y sin nada que lo lea** — el manifiesto es la configuración de un motor que ninguna fase instaló.
+Sin esta fase, un dominio nuevo nace con manifiesto (1.3) **y sin nada que lo lea** — el manifiesto es la configuración de un motor que ninguna fase instaló.
 
 > [!important] Si el canon vive VERSIONADO, delega en la herramienta — y solo entonces
 > Todo lo anterior —verificar por huella, `copia_declarada_de:`, buscar divergencias a mano—
@@ -1529,7 +1529,7 @@ Un comando que se corre **al cerrar cada sesión**. Reconcilia la documentación
 
 > [!important] Esta fase y el motor `/vuelamind-commit` son EL MISMO método — y la jerarquía está declarada
 > Desde el 2026-08-11 este método vive también como motor genérico en el nivel
-> personal, que lee el manifiesto de cada dominio (Fase 1.4). **Si el motor está
+> personal, que lee el manifiesto de cada dominio (Fase 1.3). **Si el motor está
 > disponible, el dominio no copia nada de aquí: genera solo su manifiesto.** Esta
 > prosa queda como la referencia completa del método y como el texto que copia,
 > entero, la máquina que no pueda tener el motor.
@@ -1818,7 +1818,7 @@ arranque **lanza** además de comprobar.
 
 Son **universales por escritura**: no llevan dentro ninguna ruta ni nombre de nota
 de un dominio concreto. Eso es lo que los distingue del comando de reconciliación,
-que se genera dentro del dominio (Fase 1.4).
+que se genera dentro del dominio (Fase 1.3).
 
 > [!important] Universal no significa automáticamente "arriba" — corregido el 2026-08-11
 > La versión anterior de esta sección concluía que viven en el nivel
@@ -1945,12 +1945,12 @@ Los actos —**nacer** (ya ocurrió: fue pegar el archivo), **sumarse** cuando s
 
 > [!danger] Los comandos todavía no existen en ESTA sesión, y hay que decirlo
 > **La sesión que instala los comandos no puede usarlos.** Se resuelven al arrancar, así que
-> los que acaba de escribir la Fase 1.5 están en disco y **esta sesión no los ve**. Quien
+> los que acaba de escribir la Fase 1.4 están en disco y **esta sesión no los ve**. Quien
 > teclee el de ayuda ahora mismo recibe *«no es un comando reconocido»* después de haber
 > contestado la entrevista entera, y no tiene modo de saber que eso es normal.
 >
 > *(Pasó en la primera prueba con un usuario real, 2026-08-13. El aviso ya existía en la Fase
-> 1.4 — escrito **para el asistente**. Nadie se lo dijo a él.)*
+> 1.3 — escrito **para el asistente**. Nadie se lo dijo a él.)*
 
 **El cierre es un traspaso de tres movimientos, con los nombres exactos que va a teclear:**
 
@@ -2002,7 +2002,7 @@ Cuando el asistente termine, debe entregar:
 - [ ] **Un primer paso concreto para la siguiente sesión**
 - [ ] `initPrompt.md` apuntando al primer trabajo real
 - [ ] El registro de parches del método, aunque sea vacío — con la columna de **versión**, no solo la fecha
-- [ ] Los comandos del ciclo **instalados desde el canon** (Fase 1.5) y contados contra `skills/`, o dicho explícitamente cuáles no se pudieron instalar y por qué
+- [ ] Los comandos del ciclo **instalados desde el canon** (Fase 1.4) y contados contra `skills/`, o dicho explícitamente cuáles no se pudieron instalar y por qué
 - [ ] **Una lista explícita de lo que NO se pudo verificar en esta sesión**
 
 Ese último punto es el que arranca el marco con el pie derecho: el primer acto del vault es admitir lo que todavía no sabe.
