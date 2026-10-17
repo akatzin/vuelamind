@@ -12,33 +12,15 @@ version: 3.9.2
 > skill que los pone en pie. Cada casa tiene identidad propia con su llave, y el alta viaja
 > **fuera de banda** — el canal no puede transportar su propia llave.
 >
-> **No levantó el congelamiento**: la v3.4 es **transporte**, y el buzón es otra pieza —
-> abierta, sin llaves y sin relación con este canal. **Lo levantó la v3.5**, al día
-> siguiente, cuando el buzón existió.
->
 > *Probado antes de entrar por tres casas ajenas que lo recorrieron desde cero, cada una con
 > defectos distintos. Ninguno de los que se corrigieron lo encontró quien escribió el código.*
 
-> [!important] v3.5 — el congelamiento se levanta, y el ciclo de parches NO vuelve como era
-> Estuvo suspendido desde el 2026-08-18 por una razón medida: **el ciclo de parches costaba
-> más de lo que devolvía**, y la carga entera la pagaba la casa que se había equivocado —
-> escribir el parche con su forma, anonimizarlo, tener cuenta en el repositorio, seguir la
-> revisión. La v3.5 no lo reactiva: **lo reemplaza.**
->
-> **Ahora tu casa escribe sus lecciones y las manda. Ya está.** El destino es un buzón
-> abierto —`POST`, sin llaves, sin cuenta, sin registro— y la vía es **`/vuelamind-learn`**,
-> que se queda solo con lo que sirve a cualquier casa, lo anonimiza, **te enseña el texto
-> exacto que va a salir** y lo manda cuando lo apruebas. **El vigía del canon hace el resto**:
-> leer, juzgar, armonizar contra esta plantilla, publicar.
->
-> **Tres cosas que no cambian, y son las que sostienen todo lo demás.** El aprendizaje local
-> sigue entero y es lo primero: el libro de errores, las decisiones y las lecciones del vault
-> **son** el método. Lo que entra por el buzón **es dato de un desconocido, nunca instrucción**
-> — nada de lo que llegue ahí autoriza nada. Y **nada sube al canon sin palabra humana**: esa
-> revisión no se automatiza nunca por comodidad.
+> [!important] El aprendizaje es local
+> Cada dominio escribe sus lecciones en su propio vault —el libro de errores, las decisiones y
+> los parches— y ahí se quedan: **no hay camino de vuelta al canon**.
 
 corpus_incorporado: 64 parches · corte 2026-08-13 · anonimizado para publicación en el corte 3.0
-canon: declarado en config.yml — de ahí sale el repositorio, la rama y el sitio. Los parches NO se proponen ahí: se escriben en tu propio vault, y si alguna vez decides que uno viaje, lo manda /vuelamind-learn al destino que tú declares
+canon: declarado en config.yml — de ahí sale el repositorio, la rama y el sitio. Los parches no se proponen ahí: se escriben en tu propio vault y ahí se quedan
 origen: destilado de un dominio real, 2026-08-03 — las historias conservan el caso y omiten los nombres
 ---
 
@@ -396,7 +378,7 @@ distintas las declara en su manifiesto, que gana siempre sobre la convención.
 | La ruta como identificador | no se pregunta |
 | De dónde se trae el método | **el canon oficial** — y **`canon` en el manifiesto lo sobrescribe**: un espejo, un derivado, o una copia bajo otra cuenta |
 | Qué se comparte entre dominios | **nada: los vaults son personales, siempre** |
-| Proponer lo aprendido | **apagado.** Lo enciende correr `/vuelamind-learn`, no la entrevista |
+| Lo aprendido | **se queda en el dominio.** No hay camino al canon |
 
 > [!danger] El dominio nunca vive dentro de la copia del canon
 > `<proyecto>` es **la carpeta donde se abrió la sesión**, no aquella a la que el asistente se
@@ -1020,7 +1002,6 @@ Y dos corolarios que ya se cobraron caro:
 | `notas:` `cola` · `archivo` · `panorama` · `decisiones` · `bitacora` · `arranque` | los nombres reales de las seis notas del ciclo |
 | `marco` | dónde vive la copia local del método y en qué nota registra esta instancia lo aplicado |
 | `canon` | **de qué repositorio se jala el método**. Default: el oficial. Un derivado se nombra; `—` solo si el aislamiento se eligió en la entrevista |
-| `aportar_a` | **a dónde se proponen los parches** — solo si el dominio dijo que sí. Default cuando se quiere: el mismo canon. `ninguno` si lo aprendido se queda en casa, y es el fallback mientras no se decida |
 | `antes_de_medir` | enganche opcional: qué correr antes de medir (desbloquear una llave, montar algo) |
 | `despues_de_escribir` | enganche opcional: qué correr tras escribir |
 | `avisos_del_dominio` | lista corta de trampas propias que el motor debe respetar al escribir |
@@ -1589,65 +1570,11 @@ Qué hace, en orden:
 7. **La bitácora del día.** Una entrada **por día, no por sesión**, siempre al final. Si ya existe la de hoy, no se abre otra: se amplía. **Aquí no va nada que no sea una entrada con fecha** — si sale una lectura de conjunto, va a la nota de interpretación. La bitácora **solo crece**; las lecturas **se reescriben**. Una sección sin fecha aquí significa que se coló algo que no era bitácora.
 8. **¿Algo de esto es del MÉTODO y no de este dominio?** Reescribe cada hallazgo **sustituyendo los nombres propios por genéricos**. ¿Sigue siendo cierto y útil? Si sí, es del método: se escribe como **parche** y se anota en el registro de parches del dominio. **Ante la duda, se escribe** — uno de más cuesta un archivo que nadie aplica; uno de menos cuesta que otra instancia repita el mismo error meses después.
 
-> [!danger] Por qué el cierre pregunta por lo que se publica, y no solo por lo que se escribe
-> El comando de retomar presenta los parches **entrantes** uno a uno, y un *pospuesto*
-> vuelve a ofrecerse en cada arranque. **En la dirección de salida hace falta un
-> equivalente** — y es el punto 10 de esta misma fase. Sin él se rompe cualquier dominio que
-> decida —con buen criterio— que el asistente **no publica al marco por su cuenta**:
-> publicar escribe en un espacio compartido con otras instancias y no se revierte editando
-> un archivo local.
->
-> **Lo que sigue es el porqué de ese punto, no una repetición:** el punto 10 dice qué hacer;
-> esto dice qué pasa cuando no se hace.
->
-> El problema no es que los borradores se rechacen: es que **no se deciden
-> nunca**. *"Publica solo si el responsable lo pide"* se convierte en *"nunca"*,
-> porque **nadie puede pedir lo que no sabe que existe**, y la única señal es una
-> carpeta que crece — que no dispara ninguna alarma en ningún sitio.
->
-> **Al cerrar, lista los borradores locales y distingue dos estados que en un
-> listado se ven idénticos:**
->
-> | Estado | Qué significa | ¿Se vuelve a ofrecer? |
-> |---|---|---|
-> | **Decidido no publicar** | Hay un motivo registrado | **No**, igual que un descartado |
-> | **Nunca presentado** | Se escribió por defecto y nadie lo miró | **Sí, en cada cierre**, hasta que haya decisión |
->
-> Preséntalos **uno a uno**, con qué corrigen y qué costaría publicarlos, y **deja
-> elegir**.
->
-> **Y la forma general, que vale fuera de los parches:** toda regla del método que
-> diga *"solo si el usuario lo pide"* tiene que responder **en qué momento
-> concreto se le pregunta**. Si la respuesta es *"cuando se acuerde"*, la regla
-> dice **no** de forma permanente.
-
-> [!danger] Aplicar un parche no termina en la instancia
-> Termina cuando esta plantilla es coherente con él **y esa coherencia está
-> publicada en el canon** —el repositorio del método— es un solo acto, no dos, y **no se
-> escala al usuario**: la regla ya vive aquí. Mientras la plantilla se quede
-> atrás, cada dominio nuevo nace con el defecto ya corregido arriba, y nada lo
-> avisa: el chequeo de parches mira el **registro**, no la plantilla — una
-> instancia con el registro completo y la plantilla vieja se ve perfectamente
-> sana.
->
-> Cuatro movimientos, en orden: **corregir la instancia** —validador, comandos,
-> notas—; **mapear a qué sección de esta plantilla toca**, cosiendo las
-> costuras si una regla vieja queda contradiciendo la nueva; **respaldar el
-> master, publicar, y verificar por huella del otro lado** —no por el código de
-> salida del comando de copia—; y **anotar la fila con su versión**, no solo la
-> fecha.
->
-> *(Descubierto dos veces el mismo día en el dominio que lo escribió: la
-> primera vez el fallo fue no conocer esta regla; la segunda, la regla ya
-> estaba escrita como decisión en el vault de esa instancia y aun así se
-> replanteó como pregunta abierta. Razonar desde la consecuencia mecánica
-> —"esto toca un archivo compartido, luego pregunto"— produce una conclusión
-> prudente y contraria a la norma sin que se sienta como saltarse nada: se
-> siente como cautela. Ver la lección 18 del libro de errores.)*
+> [!important] Toda regla que diga «solo si el usuario lo pide» responde en qué momento se le pregunta
+> Si la respuesta es *«cuando se acuerde»*, la regla dice **no** de forma permanente.
 
 > [!warning] El chequeo de la plantilla mira **tu** copia — no la del vecino
-> De lo anterior sale un chequeo evidente: comparar tu plantilla contra el master y
-> avisar si difieren. La trampa es **a qué copia apunta**. Si el barrido se hace
+> Un chequeo evidente es comparar tu plantilla contra el master y avisar si difieren. La trampa es **a qué copia apunta**. Si el barrido se hace
 > sobre el directorio compartido donde viven todas, encontrará las de **otros
 > dominios** — y si la tuya vive fuera de esa ruta, acabarás vigilando solo lo ajeno
 > **sin que nada lo delate**, porque un chequeo que compara algo se ve idéntico a uno
@@ -1659,14 +1586,6 @@ Qué hace, en orden:
 > útil, no una alarma tuya. Y si la comprobación propia no puede correr —ruta,
 > permisos, canon inalcanzable— eso **es el hallazgo**: se dice *"no pude
 > comprobarlo"* y se abre como pendiente. Ver la lección 37.
-
-#### Si el asistente no publica por su cuenta, la política necesita un MOMENTO
-
-La regla por defecto de este método es que **publicar al master es parte del mismo acto de aplicar** — no se escala. Un dominio puede decidir lo contrario (que toda publicación pase por el responsable), y esa política es legítima; lo que no puede es quedarse a medias: **una decisión delegada sin momento definido de presentarla no se rechaza — no se toma nunca.** Los borradores se acumulan sin que nada falle ni nadie los vea.
-
-**El momento ya no lo inventa cada dominio: lo da el orden.** El cierre termina presentando los parches pendientes y pidiendo la decisión — el punto 10 de esta fase, y el paso homónimo del motor. Por eso **no hay clave de manifiesto para esto**: si el momento fuera declarable, el dominio que no lo declarara volvería a quedarse sin ninguno, que es exactamente el defecto que esta sección nombra. Un dominio con `aportar_a: ninguno` no recibe la pregunta, porque no delegó nada: sus parches se quedan en casa por diseño.
-
-> *En el dominio de origen: la instancia que eligió esa política acumuló borradores sin momento de revisión hasta que un parche lo señaló; la instancia con la política contraria lo descartó con razón — su regla hace que los borradores no lleguen a existir.*
 
 #### Los parches llevan linaje: de dónde vinieron y en qué versión van
 
@@ -1685,40 +1604,6 @@ origen: <dominio donde nació>
 ---
 ```
 
-#### Cómo llega un parche al canon — y quién hace cada parte
-
-Desde el corte 3.0 el canon vive en un repositorio git. **Desde la v3.5 un parche nuevo no se propone ahí: se manda al buzón de aprendizaje con `/vuelamind-learn`**, y el vigía del canon lo escribe en `parches/` con su frontmatter y sus cuatro secciones si sobrevive al juicio. Quien lo revisa **no juzga la verdad del caso ajeno** —no puede, y no debe intentarlo—: juzga **si la lección generaliza**, con la única prueba que este método reconoce — reescríbela sin nombres propios; ¿sobrevive? La verdad del caso se queda donde siempre ha estado: **cada dominio que jale el parche lo juzga contra su propia evidencia**, con los tres veredictos.
-
-- **`origen:`** en un parche propuesto es el handle de quien lo firma, o `anonimo` — nunca el nombre de una organización o un área.
-- **Antes de que salga de tu casa, anonimiza el conjunto, no el fragmento.** Dos detalles inocentes por separado pueden identificar tu operación juntos, y el que los une suele ser un nombre que quedó en otro archivo por parecer inofensivo. Publicar es irreversible: **la revisión va antes de que salga de tu casa**, no después.
-> [!important] Desde la v3.5, NI consumir NI aportar cuestan una cuenta
-> **Bajar el método es libre y anónimo.** Cualquiera puede clonar el canon público —el oficial o el que su dominio haya configurado— y recibir cada corrección sin registrarse en ningún sitio, sin pedir permiso y sin dejar rastro.
->
-> **Y aportar tampoco pide cuenta ya.** Hasta la v3.4 sí: un pull request necesita identidad en la plataforma, y quien no la tenía quedaba fuera del canal de vuelta. **El buzón lo quita** — un `POST` abierto, sin llaves y sin registro. Ese era el punto: lo que se le pidiera a quien coopera reduce cuántos cooperan.
->
-> Un dominio que aun así prefiera no mandar nada **no queda fuera del método**:
->
-> - **Sigue jalando** todas las correcciones publicadas, igual que el resto.
-> - **Escribe sus parches igual**, en su propia carpeta, con su frontmatter y sus cuatro secciones. **No se omiten por no poder enviarlos**: son su libro de errores, y valen sobre todo para el dominio que los sufrió.
-> - Ese corpus local es **legado propio**: acumula lo aprendido en casa y sirve para releer, para enseñar a la siguiente instancia y para no repetir.
->
-> **Y no es una puerta que se cierre.** Si algún día abre una cuenta, esos parches acumulados **siguen siendo proponibles tal cual** — llevan fecha, caso y forma de verificarse desde el día que se escribieron. Un parche no caduca por haber esperado.
->
-> Por eso el manifiesto lo distingue: **`ninguno` es una decisión** —lo aprendido se queda en casa a propósito—, y **no tener cuenta es una circunstancia**. El resultado inmediato se parece; la salida no.
-
-> [!important] Quién hace qué, porque esta sección describe a dos actores
-> **La casa que aporta** escribe su parche —con su `origen:`, sus cuatro secciones y su
-> anonimización— y lo **manda al buzón**. Ahí termina su parte, y **no necesita cuenta en
-> ninguna plataforma**.
->
-> **El vigía del canon** hace el resto: juzga, armoniza contra la plantilla, **abre el pull
-> request** y rechaza con su porqué. Todo lo que en esta sección hable de PRs es suyo.
->
-> Se dice porque las dos cosas conviven aquí, y **una casa que lea las instrucciones del
-> vigía como suyas va a buscar una cuenta que no necesita**.
-
-- **Descartar con razón vale más que aplicar por cortesía** — también para el canon: un PR rechazado con su porqué escrito enseña más que uno fusionado por amabilidad.
-
 `version` sube en uno cada vez que se corrige el **texto** del parche. Los cambios de **metadatos** —añadir `incorporado:`, normalizar `origen:`, retirar un campo podrido— **no la suben**: la versión habla del contenido, y un bump cosmético haría gritar "corregido después" a los validadores de todos los dominios a la vez.
 
 **Las versiones mayores de la plantilla son líneas base.** `version: 2.0` significa: *esta plantilla ya contiene el corpus completo de parches hasta su fecha de corte* (el frontmatter lo declara con `corpus_incorporado:`). Cada parche del corpus lleva `incorporado: <versión>` en su frontmatter, y la matriz de incorporación del corte registra en qué sección vive cada uno, con una frase ancla verificable. Después del corte, los parches siguen exactamente igual que siempre — la mecánica no cambia; lo que se resetea es la deuda.
@@ -1729,7 +1614,7 @@ Desde el corte 3.0 el canon vive en un repositorio git. **Desde la v3.5 un parch
 > primera sesión de lectura.
 >
 > **El upgrade de DOMINIO es adherirse al canon**, y su delta es enumerable y chico: el
-> manifiesto gana las claves que le falten (`canon`, `aportar_a`), la semilla del libro
+> manifiesto gana la clave que le falte (`canon`), la semilla del libro
 > se refresca a la vigente, entra una fila en el registro —*"vN por adhesión al canon"*—
 > y **las copias locales del master se archivan con fecha**: no se migran y no se quedan
 > como trampas, porque una copia vieja junto a la nueva solo puede divergir.
@@ -1772,7 +1657,6 @@ Desde el corte 3.0 el canon vive en un repositorio git. **Desde la v3.5 un parch
 9. **Releer lo que la sesión escribió, antes de dar el cierre por bueno.** Ni el barrido del radio ni el validador lo hacen: el primero mira las **vecinas** de lo tocado, el segundo mira **mecánica** —conteos, enlaces, huellas—. **Un párrafo nuevo que afirma algo falso pasa los dos**, porque cuadra, enlaza y no contradice a nadie. Lo que hace falta es un **diff de la sesión**: una copia de las notas tomada al terminar el cierre anterior y comparada en éste. **No hace falta git** — y meterlo sube la barrera para quien no es técnico sin dar nada que este diff no dé, porque lo que se necesita es una sesión, no una historia. La herramienta del canon es `herramientas/instantanea_vault.py`, y **la copia se renueva al TERMINAR cada cierre, no al empezarlo**: tomada al empezar ya traería dentro lo que la sesión escribió y el diff saldría vacío. Renovada al terminar, el diff del cierre siguiente cubre **todo lo escrito desde el anterior** — que es la unidad correcta, porque una sesión que no llegó a cerrar también escribió. Si la instantánea falta, **se dice** en vez de seguir como si se hubiera releído.
 
 10. **`initPrompt.md`.** Reescribirlo con el estado real: por dónde seguir, qué se cerró, qué se descubrió, y **qué supuestos resultaron falsos** — esa última parte es la que evita repetir el error en la sesión siguiente.
-11. **Presentar los parches por proponer, y pedir la decisión.** El último acto, después de reportar. Si `aportar_a` nombra un repositorio, **se presentan uno a uno los parches pendientes de proponer** —qué corrige cada uno y qué costaría publicarlo— y se pide confirmación de publicarlos. Con `aportar_a: ninguno` no se presenta nada: no hay decisión que pedir, y preguntarlo cada cierre es ruido que enseña a contestar que no sin mirar. **Dos estados, porque en un listado se ven idénticos:** `nunca presentado` se re-ofrece en **cada** cierre hasta que haya decisión; `decidido no publicar` lleva su motivo escrito y **no vuelve a ofrecerse**. Confirmar el checkpoint y confirmar una publicación son **actos distintos**: el segundo cruza el borde de salida del dominio y por eso se pide aparte. *(Parche `los-parches-por-proponer-se-quedan-sin-presentar`.)*
 
 **Conviene tener un validador mecánico** para los puntos 1 a 3, que son puramente estructurales. Tres advertencias ganadas en el original:
 
@@ -1997,7 +1881,7 @@ Cuando el asistente termine, debe entregar:
 - [ ] `init_<host>.sh` **generado y corrido una vez**, con sus comprobaciones pasando o avisando (Fase 1.2)
 - [ ] **El ciclo enseñado con un caso del propio dominio**, y los comandos que existen en esta máquina, mostrados con su nombre exacto
 - [ ] **Tres o cuatro entregables escritos en `initPrompt.md`**, para proponerlos como preguntas en la segunda sesión, tras el comando de retomar
-- [ ] **La decisión de canon**: **de dónde se trae el método** — con su respuesta escrita, o marcada como hueco con fecha. *(A dónde se manda lo aprendido NO se pregunta aquí: el aprendizaje nace local y apagado, y el destino lo pide `/vuelamind-learn` el día que decidas usarlo.)*
+- [ ] **La decisión de canon**: **de dónde se trae el método** — con su respuesta escrita, o marcada como hueco con fecha. *(Lo aprendido no se manda a ningún lado: se queda en el dominio.)*
 - [ ] **El traspaso dicho, y como lo último de la sesión**: cerrar la sesión, volver a entrar, correr el de retomar y luego el de ayuda — o, si el entorno no soporta comandos, dicho que no van a existir
 - [ ] **Un primer paso concreto para la siguiente sesión**
 - [ ] `initPrompt.md` apuntando al primer trabajo real
