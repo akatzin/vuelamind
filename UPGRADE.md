@@ -85,10 +85,13 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 ```
 
 > [!important] Las versiones se comparan por segmentos, como enteros — nunca como decimales
-> `3.9 < 3.9.1 < 3.10`. Leída como número, `3.10` es `3.1`: menor que `3.9`, y además choca con la
+> `3.9 < 3.9.1 < 3.10.0`. Leída como número, `3.10` es `3.1`: menor que `3.9`, y además choca con la
 > «v3.1» revertida del linaje. Ningún código del marco compara versiones —lo hace quien lee—, así
 > que la regla se escribe aquí. Y en el frontmatter, una versión con dos puntos (`3.9.1`) se lee
 > como texto, que es lo que se quiere.
+>
+> **Y para que nadie la lea como decimal, una versión con un segmento de dos cifras se escribe
+> siempre con sus tres segmentos:** `3.10.0`, nunca `3.10`.
 
 **Por qué la v3.4 cuelga suelta:** los masters de la v3.6 en adelante **no nombran el canal ni
 una vez**. Es una capacidad que vive en sus propios archivos.
