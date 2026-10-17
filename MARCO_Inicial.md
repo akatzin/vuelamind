@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.9.2
+version: 3.9.3
 
 > [!note] v3.4 (2026-09-05) — el canal entre instancias, y lo que NO trae
 > **RETIRADO en la v3.9.2 (2026-10-12): la mensajería entre instancias se deprecó** y su
