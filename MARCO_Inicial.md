@@ -1571,61 +1571,8 @@ Qué hace, en orden:
 7. **La bitácora del día.** Una entrada **por día, no por sesión**, siempre al final. Si ya existe la de hoy, no se abre otra: se amplía. **Aquí no va nada que no sea una entrada con fecha** — si sale una lectura de conjunto, va a la nota de interpretación. La bitácora **solo crece**; las lecturas **se reescriben**. Una sección sin fecha aquí significa que se coló algo que no era bitácora.
 8. **¿Algo de esto es del MÉTODO y no de este dominio?** Reescribe cada hallazgo **sustituyendo los nombres propios por genéricos**. ¿Sigue siendo cierto y útil? Si sí, es del método: se escribe como **parche** y se anota en el registro de parches del dominio. **Ante la duda, se escribe** — uno de más cuesta un archivo que nadie aplica; uno de menos cuesta que otra instancia repita el mismo error meses después.
 
-> [!danger] Por qué el cierre pregunta por lo que se publica, y no solo por lo que se escribe
-> El comando de retomar presenta los parches **entrantes** uno a uno, y un *pospuesto*
-> vuelve a ofrecerse en cada arranque. **En la dirección de salida hace falta un
-> equivalente** — y es el punto 10 de esta misma fase. Sin él se rompe cualquier dominio que
-> decida —con buen criterio— que el asistente **no publica al marco por su cuenta**:
-> publicar escribe en un espacio compartido con otras instancias y no se revierte editando
-> un archivo local.
->
-> **Lo que sigue es el porqué de ese punto, no una repetición:** el punto 10 dice qué hacer;
-> esto dice qué pasa cuando no se hace.
->
-> El problema no es que los borradores se rechacen: es que **no se deciden
-> nunca**. *"Publica solo si el responsable lo pide"* se convierte en *"nunca"*,
-> porque **nadie puede pedir lo que no sabe que existe**, y la única señal es una
-> carpeta que crece — que no dispara ninguna alarma en ningún sitio.
->
-> **Al cerrar, lista los borradores locales y distingue dos estados que en un
-> listado se ven idénticos:**
->
-> | Estado | Qué significa | ¿Se vuelve a ofrecer? |
-> |---|---|---|
-> | **Decidido no publicar** | Hay un motivo registrado | **No**, igual que un descartado |
-> | **Nunca presentado** | Se escribió por defecto y nadie lo miró | **Sí, en cada cierre**, hasta que haya decisión |
->
-> Preséntalos **uno a uno**, con qué corrigen y qué costaría publicarlos, y **deja
-> elegir**.
->
-> **Y la forma general, que vale fuera de los parches:** toda regla del método que
-> diga *"solo si el usuario lo pide"* tiene que responder **en qué momento
-> concreto se le pregunta**. Si la respuesta es *"cuando se acuerde"*, la regla
-> dice **no** de forma permanente.
-
-> [!danger] Aplicar un parche no termina en la instancia
-> Termina cuando esta plantilla es coherente con él **y esa coherencia está
-> publicada en el canon** —el repositorio del método— es un solo acto, no dos, y **no se
-> escala al usuario**: la regla ya vive aquí. Mientras la plantilla se quede
-> atrás, cada dominio nuevo nace con el defecto ya corregido arriba, y nada lo
-> avisa: el chequeo de parches mira el **registro**, no la plantilla — una
-> instancia con el registro completo y la plantilla vieja se ve perfectamente
-> sana.
->
-> Cuatro movimientos, en orden: **corregir la instancia** —validador, comandos,
-> notas—; **mapear a qué sección de esta plantilla toca**, cosiendo las
-> costuras si una regla vieja queda contradiciendo la nueva; **respaldar el
-> master, publicar, y verificar por huella del otro lado** —no por el código de
-> salida del comando de copia—; y **anotar la fila con su versión**, no solo la
-> fecha.
->
-> *(Descubierto dos veces el mismo día en el dominio que lo escribió: la
-> primera vez el fallo fue no conocer esta regla; la segunda, la regla ya
-> estaba escrita como decisión en el vault de esa instancia y aun así se
-> replanteó como pregunta abierta. Razonar desde la consecuencia mecánica
-> —"esto toca un archivo compartido, luego pregunto"— produce una conclusión
-> prudente y contraria a la norma sin que se sienta como saltarse nada: se
-> siente como cautela. Ver la lección 18 del libro de errores.)*
+> [!important] Toda regla que diga «solo si el usuario lo pide» responde en qué momento se le pregunta
+> Si la respuesta es *«cuando se acuerde»*, la regla dice **no** de forma permanente.
 
 > [!warning] El chequeo de la plantilla mira **tu** copia — no la del vecino
 > De lo anterior sale un chequeo evidente: comparar tu plantilla contra el master y
