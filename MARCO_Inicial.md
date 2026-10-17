@@ -1575,8 +1575,7 @@ Qué hace, en orden:
 > Si la respuesta es *«cuando se acuerde»*, la regla dice **no** de forma permanente.
 
 > [!warning] El chequeo de la plantilla mira **tu** copia — no la del vecino
-> De lo anterior sale un chequeo evidente: comparar tu plantilla contra el master y
-> avisar si difieren. La trampa es **a qué copia apunta**. Si el barrido se hace
+> Un chequeo evidente es comparar tu plantilla contra el master y avisar si difieren. La trampa es **a qué copia apunta**. Si el barrido se hace
 > sobre el directorio compartido donde viven todas, encontrará las de **otros
 > dominios** — y si la tuya vive fuera de esa ruta, acabarás vigilando solo lo ajeno
 > **sin que nada lo delate**, porque un chequeo que compara algo se ve idéntico a uno
