@@ -1506,10 +1506,10 @@ Un marco honesto también documenta sus propios defectos:
 
 ## Fase 3 — La reconciliación (`checkpoint`)
 
-Un comando que se corre **al cerrar cada sesión**. Reconcilia la documentación con la realidad, que es lo único que evita que un vault se vuelva ficción bien organizada.
+Un comando que se corre **al cerrar cada sesión**. Reconcilia la documentación con la realidad.
 
 > [!important] Esta fase y el motor `/vuelamind-commit` son EL MISMO método — y la jerarquía está declarada
-> Desde el 2026-08-11 este método vive también como motor genérico en el nivel
+> Este método vive también como motor genérico en el nivel
 > personal, que lee el manifiesto de cada dominio (Fase 1.3). **Si el motor está
 > disponible, el dominio no copia nada de aquí: genera solo su manifiesto.** Esta
 > prosa queda como la referencia completa del método y como el texto que copia,
@@ -1523,9 +1523,9 @@ Qué hace, en orden:
 
 1. **Contadores.** Que `total_abiertos`, `cerrados` y `riesgo_aceptado` del frontmatter cuadren con las casillas reales.
 2. **Folios.** Sin huecos ni repetidos. Que cada folio citado en otras notas exista.
-3. **Enlaces.** Ningún enlace colgante. **Compara los nombres normalizando Unicode, no por bytes** — y esto no es una advertencia, es un requisito del chequeo. Un sistema de archivos puede guardar `ñ` como `n` + tilde combinante mientras el texto tecleado en un enlace queda precompuesto: **el mismo texto, bytes distintos**, y el chequeo reporta colgante un archivo que existe. *"Tolerante a mayúsculas" y "tolerante a Unicode" son dos normalizaciones distintas, y resolver una no resuelve la otra*, así que una comparación que ignora mayúsculas sigue teniendo el defecto. Normaliza los dos lados a la misma forma y aplica plegado de mayúsculas en el mismo paso. *(Ver la lección 9: el mecanismo general del que éste es un caso.)*
+3. **Enlaces.** Ningún enlace colgante. **Compara los nombres normalizando Unicode, no por bytes.** Un sistema de archivos puede guardar `ñ` como `n` + tilde combinante mientras el texto tecleado en un enlace queda precompuesto: **el mismo texto, bytes distintos**, y el chequeo reporta colgante un archivo que existe. *"Tolerante a mayúsculas" y "tolerante a Unicode" son dos normalizaciones distintas, y resolver una no resuelve la otra*, así que una comparación que ignora mayúsculas sigue teniendo el defecto. Normaliza los dos lados a la misma forma y aplica plegado de mayúsculas en el mismo paso. *(Ver la lección 9: el mecanismo general del que éste es un caso.)*
 
-   > [!warning] Y no cantes victoria: normalizar no cubre los homoglifos
+   > [!warning] Normalizar no cubre los homoglifos
    > Normalizar resuelve **dos formas del mismo carácter**. No resuelve **dos
    > caracteres distintos que se dibujan igual**: la `а` cirílica y la `a`
    > latina son letras de alfabetos diferentes, y ninguna normalización las
@@ -1546,11 +1546,9 @@ Qué hace, en orden:
    > Este chequeo **no puede distinguir un enlace exhibido de uno pretendido: son el
    > mismo texto.** Cualquier nota que enseñe la sintaxis usándola —y la semilla del
    > libro de errores lo hacía— genera un colgante que el validador reporta en rojo,
-   > y su primera manifestación es la peor posible: **el primer validador que alguien
-   > corre en su vida sale en rojo por un defecto heredado**, justo cuando está
-   > decidiendo si esta herramienta merece confianza. Quien no sepa de dónde viene
-   > concluirá que su vault está mal o que el validador miente — las dos falsas, y las
-   > dos enseñan a ignorar el rojo.
+   > **incluso la primera vez que alguien lo corre, por un defecto heredado**. Quien no
+   > sepa de dónde viene concluirá que su vault está mal o que el validador miente —
+   > las dos falsas, y las dos enseñan a ignorar el rojo.
    >
    > La regla general, que aplica también a marcadores de plantilla y comodines: **no
    > enseñes una sintaxis usándola si algún chequeo va a recorrer ese mismo texto.**
@@ -1561,14 +1559,14 @@ Qué hace, en orden:
    > *(Parche `2026-08-14-un-ejemplo-de-enlace-no-se-distingue-de-uno-real`.)*
 4. **El radio del cambio — el grafo de enlaces, ANTES de cerrar la lista.** La lista de notas a tocar no sale solo de lo que la sesión tuvo abierto: por cada nota candidata, dos barridos. **Hacia afuera** — sus enlaces salientes, los de doble corchete: ¿alguna vecina habla del mismo tema y quedaría desactualizada, o tiene un *"por confirmar"* que este cambio responde? **Hacia adentro** — quién la enlaza: ¿alguien cita como hecho lo que este cambio vuelve falso? Los dos barridos los da `herramientas/vecinas.py <nota> <vault>`: un `grep` del nombre no ve los alias ni las secciones, y falla callado. Lo encontrado entra a la lista como fila propia con su porqué. La estructura de carpetas no delata la relación temática; el grafo sí. Y si el tema no tiene nota de la que salir, eso también es hallazgo (lección 30: un track sin nodo no aparece en ningún censo).
 
-   > *En el dominio de origen: una auditoría de un aparato de red se iba a escribir solo en el panorama, con dos notas vecinas cargando semanas un "por confirmar" que la auditoría acababa de resolver — los wikilinks de la nota ya leída las delataban, y nadie los siguió (lección 27). Semanas después, un permiso de acceso se concedió sobre una premisa que otra nota marcaba como no verificada: el grafo las conectaba, la sesión no.*
+   > *Medido en el dominio de origen: una auditoría que resolvía el "por confirmar" de dos notas vecinas —enlazadas desde la nota ya leída— iba a escribirse solo en el panorama (lección 27); y un permiso de acceso se concedió sobre una premisa que una nota enlazada marcaba como no verificada.*
 
-   **Y un tercer barrido, de otra naturaleza: hacia la regla.** Si lo que cambió no es un hecho sino una **regla** —una memoria, una convención, un vocabulario, un umbral—, el radio **no es el grafo: es el corpus**. Lo escrito bajo la regla anterior no tiene enlace que lo delate: sigue ahí, coherente consigo mismo y desalineado con la nueva. **Se busca por el término que cambió**, en las dos direcciones —lo que usa la forma vieja y lo que ya usaba la nueva sin declararlo—. Es el barrido que más se salta **porque nada se pone en rojo**: los conteos cuadran, los enlaces resuelven, el validador sale verde. Si aparecen muchos, se corrige lo que la regla vuelve **falso** y se anota lo que solo vuelve **inconsistente**; lo que no se vale es cambiar la regla y no mirar el corpus, porque entonces la regla nueva **convive con su contradicción y la siguiente sesión no sabe cuál manda**. *(En el dominio de origen, el mismo día: se cambió el vocabulario de una nota conceptual y el resto del vault siguió con el término viejo; y una nota pasó de cuatro piezas a cinco mientras el comando que la muestra seguía diciendo cuatro.)*
+   **Y un tercer barrido, de otra naturaleza: hacia la regla.** Si lo que cambió no es un hecho sino una **regla** —una memoria, una convención, un vocabulario, un umbral—, el radio **no es el grafo: es el corpus**. Lo escrito bajo la regla anterior no tiene enlace que lo delate: sigue ahí, coherente consigo mismo y desalineado con la nueva. **Se busca por el término que cambió**, en las dos direcciones —lo que usa la forma vieja y lo que ya usaba la nueva sin declararlo—. Es el barrido que más se salta **porque nada se pone en rojo**: los conteos cuadran, los enlaces resuelven, el validador sale verde. Si aparecen muchos, se corrige lo que la regla vuelve **falso** y se anota lo que solo vuelve **inconsistente**; lo que no se vale es cambiar la regla y no mirar el corpus, porque entonces la regla nueva **convive con su contradicción y la siguiente sesión no sabe cuál manda**. *(Medido en el dominio de origen: una nota conceptual cambió de vocabulario y el resto del vault siguió con el término viejo; una nota pasó de cuatro piezas a cinco y el comando que la muestra seguía diciendo cuatro.)*
 
 5. **El panorama.** Que se haya actualizado si cambió — y que siga siendo una **foto**: presente, sin fechas de jornada. *Qué hay, cómo está, qué falta.* Nunca *"el 3 de agosto se arregló X"*, que es bitácora. **La prueba:** ¿seguirá siendo cierta y útil dentro de seis meses? Al convertir crónica en foto, **rescatar el hecho y tirar la jornada** — y comprobar después que ningún hecho vivía solo en la parte narrativa.
 6. **Afirmaciones que envejecieron.** Lo que se escribió como medido hace semanas puede haber dejado de ser cierto. Marcar lo que convenga re-verificar. **Y revisar las capacidades afirmadas:** si una nota dice que el sistema *"tiene"*, *"puede"* o *"soporta"* algo, comprobar que no dependa de un estado que hoy no se cumple — una capacidad condicional escrita sin su condición se propaga a todos los planes que la citen. Es la regla de la Fase 2 §1, y el validador no puede juzgarla.
 7. **La bitácora del día.** Una entrada **por día, no por sesión**, siempre al final. Si ya existe la de hoy, no se abre otra: se amplía. **Aquí no va nada que no sea una entrada con fecha** — si sale una lectura de conjunto, va a la nota de interpretación. La bitácora **solo crece**; las lecturas **se reescriben**. Una sección sin fecha aquí significa que se coló algo que no era bitácora.
-8. **¿Algo de esto es del MÉTODO y no de este dominio?** Reescribe cada hallazgo **sustituyendo los nombres propios por genéricos**. ¿Sigue siendo cierto y útil? Si sí, es del método: se escribe como **parche** y se anota en el registro de parches del dominio. **Ante la duda, se escribe** — uno de más cuesta un archivo que nadie aplica; uno de menos cuesta que otra instancia repita el mismo error meses después.
+8. **¿Algo de esto es del MÉTODO y no de este dominio?** Reescribe cada hallazgo **sustituyendo los nombres propios por genéricos**. ¿Sigue siendo cierto y útil? Si sí, es del método: se escribe como **parche** y se anota en el registro de parches del dominio. **Ante la duda, se escribe.**
 
 > [!important] Toda regla que diga «solo si el usuario lo pide» responde en qué momento se le pregunta
 > Si la respuesta es *«cuando se acuerde»*, la regla dice **no** de forma permanente.
@@ -1623,7 +1621,7 @@ origen: <dominio donde nació>
 > — vaults cuya estructura cambió entre líneas base, no plantillas que el canon ya carga.
 >
 > *(Parche `2026-08-16-el-upgrade-es-adhesion-al-canon`. Su caso de ejecución sigue
-> pendiente: la regla está escrita, y el primer dominio que se adhiera la pagará.)*
+> pendiente.)*
 
 **Un dominio que NACE de una línea base la hereda saldada:** al generar su registro, siembra una fila `✅ incorporado en plantilla vX.0 · vN` por cada parche cuyo `incorporado:` sea menor o igual a su versión. Sin esa siembra, su arranque le ofrecería como "sin mirar" decenas de parches que su plantilla ya trae dentro. **Un dominio que hace UPGRADE los hereda en bloque** con lista visible — el humano aparta los que quiera revisar; posponer o descartar previos no se pisa en silencio.
 
@@ -1645,9 +1643,8 @@ origen: <dominio donde nació>
 >    elemento. Se cura con **`ssh -n`**.
 > 3. **El título del parche ya no es la primera línea**, porque el frontmatter la
 >    ocupa. Lo que lo leyera con `head -1` ahora obtiene `---`: busca el primer
->    encabezado. **Esta trampa se cobró sola:** una instancia llevaba quince
->    parches mostrando `---` como título en su inventario sin que nadie lo notara,
->    porque un título feo no rompe nada.
+>    encabezado. *(Medido: una instancia mostraba `---` como título de quince
+>    parches en su inventario, y nadie lo notó porque un título feo no rompe nada.)*
 >
 > Si una vista de linaje sale vacía, sospecha de éstas antes que de la realidad.
 > Y si el alcance real hace que la vista solo pueda leerse a sí misma —dominios
@@ -1656,12 +1653,12 @@ origen: <dominio donde nació>
 > forma de dato.
 9. **Releer lo que la sesión escribió, antes de dar el cierre por bueno.** Ni el barrido del radio ni el validador lo hacen: el primero mira las **vecinas** de lo tocado, el segundo mira **mecánica** —conteos, enlaces, huellas—. **Un párrafo nuevo que afirma algo falso pasa los dos**, porque cuadra, enlaza y no contradice a nadie. Lo que hace falta es un **diff de la sesión**: una copia de las notas tomada al terminar el cierre anterior y comparada en éste. **No hace falta git** — y meterlo sube la barrera para quien no es técnico sin dar nada que este diff no dé, porque lo que se necesita es una sesión, no una historia. La herramienta del canon es `herramientas/instantanea_vault.py`, y **la copia se renueva al TERMINAR cada cierre, no al empezarlo**: tomada al empezar ya traería dentro lo que la sesión escribió y el diff saldría vacío. Renovada al terminar, el diff del cierre siguiente cubre **todo lo escrito desde el anterior** — que es la unidad correcta, porque una sesión que no llegó a cerrar también escribió. Si la instantánea falta, **se dice** en vez de seguir como si se hubiera releído.
 
-10. **`initPrompt.md`.** Reescribirlo con el estado real: por dónde seguir, qué se cerró, qué se descubrió, y **qué supuestos resultaron falsos** — esa última parte es la que evita repetir el error en la sesión siguiente.
+10. **`initPrompt.md`.** Reescribirlo con el estado real: por dónde seguir, qué se cerró, qué se descubrió, y **qué supuestos resultaron falsos**.
 
-**Conviene tener un validador mecánico** para los puntos 1 a 3, que son puramente estructurales. Tres advertencias ganadas en el original:
+**Conviene tener un validador mecánico** para los puntos 1 a 3, que son puramente estructurales. Advertencias:
 
 - **Un validador que falla en silencio es peor que no tenerlo**, porque enseña a ignorarlo. Que grite cuando no pueda comprobar algo, en vez de dar por bueno.
-- **Portar un script no es copiarlo: es correrlo** en cada máquina donde vaya a vivir. La primera vez que el validador del original corrió en una máquina distinta, aparecieron cinco incompatibilidades y cuatro fallaban sin decir nada.
+- **Portar un script no es copiarlo: es correrlo** en cada máquina donde vaya a vivir. Medido en el original: en una máquina distinta, el validador dio cinco incompatibilidades, y cuatro fallaban sin decir nada.
 - **Un chequeo que solo se probó en verde no está probado**, y arreglarlo puede volverlo ciego en vez de correcto: un chequeo que ya no encuentra nada se ve igual que uno que ya no falla. Cada arreglo se verifica con **dos casos** —el que antes fallaba, que ahora debe pasar; y uno inventado, que debe seguir saliendo—. Y después, **deshacer el escenario de prueba y comprobar la reversión** (lección 16). En un vault el escenario es documental —una copia temporal, una fila alterada, un archivo de prueba— y por eso engaña más: no hay proceso que delate el residuo. La comprobación es un `diff` contra el estado previo, no la memoria de haberlo revertido.
 - **Comprueba también las dos SALIDAS, no solo la lógica.** Un artefacto que mide tiene dos salidas que casi nunca se prueban —**lo que imprime** y **lo que devuelve**— y cuando una falla, **nada se pone rojo**: la parte que mide sigue acertando, así que el chequeo se reporta a sí mismo en verde mientras comunica algo falso. Es distinto del chequeo ciego, donde la medición sí se rompe: aquí **la medición es correcta y miente el mensajero**. Dos comprobaciones baratas: **toma una fila y compárala a mano contra la fuente** —no leas la salida entera buscando algo raro, que lo raro se normaliza al tercer vistazo—, y **`echo $?` en el camino verde y en el rojo**. Al arreglar la impresión, provoca los dos casos: suele fallar precisamente **la rama que más ocurre**, mientras la rara es la que funciona.
 
