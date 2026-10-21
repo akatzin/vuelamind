@@ -78,7 +78,7 @@ Se empaca solo con su sí.
 ### 7. Escribir y empacar
 
 - `MIGRACION.md`, en la raíz del zip, con el formato de abajo.
-- `RUTAS.tsv`: una fila por ruta absoluta encontrada en el paso 4, con tres columnas separadas por tabulador: archivo dentro del zip, renglón y ruta.
+- `RUTAS.tsv`: una fila por ruta absoluta encontrada en el paso 4, con tres columnas separadas por tabulador: archivo dentro del zip, renglón y **la ruta completa como aparece en el renglón**, desde donde empieza la coincidencia hasta el primer espacio, comilla, acento grave o cierre de paréntesis o corchete. No basta el pedazo que coincidió: `~/` a secas no dice si la ruta es del dominio o de otra parte.
 - `HUELLAS.txt`: el `sha256` de cada archivo del zip, salvo él mismo, con su ruta dentro del zip.
 - El zip: `<dominio>-<AAAA-MM-DD>T<HHMM>Z.zip`, con la hora en UTC para que dos exportaciones del mismo día no choquen. Se hace con las herramientas del sistema (`zip`, o `ditto` en macOS).
 
