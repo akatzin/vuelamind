@@ -98,3 +98,8 @@ bloque busca. Lo que apareció, medido:
 > Que la entrevista corta funcione mejor es **inferido**: sale de cruzar cinco actas, y cinco
 > es una señal, no una prueba. **La corrida que lo ascendería es la próxima que hagas.** Si al
 > usarla algo se atora, eso es un hueco de este documento y se aporta con `/vuelamind-learn`.
+
+## Historia que salió del master en la v3.10.0
+
+- **«Antes de decir "encontré", búscalo»** era, hasta la v3.5, la pregunta 25 de la entrevista. No
+  era una pregunta, porque nadie la contesta: desde la v3.6 vive en la doctrina del asistente.
