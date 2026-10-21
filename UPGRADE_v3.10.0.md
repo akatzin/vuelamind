@@ -15,7 +15,7 @@ para: dominios en la v3.9.3
 
 | Pieza | Cambio | Qué te toca |
 |---|---|---|
-| `MARCO_Inicial.md` | `version: 3.10.0`. El master dice el hecho y la regla, sin narrativa: el libro de errores y las secciones de las cuatro fases. **Ninguna regla cambia**: cada sección se comparó antes y después con un juez de lógica aparte. La historia que salió vive en los `UPGRADE` de su versión | Traerlo (paso 1) |
+| `MARCO_Inicial.md` | `version: 3.10.0`. El master dice el hecho y la regla, sin narrativa: el libro de errores y las secciones de las cuatro fases. **Ninguna regla cambia.** La historia que salió vive en los `UPGRADE` de su versión | Traerlo (paso 1) |
 | `ALMA.md` | Versión 1.1: el aprendizaje es local, y la pieza «la mente distribuida» ya no dice que los aprendizajes viajen al canon | Copiarlo de nuevo, conservando tus atestiguaciones (paso 2) |
 | Los README | Las nueve traducciones dicen lo mismo que el inglés | Nada |
 | Los skills | Sin cambios: siguen siendo 8 | Nada |
