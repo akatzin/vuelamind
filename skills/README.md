@@ -12,6 +12,7 @@
 | alma | `vuelamind-soul` |
 | sumar una máquina | `vuelamind-join` |
 | catálogo de lo instalado | `vuelamind-help` |
+| empacar el dominio con sus notas de migración | `vuelamind-export` |
 
 **El control remoto (`vuelamind-rc`, `vuelamind-rc-update`) salió del canon el 2026-10-01**, con el puente y la imagen de contenedor: viven en un repositorio aparte. Ver `UPGRADE.md`.
 
