@@ -150,7 +150,7 @@ no_verificado: [<una línea por cosa>, ...]
 
 Toda ruta de `piezas`, `respaldos_manuales` y `se_ejecuta` es relativa a la raíz del zip. **Lo de `se_ejecuta` el destino lo revisa antes de activarlo**: importar un dominio es ejecutar lo que otro escribió.
 
-`raiz_alias` y `alias` son opcionales dentro del `formato: 1`: un importador que no los conozca los ignora, y uno que los lea los prefiere a lo que deduzca.
+El exportador escribe siempre `raiz_alias` y el `alias` de cada entrada de `fuera`, con `[]` si no hay. Siguen en el `formato: 1`: una clave ausente es de un paquete anterior y el importador puede deducirla; una presente manda sobre lo que deduzca, clave por clave.
 
 ## Qué NO hace
 
