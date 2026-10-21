@@ -52,9 +52,11 @@ En el destino, solo el primer nivel se corrige sin discusión. Los otros dos se 
 
 **Un enlace simbólico no se sigue**: se anota adónde apunta. Seguirlo mete en el zip algo que no es del dominio, o lo mismo dos veces.
 
+**Una ruta del manifiesto que no existe en esta máquina, con la pieza en otra ruta de esta máquina, es un alias**: pasa en una réplica y en un dominio que vive en varias máquinas. Se empaca lo que existe, y la ruta declarada va en `alias` de su entrada de `fuera`. La raíz del proyecto con que la nombra otra máquina va en `raiz_alias`: es la ruta absoluta de una pieza que el manifiesto declara dentro del proyecto, menos la parte que coincide exacta con donde quedó aquí. Dónde está la pieza lo dicen la persona, la configuración de sincronización o esa coincidencia exacta; nunca se elige por parecido, y lo que no se sepa se pregunta en el paso 6.
+
 ### 4. Barrer las rutas absolutas
 
-En cada archivo de texto que entra, buscar la ruta raíz del proyecto, la de cada pieza de `_fuera/`, `$HOME` expandido y `~/`. Cada hallazgo, con archivo, renglón y ruta.
+En cada archivo de texto que entra, buscar la ruta raíz del proyecto, la de cada pieza de `_fuera/`, cada `alias` y `raiz_alias`, `$HOME` expandido y `~/`. Cada hallazgo, con archivo, renglón y ruta.
 
 **La nota declara el patrón con que se buscó**, para que una lista vacía signifique «no hay» y no «no se buscó». Lo encontrado se **declara**, no se reescribe: reescribir es del destino.
 
@@ -71,7 +73,7 @@ Cada uno, con la ruta que usa. Lo que no se pudo comprobar se dice con esas pala
 
 ### 6. Enseñar antes de empacar
 
-Presentar a la persona el mapa de piezas, el tamaño de lo que entra (cada carpeta de más de 100 MB, por separado), lo excluido y dónde se va a escribir el zip.
+Presentar a la persona el mapa de piezas, cada alias con de dónde salió, el tamaño de lo que entra (cada carpeta de más de 100 MB, por separado), lo excluido y dónde se va a escribir el zip.
 
 **Dónde:** la carpeta que se pase como argumento (`/vuelamind-export <carpeta>`); sin argumento, la carpeta padre del proyecto, porque dentro de él se empacaría a sí mismo.
 
@@ -108,6 +110,7 @@ exportado_utc: <AAAA-MM-DDTHH:MM:SSZ>
 host: <host de origen>
 version_marco: <versión del master del dominio>
 raiz_original: <ruta absoluta del proyecto en el origen>
+raiz_alias: [<ruta>, ...]      # la raíz con que la nombran otras máquinas; [] si no hay
 piezas:                        # pieza estándar → ruta dentro del zip | no-existe
   manifiesto: proyecto/.claude/vuelamind-commit.manifiesto.md
   vault: <ruta>
@@ -125,7 +128,7 @@ piezas:                        # pieza estándar → ruta dentro del zip | no-ex
   init: [<ruta>, ...]
   memoria: <ruta>
 fuera:                         # ruta dentro del zip → ruta original
-  - {zip: _fuera/<clave>/, origen: <ruta absoluta>}
+  - {zip: _fuera/<clave>/, origen: <ruta absoluta>, alias: [<ruta>, ...]}
 memoria_origen: <ruta absoluta de la memoria en el origen>
 canon: {zip: <ruta del clon dentro del zip> | no-existe, ref: <commit en que está>, remoto: <url de origin>}
 desviaciones:
@@ -146,6 +149,8 @@ no_verificado: [<una línea por cosa>, ...]
 **El frontmatter tiene que ser YAML válido**, y se comprueba cargándolo antes de empacar. Un valor con `: ` dentro, como una URL, va entre comillas dobles; el patrón de rutas, entre comillas simples, porque sus barras invertidas no son escapes de YAML.
 
 Toda ruta de `piezas`, `respaldos_manuales` y `se_ejecuta` es relativa a la raíz del zip. **Lo de `se_ejecuta` el destino lo revisa antes de activarlo**: importar un dominio es ejecutar lo que otro escribió.
+
+`raiz_alias` y `alias` son opcionales dentro del `formato: 1`: un importador que no los conozca los ignora, y uno que los lea los prefiere a lo que deduzca.
 
 ## Qué NO hace
 
