@@ -69,36 +69,77 @@ Cada uno, con la ruta que usa. Lo que no se pudo comprobar se dice con esas pala
 
 ### 6. Enseñar antes de empacar
 
-Presentar a la persona el mapa de piezas, el tamaño de lo que entra (cada carpeta de más de 100 MB, por separado), lo excluido y dónde se va a escribir el zip. **Por omisión, en la carpeta padre del proyecto**: dentro de él se empacaría a sí mismo.
+Presentar a la persona el mapa de piezas, el tamaño de lo que entra (cada carpeta de más de 100 MB, por separado), lo excluido y dónde se va a escribir el zip.
+
+**Dónde:** la carpeta que se pase como argumento (`/vuelamind-export <carpeta>`); sin argumento, la carpeta padre del proyecto, porque dentro de él se empacaría a sí mismo.
 
 Se empaca solo con su sí.
 
 ### 7. Escribir y empacar
 
 - `MIGRACION.md`, en la raíz del zip, con el formato de abajo.
+- `RUTAS.tsv`: una fila por ruta absoluta encontrada en el paso 4, con tres columnas separadas por tabulador: archivo dentro del zip, renglón y ruta.
 - `HUELLAS.txt`: el `sha256` de cada archivo del zip, salvo él mismo, con su ruta dentro del zip.
-- El zip: `<dominio>-<AAAA-MM-DD>.zip`, hecho con las herramientas del sistema (`zip`, o `ditto` en macOS).
+- El zip: `<dominio>-<AAAA-MM-DD>T<HHMM>Z.zip`, con la hora en UTC para que dos exportaciones del mismo día no choquen. Se hace con las herramientas del sistema (`zip`, o `ditto` en macOS).
 
 ### 8. Verificar en el zip, no en el origen
 
 - `unzip -t` sin errores.
 - El zip tiene exactamente un archivo más que las filas de `HUELLAS.txt`.
 - Reportar la ruta y el tamaño del zip, cuántos archivos lleva, qué se excluyó y lo que no se pudo verificar.
+- **La última línea del reporte es exactamente `EXPORTADO: <ruta absoluta del zip>`**, para que un programa que invoque el skill recoja el zip sin adivinar. Si no se exportó, la última línea es `NO EXPORTADO: <motivo>`.
 
 Un zip escrito no es un zip que se puede abrir: se comprueba lo segundo.
 
 ## El formato de `MIGRACION.md`
 
-La primera línea es `formato: 1`. Un importador que reciba un formato más nuevo del que entiende se detiene.
+Dos partes: un **frontmatter YAML para máquina** y un cuerpo para la persona. **Un importador lee solo el frontmatter y los archivos que nombra**; el cuerpo explica lo mismo, en prosa.
 
-1. **Origen:** dominio, fecha en UTC, host, versión del marco, ruta raíz original y ruta original de cada pieza de `_fuera/` y de `_memoria/`.
-2. **Mapa de piezas:** la tabla del paso 2.
-3. **Desviaciones:** agrupadas por nivel.
-4. **Rutas absolutas:** el patrón de búsqueda y la lista.
-5. **Lo que no viaja:** el inventario del paso 5.
-6. **Lo excluido:** el paso 3, con las credenciales solo por nombre.
-7. **Respaldos manuales:** la lista.
-8. **Configuración que se ejecuta:** los ganchos de `.claude/settings*.json` y los comandos del proyecto, por nombre. **El destino los revisa antes de activarlos**: importar un dominio es ejecutar lo que otro escribió.
+La primera clave es `formato`. Un importador que reciba un formato más nuevo del que entiende se detiene.
+
+```yaml
+---
+formato: 1
+dominio: <nombre>
+exportado_utc: <AAAA-MM-DDTHH:MM:SSZ>
+host: <host de origen>
+version_marco: <versión del master del dominio>
+raiz_original: <ruta absoluta del proyecto en el origen>
+piezas:                        # pieza estándar → ruta dentro del zip | no-existe
+  manifiesto: proyecto/.claude/vuelamind-commit.manifiesto.md
+  vault: <ruta>
+  panorama: <ruta>             # las seis notas, con las claves del manifiesto
+  cola: <ruta>
+  archivo: <ruta>
+  decisiones: <ruta>
+  bitacora: <ruta>
+  arranque: <ruta>
+  acta: <ruta>
+  alma: <ruta>
+  registro_parches: <ruta>
+  borradores_indice: <ruta>
+  validador: <ruta>
+  init: [<ruta>, ...]
+  memoria: <ruta>
+fuera:                         # ruta dentro del zip → ruta original
+  - {zip: _fuera/<clave>/, origen: <ruta absoluta>}
+memoria_origen: <ruta absoluta de la memoria en el origen>
+desviaciones:
+  - {nivel: regla | declarado | desorden, pieza: <pieza o ruta>, detalle: <una línea>}
+rutas: {archivo: RUTAS.tsv, patron: <expresión con que se buscó>}
+no_viaja:
+  - {tipo: launchd | systemd | cron | syncthing | replica | proceso, ref: <nombre o archivo>, ruta: <ruta que usa>}
+excluido:
+  credenciales: [<ruta original>, ...]   # solo el nombre: el contenido nunca
+  otros: [<patrón o ruta>, ...]
+respaldos_manuales: [<ruta dentro del zip>, ...]
+se_ejecuta: [<ruta dentro del zip>, ...]  # ganchos de .claude/settings*.json y comandos del proyecto
+huellas: HUELLAS.txt
+no_verificado: [<una línea por cosa>, ...]
+---
+```
+
+Toda ruta de `piezas`, `respaldos_manuales` y `se_ejecuta` es relativa a la raíz del zip. **Lo de `se_ejecuta` el destino lo revisa antes de activarlo**: importar un dominio es ejecutar lo que otro escribió.
 
 ## Qué NO hace
 
