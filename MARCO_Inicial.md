@@ -463,10 +463,9 @@ no tres semanas después. Las tres se contestan **en frío**; el cierre viene al
     línea entre leer, proponer y aplicar. Escríbela: es la única de la entrevista que fija la
     autonomía.
 
-> [!important] Una regla que salió de aquí y NO se pierde: antes de decir «encontré», búscalo
-> Hasta la v3.5 esto era la pregunta 25, y **no era una pregunta**: nadie la contesta. Es una
-> regla de cómo debe comportarse el asistente, y por eso ahora vive donde le toca — en su
-> doctrina, no en la entrevista al usuario.
+> [!important] Antes de decir «encontré», búscalo
+> Es una regla de cómo debe comportarse el asistente, **no una pregunta**: nadie la contesta.
+> Vive en su doctrina, no en la entrevista.
 >
 > Antes de anunciar un hallazgo hay que buscarlo en los tres sitios: el registro de decisiones,
 > la nota del componente, y el archivo de cerrados —que es el que nadie abre—. Un hallazgo
@@ -523,7 +522,7 @@ llegó la carpeta— con sus palabras y dicho que se dijo antes de la primera pr
 señal, se escribe que no la había: *"la carpeta se llamaba `proyecto`"* es un dato, y uno que
 explica por qué la entrevista arrancó en frío.
 
-Un acta **se enmienda con fecha, nunca se reescribe en silencio**. Y un dominio ya nacido sin acta la **reconstruye** — primero del transcript de la sesión fundacional (las palabras del responsable), luego de sus notas, y solo al final preguntando — marcándola con la fuente de cada bloque. **Agota el transcript antes de tocar las notas**: reconstruir del panorama produce las paráfrasis del asistente, no las respuestas del responsable, y un dominio nacido orgánicamente puede no tener entrevista que relatar — se cuenta lo que el transcript muestre, sin inventarle bloques. *(Error cometido y corregido el 2026-08-12.)*
+Un acta **se enmienda con fecha, nunca se reescribe en silencio**. Y un dominio ya nacido sin acta la **reconstruye** — primero del transcript de la sesión fundacional (las palabras del responsable), luego de sus notas, y solo al final preguntando — marcándola con la fuente de cada bloque. **Agota el transcript antes de tocar las notas**: reconstruir del panorama produce las paráfrasis del asistente, no las respuestas del responsable, y un dominio nacido orgánicamente puede no tener entrevista que relatar — se cuenta lo que el transcript muestre, sin inventarle bloques.
 
 ### La nota del alma — vista desde arriba
 
