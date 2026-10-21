@@ -15,8 +15,9 @@ formas de instalacion que existen (archivo suelto en commands/, o carpeta con
 SKILL.md dentro de skills/) y dice cuales difieren. No escribe nada, no toca
 nada y no manda nada a ningun sitio.
 
-SALIDAS: 0 si todo cuadra, 1 si algo difiere. Las dos probadas — un chequeo
-probado solo en verde no esta probado.
+SALIDAS: 0 si todo cuadra, 1 si alguno difiere o no esta instalado. Un
+instalado que el inventario no lista no cambia la salida. Se prueban las dos
+salidas, no solo el 0.
 
 SI TU DOMINIO NO EJECUTA COSAS BAJADAS DE INTERNET, no lo bajes: el canon YA
 publica skills/MD5SUM.txt, que es todo lo que hace falta. La receta cabe en
@@ -94,6 +95,9 @@ if viejos:
     for n, m, c, r in viejos:
         print("  %-28s %s -> %s   %s" % (n, m, c, r))
     print("\nCopia esos desde skills/ del canon. Ninguno da error si no lo haces.")
-    sys.exit(1)
 else:
     print("\nNinguno desalineado.")
+if ausentes:
+    print("Instala los que faltan desde skills/ del canon.")
+if viejos or ausentes:
+    sys.exit(1)
