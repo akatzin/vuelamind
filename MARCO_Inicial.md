@@ -464,8 +464,7 @@ no tres semanas después. Las tres se contestan **en frío**; el cierre viene al
     autonomía.
 
 > [!important] Antes de decir «encontré», búscalo
-> Es una regla de cómo debe comportarse el asistente, **no una pregunta**: nadie la contesta.
-> Vive en su doctrina, no en la entrevista.
+> Vive en la doctrina del asistente, no en la entrevista.
 >
 > Antes de anunciar un hallazgo hay que buscarlo en los tres sitios: el registro de decisiones,
 > la nota del componente, y el archivo de cerrados —que es el que nadie abre—. Un hallazgo
