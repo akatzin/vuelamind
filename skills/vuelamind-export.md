@@ -10,13 +10,13 @@ Copia el dominio **tal cual está** a un zip y le agrega `MIGRACION.md`: qué tr
 
 ### 1. Localizar el dominio
 
-Lee `.claude/vuelamind-commit.manifiesto.md` en el directorio de trabajo. **Sin manifiesto, se detiene**: empacar el dominio equivocado es peor que no empacar.
+Lee `.claude/vuelamind-commit.manifiesto.md` en el directorio de trabajo. **Sin manifiesto, se detiene.**
 
 Del manifiesto salen las rutas: `vault`, `validador`, las seis `notas:`, `acta`, `alma` y `marco` (el registro de parches). Una clave ausente se anota como hueco; no se adivina.
 
 ### 2. Hacer el mapa de piezas
 
-La estructura de referencia es la del master: la topología de la Fase 1.0, los archivos de la 1.1 y lo que el mismo master pone dentro del vault (el acta, `ALMA.md`, el registro de parches, `borradores/0_Borradores.md`). **Se lee del master, no de este archivo**: una lista copiada aquí envejece.
+La estructura de referencia es la del master: la topología de la Fase 1.0, los archivos de la 1.1 y lo que el mismo master pone dentro del vault (el acta, `ALMA.md`, el registro de parches, `borradores/0_Borradores.md`). **Se lee del master, no de este archivo.**
 
 Para cada pieza, una fila: dónde está en el origen, dónde queda en el zip, o `no existe`.
 
