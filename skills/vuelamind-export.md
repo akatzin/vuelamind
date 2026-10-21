@@ -35,6 +35,7 @@ En el destino, solo el primer nivel se corrige sin discusión. Los otros dos se 
 | Entra | Dónde, en el zip |
 |---|---|
 | La carpeta del proyecto, tal cual | `proyecto/` |
+| El clon del canon del dominio, con su `.git`: es la versión del método que el dominio eligió, y volver a clonar trae otra | donde esté: dentro de `proyecto/`, o en `_fuera/canon/` |
 | Lo que el manifiesto declara **fuera** del proyecto y es del dominio, como un vault externo | `_fuera/<clave>/` |
 | La memoria de Claude Code, si no vive ya dentro del proyecto | `_memoria/` |
 | Los respaldos manuales: `*.bak*`, `*.antes-*`, `*.viejo-*`, `*.orig` | en su sitio, y listados en la nota |
@@ -45,7 +46,8 @@ En el destino, solo el primer nivel se corrige sin discusión. Los otros dos se 
 |---|---|
 | Las transcripciones de Claude Code (`*.jsonl`) | que se excluyeron |
 | Credenciales: llaves, `.env`, `*.pem`, `*.key`, `*secret*`, y los archivos con permisos `600` o `400` que lo parezcan | **solo el nombre y la ruta**, para recrearlas en el destino. El contenido, nunca. Un archivo con `600` o `400` que no parezca secreto —una imagen, una nota— se le pregunta a la persona en el paso 6 |
-| El clon del canon y cualquier otro clon público | de dónde se vuelve a clonar |
+| Cualquier otro clon público que no sea del dominio | de dónde se vuelve a clonar |
+| `.git/worktrees/` de cualquier repositorio: son copias de trabajo de esta máquina | que se excluyeron; en el destino, `git worktree prune` |
 | Cachés y basura de sistema: `__pycache__/`, `.stversions/`, `.trash/`, `.DS_Store`, las instantáneas del vault | que se excluyeron |
 
 **Un enlace simbólico no se sigue**: se anota adónde apunta. Seguirlo mete en el zip algo que no es del dominio, o lo mismo dos veces.
@@ -124,6 +126,7 @@ piezas:                        # pieza estándar → ruta dentro del zip | no-ex
 fuera:                         # ruta dentro del zip → ruta original
   - {zip: _fuera/<clave>/, origen: <ruta absoluta>}
 memoria_origen: <ruta absoluta de la memoria en el origen>
+canon: {zip: <ruta del clon dentro del zip> | no-existe, ref: <commit en que está>, remoto: <url de origin>}
 desviaciones:
   - {nivel: regla | declarado | desorden, pieza: <pieza o ruta>, detalle: <una línea>}
 rutas: {archivo: RUTAS.tsv, patron: <expresión con que se buscó>}
