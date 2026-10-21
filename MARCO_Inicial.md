@@ -26,16 +26,16 @@ origen: destilado de un dominio real, 2026-08-03 — las historias conservan el 
 
 # Marco de trabajo — prompt de inicialización
 
-**Qué es esto.** Un marco para auditar y documentar un dominio complejo con un asistente, sin que la documentación se despegue de la realidad. Nació auditando un dominio técnico real, pero nada de su núcleo es de infraestructura: sirve para un área de trabajo, un producto, un proceso, una migración o una operación.
+**Qué es esto.** Un marco para auditar y documentar un dominio complejo con un asistente, sin que la documentación se despegue de la realidad. Nada de su núcleo es de infraestructura: sirve para un área de trabajo, un producto, un proceso, una migración o una operación.
 
 **Cómo se usa.** Clona el repositorio, abre tu asistente **en esa carpeta** y dile: *"Inicializa `MARCO_Inicial.md`"*. No hace falta pegar nada — el archivo ya está en disco y el asistente lo lee. *(Si llegaste aquí con el archivo pegado en un contexto, también funciona: es el mismo texto.)* **Lo segundo que te va a preguntar es si el dominio nace aquí o si esta máquina se suma a uno que ya vive** — y de ahí salen dos caminos distintos. Si nace: la entrevista de la Fase 0, el vault en la Fase 1 y las reglas de la Fase 2. Si se suma: no hay entrevista ni se genera nada, se conecta esta máquina a lo que ya existe.
 
 **Y también es así como llegan los comandos.** Pegar este archivo es lo que instala el ciclo, incluido `vuelamind-join`. Por eso una máquina nueva que quiere sumarse empieza aquí igual: no por el comando —que todavía no tiene— sino por este archivo, que se lo trae.
 
-Después, el dominio vive en un ciclo de cuatro actos: **nacer** una vez, **sumarse** cuando otra máquina se une, **retomarse** al abrir cada sesión y **reconciliarse** al cerrarla. Los tres últimos son comandos, no buenas intenciones — la Fase 3 y la sección *El ciclo completo*.
+Después, el dominio vive en un ciclo de cuatro actos: **nacer** una vez, **sumarse** cuando otra máquina se une, **retomarse** al abrir cada sesión y **reconciliarse** al cerrarla. Los tres últimos son comandos — la Fase 3 y la sección *El ciclo completo*.
 
-> [!note] Nacer **no tiene comando**, y es a propósito: nacer es pegar este archivo
-> No hace falta instalar nada para empezar, ni un atajo que prepare el terreno. Un comando que decidiera las rutas por adelantado **duplicaría la convención del Bloque E y la Fase 1** — y sobre todo contradiría la promesa: *pegar el archivo y contestar*. Los comandos aparecen **después** del primer dominio, para lo que se repite.
+> [!note] Nacer **no tiene comando**: nacer es pegar este archivo
+> No hace falta instalar nada para empezar, ni un atajo que prepare el terreno. Un comando que decidiera las rutas por adelantado **duplicaría la convención del Bloque E y la Fase 1**. Los comandos aparecen **después** del primer dominio, para lo que se repite.
 
 > [!warning] Lo que hace que esto funcione no es la estructura
 > Las carpetas y plantillas son la parte fácil y la menos valiosa. Lo que sostiene el marco es el **núcleo epistémico** de la Fase 2: la disciplina de no escribir nada que no se haya comprobado, y de dejar rastro de la diferencia entre lo medido y lo inferido. Un vault con esta estructura y sin esa disciplina es peor que no tener vault, porque se lee con una confianza que no se ganó.
@@ -59,8 +59,8 @@ lo dirá ya dentro del marco, con los términos que el asistente acaba de enseñ
 | `agente`, `vuelamind`, `claude`, `ai`, `bot`, `proyecto`, `prueba`, `test`, `nuevo`, `temp`, `carpeta` | **No hay señal.** No se menciona, no se comenta y no se pregunta por qué. Se arranca normal |
 
 **Lo que escribió, íntegro y con sus palabras, entra al acta** — en su propio renglón y diciendo
-que se dijo **antes de la primera pregunta**. No es un dato cualquiera: el resto del acta está
-anclado por el vocabulario del marco y éste no lo está. **El momento cambia lo que vale.**
+que se dijo **antes de la primera pregunta**: el resto del acta está anclado por el vocabulario
+del marco y éste no lo está.
 
 > [!warning] Es hipótesis, y confundirla con dato es el error de esta sección
 > Un nombre de carpeta puede ser una suposición vieja, el nombre de otra cosa que estaba ahí
@@ -68,23 +68,16 @@ anclado por el vocabulario del marco y éste no lo está. **El momento cambia lo
 > ni se escribe en el vault como si el usuario lo hubiera afirmado. Si el usuario lo corrige,
 > gana la corrección y **el acta conserva las dos**: lo que dijo en frío y lo que dijo después.
 
-> [!note] Por qué está escrito esto, y de dónde salió
-> **Esta señal existía y se tiraba.** El nombre del dominio se propone al final de la entrevista
-> —*«a estas alturas ya lo tienes»*— y nada miraba con qué nombre había llegado la carpeta.
->
-> El marco ya supo esto y lo perdió: su comando de inicialización retirado decía **«Solo pregunta
-> el nombre»**, y los ejemplos que eligió son exactamente los del tipo que aporta — *`tesis`,
-> `taller`, `mudanza`*. Cuando esa pieza se retiró, la señal dejó de recogerse.
->
-> **Y no vale sustituirla por una pregunta.** *«¿De qué es este dominio?»* preguntado por el
-> asistente ya llega anclado: la persona contesta con las palabras que acaba de recibir. Lo que
-> hace valiosa a ésta es que se contestó **sin que nadie estuviera mirando**.
+> [!note] No vale sustituirla por una pregunta
+> *«¿De qué es este dominio?»* preguntado por el asistente ya llega anclado: la persona contesta
+> con las palabras que acaba de recibir. Lo que hace valiosa a ésta es que se contestó **sin que
+> nadie estuviera mirando**.
 
 ### Pregunta 0 — El idioma
 
-**Antes que nada: «¿en qué idioma quieres trabajar?»** Se pregunta en el idioma en que llegó el usuario, y a partir de la respuesta **todo** va en ese idioma: la entrevista, el vault, las notas, los reportes. Este archivo está escrito en uno solo porque tiene que estarlo; el dominio que genera, no.
+**Antes que nada: «¿en qué idioma quieres trabajar?»** Se pregunta en el idioma en que llegó el usuario, y a partir de la respuesta **todo** va en ese idioma: la entrevista, el vault, las notas, los reportes. Este archivo está escrito en uno solo; el dominio que genera, no.
 
-No es una preferencia de cortesía: **la persona va a escribir aquí durante meses, y va a leerlo cansada.** Un vault en un idioma que no es el propio se abandona.
+**La persona va a escribir aquí durante meses, y va a leerlo cansada.** Un vault en un idioma que no es el propio se abandona.
 
 > [!danger] Las dos palabras del método que hay que presentar, y solo una vez
 > Este archivo usa **«vault»** y **«dominio»** decenas de veces porque necesita un vocabulario
@@ -102,7 +95,7 @@ No es una preferencia de cortesía: **la persona va a escribir aquí durante mes
 > hecho falso, y es más difícil de detectar.
 >
 > Lo que **no** se vale es soltarlas sin presentar. *(Medido: `vault` aparece más de setenta
-> veces en este archivo y no se definía en ninguna — un tlapalero lo señaló el 2026-08-13.)*
+> veces en este archivo y no se definía en ninguna.)*
 
 ### Pregunta 1 — ¿este dominio **nace** aquí, o esta máquina **se suma** a uno que ya vive?
 
@@ -126,9 +119,8 @@ tiene vault, historia y decisiones tomadas?»*
 > | **se suma** | con contenido | **Vía B.** Adelante |
 > | **se suma** | vacía | No es un dominio que ya vive: es uno que no ha nacido. **Decirlo y ofrecer la Vía A** en vez de conectar una máquina a una carpeta sin nada que retomar |
 >
-> Las dos filas del medio son las que importan, y son **simétricas a propósito**: cada vía se
-> niega a correr cuando el terreno dice lo contrario. Un desvío que solo cree lo que le
-> contestan no es una comprobación, es una cortesía.
+> Las dos filas del medio son las que importan: cada vía se niega a correr cuando el terreno
+> dice lo contrario.
 
 **Vía A — nace.** Sigue leyendo: la presentación, los bloques A–F, y después las Fases 1 y 2.
 
@@ -159,8 +151,7 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 > lo que sí hay.** El reporte final las lista aparte: un hueco que la persona declaró y uno
 > que el silencio declaró por ella son cosas distintas, y el segundo invita a retomar.
 > *(Medido el 2026-08-14: una inicialización recibió el mismo bloque de respuestas ocho
-> veces mientras tres preguntas seguían abiertas; el asistente hizo lo correcto por
-> instinto — esta regla existe para que no haga falta el instinto.)*
+> veces mientras tres preguntas seguían abiertas.)*
 
 > [!important] Una pregunta por mensaje
 > La presentación termina en la pregunta del nombre, sola. Cada pregunta de la entrevista va en
