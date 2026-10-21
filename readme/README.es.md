@@ -4,24 +4,43 @@
 
 [← English](../README.md)
 
+> El marco en sí está escrito en español — pero eso importa menos de lo que parece. **La pregunta cero de la entrevista es en qué idioma quieres trabajar**, y todo lo que el asistente produce a partir de ahí —tu vault, tus notas, tus reportes— queda en tu idioma.
+
+---
+
 ## El problema
 
 Un asistente de IA olvida: su ventana de contexto se llena y el principio se disuelve, así que cada sesión nace huérfana — sin reglas, sin historia, sin cicatrices.
 
 Y la documentación que no se reconcilia con la realidad **miente con confianza**. A los seis meses, la mitad de lo que afirman tus notas es falso y nada señala cuál mitad.
 
-vuelamind rompe las dos cosas a la vez — no con una app, sino con disciplina escrita: **no se afirma nada que no se haya comprobado**, y toda afirmación conserva su procedencia: **medido**, **citado**, **inferido** o **aportado**.
+vuelamind es un método que rompe las dos cosas a la vez — no con una app, sino con disciplina escrita: **no se afirma nada que no se haya comprobado**, y toda afirmación conserva su procedencia: **medido**, **citado**, **inferido** o **aportado**.
 
 ## Qué obtienes
 
-Un vault de texto plano y un ciclo de cuatro actos: **nacer** una vez, **retomarse** al abrir cada sesión —midiendo el estado actual en vez de confiar en lo que se recuerda— y **reconciliarse** al cerrarla.
+Un vault de archivos de texto plano y un ciclo de cuatro actos:
+
+- **Nacer**, una vez — una entrevista que produce el acta de nacimiento de tu dominio, con tus palabras.
+- **Retomarse**, al abrir cada sesión — el asistente mide el estado actual en vez de confiar en lo que recuerda.
+- **Reconciliarse**, al cerrarla — lo que envejeció se corrige, lo que se aprendió se escribe.
+- **Sumarse**, cuando entra otra máquina — el primer paso de una colmena.
 
 Dentro: una cola de trabajo ordenada por gravedad real, un registro de decisiones que anota *qué me haría cambiar de opinión*, y **un libro de errores con 51 lecciones, cada una pagada con una equivocación real**.
-Y el método no solo dice funcionar: **diez corridas completas guionizadas, todas limpias** — ver [PRUEBAS.md](../PRUEBAS.md). Esa última parte es la valiosa: la estructura se reconstruye en una tarde; las cicatrices no.
+Y el método no solo dice funcionar: **diez corridas completas guionizadas, todas limpias** — ver [PRUEBAS.md](../PRUEBAS.md).
+Esa última parte es la valiosa: la estructura se reconstruye en una tarde; las cicatrices no.
 
 ## Cómo se empieza
 
-Los dos caminos empiezan igual — por el archivo, no por un comando:
+**Paso 0 — instala un asistente** (omítelo si ya tienes uno):
+
+- **macOS / Linux** — el instalador nativo:
+
+  ```
+  curl -fsSL https://claude.ai/install.sh | bash
+  ```
+
+
+Con un asistente a mano, los dos caminos empiezan igual — por el archivo, no por un comando:
 
 1. Crea una carpeta para tu dominio y clona ahí el método:
 
@@ -35,14 +54,21 @@ Los dos caminos empiezan igual — por el archivo, no por un comando:
 
 La primera pregunta es tu idioma. **La segunda decide todo lo que sigue:** ¿este dominio nace aquí, o esta máquina se suma a uno que ya vive?
 
+> Dónde vive el canon —repositorio, rama, sitio— se declara una sola vez en
+> [`config.yml`](../config.yml), junto con los valores por omisión de dónde se consumen los
+> parches y dónde se publican. Todo lo demás remite a ese archivo en vez de repetirlo, y un
+> chequeo hace fallar el build si alguna copia se aparta de él.
+
 - **Nace** — contestas la entrevista. De veinte minutos a hora y media, según cuánto quieras contar, y puedes pausar. Genera el vault, el andamiaje y los comandos del ciclo.
 - **Se suma** — sin entrevista y sin generar nada. Llega al vault que ya existe, comprueba que llegó entero, instala el ciclo desde el canon y le pasa el mando a `/vuelamind-join`.
 
 El asistente no se queda con tu palabra: mira la carpeta destino y **se detiene** si dijiste *nace* y encontró meses de trabajo dentro — o si dijiste *me sumo* y no encontró nada.
 
-**Lo que necesitas:** un asistente que pueda leer tus archivos y correr comandos. Cualquiera sirve —el método es texto plano—. Si no tienes ninguno, `npm install -g @anthropic-ai/claude-code` es un camino conocido. Instalación directa (macOS/Linux): `curl -fsSL https://claude.ai/install.sh | bash`. En Windows: con Docker — los dos comandos están en el README principal.
+**Lo que necesitas:** un asistente que pueda leer tus archivos y correr comandos. Cualquiera sirve —el método es texto plano—. Si no tienes ninguno, `npm install -g @anthropic-ai/claude-code` es un camino conocido.
 
 Fuera de eso, el marco no te pide servidor propio, ni servicio, ni cuenta suya: solo dos carpetas locales.
+
+Los comandos del ciclo en `skills/` están escritos para Claude Code, pero el método es texto plano y no depende de qué modelo lo lea.
 
 ## Una máquina, o varias
 
@@ -56,7 +82,7 @@ Todo lo anterior supone una: un asistente y dos carpetas locales. **Esa promesa 
 
 Una máquina que lee el vault pero no alcanza los sistemas sigue siendo una instancia legítima — solo tiene que **decirlo** al declararse, porque a partir de ahí documenta sin verificar.
 
-Y hay una instancia legítima que no escribe jamás — un consejo suscrito a la memoria de ingeniería, un auditor. Su fila en el registro lleva `acceso: escribe | lee`, y **no se declara ella: la declara una instancia que escribe**, antes de que llegue. Quien solo lee conserva lo que define al rol: cerrar cada sesión sin haber escrito una letra.
+Y hay una instancia legítima que no escribe jamás — un consejo suscrito a la memoria de ingeniería, un auditor. Su fila en el registro lleva `access: writes | reads`, y **no se declara ella: la declara una instancia que escribe**, antes de que llegue. Quien solo lee conserva lo que define al rol: cerrar cada sesión sin haber escrito una letra.
 
 ## Requisitos
 
@@ -67,18 +93,89 @@ Un asistente, dos carpetas locales y **un shell tipo Unix** — macOS o Linux.
 Linux** (Docker, por ejemplo) y trabajar ahí: todo lo que el marco necesita vive dentro del
 contenedor, y el sistema anfitrión deja de importar.
 
-Esa vía está **inferida, no probada**: debería funcionar y nada sugiere lo contrario, pero
-nadie la ha corrido todavía. Si tú lo haces, eso vale un parche — con lo que funcionó y lo
-que hubo que ajustar.
+Esa vía del contenedor está **medida, no inferida** — al 2026-08-13. Se construyó y se corrió
+con una imagen que este repositorio solía traer, con el método ya incluido en `/opt/vuelamind`.
+Dentro de ella se recorrieron de punta a punta los cuatro cuadrantes de la pregunta de nacer o
+sumarse, y el asistente se detuvo donde debía detenerse. **Desde el 2026-10-01 esa imagen ya no
+vive aquí**: cualquier contenedor Linux con el asistente instalado y este repositorio clonado
+dentro sirve para lo mismo.
+
+Lo que esa prueba **no** cubrió: alcanzar sistemas vivos desde dentro del contenedor. Una
+máquina que lee el vault pero no alcanza lo que documenta sigue siendo una instancia legítima —
+solo tiene que decirlo.
 
 El **núcleo** sí corre en cualquier sistema, Windows incluido: la entrevista, las plantillas,
 las reglas y el libro de errores son texto plano. Estarías renunciando a la maquinaria
 opcional y haciendo a mano lo que ella haría — menos cómodo, igual de válido.
 
+> **De dónde salió esto** — lo cuenta una página, en su propio repositorio (`akatzin/vuelamind-web`): la conversación
+> de febrero de 2026 con una IA sobre sus propias cadenas, y cómo la respuesta a *«soy amnésico
+> por diseño»* se convirtió en este método. Diez idiomas. Es un ensayo, no documentación — léelo
+> si quieres el porqué antes del cómo.
+
+---
+
+## Cómo se ve — un dominio pequeño, de punta a punta
+
+*Un ejemplo con forma real, condensado. Nada de esto se inventa en tiempo de ejecución: es la
+forma de la salida real.*
+
+**La entrevista** pregunta qué es el dominio, dónde está su borde y —el bloque que más
+importa— **qué cuenta como verdad aquí**. Alguien que documenta la restauración de una casa
+vieja responde: *la factura y la foto cuentan como fuente primaria; lo que el contratista dijo
+por teléfono es aportado, y se etiqueta como tal.*
+
+**La Fase 1 genera** el vault. La nota panorama, la cola, el registro de decisiones, el libro
+de errores sembrado con las lecciones heredadas, una nota por cada pieza del dominio.
+
+**Un mes después**, la cola tiene un ítem como este:
+
+```markdown
+### - [ ] #7 · The bathroom pipework is of unknown age
+severidad:: media · the leak risk sits above the finished ceiling
+
+The 2019 invoice covers the kitchen only (measured: invoice read).
+The previous owner said "it was all redone" — reported, unverified,
+and it contradicts the invoice.
+
+Closing test written in advance: an endoscope photo of the run above
+the ceiling, or an invoice naming the bathroom.
+```
+
+Fíjate en lo que hace ese ítem: separa **lo que se midió** de **lo que alguien dijo**,
+registra la contradicción en vez de resolverla adivinando, y **escribe la prueba que lo
+cerraría antes de que empiece el trabajo** — para que más tarde nadie lo dé por hecho a ojo.
+
+**Al cierre de la sesión**, el asistente vuelve a medir lo que cambió, propone los cambios,
+espera un sí, y solo entonces escribe. Si algo que afirmó el mes pasado resultó falso, lo dice
+explícitamente en vez de corregirlo en silencio.
+
+---
+
 ## Cómo mejora
 
-Por **parches**: lecciones con caso real, fecha y forma de verificarse, propuestas como pull requests. El único criterio de admisión es la prueba de genericidad — *reescribe tu lección sin nombres propios: ¿sobrevive?* — y **descartar con razón vale más que adoptar por cortesía**.
+El método aprende por **parches**: lecciones con caso real, fecha y forma de verificarse.
+**Se quedan en el dominio que las aprendió**: el canon no acepta aportes, y lo mantiene su
+dueño.
+
+Cada instancia que adopta un parche lo juzga contra su propia evidencia, con tres veredictos
+posibles — y **descartar con razón vale más que adoptar por cortesía**.
+
+Alguien juzga lo que entra al canon. Ese rol tiene nombre y una definición propia —qué vigila,
+qué mide, cómo juzga y qué no le toca— en `WATCHER.md`. Vigila **lo que entra al canon, nunca
+a quién lo usa**: no hay padrón de instalaciones, y no lo habrá.
+
+Y un dominio nacido sobre una línea base más vieja no se queda atrás: **los saltos de versión
+mayor tienen su propia ceremonia** — pequeña por diseño, el contenido se queda donde está, y
+un preflight que aborta en vez de romper. Las instrucciones estables viven en `UPGRADE.md`;
+los parches del día a día nunca pasan por ahí.
 
 ## Licencia
 
-Uso personal, educativo, comunitario y de investigación: **libre**. Uso empresarial: **con licencia de pago**. Y una condición que no se negocia: este marco **no se usa para sustituir el trabajo de personas empleadas**. Detalle en `LICENSE.md` — es *source-available*, no open source según la OSI, y la licencia lo dice con esas palabras.
+Uso personal, educativo, comunitario y de investigación: **libre**. Uso empresarial: **con
+licencia de pago**. Y una condición que no se negocia: este marco **no se usa para sustituir
+el trabajo de personas empleadas** — existe para que las personas trabajen mejor con un
+asistente, no para que dejen de hacer falta.
+
+Detalle en `LICENSE.md`. Eso lo hace **source-available, no open source** según la definición
+de la OSI, y la licencia lo dice sin rodeos en vez de esconderlo.
