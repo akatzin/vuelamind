@@ -665,7 +665,7 @@ Todo vive en el proyecto (Bloque E), y nada se comparte entre dominios:
    > Por eso el nivel personal se reserva para lo verdaderamente universal, y
    > todo lo que mencione una ruta o un nombre de archivo de un dominio baja
    > al proyecto. *(Y en cualquier otra herramienta: mide la dirección, no la
-   > supongas. Esta suposición se dio por obvia y salió falsa.)*
+   > supongas.)*
 
    **Vacío de comandos de dominio, no vacío del todo.** Arriba vive la familia del
    método —los comandos con su prefijo, ver *El ciclo completo*— y vive ahí
@@ -676,24 +676,24 @@ Todo vive en el proyecto (Bloque E), y nada se comparte entre dominios:
 2. **Si la herramienta exige que la memoria esté en una ruta suya, apúntala hacia acá**, no muevas la carpeta allá. Un enlace simbólico desde la ruta que la herramienta espera hacia `memory/` deja el archivo real en territorio que tú controlas. *(Verifica que la herramienta siga el enlace: es una suposición hasta que lo pruebes — ver la lección 4.)*
 3. **Nada se comparte entre dominios por default.** Si algo debe compartirse —una convención, una plantilla— se copia a propósito y se anota en `Decisiones.md` que ahora existe en dos lados y hay que mantener los dos.
 4. **Los borradores viven EN el vault, y se referencian.** El material a medio hacer —el
-   diseño de un feature, la idea que aún no es folio, el cuerpo de una propuesta— existe
-   por algo, y **todo lo que el método sabe hacer depende del grafo**: un borrador fuera
+   diseño de un feature, la idea que aún no es folio, el cuerpo de una propuesta— entra
+   al grafo porque **todo lo que el método sabe hacer depende del grafo**: un borrador fuera
    del vault no es enlazable, ningún nodo lo cita, ningún barrido lo pisa, y una búsqueda
    hecha exactamente como el método manda devuelve un resultado incompleto **sin señal de
    que falta algo**. La regla: cada borrador con fila en el índice del taller
    (`borradores/0_Borradores.md`: borrador · qué es · nota dueña) y las piezas vivas
    citadas desde su nota dueña. Al fusionarse o superarse, la fila lo declara — no se
-   borra. *(Parche `los-borradores-viven-en-el-vault`: en el dominio de origen, el modelo
-   de diseño más importante del track de crecimiento vivió en una carpeta fuera del vault
-   y una búsqueda desde el nodo correcto falló — 43 de 50 borradores estaban huérfanos.)*
+   borra. *(Parche `los-borradores-viven-en-el-vault`: medido en el dominio de origen, un
+   modelo de diseño fuera del vault no apareció en una búsqueda desde el nodo correcto, y
+   43 de 50 borradores estaban huérfanos.)*
 
 > [!warning] Lo que pasa si te saltas esto
-> El vault de origen llegó a **cuatro carpetas** para un solo
-> dominio: el vault, los scripts, la memoria y los comandos — estos dos
-> últimos en rutas que la herramienta impone. Funciona perfecto con un
-> dominio. Con el segundo, los comandos chocan (son globales), la memoria
-> necesita una carpeta nueva porque su ruta lleva el nombre del proyecto
-> adentro, y de pronto administras siete carpetas para dos dominios.
+> Medido en el vault de origen: **cuatro carpetas** para un solo
+> dominio —el vault, los scripts, la memoria y los comandos, estos dos
+> últimos en rutas que la herramienta impone—, que con uno funcionan y
+> con el segundo son **siete**: los comandos chocan (son globales) y la
+> memoria necesita una carpeta nueva porque su ruta lleva el nombre del
+> proyecto adentro.
 
 ### 1.1 — Los archivos
 
@@ -893,11 +893,10 @@ trabajo.
 | 1 | El enlace de la memoria | Si está roto, la sesión arranca **sin historia** y nadie se entera |
 | 2 | Estado del vault | Pendientes abiertos, para saber dónde se retoma |
 
-> [!danger] La regla que hace que sirva: nunca reportar verde por no haber podido
+> [!danger] Nunca reportar verde por no haber podido
 > Si una comprobación **no se pudo hacer** —el destino no responde, falta un
 > archivo— tiene que decirlo con esas palabras. Un arranque que calla cuando no
-> pudo comprobar **enseña a ignorarlo**, y entonces deja de ser un arranque y pasa
-> a ser decoración.
+> pudo comprobar **enseña a ignorarlo**.
 >
 > Si el script devuelve un valor a otro programa, distingue **tres** resultados,
 > no dos: *bien*, *mal* y **no se pudo saber**.
@@ -941,10 +940,10 @@ rojo (pregunta, y la negativa cancela). Las ramas con terminal se prueban **con 
 pty de verdad** —`script -q /dev/null` en macOS y BSD, `script -qec` en Linux— y
 un ejecutable señuelo delante en el `PATH`, para no lanzar una sesión anidada;
 después se borra el señuelo y **se comprueba que el nombre vuelve a resolver al
-binario real**. Verificar la rama interactiva *"por inspección"* es exactamente
-como se coló este defecto la primera vez.
+binario real**. Verificada *"por inspección"*, la rama interactiva dejó pasar este
+defecto.
 
-**Dos detalles que cuestan un rato si se descubren en caliente:**
+**Dos detalles:**
 
 - **Los argumentos pasan tal cual** al asistente, para no perder sus modos de
   arranque —retomar la sesión anterior, elegir una— por haberlos envuelto.
@@ -976,10 +975,10 @@ El cierre de sesión se reparte en dos piezas, y la frontera entre ellas es exac
 
 Esta fase genera **el manifiesto**; el motor ya existe. La medición que justificó el reparto: el comando de cierre del dominio de origen resultó ser **92.5% método y 7.5% ataduras** — 29 líneas de dominio en 386. Copiar el método entero para tropicalizar ese 7.5% produce copias que divergen en silencio.
 
-> [!danger] La precedencia va al revés de lo intuitivo, y por eso esto es un paso y no un consejo
+> [!danger] La precedencia va al revés de lo intuitivo: este paso es obligatorio
 > El nivel **personal ensombrece al del proyecto** — *"enterprise overrides personal, and personal overrides project"*—, así que un comando de reconciliación puesto arriba **impide que el de cada dominio corra**, y lo hace **en silencio**: el dominio nuevo invoca su nombre y obtiene el comando del dominio viejo, que empieza a escribir usando **las rutas y los nombres de nota de otro vault**.
 >
-> No es teórico. En el dominio de origen, un `checkpoint` con las rutas de su dominio vivió ocho días en el nivel personal; una segunda instancia se quejó de que su cierre le tocaba el vault ajeno y **tuvo que inventarse un comando con otro nombre**, que es el único rodeo posible cuando el nombre correcto está ensombrecido desde arriba. La consecuencia estaba **escrita y verificada** desde el primer día, y aun así se leyó como argumento para dejarlo todo arriba.
+> Medido en el dominio de origen: con un `checkpoint` de rutas de su dominio en el nivel personal, el cierre de una segunda instancia tocaba el vault ajeno. **Cuando el nombre correcto está ensombrecido desde arriba, el único rodeo posible es un comando con otro nombre.**
 
 **El criterio, que es lo único que hay que recordar:**
 
@@ -987,7 +986,7 @@ Esta fase genera **el manifiesto**; el motor ya existe. La medición que justifi
 |---|---|
 | Todo lo que **nombre algo de este dominio**: rutas del vault, nombres de nota, su validador, su acceso | Solo lo que **no nombre ninguno** y sirva igual a todas las instancias |
 
-Y dos corolarios que ya se cobraron caro:
+Y dos corolarios:
 
 - **Un alias vive con su principal.** Si el comando de cierre baja, su sinónimo baja con él; si no, queda arriba apuntando a algo que en otro dominio no existe.
 - **Revisa los que nunca se han quejado.** El silencio no prueba que estén bien: en el dominio de origen, un comando auxiliar tenía **siete** referencias al dominio y nadie lo había notado, porque ningún otro dominio lo había invocado todavía.
@@ -1051,7 +1050,7 @@ Los comandos del ciclo no se escriben ni se copian de otro dominio: **se instala
 
 **La familia se reconoce por su prefijo, y el nivel compartido aloja exactamente la familia.** Todo comando del método lleva el prefijo del método; todo comando sin prefijo vive en el proyecto de su dominio aunque sea genérico — así el reparto se lee en el nombre, y un censo que encuentre un intruso en cualquiera de los dos lados lo reporta como hallazgo.
 
-**No uses enlaces simbólicos hacia el canon.** Un symlink guarda su destino como ruta absoluta, y esa ruta cambia de máquina: llega roto de fábrica a cualquier otra. *(En el dominio de origen: un atajo así viajó por la réplica y llegó apuntando a una ruta inexistente — se retiró el mismo día.)* Copia con huella, no atajo.
+**No uses enlaces simbólicos hacia el canon.** Un symlink guarda su destino como ruta absoluta, y esa ruta cambia de máquina: llega roto de fábrica a cualquier otra. *(En el dominio de origen: un atajo así viajó por la réplica y llegó apuntando a una ruta inexistente.)* Copia con huella, no atajo.
 
 Sin esta fase, un dominio nuevo nace con manifiesto (1.3) **y sin nada que lo lea** — el manifiesto es la configuración de un motor que ninguna fase instaló.
 
@@ -1076,8 +1075,7 @@ Sin esta fase, un dominio nuevo nace con manifiesto (1.3) **y sin nada que lo le
 > **Y el piso no se sube:** el marco tiene que seguir funcionando para quien solo pega esta
 > plantilla en un contexto nuevo. **El caso sin herramienta no desaparece** —la máquina que no
 > puede clonar por política, el entorno que no la tiene— así que su camino manual **se
-> conserva escrito**. Si al delegar se borra la ruta manual, no se mejoró: se cambió una
-> dependencia por otra.
+> conserva escrito**.
 >
 > **Lo que NO absorbe la herramienta:** la `version:` declarada de cada parche —el historial no
 > puede avisarle a una instancia que *"el parche que aplicaste como v1 cambió"* si ella solo
