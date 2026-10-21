@@ -142,6 +142,8 @@ no_verificado: [<una línea por cosa>, ...]
 ---
 ```
 
+**El frontmatter tiene que ser YAML válido**, y se comprueba cargándolo antes de empacar. Un valor con `: ` dentro, como una URL, va entre comillas dobles; el patrón de rutas, entre comillas simples, porque sus barras invertidas no son escapes de YAML.
+
 Toda ruta de `piezas`, `respaldos_manuales` y `se_ejecuta` es relativa a la raíz del zip. **Lo de `se_ejecuta` el destino lo revisa antes de activarlo**: importar un dominio es ejecutar lo que otro escribió.
 
 ## Qué NO hace
