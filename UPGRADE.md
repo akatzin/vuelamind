@@ -79,9 +79,9 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 ```
   v3.0 ──┬── v3.4  el canal        RETIRADO en la v3.9.2 (2026-10-12)
          │
-         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0
+         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1
          │
-         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0   sin pasar por la v3.5
+         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1   sin pasar por la v3.5
 ```
 
 > [!important] Las versiones se comparan por segmentos, como enteros — nunca como decimales
@@ -108,6 +108,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 > **De ahí la ruta corta desde la v3.0: trae el master de la más alta y corre
 > `UPGRADE_v3.9.3.md`**, que reinstala los comandos desde `skills/`, **y después
 > `UPGRADE_v3.10.0.md`**, que vuelve a copiar `ALMA.md` e instala `vuelamind-export`.
+> La v3.10.1 solo pide traer el canon.
 
 | Salto | Documento | Estado |
 |---|---|---|
@@ -122,6 +123,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 | v3.5 → v3.9.2 | `UPGRADE_v3.9.2.md` | **Liberado** — la mensajería entre instancias se depreca: `canal/` y el skill `vuelamind-mensajeria` pasan a `deprecated/` (de 11 skills a 10), y el master marca la nota de la v3.4 como retirada. Menor. **Requiere los artefactos de la v3.5**; su master ya incluye de la v3.6 a la v3.9.1 |
 | v3.0 → v3.9.3 | `UPGRADE_v3.9.3.md` | **Liberado** — el aprendizaje es local (`vuelamind-learn` y el buzón se retiran), la réplica sale del canon y `vuelamind-accidente` se retira (de 10 skills a 8). La Fase 1 se renumera. Menor. **Ya no requiere la v3.5** |
 | v3.9.3 → v3.10.0 | `UPGRADE_v3.10.0.md` | **Liberado** — el marco sin narrativa: el master dice el hecho y la regla, `ALMA.md` pasa a la 1.1 (el aprendizaje es local) y entra `vuelamind-export` (de 8 skills a 9). Menor. **Requiere la v3.9.3**; no cambia el manifiesto |
+| v3.10.0 → v3.10.1 | `UPGRADE_v3.10.1.md` | **Liberado** — `comprobar_skills.py` sale con 1 también si falta un skill del inventario. Menor. **Requiere la v3.10.0**; solo se trae el canon |
 
 ## Fuera de la cadena: lo que salió del canon
 
