@@ -1149,10 +1149,9 @@ se saltó el 3 rellena el hueco con lo que parezca razonable — que es la
 definición exacta de inventar. Las tres formas producen frases seguras de sí
 mismas, y por eso ninguna se delata sola.
 
-*(2026-08-15: un asistente se saltó el paso 1, hizo del paso 2 una sonda a un
-nombre supuesto, y emitió una recomendación de compra — de hardware que el
-dominio ya tenía, documentado con modelo y número de serie. La lección 42 del
-libro guarda el caso.)*
+*(Medido, lección 42: un asistente se saltó el paso 1, hizo del paso 2 una sonda a un nombre
+supuesto y recomendó comprar hardware que el dominio ya tenía, documentado con modelo y número
+de serie.)*
 
 **Y un caso donde el paso 2 tiene una trampa: la intención en curso también es estado.**
 
@@ -1401,9 +1400,8 @@ Las **adoptadas** y **descartadas** se mueven a `Decisiones.md` con su razonamie
 
 > [!note] Es el mismo argumento que sostiene los comandos
 > *Un párrafo se lee cuando alguien se acuerda; un comando está en el camino de
-> todos los días.* El marco usó esa frase para justificar que nacer y retomar
-> fueran comandos y no secciones de un archivo — y luego dejó las ideas viviendo
-> en una sección de archivo. Toda la maquinaria de esta sección sirve para
+> todos los días.* Es la razón por la que nacer y retomar son comandos y no secciones de un
+> archivo, y vale igual para las ideas: toda la maquinaria de esta sección sirve para
 > **archivar bien algo que nadie volverá a mirar** si la salida no existe.
 
 ### 5. Confidencialidad
