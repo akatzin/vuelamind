@@ -79,9 +79,9 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 ```
   v3.0 ──┬── v3.4  el canal        RETIRADO en la v3.9.2 (2026-10-12)
          │
-         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2
+         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3
          │
-         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2   sin pasar por la v3.5
+         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3   sin pasar por la v3.5
 ```
 
 > [!important] Las versiones se comparan por segmentos, como enteros — nunca como decimales
@@ -125,6 +125,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 | v3.9.3 → v3.10.0 | `UPGRADE_v3.10.0.md` | **Liberado** — el marco sin narrativa: el master dice el hecho y la regla, `ALMA.md` pasa a la 1.1 (el aprendizaje es local) y entra `vuelamind-export` (de 8 skills a 9). Menor. **Requiere la v3.9.3**; no cambia el manifiesto |
 | v3.10.0 → v3.10.1 | `UPGRADE_v3.10.1.md` | **Liberado** — `comprobar_skills.py` sale con 1 también si falta un skill del inventario. Menor. **Requiere la v3.10.0**; solo se trae el canon |
 | v3.10.1 → v3.10.2 | `UPGRADE_v3.10.2.md` | **Liberado** — `vuelamind-export` declara `alias` y `raiz_alias`: las rutas con que otra máquina nombra la misma pieza, como en una réplica. Menor. **Requiere la v3.10.1**; no cambia el manifiesto |
+| v3.10.2 → v3.10.3 | `UPGRADE_v3.10.3.md` | **Liberado** — no cambia nada: es la versión de prueba del aviso de versión nueva. Menor. **Requiere la v3.10.2**; solo se trae el canon |
 
 ## Fuera de la cadena: lo que salió del canon
 
