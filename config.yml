@@ -1,7 +1,7 @@
 # Configuración del canon — vuelamind
 #
-# Este archivo declara UNA VEZ dónde vive el canon y por dónde entran los
-# parches. Todo lo demás lo referencia en vez de repetirlo.
+# Este archivo declara UNA VEZ dónde vive el canon. Todo lo demás lo
+# referencia en vez de repetirlo.
 #
 # Por qué existe: la URL del repositorio estaba escrita a mano en once lugares
 # —el README, sus nueve traducciones y el archivo de textos del micrositio (que desde el
@@ -29,32 +29,15 @@ canon:
   clonar: git clone https://github.com/akatzin/vuelamind.git
 
 parches:
-  # DESTINO por omisión de las dos direcciones. `canon` significa: el
-  # repositorio declarado arriba. Esto responde "¿a cuál?", no "¿lo hago?".
+  # De dónde se trae el método. `canon` es el repositorio declarado arriba.
   consumir_de: canon
-  publicar_en: canon
-  via: pull request
+  # El aprendizaje es local desde la v3.9.3: cada dominio escribe sus parches en
+  # su propio vault y ahí se quedan. El canon no recibe aportaciones.
+  publicar_en: ninguno
 
-  # La diferencia entre las dos direcciones NO es cosmética, y este archivo no
-  # la deroga: consumir es de solo lectura y no expone nada del dominio, así
-  # que se adopta por omisión. PUBLICAR SIGUE SIENDO OPT-IN — un parche lleva
-  # su caso, y el caso cuenta algo del dominio que lo escribió. Lo que se manda
-  # no se puede des-mandar.
-  #
-  # O sea: `publicar_en: canon` dice A DÓNDE va si el dominio dijo que sí. No
-  # dice que haya dicho que sí. Esa respuesta vive en el manifiesto de cada
-  # dominio, y mientras no exista, el valor es `ninguno`.
-  publicar_es_opt_in: true
-
-  # Un dominio puede apartarse de los valores por omisión —una bifurcación
-  # privada, una organización con su propio canon interno— y entonces lo
-  # declara en SU manifiesto, no aquí. Este archivo describe el canon público;
-  # cada dominio registra a cuál se adhirió.
-  #
-  # Y una asimetría que conviene tener escrita: consumir y publicar son
-  # decisiones SEPARADAS. Un dominio puede consumir del canon público y
-  # publicar sólo hacia adentro; lo que no puede es publicar hacia afuera sin
-  # decirlo, porque un parche que sale lleva el caso de quien lo escribió.
+  # Un dominio que consuma de otro canon —una bifurcación privada, el canon
+  # interno de una organización— lo declara en SU manifiesto, no aquí. Este
+  # archivo describe el canon público.
 
 licencia:
   # Se nombra aquí porque viaja con cada copia y con cada derivado.
