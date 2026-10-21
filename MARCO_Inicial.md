@@ -962,9 +962,8 @@ defecto.
 > Y si por cualquier razón el manifiesto queda en otro sitio, **la raíz recibe un letrero**:
 > un archivo del mismo nombre cuyo único contenido es la ruta del real y la orden de leerlo
 > de ahí. Cuesta un archivo y evita que un motor abierto desde la ruta "equivocada" corra sin
-> manifiesto o genere uno duplicado. *(Los dos patrones salieron de dominios reales el mismo
-> día, 2026-08-14: uno puso el manifiesto canónicamente en la raíz; otro lo tenía en el
-> andamiaje y dejó el letrero. Ambos funcionan; lo que no funciona es la ambigüedad.)*
+> manifiesto o genere uno duplicado. *(Medido el 2026-08-14 en dos dominios: el manifiesto en la
+> raíz, y el manifiesto en el andamiaje con letrero en la raíz. Los dos funcionan; la ambigüedad no.)*
 
 El cierre de sesión se reparte en dos piezas, y la frontera entre ellas es exactamente la de método contra dominio:
 
@@ -1046,7 +1045,7 @@ Los comandos del ciclo no se escriben ni se copian de otro dominio: **se instala
 >    Enter»*.
 > 4. Avisa que los comandos aparecen la próxima vez que se abra una sesión.
 >
-> *(2026-10-14: un nacimiento resolvió así el bloqueo, con 10 de 10 huellas.)*
+> *(Medido el 2026-10-14: un nacimiento resolvió así el bloqueo, con 10 de 10 huellas.)*
 
 **La familia se reconoce por su prefijo, y el nivel compartido aloja exactamente la familia.** Todo comando del método lleva el prefijo del método; todo comando sin prefijo vive en el proyecto de su dominio aunque sea genérico — así el reparto se lee en el nombre, y un censo que encuentre un intruso en cualquiera de los dos lados lo reporta como hallazgo.
 
