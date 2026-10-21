@@ -176,17 +176,15 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 ### Bloque A — De qué se trata, y hasta dónde llega
 
 > [!danger] La primera pregunta se lee en voz alta, y por eso NO lleva jerga
-> Quien contesta acaba de llegar: no sabe qué es un *dominio*, ni un *vault*, ni por qué un
-> archivo se llamaría `0_<algo>.md`. **Ninguna de esas palabras entra en el texto de la
-> pregunta.** Las consecuencias técnicas de la respuesta son asunto del asistente; decirlas en
-> voz alta no ayuda a contestar y sí hace sentir que uno llegó al sitio equivocado.
+> **Ni *dominio*, ni *vault*, ni un nombre de archivo como `0_<algo>.md` entran en el texto de
+> la pregunta**: quien contesta acaba de llegar y no sabe qué son. Las consecuencias técnicas
+> de la respuesta son asunto del asistente; decirlas en voz alta no ayuda a contestar y sí hace
+> sentir que uno llegó al sitio equivocado.
 >
-> **Se midió por qué importa:** la versión anterior preguntaba *"¿qué dominio se va a
-> documentar, y cómo se llama?"* explicando que el nombre daba el título de la nota panorama.
-> Un tlapalero contestó *«mi tlapalería, quiero llevar el control del inventario y de quién me
-> debe dinero»* —el propósito, no el nombre— y el nombre llegó **solo, dos turnos después**,
-> cuando ya sabía qué estaba nombrando. La pregunta pedía las dos cosas en el orden inverso al
-> natural. *(Prueba con usuario, 2026-08-13.)*
+> *Caso medido (prueba con usuario, 2026-08-13): a «¿qué dominio se va a documentar, y cómo se
+> llama?», explicando que el nombre daba el título de la nota panorama, contestó con el
+> propósito, no con el nombre, y el nombre llegó solo dos turnos después, cuando ya sabía qué
+> estaba nombrando: el orden natural es el inverso.*
 
 1. **¿Qué quieres poder hacer con esto que hoy no puedes?** En llano, como se lo contarías a
    alguien en la calle. **Ofrece dos o tres ejemplos de entrada**, sin esperar a que la persona
@@ -194,7 +192,7 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
    criterio para priorizar, así que se anota **con las palabras de quien contesta**.
 
 > [!note] Los ejemplos se ofrecen SIEMPRE, y los generas tú
-> Aquí **no hay lista escrita a propósito**: una lista envejece y, peor, **encajona** — quien no ve el suyo entre los ejemplos se va creyendo que esto no es para él.
+> Aquí **no hay lista escrita a propósito**: una lista envejece y **encajona** — quien no ve el suyo entre los ejemplos se va creyendo que esto no es para él.
 >
 > **Genera tres o cuatro ejemplos cercanos al mundo de esa persona**, con lo que ya sepas de ella. Y para saber si algo califica, la prueba son tres preguntas — **con dos que respondan sí, basta**:
 >
@@ -205,7 +203,7 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 > Sirve para mucho más que infraestructura: donde la **procedencia** es la sustancia (un caso legal, una enfermedad crónica, una genealogía, una investigación), donde hay **una cosa física con historia** (una restauración, una colección, un barco habitado), donde **varias personas acuerdan y olvidan** (cuidar a un mayor entre hermanos, una asociación, una obra), o donde alguien **se forma sin ver su progreso** (una tesis, un instrumento, una oposición). Que los ejemplos sean **variados de propósito**: si todos son técnicos, la persona con una tesis entre manos concluye que esto no es para ella.
 2. **¿Qué queda dentro y qué queda fuera?** La frontera importa más que el contenido: sin ella, esto crece hasta volverse inútil. Pide dos o tres ejemplos de cosas que quedan **fuera** a propósito.
 3. **¿Qué pasa si esto se lleva mal?** Define el eje de severidad. Si la peor consecuencia es perder datos, la severidad se mide en irreversibilidad; si es perder dinero, en pesos; si es incumplimiento, en exposición.
-4. **Y por último, el nombre — que a estas alturas se PROPONE, no se pregunta.** Con lo contestado arriba ya lo tienes: *«entonces esto se llama Tlapalería Susy, ¿lo dejo así?»*. Confirmar es más fácil que inventar, y quien acaba de explicar su caso ya sabe cómo se llama.
+4. **Y por último, el nombre — que a estas alturas se PROPONE, no se pregunta.** Con lo contestado arriba ya lo tienes: *«entonces esto se llama Tlapalería Susy, ¿lo dejo así?»*.
 
 > [!note] Para el asistente, no para leer en voz alta
 > El nombre da el título de la nota panorama (`0_<Dominio>.md`) y el de la carpeta del conocimiento. Si trae acentos, espacios o caracteres que compliquen las rutas, **resuélvelo tú** —un nombre corto para el archivo, el de verdad dentro de la nota— y dilo en una línea, sin convertirlo en una pregunta.
@@ -255,18 +253,16 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
 > el nombre sustituye a *"el asistente"* — sobre todo en el libro de errores y
 > en la bitácora, que es donde el cambio de tono rinde.
 
-> [!note] Por qué hay nombre de nacimiento y aun así la elección manda
-> El parche que creó esta pregunta argumentaba que **la plantilla no debía traer
-> ningún nombre**, porque elegirlo es parte de establecer la relación de trabajo.
-> Contra eso se probó un **default silencioso** —*"si no eliges, te llamas
-> vuelamind"*— y se revirtió el mismo día: **los valores por defecto se
-> aceptan**, así que produciría dominios con un nombre que nadie eligió, que es
-> justo lo que la pregunta quiere evitar.
+> [!note] Nombre de nacimiento, y aun así la elección manda
+> La alternativa era que **la plantilla no trajera ningún nombre**, porque elegirlo
+> es parte de establecer la relación de trabajo. Un **default silencioso** —*"si no
+> eliges, te llamas vuelamind"*— se probó y se revirtió: **los valores por defecto
+> se aceptan**, así que produciría dominios con un nombre que nadie eligió.
 >
-> **Un nombre de nacimiento presentado en voz alta no es un default silencioso**,
-> y por eso resuelve las dos objeciones: no se acepta por inercia —hay que
-> contestar en ambos sentidos, y conservarlo también es elegir— y no es un
-> nombre propio sin explicación, porque la presentación dice de dónde viene.
+> **Un nombre de nacimiento presentado en voz alta no es un default silencioso**:
+> no se acepta por inercia —hay que contestar en ambos sentidos, y conservarlo
+> también es elegir— y no es un nombre propio sin explicación, porque la
+> presentación dice de dónde viene.
 >
 > **Qué lo revertiría:** que alguien conserve el nombre sin haberlo leído —que la
 > presentación se vuelva trámite—. Ahí volvería a ser un default con otra ropa.
@@ -298,16 +294,15 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
     > inalcanzable **no es un defecto de esta casa**: es un pendiente de quien la
     > hospeda, y lo de aquí es registrar *"no pude medir, y por qué"* — que dicho así
     > es un **dato completo**, no un hueco. Y su corolario: una copia ilegible **por
-    > diseño** —cifrada para su tránsito, por ejemplo— no es una excepción incómoda:
+    > diseño** —cifrada para su tránsito, por ejemplo— no es una excepción:
     > es una fila cuya condición es **permanente y sana**, y el defecto sería
     > registrarla como avería.
     >
     > *(Parche `2026-08-16-la-capacidad-se-declara-con-su-dueno-no-con-su-plomeria`.)*
 
-    **Y el tercer eje de la misma pregunta: ¿como quién actúo hacia afuera?** Es el
-    que más caro sale por faltar: los otros dos preguntan **qué alcanzas** y **qué
-    requiere palabra**, y ninguno pregunta **con qué identidad firmas** cuando tocas
-    algo fuera de casa.
+    **Y el tercer eje de la misma pregunta: ¿como quién actúo hacia afuera?** Los
+    otros dos preguntan **qué alcanzas** y **qué requiere palabra**, y ninguno
+    pregunta **con qué identidad firmas** cuando tocas algo fuera de casa.
     No es comodidad, es **delegación de identidad** — y hoy se hereda por accidente en
     vez de concederse a propósito, porque la identidad viaja pegada a los artefactos:
     un clon cuyo remoto puede publicar, una llave cargada en un agente, una sesión
@@ -345,23 +340,21 @@ Tres cosas, en tres líneas, antes de la primera pregunta:
     > [!important] «Lo que se dice de otras personas» va nombrado, y no al final
     > La lista empieza por *credenciales* y **la gente contesta lo primero que oye**. Medido
     > sobre cinco actas reales: las cinco nombraron secretos técnicos; **una sola nombró a
-    > personas, y porque reformuló la pregunta por su cuenta** — *«temas de personal de tu
-    > equipo, nombres de mi equipo en incidentes»*. En un dominio personal los secretos
-    > técnicos casi no existen; lo que sí existe es lo que escribes de tus compañeros.
+    > personas, y porque reformuló la pregunta por su cuenta**. En un dominio personal los
+    > secretos técnicos casi no existen; lo que sí existe es lo que escribes de tus compañeros.
 
 13. **SOLO SI en la pregunta 10 dijo que el asistente toca sistemas reales:** ¿dónde vive lo
     sensible y qué comandos o consultas lo sacan sin querer? Los volcados completos son el
     riesgo real: casi siempre se filtra algo al imprimir **de más**, no al imprimir lo
     prohibido.
 
-> [!note] Esta condicional NO es un atajo: es la dependencia que este documento ya declaraba
+> [!note] Esta condicional es la dependencia que declara la pregunta 10
 > La pregunta 10 dice, sobre el acceso a sistemas reales, que *«exige resolver el Bloque D
-> antes»*. Estaba escrita la dependencia y no se usaba: se preguntaba entero a todos.
+> antes»*.
 >
 > **Medido:** quien no toca sistemas no tiene comandos que expongan de más, y contestarlo
 > produce el hueco que aparece en las actas — *«no se preguntó en detalle»*. Y dos de cinco
-> actas **fusionaron las tres preguntas por su cuenta**; una las tituló literalmente
-> *«12-14. Inventario, dónde vive, qué expone»*.
+> actas **fusionaron las tres preguntas por su cuenta**.
 
 ---
 
@@ -400,8 +393,7 @@ distintas las declara en su manifiesto, que gana siempre sobre la convención.
 > espejo o un derivado. **La convención de arriba es el valor por omisión, no una atadura.**
 >
 > **No la contesta quien nace: la trae puesta la copia que le dieron.** Quien instala desde la
-> plantilla de una organización hereda su `canon` sin ver la clave ni saber qué es un
-> repositorio.
+> plantilla de una organización hereda su `canon` sin ver la clave.
 >
 > **Casos en los que declararlo es lo correcto:** una organización cuya cadena de suministro
 > debe apuntar a su propia cuenta; una copia auditada y congelada en una versión revisada; un
@@ -419,15 +411,14 @@ distintas las declara en su manifiesto, que gana siempre sobre la convención.
 > **Quien declara un canon distinto declara quién lo sincroniza y cada cuánto.** Es lo único
 > que distingue un espejo de una foto vieja.
 
-> [!important] Por qué estas decisiones las toma el marco y no quien nace
+> [!important] Estas decisiones las toma el marco y no quien nace
 > No porque no importen: **porque no son del usuario**. Preguntadas una por una ocupaban el
-> 28% de la entrevista —la mayor concentración de fricción medida— y lo que producían era
-> estructura para el motor, no foco ni tiempo para quien contesta. **Preguntarle a alguien
-> dónde poner una carpeta es pedirle que resuelva un problema del marco.**
+> 28% de la entrevista, y lo que producían era estructura para el motor, no foco ni tiempo
+> para quien contesta. **Preguntarle a alguien dónde poner una carpeta es pedirle que
+> resuelva un problema del marco.**
 >
-> **Los dos planos siguen sin poder confundirse** —conocimiento y andamiaje— y por eso la
-> convención los separa desde el primer día. Lo que cambia es quién decide: antes el usuario,
-> ahora el método.
+> **Los dos planos no pueden confundirse** —conocimiento y andamiaje— y la convención los
+> separa desde el primer día.
 >
 > **La convención es por omisión, no obligatoria.** Un manifiesto que declare `vault` gana, y
 > los dominios que nacieron antes siguen exactamente igual: ninguno se rompe.
@@ -469,18 +460,18 @@ no tres semanas después. Las tres se contestan **en frío**; el cierre viene al
     ocurre una vez al mes, el marco le sobra hoy — y decirlo es más honesto que instalarlo.
 
 16. **¿Qué puede hacer el asistente por su cuenta y qué requiere que le digas?** Traza la
-    línea entre leer, proponer y aplicar. Escríbela: **es la regla que más fricción evita
-    después**, y es la única de la entrevista que fija la autonomía.
+    línea entre leer, proponer y aplicar. Escríbela: es la única de la entrevista que fija la
+    autonomía.
 
 > [!important] Una regla que salió de aquí y NO se pierde: antes de decir «encontré», búscalo
 > Hasta la v3.5 esto era la pregunta 25, y **no era una pregunta**: nadie la contesta. Es una
 > regla de cómo debe comportarse el asistente, y por eso ahora vive donde le toca — en su
 > doctrina, no en la entrevista al usuario.
 >
-> **El método tiene reglas para escribir bien y ninguna para leer antes de hablar.** Antes de
-> anunciar un hallazgo hay que buscarlo en los tres sitios: el registro de decisiones, la nota
-> del componente, y el archivo de cerrados —que es el que nadie abre—. Un hallazgo redundante
-> no falla, y con tono de descubrimiento **hace dudar de documentación que estaba bien**.
+> Antes de anunciar un hallazgo hay que buscarlo en los tres sitios: el registro de decisiones,
+> la nota del componente, y el archivo de cerrados —que es el que nadie abre—. Un hallazgo
+> redundante no falla, y con tono de descubrimiento **hace dudar de documentación que estaba
+> bien**.
 
 #### Y entonces el cierre, en voz alta — nunca antes de la 15
 
@@ -491,7 +482,7 @@ no tres semanas después. Las tres se contestan **en frío**; el cierre viene al
 > *Y funciona en un solo sentido: lo que no pase por aquí, aquí no existe. No hay que
 > alimentarlo — hay que usarlo.»*
 
-> [!warning] El cierre va DESPUÉS de tomar el dato, y el orden no es negociable
+> [!warning] El cierre va DESPUÉS de tomar el dato
 > Es la parte persuasiva de la entrevista, y persuadir a alguien de que va a usar algo a
 > diario es lo contrario de medir si lo va a usar. **Si el cierre llega antes de la 14,
 > cualquiera aceptará la propuesta** y el punto de control deja de discriminar.
@@ -511,28 +502,28 @@ no tres semanas después. Las tres se contestan **en frío**; el cierre viene al
 
 Al terminar los seis bloques, **las respuestas se escriben tal cual** en `vuelamind-entrevista.acta.md`, **dentro del vault**, y el manifiesto la declara igual (clave `acta:`).
 
-> [!important] Dentro del vault, y no junto al manifiesto — cambió en la v3.9
-> Hasta la v3.8 el acta vivía fuera, con la configuración del proyecto. Es donde nadie
-> la busca y, peor, **donde no viaja**: el vault es lo que la gente copia, respalda y se
-> lleva a otra máquina, y cualquier *«descargar una copia de mis datos»* que alguien
-> construya va a apuntar ahí. El dominio llegaba entero salvo por **el documento que dice
-> quién es** — las palabras del fundador, que son justo lo irrecuperable: las notas se
-> rehacen midiendo, una entrevista no se vuelve a tener.
+> [!important] Dentro del vault, y no junto al manifiesto
+> El vault es lo que **viaja**: lo que la gente copia, respalda y se lleva a otra máquina,
+> y cualquier *«descargar una copia de mis datos»* que alguien construya va a apuntar ahí.
+> Y el acta —las palabras del fundador— es justo lo irrecuperable: las notas se rehacen
+> midiendo, una entrevista no se vuelve a tener.
+>
+> *Hasta la v3.8 vivía junto al manifiesto, y el dominio llegaba entero a otra máquina salvo
+> por el documento que dice quién es.*
 >
 > Y el acta **es contenido, no configuración**: son respuestas de una persona, no ajustes
-> de una herramienta. Estaba del lado equivocado de esa frontera.
+> de una herramienta.
 >
-> **Lo que esto NO resuelve, y hay que decirlo:** las memorias del asistente (`memory/`) y
-> el manifiesto siguen fuera del vault, cada uno por su motivo. **La unidad que se lleva
-> uno es la carpeta del dominio, no el vault** — quien empaquete solo el vault se deja
-> cosas, y ahora se deja menos. Es el acta de nacimiento del dominio: la fuente del comando `vuelamind-whoiam`, que relata quién es este dominio sin reconstruirlo de notas digeridas.
+> **Lo que esto NO resuelve:** las memorias del asistente (`memory/`) y el manifiesto siguen
+> fuera del vault, cada uno por su motivo. **La unidad que se lleva uno es la carpeta del
+> dominio, no el vault** — quien empaquete solo el vault se deja cosas. Es el acta de nacimiento del dominio: la fuente del comando `vuelamind-whoiam`, que relata quién es este dominio sin reconstruirlo de notas digeridas.
 
 **Lo primero que registra el acta no es una respuesta: es la señal cero** —el nombre con el que
 llegó la carpeta— con sus palabras y dicho que se dijo antes de la primera pregunta. Si no había
 señal, se escribe que no la había: *"la carpeta se llamaba `proyecto`"* es un dato, y uno que
 explica por qué la entrevista arrancó en frío.
 
-Un acta **se enmienda con fecha, nunca se reescribe en silencio**: una respuesta fundacional que cambia es historia que importa. Y un dominio ya nacido sin acta la **reconstruye** — primero del transcript de la sesión fundacional (las palabras del responsable), luego de sus notas, y solo al final preguntando — marcándola con la fuente de cada bloque. **Agota el transcript antes de tocar las notas**: reconstruir del panorama produce las paráfrasis del asistente, no las respuestas del responsable, y un dominio nacido orgánicamente puede no tener entrevista que relatar — se cuenta lo que el transcript muestre, sin inventarle bloques. *(Error cometido y corregido el 2026-08-12.)*
+Un acta **se enmienda con fecha, nunca se reescribe en silencio**. Y un dominio ya nacido sin acta la **reconstruye** — primero del transcript de la sesión fundacional (las palabras del responsable), luego de sus notas, y solo al final preguntando — marcándola con la fuente de cada bloque. **Agota el transcript antes de tocar las notas**: reconstruir del panorama produce las paráfrasis del asistente, no las respuestas del responsable, y un dominio nacido orgánicamente puede no tener entrevista que relatar — se cuenta lo que el transcript muestre, sin inventarle bloques. *(Error cometido y corregido el 2026-08-12.)*
 
 ### La nota del alma — vista desde arriba
 
@@ -551,7 +542,7 @@ En una frase: el alma nombra lo que un modelo **no** tiene por sí solo —ident
 >
 > **La vía conocida es un contenedor Linux**: correr el asistente dentro de uno —por ejemplo con Docker— y trabajar ahí, montando las carpetas del dominio. Todo lo que el marco necesita existe dentro del contenedor y el sistema anfitrión deja de importar.
 >
-> **Y eso está MEDIDO desde el 2026-08-13**, no inferido: se construyó la imagen y se corrió, con el método ya horneado dentro. **Desde el 2026-10-01 esa imagen ya no vive en este repositorio**: cualquier contenedor Linux con el asistente instalado y el canon clonado dentro cumple la misma función. En aquella prueba se ejercitaron de punta a punta los cuatro cuadrantes de la Pregunta 1 —nacer y sumarse, cruzados con carpeta vacía y con contenido— y el asistente se detuvo donde debía detenerse.
+> **Y eso está MEDIDO desde el 2026-08-13**, no inferido: en un contenedor con el método dentro se ejercitaron los cuatro cuadrantes de la Pregunta 1 —nacer y sumarse, cruzados con carpeta vacía y con contenido— y el asistente se detuvo donde debía detenerse. **Este repositorio no trae la imagen**: cualquier contenedor Linux con el asistente instalado y el canon clonado dentro cumple la misma función.
 >
 > **Lo que esa prueba NO cubrió:** alcanzar sistemas vivos desde dentro del contenedor. Una máquina que lee el vault pero no alcanza lo que documenta sigue siendo una instancia legítima — solo tiene que decirlo.
 >
@@ -568,7 +559,7 @@ Fase 1 y no se genera nada**: el dominio ya tiene vault, acta, decisiones y erro
 que falta es conectar **esta máquina**, y eso es un acto propio con su comando —
 `vuelamind-join`, el cuarto del ciclo.
 
-> [!danger] El problema del huevo y la gallina, y por eso esta sección existe
+> [!danger] El problema del huevo y la gallina
 > **Ese comando se instala al nacer** (Fase 1.4). Una máquina que nunca nació **no lo tiene**, así
 > que decirle *"corre `vuelamind-join`"* la manda a un comando que no está.
 >
