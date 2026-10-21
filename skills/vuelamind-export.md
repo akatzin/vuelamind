@@ -82,12 +82,13 @@ Se empaca solo con su sí.
 - `MIGRACION.md`, en la raíz del zip, con el formato de abajo.
 - `RUTAS.tsv`: una fila por ruta absoluta encontrada en el paso 4, con tres columnas separadas por tabulador: archivo dentro del zip, renglón y **la ruta completa como aparece en el renglón**, desde donde empieza la coincidencia hasta el primer espacio, comilla, acento grave o cierre de paréntesis o corchete. No basta el pedazo que coincidió: `~/` a secas no dice si la ruta es del dominio o de otra parte.
 - `HUELLAS.txt`: el `sha256` de cada archivo del zip, salvo él mismo, con su ruta dentro del zip.
-- El zip: `<dominio>-<AAAA-MM-DD>T<HHMM>Z.zip`, con la hora en UTC para que dos exportaciones del mismo día no choquen. Se hace con las herramientas del sistema (`zip`, o `ditto` en macOS).
+- El zip: `<dominio>-<AAAA-MM-DD>T<HHMM>Z.zip`, con la hora en UTC para que dos exportaciones del mismo día no choquen. Se hace con las herramientas del sistema (`zip`, o `ditto` en macOS), **en la carpeta de destino y con el nombre temporal `<nombre>.zip.parcial`**: quien lo lea mientras se escribe vería un zip roto.
 
 ### 8. Verificar en el zip, no en el origen
 
 - `unzip -t` sin errores.
 - El zip tiene exactamente un archivo más que las filas de `HUELLAS.txt`.
+- Solo con las dos cosas en verde se renombra `<nombre>.zip.parcial` a `<nombre>.zip`, con `mv` en la misma carpeta, que es un solo paso. Si alguna falla, se borra el `.parcial` y se reporta `NO EXPORTADO`.
 - Reportar la ruta y el tamaño del zip, cuántos archivos lleva, qué se excluyó y lo que no se pudo verificar.
 - **La última línea del reporte es exactamente `EXPORTADO: <ruta absoluta del zip>`**, para que un programa que invoque el skill recoja el zip sin adivinar. Si no se exportó, la última línea es `NO EXPORTADO: <motivo>`.
 

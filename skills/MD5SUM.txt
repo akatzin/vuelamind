@@ -1,6 +1,6 @@
 288fc36a50a78db2d47d846ee8ad6abf  README.md
 e30b52be7fef356a6cb1aaaefb013f28  vuelamind-commit.md
-8578ff6a79219f6569ed28cd781931a9  vuelamind-export.md
+703493d2081d148472f6a8546ab3de3b  vuelamind-export.md
 fc5001a4bd8f7cfd785b406a54e7e650  vuelamind-help.md
 36f6874240e4c10318753ec419ac1ff8  vuelamind-join.md
 e803da78159d680457be311406c8917d  vuelamind-load.md
