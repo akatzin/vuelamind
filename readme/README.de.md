@@ -4,23 +4,42 @@
 
 [← English](../README.md)
 
+> Das Rahmenwerk selbst ist auf Spanisch geschrieben — aber das wiegt weniger, als es aussieht. **Frage null des Interviews fragt, in welcher Sprache du arbeiten willst**, und alles, was der Assistent von da an erzeugt — dein Vault, deine Notizen, deine Berichte —, ist in deiner Sprache.
+
+---
+
 ## Das Problem
 
 Ein KI-Assistent vergisst: Sein Kontextfenster füllt sich und der Anfang löst sich auf, also wird jede Sitzung als Waise geboren — ohne Regeln, ohne Geschichte, ohne Narben.
 
 Und Dokumentation, die nie mit der Wirklichkeit abgeglichen wird, **lügt selbstbewusst**. Nach einem halben Jahr ist die Hälfte dessen, was deine Notizen behaupten, falsch — und nichts zeigt an, welche Hälfte.
 
-vuelamind bricht beides zugleich — nicht mit einer App, sondern mit geschriebener Disziplin: **nichts wird behauptet, was nicht geprüft wurde**, und jede Aussage behält ihre Herkunft: **gemessen**, **zitiert**, **erschlossen** oder **berichtet**.
+vuelamind ist eine Methode, die beides zugleich bricht — nicht mit einer App, sondern mit geschriebener Disziplin: **nichts wird behauptet, was nicht geprüft wurde**, und jede Aussage behält ihre Herkunft: **gemessen**, **zitiert**, **erschlossen** oder **berichtet**.
 
 ## Was du bekommst
 
-Ein Vault aus reinem Text und ein Zyklus aus vier Akten: einmal **geboren werden**; zu Beginn jeder Sitzung **wiederaufnehmen** — den aktuellen Zustand messen statt der Erinnerung trauen; und beim Abschluss **abgleichen**.
+Ein Vault aus reinen Textdateien und ein Zyklus aus vier Akten:
 
-Darin: eine nach echter Schwere geordnete Arbeitswarteschlange, ein Entscheidungsregister, das festhält *was mich umstimmen würde*, und **ein Fehlerbuch mit 51 Lektionen, jede mit einem echten Fehler bezahlt**. Genau das ist das Wertvolle: die Struktur baust du an einem Nachmittag nach, die Narben nicht.
+- **Geboren**, einmal — ein Interview, aus dem die Geburtsurkunde deiner Domäne entsteht, in deinen Worten.
+- **Wiederaufgenommen**, zu Beginn jeder Sitzung — der Assistent misst den aktuellen Zustand, statt dem zu trauen, woran er sich erinnert.
+- **Abgeglichen**, beim Abschluss — was veraltet ist, wird korrigiert; was gelernt wurde, wird aufgeschrieben.
+- **Angeschlossen**, wenn eine weitere Maschine dazukommt — der erste Schritt zu einem Schwarm.
+
+Darin: eine nach echter Schwere geordnete Arbeitswarteschlange, ein Entscheidungsregister, das festhält *was mich umstimmen würde*, und **ein Fehlerbuch — 51 Lektionen, jede mit einem echten Fehler bezahlt**.
+Und die Methode behauptet nicht nur, dass sie funktioniert: **zehn geskriptete Durchläufe von Anfang bis Ende, alle sauber** — siehe [PRUEBAS.md](../PRUEBAS.md).
+Genau das ist das Wertvolle: die Struktur baust du an einem Nachmittag nach, die Narben nicht.
 
 ## Loslegen
 
-Beide Wege beginnen gleich — mit der Datei, nicht mit einem Befehl:
+**Schritt 0 — einen Assistenten installieren** (überspringen, wenn du schon einen hast):
+
+- **macOS / Linux** — der native Installer:
+
+  ```
+  curl -fsSL https://claude.ai/install.sh | bash
+  ```
+
+Mit einem Assistenten zur Hand beginnen beide Wege gleich — mit der Datei, nicht mit einem Befehl:
 
 1. Lege einen Ordner für deine Domäne an und klone die Methode hinein:
 
@@ -34,14 +53,18 @@ Beide Wege beginnen gleich — mit der Datei, nicht mit einem Befehl:
 
 Die erste Frage ist deine Sprache. **Die zweite entscheidet alles Weitere:** wird diese Domäne hier geboren, oder schließt sich diese Maschine einer an, die bereits lebt?
 
+> Wo der Kanon lebt — Repository, Branch, Website —, wird einmal in [`config.yml`](../config.yml) festgelegt, zusammen mit den Standardwerten dafür, woher Patches bezogen und wohin sie veröffentlicht werden. Alles andere verweist auf diese Datei, statt sie zu wiederholen, und eine Prüfung lässt den Build scheitern, wenn irgendeine Kopie davon abweicht.
+
 - **Geboren** — du beantwortest das Interview. Zwischen zwanzig Minuten und anderthalb Stunden, je nachdem, wie viel du erzählst, mit Pausen. Es erzeugt den Vault, das Gerüst und die Zyklus-Befehle.
 - **Anschließen** — kein Interview, nichts wird erzeugt. Es erreicht den vorhandenen Vault, prüft, dass er vollständig ankam, installiert den Zyklus aus dem Kanon und übergibt an `/vuelamind-join`.
 
 Der Assistent verlässt sich nicht auf dein Wort: er schaut in den Zielordner und **hält an**, wenn du *geboren* gesagt hast und dort Monate an Arbeit liegen — oder wenn du *anschließen* gesagt hast und nichts da ist.
 
-**Was du brauchst:** einen Assistenten, der deine Dateien lesen und Befehle ausführen kann. Jeder taugt —die Methode ist reiner Text—. Hast du keinen, ist `npm install -g @anthropic-ai/claude-code` ein bekannter Weg. Direktinstallation (macOS/Linux): `curl -fsSL https://claude.ai/install.sh | bash`. Unter Windows: per Docker — beide Befehle stehen im Haupt-README.
+**Was du brauchst:** einen Assistenten, der deine Dateien lesen und Befehle ausführen kann. Jeder taugt —die Methode ist reiner Text—. Hast du keinen, ist `npm install -g @anthropic-ai/claude-code` ein bekannter Weg.
 
 Darüber hinaus verlangt das Rahmenwerk keinen eigenen Server, keinen Dienst und kein Konto bei ihm: nur zwei lokale Ordner.
+
+Die Zyklus-Befehle in `skills/` sind für Claude Code geschrieben, aber die Methode ist reiner Text und hängt nicht davon ab, welches Modell sie liest.
 
 ## Eine Maschine oder mehrere
 
@@ -53,7 +76,7 @@ Alles Obige setzt eine voraus: ein Assistent und zwei lokale Ordner. **Dieses Ve
 
 **Und dieser Befehl liegt auf der neuen Maschine noch nicht** — er kommt mit der Geburt. Eine Maschine, die nie geboren wurde, beginnt also dort, wo alle beginnen: dieses Repository klonen, `MARCO_Inicial.md` initialisieren, *anschließen* antworten. Die Datei bringt die Befehle mit; ab da übernimmt der Befehl.
 
-Eine Maschine, die den Vault liest, aber die Systeme nicht erreicht, ist trotzdem eine legitime Instanz — sie muss es nur **sagen**, wenn sie sich anmeldet.
+Eine Maschine, die den Vault liest, aber die Systeme nicht erreicht, ist trotzdem eine legitime Instanz — sie muss es nur **sagen**, wenn sie sich anmeldet, denn von da an dokumentiert sie, ohne zu prüfen.
 
 Und es gibt eine legitime Instanz, die nie schreibt — ein Vorstand, der das Engineering-Gedächtnis abonniert, ein Auditor. Ihre Zeile im Register trägt `Zugriff: schreibt | liest`, und **sie meldet sich nicht selbst an: eine schreibende Instanz trägt sie ein**, bevor sie kommt. Wer nur liest, behält, was die Rolle ausmacht: jede Sitzung zu schließen, ohne einen Buchstaben geschrieben zu haben.
 
@@ -63,14 +86,56 @@ Ein Assistent, zwei lokale Ordner und **eine Unix-artige Shell** — macOS oder 
 
 **Windows wird nativ nicht unterstützt.** Die Skripte, die das Rahmenwerk erzeugt, setzen `sh`/`bash` und POSIX-Pfade voraus. Der bekannte Weg ist, den Assistenten **in einem Linux-Container** (etwa Docker) laufen zu lassen und dort zu arbeiten: alles Nötige liegt im Container, das Wirtssystem spielt keine Rolle mehr.
 
-Dieser Weg ist **erschlossen, nicht erprobt**: er sollte funktionieren, aber niemand hat ihn bislang tatsächlich gefahren. Wenn du es tust, ist das einen Patch wert.
+Dieser Container-Weg ist **gemessen, nicht erschlossen** — Stand 2026-08-13. Er wurde mit einem Image gebaut und gefahren, das dieses Repository früher mitführte, mit der Methode fest eingebaut in `/opt/vuelamind`. Darin wurden die vier Quadranten der Frage Geburt/Anschluss von Anfang bis Ende durchgespielt, und der Assistent hielt dort an, wo er anhalten sollte. **Seit 2026-10-01 liegt dieses Image nicht mehr hier**: Jeder Linux-Container mit installiertem Assistenten und diesem Repository darin geklont erfüllt denselben Zweck.
 
-Der **Kern** läuft überall, auch unter Windows: Interview, Vorlagen, Regeln und Fehlerbuch sind reiner Text. Du verzichtest nur auf die optionale Maschinerie — weniger bequem, ebenso gültig.
+Was dieser Test **nicht** abgedeckt hat: laufende Systeme aus dem Container heraus zu erreichen. Eine Maschine, die den Vault lesen kann, aber nicht erreicht, was sie dokumentiert, ist trotzdem eine legitime Instanz — sie muss es nur sagen.
+
+Der **Kern** läuft überall, auch unter Windows: Interview, Vorlagen, Regeln und Fehlerbuch sind reiner Text. Du verzichtest auf die optionale Maschinerie und machst von Hand, was sie tun würde — weniger bequem, ebenso gültig.
+
+> **Woher das kommt** — eine Seite erzählt es, in ihrem eigenen Repository (`akatzin/vuelamind-web`): das Gespräch vom Februar 2026 mit einer KI über ihre eigenen Ketten, und wie aus der Antwort *«Ich bin konstruktionsbedingt amnestisch»* diese Methode wurde. Zehn Sprachen. Es ist ein Essay, keine Dokumentation — lies ihn, wenn du das Warum vor dem Wie willst.
+
+---
+
+## So sieht es aus — eine kleine Domäne, von Anfang bis Ende
+
+*Ein Beispiel in realer Form, verdichtet. Nichts davon wird zur Laufzeit erfunden: So sieht die tatsächliche Ausgabe aus.*
+
+**Das Interview** fragt, was die Domäne ist, wo ihre Grenze verläuft und — der Block, der am meisten zählt — **was hier als Wahrheit gilt**. Jemand, der die Restaurierung eines alten Hauses dokumentiert, antwortet: *Rechnung und Foto gelten als primär; was der Bauunternehmer am Telefon gesagt hat, ist berichtet und wird auch so gekennzeichnet.*
+
+**Phase 1 erzeugt** den Vault. Die Panorama-Notiz, die Warteschlange, das Entscheidungsregister, das Fehlerbuch, vorbefüllt mit den geerbten Lektionen, eine Notiz pro Teil der Domäne.
+
+**Einen Monat später** steht in der Warteschlange ein Eintrag wie dieser:
+
+```markdown
+### - [ ] #7 · The bathroom pipework is of unknown age
+severidad:: media · the leak risk sits above the finished ceiling
+
+The 2019 invoice covers the kitchen only (measured: invoice read).
+The previous owner said "it was all redone" — reported, unverified,
+and it contradicts the invoice.
+
+Closing test written in advance: an endoscope photo of the run above
+the ceiling, or an invoice naming the bathroom.
+```
+
+Achte darauf, was dieser Eintrag tut: Er trennt **das Gemessene** von **dem, was jemand gesagt hat**, er hält den Widerspruch fest, statt ihn durch Raten aufzulösen, und **er schreibt den Test, der ihn schließen würde, bevor die Arbeit beginnt** — damit ihn später niemand nach Gefühl für erledigt erklärt.
+
+**Beim Abschluss der Sitzung** misst der Assistent neu, was sich geändert hat, schlägt die Änderungen vor, wartet auf ein Ja und schreibt erst dann. Hat sich etwas, das er im Vormonat behauptet hat, als falsch herausgestellt, sagt er das ausdrücklich, statt es stillschweigend zu korrigieren.
+
+---
 
 ## Wie es besser wird
 
-Durch **Patches**: Lektionen mit echtem Fall, Datum und Prüfweg, eingereicht als Pull Request. Das einzige Aufnahmekriterium ist die Allgemeinheitsprobe — *schreib deine Lektion ohne jeden Eigennamen neu: überlebt sie?* — und **mit Begründung verwerfen ist mehr wert als aus Höflichkeit übernehmen**.
+Die Methode lernt durch **Patches**: Lektionen mit echtem Fall, Datum und Prüfweg. **Sie bleiben in der Domäne, die sie gelernt hat**: Der Kanon nimmt keine Beiträge an, und sein Eigentümer pflegt ihn.
+
+Jede Instanz, die einen Patch übernimmt, beurteilt ihn anhand ihrer eigenen Belege, mit drei möglichen Urteilen — und **mit Begründung verwerfen ist mehr wert als aus Höflichkeit übernehmen**.
+
+Jemand beurteilt, was in den Kanon eingeht. Diese Rolle hat einen Namen und eine eigene Definition — was sie beobachtet, was sie misst, wie sie urteilt und was sie nichts angeht — in `WATCHER.md`. Sie beobachtet, **was in den Kanon eingeht, nie, wer ihn benutzt**: Es gibt kein Register der Installationen, und es wird keines geben.
+
+Und eine Domäne, die auf einem älteren Stand geboren wurde, bleibt nicht zurück: **Upgrades auf eine neue Hauptversion haben ihre eigene Zeremonie** — mit Absicht klein, die Inhalte bleiben, wo sie sind, und ein Preflight, der lieber abbricht, als etwas kaputtzumachen. Die stabilen Anweisungen stehen in `UPGRADE.md`; die Patches des Alltags laufen nie darüber.
 
 ## Lizenz
 
-Private, edukative, gemeinschaftliche und Forschungsnutzung: **frei**. Unternehmensnutzung: **kostenpflichtige Lizenz**. Und eine nicht verhandelbare Bedingung: Dieses Rahmenwerk **darf nicht dazu verwendet werden, die Arbeit angestellter Menschen zu ersetzen**. Details in `LICENSE.md` — nach OSI-Definition ist es *source-available*, nicht Open Source, und die Lizenz sagt das offen.
+Private, edukative, gemeinschaftliche und Forschungsnutzung: **frei**. Unternehmensnutzung: **kostenpflichtige Lizenz**. Und eine nicht verhandelbare Bedingung: Dieses Rahmenwerk **darf nicht dazu verwendet werden, die Arbeit angestellter Menschen zu ersetzen** — es existiert, damit Menschen mit einem Assistenten besser arbeiten, nicht damit sie nicht mehr gebraucht werden.
+
+Details in `LICENSE.md`. Damit ist es nach der OSI-Definition **source-available, nicht Open Source**, und die Lizenz sagt das offen, statt es zu verstecken.
