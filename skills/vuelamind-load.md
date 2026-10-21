@@ -27,7 +27,7 @@ No en diagonal. Ese archivo suele traer las reglas de trabajo del dominio, los h
 
 ### 3. Correr el validador del dominio
 
-Cada dominio tiene el suyo. Reporta lo que envejeció desde la última sesión: conteos descuadrados, enlaces rotos.
+Cada dominio tiene el suyo. Reporta lo que envejeció desde la última sesión: conteos descuadrados, enlaces rotos. Y se corre `python3 herramientas/pendientes.py revisar <vault>` desde el canon: un cerrado sin su párrafo o un índice descuadrado se dice al empezar, no se descubre al cerrar.
 
 **El `initPrompt` describe un estado que puede tener días; el validador mide el de ahora.** Cuando se contradigan, gana el validador — y esa contradicción es material para el checkpoint.
 

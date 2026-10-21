@@ -120,6 +120,7 @@ piezas:                        # pieza estándar → ruta dentro del zip | no-ex
   panorama: <ruta>             # las seis notas, con las claves del manifiesto
   cola: <ruta>
   archivo: <ruta>
+  pendientes: <ruta>          # la carpeta de un pendiente por archivo, o no-existe
   decisiones: <ruta>
   bitacora: <ruta>
   arranque: <ruta>

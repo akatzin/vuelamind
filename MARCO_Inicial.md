@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.11.0
+version: 3.12.0
 
 > [!important] El aprendizaje es local
 > Cada dominio escribe sus lecciones en su propio vault —el libro de errores, las decisiones y
@@ -606,8 +606,8 @@ Todo vive en el proyecto (Bloque E), y nada se comparte entre dominios:
 ├── validar_<dominio>.sh        ← el validador mecánico de la Fase 3
 └── vault/                      ← EL CONOCIMIENTO
     ├── 0_<Dominio>.md
-    ├── Pendientes.md
-    ├── Pendientes_Cerrados.md
+    ├── Pendientes.md           ← el índice; lo de abajo lo genera herramientas/pendientes.py
+    ├── pendientes/             ← un archivo por pendiente; dentro, cerrados/ y riesgo/
     ├── Decisiones.md
     ├── Errores.md
     ├── Bitacora.md
@@ -670,8 +670,8 @@ Con las respuestas, el asistente crea estos archivos. Los nombres son sugerencia
 | Archivo | Contesta | Regla que lo mantiene sano |
 |---|---|---|
 | `0_<Dominio>.md` | *¿Qué es esto y cómo está hoy?* | Una página. Si crece, algo bajó del nivel de panorama |
-| `Pendientes.md` | *¿Qué falta y qué tan grave es?* | Solo lo abierto. Lo cerrado se condensa a un párrafo |
-| `Pendientes_Cerrados.md` | *¿Qué se hizo y con qué evidencia?* | Archivo. Nadie lo lee mientras trabaja — por eso las lecciones no viven aquí |
+| `Pendientes.md` | *¿Qué falta y qué tan grave es?* | El índice de lo abierto. Debajo de su marca lo genera `herramientas/pendientes.py`, y no se edita a mano |
+| `pendientes/<folio>.md` | *¿Qué es este pendiente, y cómo se cerró?* | Un archivo por pendiente. Al cerrarse se mueve a `pendientes/cerrados/` con un párrafo de cierre, y ya no se carga al trabajar. Las lecciones no viven aquí |
 | `Decisiones.md` | *¿Por qué está así y no de otra forma?* | Cada entrada trae **lo que se descartó** y **qué haría cambiar de opinión** |
 | `Errores.md` | *¿En qué me he equivocado y cómo lo evito?* | Crece solo. Nada se borra |
 | `Bitacora.md` | *¿Cómo llegamos hasta aquí?* | Voz humana, sin jerga. Es lo único que se lee de corrido |
@@ -733,7 +733,11 @@ vida de las ideas en la Fase 2.>
 > panorama, no toca esta nota.
 ```
 
-### Plantilla — `Pendientes.md`
+### Plantilla — `Pendientes.md` y `pendientes/<folio>.md`
+
+`Pendientes.md` es el **índice**: una cabecera escrita a mano, con el esquema de severidad del dominio, y debajo de la marca, la lista de abiertos y de riesgo aceptado que genera `python3 <canon>/herramientas/pendientes.py indice <vault>`. Cada pendiente vive en su archivo, `pendientes/<folio>.md`; el cerrado, en `pendientes/cerrados/`, y el riesgo aceptado, en `pendientes/riesgo/`.
+
+La cabecera del índice:
 
 ```markdown
 ---
@@ -746,7 +750,7 @@ riesgo_aceptado: 0
 
 # Pendientes — <Dominio>
 
-← El panorama está en [[0_<Dominio>]]. Lo ya resuelto, en [[Pendientes_Cerrados]].
+← El panorama está en [[0_<Dominio>]]. Los cerrados viven en `pendientes/cerrados/`.
 
 ## Cómo se numera
 
@@ -759,10 +763,12 @@ citan. La **severidad** es un campo aparte, y se reevalúa sin renumerar.
 | `alta` | Falla en silencio, o el daño crece con el tiempo |
 | `media` | Riesgo real con margen de reacción |
 | `baja` | Higiene, consistencia, deuda documentada |
+```
 
-## Abiertos
+Un pendiente. Lo crea `pendientes.py nuevo <vault> "<título>"` con el siguiente folio:
 
-### - [ ] #1 · <Título en una línea, que diga el problema, no la solución>
+```markdown
+# #1 · <Título en una línea, que diga el problema, no la solución>
 
 severidad:: <crítica|alta|media|baja>
 area::      <entidad>
@@ -1295,19 +1301,20 @@ Estas lecciones se ganaron en otro dominio y ya demostraron que generalizan. Van
 ### 3. Ciclo de vida de un pendiente
 
 ```
-ABRIR  →  el registro completo, con evidencia y con la prueba de cierre escrita de antemano
+ABRIR  →  `pendientes.py nuevo`: su archivo, con evidencia y con la prueba de cierre escrita de antemano
    ↓
-TRABAJAR  →  el registro crece con lo que se va midiendo
+TRABAJAR  →  el archivo se reescribe con lo que se va midiendo
    ↓
 PROMOVER LA LECCIÓN  →  ANTES de archivar: lo que generaliza sube a Decisiones,
                         a Errores o a la nota de la entidad — Y TAMBIÉN BAJA
                         a la nota donde estaba escrita la PREGUNTA
    ↓
-CONDENSAR  →  en Pendientes queda UN párrafo: qué era, qué se hizo, cómo se verificó
+CONDENSAR  →  `pendientes.py cerrar <folio>` lo mueve a pendientes/cerrados/ y abre
+              «## Cierre»: UN párrafo, qué era, qué se hizo, cómo se verificó
    ↓
-ARCHIVAR  →  el registro completo baja a Pendientes_Cerrados
+ARCHIVAR  →  el registro completo se queda en su archivo, fuera de la carpeta de abiertos
    ↓
-ACTUALIZAR  →  marcar la casilla y ajustar los contadores del frontmatter
+ACTUALIZAR  →  el índice y sus contadores los regenera el script
 ```
 
 > [!danger] La regla que hace seguro el archivo
@@ -1342,7 +1349,9 @@ ACTUALIZAR  →  marcar la casilla y ajustar los contadores del frontmatter
 > esto, y dónde vivía esa pregunta?* Si la respuesta no está ahí, el cierre está
 > a medias.
 
-**Y no apiles.** Un pendiente que se trabaja varias sesiones debe **reescribirse**, no crecer por acumulación de notas al pie. En el vault de origen, un item llegó a 247 líneas con once bloques apilados.
+**Y no apiles.** Un pendiente que se trabaja varias sesiones debe **reescribirse**, no crecer por acumulación de notas al pie. En el vault de origen, un item llegó a 247 líneas con once bloques apilados. `pendientes.py revisar` avisa cuando un abierto pasa de 80 líneas.
+
+**`pendientes.py revisar` sale con 1** si un cerrado sigue en la carpeta de abiertos, si su cierre no es un solo párrafo, si el índice o los contadores no cuadran con las carpetas, si un folio está dos veces o si una nota cita un folio que no existe. Lo llama el validador del dominio, y el cierre no termina en verde mientras falle.
 
 ### 4. Ciclo de vida de las ideas
 
@@ -1468,8 +1477,8 @@ Un comando que se corre **al cerrar cada sesión**. Reconcilia la documentación
 
 Qué hace, en orden:
 
-1. **Contadores.** Que `total_abiertos`, `cerrados` y `riesgo_aceptado` del frontmatter cuadren con las casillas reales.
-2. **Folios.** Sin huecos ni repetidos. Que cada folio citado en otras notas exista.
+1. **La cola: `python3 <canon>/herramientas/pendientes.py revisar <vault>`.** Contadores e índice contra las carpetas, cada cerrado fuera de abiertos y con su párrafo, sale con 1 si algo falla. El validador del dominio lo llama.
+2. **Folios.** Sin repetidos, y cada folio citado en otras notas existe: lo comprueba el mismo `revisar`. Los huecos salen como aviso.
 3. **Enlaces.** Ningún enlace colgante. **Compara los nombres normalizando Unicode, no por bytes.** Un sistema de archivos puede guardar `ñ` como `n` + tilde combinante mientras el texto tecleado en un enlace queda precompuesto: **el mismo texto, bytes distintos**, y el chequeo reporta colgante un archivo que existe. *"Tolerante a mayúsculas" y "tolerante a Unicode" son dos normalizaciones distintas, y resolver una no resuelve la otra*, así que una comparación que ignora mayúsculas sigue teniendo el defecto. Normaliza los dos lados a la misma forma y aplica plegado de mayúsculas en el mismo paso. *(Ver la lección 9: el mecanismo general del que éste es un caso.)*
 
    > [!warning] Normalizar no cubre los homoglifos
@@ -1829,8 +1838,8 @@ Cuando el asistente termine, debe entregar:
 - [ ] Las respuestas de la entrevista, resumidas y confirmadas
 - [ ] **La topología escrita** — qué carpeta contiene qué plano y qué se aísla por dominio
 - [ ] `0_<Dominio>.md` con el panorama, aunque sea provisional
-- [ ] `Pendientes.md` con el esquema de severidad ya instanciado al dominio
-- [ ] `Pendientes_Cerrados.md`, `Decisiones.md` y `Bitacora.md` vacíos, con su encabezado
+- [ ] `Pendientes.md` con el esquema de severidad ya instanciado al dominio, `pendientes/` creada, y `pendientes.py revisar` saliendo con 0
+- [ ] `Decisiones.md` y `Bitacora.md` vacíos, con su encabezado
 - [ ] `Errores.md` con la semilla heredada
 - [ ] `Entidades/` con una nota por pieza, aunque sea de tres líneas
 - [ ] `init_<host>.sh` **generado y corrido una vez**, con sus comprobaciones pasando o avisando (Fase 1.2)
