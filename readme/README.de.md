@@ -53,7 +53,7 @@ Mit einem Assistenten zur Hand beginnen beide Wege gleich — mit der Datei, nic
 
 Die erste Frage ist deine Sprache. **Die zweite entscheidet alles Weitere:** wird diese Domäne hier geboren, oder schließt sich diese Maschine einer an, die bereits lebt?
 
-> Wo der Kanon lebt — Repository, Branch, Website —, wird einmal in [`config.yml`](../config.yml) festgelegt, zusammen mit den Standardwerten dafür, woher Patches bezogen und wohin sie veröffentlicht werden. Alles andere verweist auf diese Datei, statt sie zu wiederholen, und eine Prüfung lässt den Build scheitern, wenn irgendeine Kopie davon abweicht.
+> Wo der Kanon lebt — Repository, Branch, Website —, wird einmal in [`config.yml`](../config.yml) festgelegt. Alles andere verweist auf diese Datei, statt sie zu wiederholen, und eine Prüfung lässt den Build scheitern, wenn irgendeine Kopie davon abweicht.
 
 - **Geboren** — du beantwortest das Interview. Zwischen zwanzig Minuten und anderthalb Stunden, je nachdem, wie viel du erzählst, mit Pausen. Es erzeugt den Vault, das Gerüst und die Zyklus-Befehle.
 - **Anschließen** — kein Interview, nichts wird erzeugt. Es erreicht den vorhandenen Vault, prüft, dass er vollständig ankam, installiert den Zyklus aus dem Kanon und übergibt an `/vuelamind-join`.
@@ -78,7 +78,7 @@ Alles Obige setzt eine voraus: ein Assistent und zwei lokale Ordner. **Dieses Ve
 
 Eine Maschine, die den Vault liest, aber die Systeme nicht erreicht, ist trotzdem eine legitime Instanz — sie muss es nur **sagen**, wenn sie sich anmeldet, denn von da an dokumentiert sie, ohne zu prüfen.
 
-Und es gibt eine legitime Instanz, die nie schreibt — ein Vorstand, der das Engineering-Gedächtnis abonniert, ein Auditor. Ihre Zeile im Register trägt `Zugriff: schreibt | liest`, und **sie meldet sich nicht selbst an: eine schreibende Instanz trägt sie ein**, bevor sie kommt. Wer nur liest, behält, was die Rolle ausmacht: jede Sitzung zu schließen, ohne einen Buchstaben geschrieben zu haben.
+Und es gibt eine legitime Instanz, die nie schreibt — ein Vorstand, der das Engineering-Gedächtnis abonniert, ein Auditor. Ihre Zeile im Register trägt `acceso: escribe | lee`, und **sie meldet sich nicht selbst an: eine schreibende Instanz trägt sie ein**, bevor sie kommt. Wer nur liest, behält, was die Rolle ausmacht: jede Sitzung zu schließen, ohne einen Buchstaben geschrieben zu haben.
 
 ## Voraussetzungen
 

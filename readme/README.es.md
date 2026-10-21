@@ -55,8 +55,7 @@ Con un asistente a mano, los dos caminos empiezan igual — por el archivo, no p
 La primera pregunta es tu idioma. **La segunda decide todo lo que sigue:** ¿este dominio nace aquí, o esta máquina se suma a uno que ya vive?
 
 > Dónde vive el canon —repositorio, rama, sitio— se declara una sola vez en
-> [`config.yml`](../config.yml), junto con los valores por omisión de dónde se consumen los
-> parches y dónde se publican. Todo lo demás remite a ese archivo en vez de repetirlo, y un
+> [`config.yml`](../config.yml). Todo lo demás remite a ese archivo en vez de repetirlo, y un
 > chequeo hace fallar el build si alguna copia se aparta de él.
 
 - **Nace** — contestas la entrevista. De veinte minutos a hora y media, según cuánto quieras contar, y puedes pausar. Genera el vault, el andamiaje y los comandos del ciclo.
@@ -82,7 +81,7 @@ Todo lo anterior supone una: un asistente y dos carpetas locales. **Esa promesa 
 
 Una máquina que lee el vault pero no alcanza los sistemas sigue siendo una instancia legítima — solo tiene que **decirlo** al declararse, porque a partir de ahí documenta sin verificar.
 
-Y hay una instancia legítima que no escribe jamás — un consejo suscrito a la memoria de ingeniería, un auditor. Su fila en el registro lleva `access: writes | reads`, y **no se declara ella: la declara una instancia que escribe**, antes de que llegue. Quien solo lee conserva lo que define al rol: cerrar cada sesión sin haber escrito una letra.
+Y hay una instancia legítima que no escribe jamás — un consejo suscrito a la memoria de ingeniería, un auditor. Su fila en el registro lleva `acceso: escribe | lee`, y **no se declara ella: la declara una instancia que escribe**, antes de que llegue. Quien solo lee conserva lo que define al rol: cerrar cada sesión sin haber escrito una letra.
 
 ## Requisitos
 

@@ -55,8 +55,7 @@ Com um assistente em mãos, os dois caminhos começam igual — pelo arquivo, n�
 A primeira pergunta é o seu idioma. **A segunda decide tudo o que vem depois:** este domínio nasce aqui, ou esta máquina se soma a um que já vive?
 
 > Onde o cânone vive —repositório, branch, site— é declarado uma única vez em
-> [`config.yml`](../config.yml), junto com os valores padrão de onde os patches são consumidos
-> e onde são publicados. Todo o resto remete a esse arquivo em vez de repeti-lo, e uma
+> [`config.yml`](../config.yml). Todo o resto remete a esse arquivo em vez de repeti-lo, e uma
 > verificação faz o build falhar se alguma cópia se afastar dele.
 
 - **Nasce** — você responde à entrevista. De vinte minutos a uma hora e meia, conforme o quanto você quiser contar, e dá para pausar. Gera o vault, o andaime e os comandos do ciclo.
@@ -82,7 +81,7 @@ Tudo acima supõe uma: um assistente e duas pastas locais. **Essa promessa vale 
 
 Uma máquina que lê o vault mas não alcança os sistemas ainda é uma instância legítima — só precisa **dizê-lo** ao se declarar, porque daí em diante ela documenta sem verificar.
 
-E existe uma instância legítima que nunca escreve — um conselho assinante da memória de engenharia, um auditor. Sua linha no registro leva `access: writes | reads`, e **ela não se declara: uma instância que escreve a declara**, antes de chegar. Quem só lê conserva o que define o papel: fechar cada sessão sem ter escrito uma letra.
+E existe uma instância legítima que nunca escreve — um conselho assinante da memória de engenharia, um auditor. Sua linha no registro leva `acceso: escribe | lee`, e **ela não se declara: uma instância que escreve a declara**, antes de chegar. Quem só lê conserva o que define o papel: fechar cada sessão sem ter escrito uma letra.
 
 ## Requisitos
 

@@ -55,8 +55,7 @@ Avec un assistant sous la main, les deux chemins commencent pareil — par le fi
 La première question est votre langue. **La deuxième décide de tout le reste :** ce domaine naît-il ici, ou cette machine rejoint-elle un domaine qui vit déjà ?
 
 > L'endroit où vit le canon —dépôt, branche, site— est déclaré une seule fois dans
-> [`config.yml`](../config.yml), avec les valeurs par défaut indiquant d'où les correctifs sont
-> consommés et où ils sont publiés. Tout le reste renvoie à ce fichier au lieu de le répéter,
+> [`config.yml`](../config.yml). Tout le reste renvoie à ce fichier au lieu de le répéter,
 > et une vérification fait échouer le build si une copie s'en écarte.
 
 - **Naître** — vous répondez à l'entretien. De vingt minutes à une heure et demie, selon ce que vous voulez raconter, avec pauses possibles. Il génère le vault, l'échafaudage et les commandes du cycle.
@@ -82,7 +81,7 @@ Tout ce qui précède en suppose une : un assistant et deux dossiers locaux. **C
 
 Une machine qui lit le vault sans atteindre les systèmes reste une instance légitime — elle doit seulement **le dire** en se déclarant, car à partir de là elle documente sans vérifier.
 
-Et il existe une instance légitime qui n'écrit jamais — un conseil abonné à la mémoire de l'ingénierie, un auditeur. Sa ligne au registre porte `access: writes | reads`, et **elle ne se déclare pas elle-même : une instance qui écrit la déclare**, avant son arrivée. Qui ne fait que lire garde ce qui définit le rôle : fermer chaque session sans avoir écrit une lettre.
+Et il existe une instance légitime qui n'écrit jamais — un conseil abonné à la mémoire de l'ingénierie, un auditeur. Sa ligne au registre porte `acceso: escribe | lee`, et **elle ne se déclare pas elle-même : une instance qui écrit la déclare**, avant son arrivée. Qui ne fait que lire garde ce qui définit le rôle : fermer chaque session sans avoir écrit une lettre.
 
 ## Prérequis
 

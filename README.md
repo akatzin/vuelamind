@@ -71,8 +71,7 @@ The first question is your language. **The second one decides everything after i
 domain being born here, or is this machine joining one that already lives?
 
 > Where the canon lives — repository, branch, site — is declared once in
-> [`config.yml`](config.yml), along with the defaults for where patches are consumed from and
-> published to. Everything else references that file instead of repeating it, and a check
+> [`config.yml`](config.yml). Everything else references that file instead of repeating it, and a check
 > fails the build if any copy drifts away from it.
 
 - **Being born** — answer the interview. From twenty minutes to an hour and a half, depending on how much you tell it, and you can pause. It generates
@@ -106,7 +105,7 @@ Everything above assumes one: an assistant and two local folders. **That promise
 
 A machine that can read the vault but cannot reach the systems is still a legitimate instance — it just has to **say so** when it declares itself, because from then on it documents without verifying.
 
-And there is a legitimate instance that never writes at all — a board subscribed to the engineering memory, an auditor. Its registry row carries `access: writes | reads`, and **it does not declare itself: a writing instance declares it**, before it arrives. Whoever only reads keeps the thing that defines the role: closing every session without having written a letter.
+And there is a legitimate instance that never writes at all — a board subscribed to the engineering memory, an auditor. Its registry row carries `acceso: escribe | lee`, and **it does not declare itself: a writing instance declares it**, before it arrives. Whoever only reads keeps the thing that defines the role: closing every session without having written a letter.
 
 ## Requirements
 
