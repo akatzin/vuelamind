@@ -583,7 +583,7 @@ sesión, de lectura**.
 > hueco. Lo que no se hace es elegir uno nuevo en silencio.
 
 **Lo que esta vía nunca hace:** reescribir el manifiesto, el arranque o las decisiones. Del
-manifiesto solo agrega su fila en `## instancias`. Es una máquina que se suma, no una que reforma.
+manifiesto solo agrega su fila en `## instancias`.
 
 ## Fase 1 — Generar la estructura
 

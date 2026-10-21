@@ -57,7 +57,7 @@ El único paso irreductiblemente manual, y el que de verdad cuesta: llaves, cred
 
 ## 5 · Declararse ante el dominio
 
-Agregar una fila a la sección `## instancias` del manifiesto: **`nombre · acceso · carril · dónde`**. `acceso` es `escribe` o `lee`, y casi nunca es el mismo que el de las otras. Si la sección no existe, se crea con la fila de la instancia que ya estaba y la de ésta. Desde cuándo corre y qué puede medir desde ahí van a la nota de la instancia o al panorama.
+Agregar una fila a la sección `## instancias` del manifiesto: **`nombre · acceso · carril · dónde`**. `acceso` es `escribe` o `lee`, y cada instancia declara el suyo: no se copia el de otra. Si la sección no existe, se crea con la fila de la instancia que ya estaba y la de ésta. Desde cuándo corre y qué puede medir desde ahí van a la nota de la instancia o al panorama.
 
 Con dos o más instancias que escriben, el cierre se corre de uno en uno, con candado: lo dice `vuelamind-commit`.
 
@@ -93,7 +93,7 @@ La primera sesión se abre con el comando de retomar, se lee el registro de deci
 ## Qué NO hace
 
 - **No crea el dominio.** Si el vault no existe, el comando correcto es el de nacer.
-- **No reescribe el manifiesto, ni el arranque, ni las decisiones.** Del manifiesto solo agrega su fila en `## instancias`. Es una máquina que se suma, no una que reforma.
+- **No reescribe el manifiesto, ni el arranque, ni las decisiones.** Del manifiesto solo agrega su fila en `## instancias`.
 - **No sincroniza por su cuenta.** El transporte lo decide el dominio; este comando **comprueba** que funcionó.
 - **No da por buena una conexión que no midió.** Si algo no se pudo verificar, se dice — nunca se reporta como listo.
 
