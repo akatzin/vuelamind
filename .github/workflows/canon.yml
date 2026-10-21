@@ -15,11 +15,14 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   coherencia:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Leer config.yml
         id: cfg
@@ -41,12 +44,13 @@ jobs:
       # declarado. Cubre las dos direcciones: si cambia config.yml y no los
       # readmes, falla; si alguien edita un readme a mano, tambien.
       - name: Las menciones al repo coinciden con el declarado
+        env:
+          REPO: ${{ steps.cfg.outputs.repo }}
         run: |
           # Sin sed: `\?` no es portable entre BSD y GNU, y al probarlo en un Mac
           # dejo el esquema pegado y marco como malas las 19 menciones buenas.
           # Un resultado absurdo acusa al extractor antes que a los datos.
-          repo="${{ steps.cfg.outputs.repo }}"
-          declarado="${repo#*//}"
+          declarado="${REPO#*//}"
           malas=$(grep -rnoE 'github\.com/[A-Za-z0-9._-]+/vuelamind' \
                     --include='*.md' --include='*.js' --include='*.html' . \
                   | grep -v ":${declarado}$" || true)
