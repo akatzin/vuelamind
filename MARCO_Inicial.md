@@ -1704,10 +1704,8 @@ Son **universales por escritura**: no llevan dentro ninguna ruta ni nombre de no
 de un dominio concreto. Eso es lo que los distingue del comando de reconciliación,
 que se genera dentro del dominio (Fase 1.3).
 
-> [!important] Universal no significa automáticamente "arriba" — corregido el 2026-08-11
-> La versión anterior de esta sección concluía que viven en el nivel
-> personal *porque son universales*, y eso mezcla dos cosas. Ser universal es
-> condición **necesaria** para vivir arriba, no suficiente: lo que decide es si
+> [!important] Universal no significa automáticamente "arriba"
+> Ser universal es condición **necesaria** para vivir arriba, no suficiente: lo que decide es si
 > **estorbaría** a una versión propia del dominio, porque el nivel personal
 > **ensombrece** al del proyecto.
 >
@@ -1833,8 +1831,8 @@ Los actos —**nacer** (ya ocurrió: fue pegar el archivo), **sumarse** cuando s
 > teclee el de ayuda ahora mismo recibe *«no es un comando reconocido»* después de haber
 > contestado la entrevista entera, y no tiene modo de saber que eso es normal.
 >
-> *(Pasó en la primera prueba con un usuario real, 2026-08-13. El aviso ya existía en la Fase
-> 1.3 — escrito **para el asistente**. Nadie se lo dijo a él.)*
+> *(Medido el 2026-08-13: el aviso existía solo en la Fase 1.3, escrito **para el asistente**, y a
+> la persona nadie se lo dijo.)*
 
 **El cierre es un traspaso de tres movimientos, con los nombres exactos que va a teclear:**
 
