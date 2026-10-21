@@ -79,9 +79,9 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 ```
   v3.0 ──┬── v3.4  el canal        RETIRADO en la v3.9.2 (2026-10-12)
          │
-         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0
+         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0
          │
-         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0   sin pasar por la v3.5
+         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0   sin pasar por la v3.5
 ```
 
 > [!important] Las versiones se comparan por segmentos, como enteros — nunca como decimales
@@ -110,6 +110,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 > `UPGRADE_v3.10.0.md`**, que vuelve a copiar `ALMA.md` e instala `vuelamind-export`.
 > La v3.10.1 y la v3.10.3 solo piden traer el canon; la v3.10.2 y la v3.10.4 reinstalan `vuelamind-export`.
 > La v3.11.0 reinstala `vuelamind-commit` y `vuelamind-join`.
+> La v3.12.0 reinstala `vuelamind-commit`, `vuelamind-load` y `vuelamind-export`, y migra la cola con `herramientas/pendientes.py`.
 
 | Salto | Documento | Estado |
 |---|---|---|
@@ -129,6 +130,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 | v3.10.2 → v3.10.3 | `UPGRADE_v3.10.3.md` | **Liberado** — no cambia nada: es la versión de prueba del aviso de versión nueva. Menor. **Requiere la v3.10.2**; solo se trae el canon |
 | v3.10.3 → v3.10.4 | `UPGRADE_v3.10.4.md` | **Liberado** — `vuelamind-export` marca los nombres del zip como UTF-8, verifica por nombre y no por conteo, y `se_ejecuta` lista todo archivo bajo `.claude/` menos el manifiesto, y `.mcp.json`. Menor. **Requiere la v3.10.3**; no cambia el manifiesto |
 | v3.10.4 → v3.11.0 | `UPGRADE_v3.11.0.md` | **Liberado** — varias instancias en un dominio: el manifiesto las declara en `## instancias` y, con dos o más que escriben, el cierre lleva candado (`.cierre.lock/`). Menor. **Requiere la v3.10.4**; el manifiesto gana una sección opcional |
+| v3.11.0 → v3.12.0 | `UPGRADE_v3.12.0.md` | **Liberado** — un archivo por pendiente con un índice generado, y `herramientas/pendientes.py revisar` sale con 1 si un cerrado se queda en abiertos o sin su párrafo. Menor. **Requiere la v3.11.0**; la cola se migra con `pendientes.py migrar` |
 
 ## Fuera de la cadena: lo que salió del canon
 

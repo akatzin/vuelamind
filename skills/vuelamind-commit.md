@@ -57,6 +57,8 @@ Si declara `antes_de_medir`, córrelo ahora.
 
 Los **avisos** de enlaces colgantes no son errores en un vault que los use a propósito para marcar trabajo pendiente. Lo que hay que confirmar es que cada uno siga siendo deliberado.
 
+**Y la cola, aunque el validador del dominio no la llame:** `python3 herramientas/pendientes.py revisar <vault>`, desde el canon, con `--cola` y `--archivo` si el manifiesto les da otro nombre. Si dice que la cola no está migrada, se reporta y se ofrece `migrar` (`UPGRADE_v3.12.0.md`).
+
 Si el script reporta algo, anótalo para el paso 3 — **no lo arregles todavía**.
 
 > [!warning] Si corriges un chequeo del validador, dos disciplinas, no una
@@ -192,9 +194,9 @@ El **único** paso que escribe en el vault. En este orden, porque cada uno depen
 > —todo autor cree que la suya es la mínima— y el texto vuelve a crecer en el cierre
 > siguiente.*
 
-1. **La cola** — items cerrados condensados a un párrafo, correcciones, conteos.
+1. **La cola**, con `herramientas/pendientes.py`: `cerrar <folio>` por cada pendiente cerrado y su párrafo en «## Cierre»; un abierto que cambió se reescribe en su archivo, y uno nuevo se abre con `nuevo`. El índice lo regenera el script: debajo de su marca no se edita a mano.
 2. **Las notas de componente** — la lección se promueve **antes** de archivar: archivar una lección es perderla. **Y también a la nota que hacía la PREGUNTA**: si el item nació de un *"por confirmar"* escrito en una nota temática, esa nota es destino obligatorio de la respuesta — hacia atrás no va nadie, y una pregunta sin tachar invita a re-medir lo ya medido. *(Parche `la-leccion-va-tambien-a-la-nota-que-preguntaba`.)*
-3. **El archivo de cerrados** — el registro completo, con su evidencia.
+3. **El archivo de cerrados** — el registro completo ya está en `pendientes/cerrados/<folio>.md`; aquí solo se comprueba que su evidencia sirva.
 4. **El registro de decisiones** — si hubo elección con alternativa defendible: qué se descartó y qué haría cambiar de opinión.
 5. **El panorama** — solo si cambió de verdad, refrescando su fecha. **Es una FOTO, no una crónica**: presente, sin fechas de jornada. La prueba: ¿esta frase seguirá siendo cierta y útil en seis meses? Al convertir crónica en foto, rescatar el hecho y tirar la jornada — y comprobar que ningún hecho vivía solo en la parte narrativa.
 6. **La bitácora** — la entrada **del día**, al final; si ya existe la de hoy, se amplía con un `###`, no se abre otra. Solo entradas con fecha — las lecturas de conjunto van al registro de decisiones. Se escribe **en voz alta, para contárselo a un amigo**: si una frase no se entendería en una cocina, se reescribe. **Los errores propios van, y van con nombre** — es lo que separa una bitácora de un boletín de logros.
@@ -209,7 +211,7 @@ El **único** paso que escribe en el vault. En este orden, porque cada uno depen
    > **El arranque es el sitio más caro del vault.** Si una sección suya se puede sustituir
    > por su primera frase, sobra — y sobra multiplicada por todas las sesiones que vengan.
 
-Al terminar, **volver a correr el validador**: los cambios pueden romper conteos o dejar un enlace colgante nuevo.
+Al terminar, **volver a correr el validador y `pendientes.py revisar`**: los cambios pueden romper conteos o dejar un enlace colgante nuevo. Con cualquiera de los dos en rojo, el cierre no está hecho.
 
 **Y releer lo que la sesión escribió** — con `python3 herramientas/instantanea_vault.py diff <vault>`, o con lo que el dominio tenga. **Ni el barrido del radio ni el validador lo hacen**: el radio mira las **vecinas** de lo tocado, el validador mira **mecánica**. Un párrafo nuevo que afirma algo falso **pasa los dos**, porque cuadra, enlaza y no contradice a nadie — es la única parte del cierre que nada comprueba.
 
