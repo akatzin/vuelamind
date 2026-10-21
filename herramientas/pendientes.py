@@ -2,8 +2,8 @@
 """La cola de pendientes, un archivo por pendiente, y su indice generado.
 
 LO QUE HACE CUMPLIR: un pendiente cerrado sale de la carpeta de abiertos, deja su
-parrafo de cierre y nadie lo vuelve a cargar al trabajar. La regla existia en el
-master; este script la vuelve comprobable, y `revisar` sale con 1 si no se cumple.
+parrafo de cierre y nadie lo vuelve a cargar al trabajar. `revisar` sale con 1 si no
+se cumple.
 
     <vault>/Pendientes.md                 el indice: cabecera a mano, lo demas generado
     <vault>/pendientes/<folio>.md         un abierto
