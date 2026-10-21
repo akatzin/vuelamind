@@ -241,3 +241,12 @@ salto v3 está declarado pendiente en el corpus, y quien lo corra primero lo pag
 parches, que es la moneda buena. Corre con el deshacer asegurado (la réplica no es
 deshacer — lección 49), deja que el preflight aborte lo que tenga que abortar, y escribe
 lo que duela.
+
+## Historia que salió del master en la v3.10.0
+
+- **«Los comandos del ciclo»** concluía, hasta el 2026-08-11, que los comandos del método viven en
+  el nivel personal *porque son universales*. Se corrigió ese día: ser universal es condición
+  necesaria para vivir arriba, no suficiente.
+- **El ciclo de vida de las ideas.** El marco usó *«un párrafo se lee cuando alguien se acuerda; un
+  comando está en el camino de todos los días»* para que nacer y retomar fueran comandos, y dejó las
+  ideas en una sección de archivo, sin salida.
