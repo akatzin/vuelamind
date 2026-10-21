@@ -1678,7 +1678,7 @@ nueva arranca con el estado de la anterior** — que puede tener días.
 > [!important] Y hay un cuarto acto, que solo aparece cuando el dominio deja de tener una sola instancia
 > **Sumarse**: conectar una máquina nueva a un dominio que **ya vive**, con su vault, su historia y sus decisiones tomadas.
 >
-> Los otros tres asumen los dos extremos —*nacer* asume que el vault no existe, y *retomar* que la máquina ya está lista—, así que **entre "no existe" y "ya está todo" no había nada escrito**. Sumar una instancia era trabajo manual que nadie había puesto por escrito, y **una colmena sin puerta de entrada no crece**.
+> Los otros tres asumen los dos extremos: *nacer*, que el vault no existe, y *retomar*, que la máquina ya está lista.
 >
 > Sus seis pasos, en orden: **llegar al vault y comprobar que llegó entero** (uno a medio sincronizar es peor que ninguno: el asistente mide sobre un hueco y concluye con confianza) · **instalar el ciclo desde el canon**, no copiarlo de otra máquina · **resolver los accesos**, que es lo único irreductiblemente manual · **correr el validador como prueba de estar dentro** —que los archivos estén no significa que la máquina pueda medir— · **declararse ante el dominio** —con su `acceso: escribe | lee`; quien solo lee **es declarado por otra**, nunca se le exige escribir—, porque sin registro de instancias una colisión no tiene con quién conversar · y **la primera sesión, de lectura**.
 >
@@ -1711,7 +1711,7 @@ que se genera dentro del dominio (Fase 1.3).
 > **estorbaría** a una versión propia del dominio, porque el nivel personal
 > **ensombrece** al del proyecto.
 >
-> - **crear** tiene que vivir arriba, y no es una preferencia: es el **arranque en
+> - **crear** tiene que vivir arriba: es el **arranque en
 >   frío**. Si viviera dentro de un dominio, la primera instancia de una máquina
 >   nueva se quedaría sin puerta por la que nacer. Por eso mismo **no puede
 >   hardcodear el repositorio de nadie**: lo busca en las memorias, en un dominio
@@ -1803,8 +1803,8 @@ usuario puede traer otra cosa.
 > dominio, junto a su comando de reconciliación.
 
 > [!warning] Un comando que existe y no está documentado, no existe
-> En el dominio de origen, el comando de retomar llevaba escrito y funcionando
-> todo un día y **no aparecía en ninguna nota del vault**; de paso, la tabla de
+> Medido en el dominio de origen: el comando de retomar funcionaba
+> y **no aparecía en ninguna nota del vault**, y la tabla de
 > comandos declaraba seis cuando en disco había siete. **Nada falla cuando un
 > número miente**, así que puede llevar meses así. Mismo defecto que el arranque
 > de sesión, que estaba en un diagrama y no lo generaba ninguna fase: **lo que
@@ -1818,7 +1818,7 @@ Terminar la Fase 1 y decir *"listo"* es el error de recorrido más caro del marc
 
 ### 1 · Enséñale el ciclo con SU dominio, no con uno de ejemplo
 
-Los actos —**nacer** (ya ocurrió: fue pegar el archivo), **sumarse** cuando se una otra máquina, **retomar** al abrir sesión, **reconciliar** al cerrarla— se explican **con los nombres exactos que va a teclear** y con un caso hipotético del dominio que acaba de describir. Un pendiente inventado *de lo suyo*, abierto y cerrado en el aire, enseña más que cualquier manual: se ve de dónde sale el folio, dónde queda la evidencia, qué pasa al archivar.
+Los actos —**nacer** (ya ocurrió: fue pegar el archivo), **sumarse** cuando se una otra máquina, **retomar** al abrir sesión, **reconciliar** al cerrarla— se explican **con los nombres exactos que va a teclear** y con un caso hipotético del dominio que acaba de describir. Un pendiente inventado *de lo suyo*, abierto y cerrado en el aire, deja ver de dónde sale el folio, dónde queda la evidencia, qué pasa al archivar.
 
 **Y muéstrale los comandos que de verdad existan en esta máquina**, no los que el método define. Se generan del disco, y hay un comando del marco que hace exactamente eso — si está instalado, se usa y se le dice a la persona que puede volver a pedirlo cuando quiera. Si no está, se listan los que sí haya, y se dice cuáles faltan.
 
@@ -1865,7 +1865,7 @@ Tres o cuatro. Diez es un catálogo, y un catálogo no se elige: se hojea.
 
 ### 4 · Una sola cosa para mañana
 
-Y en esa misma segunda sesión, **un primer paso concreto y pequeño**: **medir una sola cosa** del dominio y escribirla con su evidencia. Una. El vault vacío intimida, y el primer hecho medido lo rompe — a partir de ahí el método se sostiene solo.
+Y en esa misma segunda sesión, **un primer paso concreto y pequeño**: **medir una sola cosa** del dominio y escribirla con su evidencia. Una.
 
 ## Resumen de la inicialización
 
@@ -1888,7 +1888,5 @@ Cuando el asistente termine, debe entregar:
 - [ ] El registro de parches del método, aunque sea vacío — con la columna de **versión**, no solo la fecha
 - [ ] Los comandos del ciclo **instalados desde el canon** (Fase 1.4) y contados contra `skills/`, o dicho explícitamente cuáles no se pudieron instalar y por qué
 - [ ] **Una lista explícita de lo que NO se pudo verificar en esta sesión**
-
-Ese último punto es el que arranca el marco con el pie derecho: el primer acto del vault es admitir lo que todavía no sabe.
 
 <!-- Semilla del marco: las mejores correcciones de este método empezaron con alguien preguntando "¿por qué?". El primero en preguntar se llamaba Akatzin. -->
