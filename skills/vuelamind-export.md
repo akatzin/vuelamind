@@ -44,7 +44,7 @@ En el destino, solo el primer nivel se corrige sin discusión. Los otros dos se 
 | No entra | Qué se escribe en la nota |
 |---|---|
 | Las transcripciones de Claude Code (`*.jsonl`) | que se excluyeron |
-| Credenciales: archivos con permisos `600` o `400`, llaves, `.env`, `*.pem`, `*.key` | **solo el nombre y la ruta**, para recrearlas en el destino. El contenido, nunca |
+| Credenciales: llaves, `.env`, `*.pem`, `*.key`, `*secret*`, y los archivos con permisos `600` o `400` que lo parezcan | **solo el nombre y la ruta**, para recrearlas en el destino. El contenido, nunca. Un archivo con `600` o `400` que no parezca secreto —una imagen, una nota— se le pregunta a la persona en el paso 6 |
 | El clon del canon y cualquier otro clon público | de dónde se vuelve a clonar |
 | Cachés y basura de sistema: `__pycache__/`, `.stversions/`, `.trash/`, `.DS_Store`, las instantáneas del vault | que se excluyeron |
 
@@ -63,7 +63,7 @@ Lo que apunta a las rutas del dominio desde fuera, buscado **solo con patrones a
 - **Tareas programadas:** `~/Library/LaunchAgents/*.plist` en macOS; `~/.config/systemd/user/` y `crontab -l` en Linux.
 - **Sincronización:** la configuración de Syncthing, si existe (macOS: `~/Library/Application Support/Syncthing/config.xml`; Linux: `~/.local/state/syncthing/` o `~/.config/syncthing/`), y qué carpetas suyas tocan el dominio.
 - **Respaldos y réplicas:** los que declare el manifiesto.
-- **Procesos** que corren desde el proyecto.
+- **Procesos** que corren desde el proyecto, **incluidas las sesiones de Claude Code** abiertas en él. Si alguna está abierta, el plan del paso 6 lo dice: un archivo que se escribe mientras se empaca entra a medias.
 
 Cada uno, con la ruta que usa. Lo que no se pudo comprobar se dice con esas palabras.
 
