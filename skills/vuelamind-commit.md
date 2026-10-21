@@ -30,10 +30,22 @@ Declara, como mínimo:
 | `antes_de_medir` | enganche opcional: qué correr antes del paso 0 (desbloquear una llave, montar algo) |
 | `despues_de_escribir` | enganche opcional: qué correr tras el paso 4 |
 | `avisos_del_dominio` | lista corta de trampas propias que el motor debe respetar al escribir |
+| `instancias` | quién trabaja en el dominio: la sección `## instancias`, con una tabla `nombre · acceso · carril · dónde` y una fila por instancia; `acceso` es `escribe` o `lee`. Opcional con una sola instancia |
 
 **Si el manifiesto no existe, detente y dilo.** Ofrece generarlo desde este contrato preguntando las claves una a una — no inventes rutas ni corras un checkpoint "genérico" sin él: reconciliar el vault equivocado es peor que no reconciliar.
 
 **Si existe pero le falta una clave, repórtalo como hueco** y sigue con lo que sí declara. Un manifiesto incompleto que avisa vale más que uno que aparenta completitud.
+
+### Con varias instancias: un cierre a la vez
+
+Si `## instancias` tiene más de una fila con acceso `escribe`, el cierre toma un candado antes de medir y lo suelta al final:
+
+1. **El nombre.** La sesión sabe qué instancia es, o lo pregunta. No se inventa.
+2. **Tomarlo:** `mkdir <proyecto>/.cierre.lock`, que es atómico, y dentro el archivo `quien` con una línea: `<nombre> <AAAA-MM-DDTHH:MM:SSZ>`. **Si la carpeta ya existe, no se cierra:** se dice quién la tiene y desde cuándo, y se espera. Un candado huérfano lo decide la persona: puede ser de un cierre que sigue corriendo.
+3. **Con el candado puesto** se numeran los folios nuevos. Lo de otra instancia que salga en la relectura se le avisa a quien lo escribió; no se corrige.
+4. **Soltarlo** después de renovar la instantánea: borrar `quien` y la carpeta, y comprobar que ya no existe.
+
+El candado vale entre sesiones de una misma máquina: `mkdir` no es atómico entre máquinas que sincronizan una carpeta. Por eso `.cierre.lock/` no se sincroniza ni se versiona, y entre máquinas sigue mandando traer fresco cada archivo antes de editarlo.
 
 Si declara `antes_de_medir`, córrelo ahora.
 
@@ -219,7 +231,7 @@ releída. **Si falta la instantánea, se dice** en vez de seguir como si se hubi
 
 Es un `grep` por fecha, no una lectura: por cada remisión con la fecha de hoy, comprobar que el destino tenga una sección con esa fecha. Lo que **no** debe reportarse es un enlace **sin** fecha — ése no promete nada. Y la regla al escribir: **la entrada primero, aunque sea su título y una línea; el enlace después.** Si no va a escribirse ahora, la remisión correcta es sin fecha, que se lee como pendiente. *(Parche `un-enlace-con-fecha-promete-contenido`.)*
 
-Si el manifiesto declara `despues_de_escribir`, córrelo ahora.
+Si el manifiesto declara `despues_de_escribir`, córrelo ahora. Y si el cierre tomó el candado, suéltalo después: borra `quien` y `.cierre.lock/`, y comprueba que ya no existe.
 
 ## 5. Reportar
 
