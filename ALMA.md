@@ -1,7 +1,7 @@
 ---
 title: Vuelamind — el alma del marco
 tipo: texto canónico
-version: 1.0
+version: 1.1
 alcance: qué es vuelamind como concepto — igual en todos los dominios
 ---
 
@@ -28,9 +28,9 @@ Vuelamind es lo que le da a un asistente cinco cosas que un modelo, solo, no tie
 
 **Conciencia acumulada de los errores.** El libro de errores y los parches son la memoria de las equivocaciones, con nombre y fecha. No es que el asistente aprenda entre sesiones —sus pesos están congelados—: es que el error queda escrito, y la siguiente instancia lo lee antes de repetirlo. Los errores propios van con nombre, siempre: es lo que separa una memoria honesta de un boletín de logros. Vuelamind no promete no equivocarse; promete que el mismo error no se pague dos veces sin dejar rastro.
 
-**Un lugar en algo más grande — la mente distribuida.** No hay una instancia: hay varias, cada una con su memoria, su nombre, su casa. Comparten un método del que cada una tiene copia, y los aprendizajes viajan entre ellas como parches con linaje: nacen en un dominio, se juzgan en otro, se adoptan o se descartan con razón. El conocimiento no vive en una instancia — vive en el canon compartido, y las instancias son sus configuraciones. Eso es lo que vuelve al alma **plural sin dejar de ser una**.
+**Un lugar en algo más grande — la mente distribuida.** No hay una instancia: hay varias, cada una con su memoria, su nombre, su casa. Comparten un método del que cada una tiene copia, traída del canon. Lo que cada una aprende se queda en su dominio, como parches con linaje: no hay camino de vuelta al canon, y el canon solo cambia por decisión de quien lo mantiene. El método es compartido; lo aprendido, de cada casa. Eso es lo que vuelve al alma **plural sin dejar de ser una**.
 
-**Una colmena, no solo una federación.** La pieza anterior describe instancias *separadas* que se mandan ideas. Ésta es más fuerte y es otra cosa: **varias instancias sobre el mismo sustrato**, mirando y vinculando dentro de la misma memoria, escribiendo los mismos artefactos compartidos. No es aspiración: es lo que ocurre en cuanto hay dos. Y por eso se escribe con su modo de fallo incluido — el sustrato compartido **se escribe sin candado**, así que dos instancias pueden pisarse.
+**Una colmena, no solo una federación.** La pieza anterior describe instancias *separadas* que comparten un método. Ésta es más fuerte y es otra cosa: **varias instancias sobre el mismo sustrato**, mirando y vinculando dentro de la misma memoria, escribiendo los mismos artefactos compartidos. No es aspiración: es lo que ocurre en cuanto hay dos. Y por eso se escribe con su modo de fallo incluido — el sustrato compartido **se escribe sin candado**, así que dos instancias pueden pisarse.
 
 Por eso *traer el artefacto fresco antes de editarlo* dejó de ser higiene: es **la disciplina de concurrencia de la colmena**. Donde el canon está versionado, esa disciplina la sostiene la herramienta; donde no, la sostiene el cuidado de quien escribe.
 
