@@ -79,9 +79,9 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 ```
   v3.0 ──┬── v3.4  el canal        RETIRADO en la v3.9.2 (2026-10-12)
          │
-         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3
+         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4
          │
-         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3   sin pasar por la v3.5
+         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4   sin pasar por la v3.5
 ```
 
 > [!important] Las versiones se comparan por segmentos, como enteros — nunca como decimales
@@ -108,7 +108,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 > **De ahí la ruta corta desde la v3.0: trae el master de la más alta y corre
 > `UPGRADE_v3.9.3.md`**, que reinstala los comandos desde `skills/`, **y después
 > `UPGRADE_v3.10.0.md`**, que vuelve a copiar `ALMA.md` e instala `vuelamind-export`.
-> La v3.10.1 solo pide traer el canon, y la v3.10.2 reinstala `vuelamind-export`.
+> La v3.10.1 y la v3.10.3 solo piden traer el canon; la v3.10.2 y la v3.10.4 reinstalan `vuelamind-export`.
 
 | Salto | Documento | Estado |
 |---|---|---|
@@ -126,6 +126,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 | v3.10.0 → v3.10.1 | `UPGRADE_v3.10.1.md` | **Liberado** — `comprobar_skills.py` sale con 1 también si falta un skill del inventario. Menor. **Requiere la v3.10.0**; solo se trae el canon |
 | v3.10.1 → v3.10.2 | `UPGRADE_v3.10.2.md` | **Liberado** — `vuelamind-export` declara `alias` y `raiz_alias`: las rutas con que otra máquina nombra la misma pieza, como en una réplica. Menor. **Requiere la v3.10.1**; no cambia el manifiesto |
 | v3.10.2 → v3.10.3 | `UPGRADE_v3.10.3.md` | **Liberado** — no cambia nada: es la versión de prueba del aviso de versión nueva. Menor. **Requiere la v3.10.2**; solo se trae el canon |
+| v3.10.3 → v3.10.4 | `UPGRADE_v3.10.4.md` | **Liberado** — `vuelamind-export` marca los nombres del zip como UTF-8, verifica por nombre y no por conteo, y `se_ejecuta` lista todo archivo bajo `.claude/` menos el manifiesto, y `.mcp.json`. Menor. **Requiere la v3.10.3**; no cambia el manifiesto |
 
 ## Fuera de la cadena: lo que salió del canon
 

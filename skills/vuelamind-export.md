@@ -84,13 +84,16 @@ Se empaca solo con su sí.
 - `MIGRACION.md`, en la raíz del zip, con el formato de abajo.
 - `RUTAS.tsv`: una fila por ruta absoluta encontrada en el paso 4, con tres columnas separadas por tabulador: archivo dentro del zip, renglón y **la ruta completa como aparece en el renglón**, desde donde empieza la coincidencia hasta el primer espacio, comilla, acento grave o cierre de paréntesis o corchete. No basta el pedazo que coincidió: `~/` a secas no dice si la ruta es del dominio o de otra parte.
 - `HUELLAS.txt`: el `sha256` de cada archivo del zip, salvo él mismo, con su ruta dentro del zip.
-- El zip: `<dominio>-<AAAA-MM-DD>T<HHMM>Z.zip`, con la hora en UTC para que dos exportaciones del mismo día no choquen. Se hace con las herramientas del sistema (`zip`, o `ditto` en macOS), **en la carpeta de destino y con el nombre temporal `<nombre>.zip.parcial`**: quien lo lea mientras se escribe vería un zip roto.
+- El zip: `<dominio>-<AAAA-MM-DD>T<HHMM>Z.zip`, con la hora en UTC para que dos exportaciones del mismo día no choquen. Se escribe **en la carpeta de destino y con el nombre temporal `<nombre>.zip.parcial`**: quien lo lea mientras se escribe vería un zip roto.
+- **Cada nombre que no sea ASCII va marcado como UTF-8** (el bit 11 de su entrada); sin la marca, el destino lee «Topología» como «Topologi╠üa». `zip` y `ditto` de macOS no la ponen (MEDIDO el 2026-10-21); `bsdtar --format zip --options zip:hdrcharset=UTF-8` y el `zipfile` de Python, sí.
 
 ### 8. Verificar en el zip, no en el origen
 
 - `unzip -t` sin errores.
-- El zip tiene exactamente un archivo más que las filas de `HUELLAS.txt`.
-- Solo con las dos cosas en verde se renombra `<nombre>.zip.parcial` a `<nombre>.zip`, con `mv` en la misma carpeta, que es un solo paso. Si alguna falla, se borra el `.parcial` y se reporta `NO EXPORTADO`.
+- Toda entrada con un nombre que no sea ASCII tiene la marca UTF-8.
+- **Por nombre, no por conteo:** los nombres del zip, en NFC, son exactamente los de `HUELLAS.txt` más él mismo. Un conteo cuadra aunque los nombres lleguen cambiados.
+- Cada archivo de la primera columna de `RUTAS.tsv` está en el zip.
+- Solo con todo en verde se renombra `<nombre>.zip.parcial` a `<nombre>.zip`, con `mv` en la misma carpeta, que es un solo paso. Si alguna falla, se borra el `.parcial` y se reporta `NO EXPORTADO`.
 - Reportar la ruta y el tamaño del zip, cuántos archivos lleva, qué se excluyó y lo que no se pudo verificar.
 - **La última línea del reporte es exactamente `EXPORTADO: <ruta absoluta del zip>`**, para que un programa que invoque el skill recoja el zip sin adivinar. Si no se exportó, la última línea es `NO EXPORTADO: <motivo>`.
 
@@ -140,7 +143,7 @@ excluido:
   credenciales: [<ruta original>, ...]   # solo el nombre: el contenido nunca
   otros: [<patrón o ruta>, ...]
 respaldos_manuales: [<ruta dentro del zip>, ...]
-se_ejecuta: [<ruta dentro del zip>, ...]  # ganchos de .claude/settings*.json y comandos del proyecto
+se_ejecuta: [<ruta dentro del zip>, ...]  # todo archivo bajo cualquier .claude/ menos el manifiesto, y .mcp.json
 huellas: HUELLAS.txt
 no_verificado: [<una línea por cosa>, ...]
 ---
@@ -149,6 +152,10 @@ no_verificado: [<una línea por cosa>, ...]
 **El frontmatter tiene que ser YAML válido**, y se comprueba cargándolo antes de empacar. Un valor con `: ` dentro, como una URL, va entre comillas dobles; el patrón de rutas, entre comillas simples, porque sus barras invertidas no son escapes de YAML.
 
 Toda ruta de `piezas`, `respaldos_manuales` y `se_ejecuta` es relativa a la raíz del zip. **Lo de `se_ejecuta` el destino lo revisa antes de activarlo**: importar un dominio es ejecutar lo que otro escribió.
+
+**`se_ejecuta` lista todo archivo bajo cualquier `.claude/` del zip**, a cualquier profundidad y con cualquier nombre —respaldos, `skills/` y subcarpetas incluidos—, **excepto el manifiesto, y además `proyecto/.mcp.json`** si existe. Declarar de más no rompe nada; dejar uno fuera, sí.
+
+Los nombres de archivo se comparan en NFC, en el zip, en `HUELLAS.txt`, en `RUTAS.tsv` y en el frontmatter: macOS puede guardarlos en NFD.
 
 El exportador escribe siempre `raiz_alias` y el `alias` de cada entrada de `fuera`, con `[]` si no hay. Siguen en el `formato: 1`: una clave ausente es de un paquete anterior y el importador puede deducirla; una presente manda sobre lo que deduzca, clave por clave.
 
