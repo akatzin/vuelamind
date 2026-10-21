@@ -34,7 +34,7 @@ El vault tiene que ser alcanzable desde aquí: réplica bidireccional, clon, mon
 ## 2 · Llegar al andamiaje
 
 - **Los comandos del ciclo se instalan desde el canon**, no se copian de la otra máquina: así entran verificados por huella y sin arrastrar ediciones locales de nadie.
-- **El manifiesto del dominio ya existe** y viaja con el proyecto. **No se reescribe.** Si falta alguna clave para esta máquina, se reporta como hueco — no se inventa.
+- **El manifiesto del dominio ya existe** y viaja con el proyecto. **No se reescribe**: solo se le agrega la fila de esta instancia (paso 5). Si falta alguna clave para esta máquina, se reporta como hueco — no se inventa.
 - Si el dominio usa memoria de asistente, se conecta la que ya tiene. **No se empieza una nueva**: ahí está lo aprendido.
 
 ## 3 · Los accesos para medir
@@ -57,7 +57,9 @@ El único paso irreductiblemente manual, y el que de verdad cuesta: llaves, cred
 
 ## 5 · Declararse ante el dominio
 
-Escribir que hay una instancia más: **dónde corre, desde cuándo, qué puede medir desde ahí** — y su **`acceso: escribe | lee`**, porque casi nunca es lo mismo que las otras. El sitio lo dice el dominio; si no tiene uno, la nota de la instancia o el panorama.
+Agregar una fila a la sección `## instancias` del manifiesto: **`nombre · acceso · carril · dónde`**. `acceso` es `escribe` o `lee`, y cada instancia declara el suyo: no se copia el de otra. Si la sección no existe, se crea con la fila de la instancia que ya estaba y la de ésta. Desde cuándo corre y qué puede medir desde ahí van a la nota de la instancia o al panorama.
+
+Con dos o más instancias que escriben, el cierre se corre de uno en uno, con candado: lo dice `vuelamind-commit`.
 
 > [!important] Si esta instancia solo LEE, este paso no lo hace ella
 > **Quien no escribe no se declara: se le declara.** Una instancia que sí escribe —o el
@@ -91,7 +93,7 @@ La primera sesión se abre con el comando de retomar, se lee el registro de deci
 ## Qué NO hace
 
 - **No crea el dominio.** Si el vault no existe, el comando correcto es el de nacer.
-- **No reescribe el manifiesto, ni el arranque, ni las decisiones.** Es una máquina que se suma, no una que reforma.
+- **No reescribe el manifiesto, ni el arranque, ni las decisiones.** Del manifiesto solo agrega su fila en `## instancias`.
 - **No sincroniza por su cuenta.** El transporte lo decide el dominio; este comando **comprueba** que funcionó.
 - **No da por buena una conexión que no midió.** Si algo no se pudo verificar, se dice — nunca se reporta como listo.
 

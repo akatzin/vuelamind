@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.10.4
+version: 3.11.0
 
 > [!important] El aprendizaje es local
 > Cada dominio escribe sus lecciones en su propio vault —el libro de errores, las decisiones y
@@ -582,8 +582,8 @@ sesión, de lectura**.
 > Si no aparece por ningún lado, **se dice que no se encontró** y se pregunta, anotándolo como
 > hueco. Lo que no se hace es elegir uno nuevo en silencio.
 
-**Lo que esta vía nunca hace:** reescribir el manifiesto, el arranque o las decisiones. Es una
-máquina que se suma, no una que reforma.
+**Lo que esta vía nunca hace:** reescribir el manifiesto, el arranque o las decisiones. Del
+manifiesto solo agrega su fila en `## instancias`.
 
 ## Fase 1 — Generar la estructura
 
@@ -973,6 +973,7 @@ Y dos corolarios:
 | `avisos_del_dominio` | lista corta de trampas propias que el motor debe respetar al escribir |
 | `acta` | dónde vive el acta de la entrevista inicial — la fuente de `vuelamind-whoiam` |
 | `alma` | dónde se instaló `ALMA.md` en este dominio —el texto canónico del marco más las atestiguaciones locales—, la fuente de `vuelamind-soul` |
+| `instancias` | quién trabaja en el dominio: la sección `## instancias`, con una tabla `nombre · acceso · carril · dónde` y una fila por instancia; `acceso` es `escribe` o `lee`. Opcional con una sola instancia. Con dos o más que escriben, el cierre lleva candado (Fase 3) |
 
 **Los dos enganches son los únicos puntos de inyección.** Un dominio que necesite reordenar los pasos no necesita un manifiesto más flexible: necesita revisar por qué quiere escribir antes de medir.
 
@@ -1513,6 +1514,19 @@ Qué hace, en orden:
 6. **Afirmaciones que envejecieron.** Lo que se escribió como medido hace semanas puede haber dejado de ser cierto. Marcar lo que convenga re-verificar. **Y revisar las capacidades afirmadas:** si una nota dice que el sistema *"tiene"*, *"puede"* o *"soporta"* algo, comprobar que no dependa de un estado que hoy no se cumple — una capacidad condicional escrita sin su condición se propaga a todos los planes que la citen. Es la regla de la Fase 2 §1, y el validador no puede juzgarla.
 7. **La bitácora del día.** Una entrada **por día, no por sesión**, siempre al final. Si ya existe la de hoy, no se abre otra: se amplía. **Aquí no va nada que no sea una entrada con fecha** — si sale una lectura de conjunto, va a la nota de interpretación. La bitácora **solo crece**; las lecturas **se reescriben**. Una sección sin fecha aquí significa que se coló algo que no era bitácora.
 8. **¿Algo de esto es del MÉTODO y no de este dominio?** Reescribe cada hallazgo **sustituyendo los nombres propios por genéricos**. ¿Sigue siendo cierto y útil? Si sí, es del método: se escribe como **parche** y se anota en el registro de parches del dominio. **Ante la duda, se escribe.**
+
+#### Con varias instancias: un cierre a la vez
+
+Si `## instancias` del manifiesto tiene más de una fila con acceso `escribe`, el cierre toma un candado antes de medir y lo suelta al final:
+
+- **El nombre.** La sesión sabe qué instancia es, o lo pregunta. No se inventa.
+- **Tomarlo:** `mkdir <proyecto>/.cierre.lock`, que es atómico, y dentro el archivo `quien` con una línea: `<nombre> <AAAA-MM-DDTHH:MM:SSZ>`. **Si la carpeta ya existe, no se cierra:** se dice quién la tiene y desde cuándo, y se espera. Un candado huérfano lo decide la persona: puede ser de un cierre que sigue corriendo.
+- **Con el candado puesto** se numeran los folios nuevos. Lo de otra instancia que salga en la relectura se le avisa a quien lo escribió; no se corrige.
+- **Soltarlo** después de renovar la instantánea: borrar `quien` y la carpeta, y comprobar que ya no existe.
+
+El candado vale entre sesiones de una misma máquina: `mkdir` no es atómico entre máquinas que sincronizan una carpeta. Por eso `.cierre.lock/` no se sincroniza ni se versiona, y entre máquinas sigue mandando traer fresco cada archivo antes de editarlo (`ALMA.md`, «Una colmena»).
+
+Qué carriles hay, quién coordina, cómo se avisan las instancias y de quién es cada archivo lo decide cada dominio.
 
 > [!important] Toda regla que diga «solo si el usuario lo pide» responde en qué momento se le pregunta
 > Si la respuesta es *«cuando se acuerde»*, la regla dice **no** de forma permanente.
