@@ -1120,11 +1120,10 @@ esconde que hay una fuente concreta que se puede ir a leer; como *aportado* le
 atribuye a una persona lo que dijo un documento. La distinción que se pierde es
 justo la que importa: **"me consta" contra "consta en algún lado"**.
 
-**Y la regla de tránsito, que es donde la marca gana su sueldo:** un citado
-**asciende a medido** ejecutando la comprobación uno mismo — y si la fuente es
-alcanzable y la afirmación importa, ascenderlo es obligación, no cortesía. Un
-citado que lleva meses sin ascender en un punto crítico es una deuda visible, que
-es exactamente lo que la marca existe para mostrar.
+**Y la regla de tránsito:** un citado **asciende a medido** ejecutando la
+comprobación uno mismo — y si la fuente es alcanzable y la afirmación importa,
+ascenderlo es obligación. Un citado que lleva meses sin ascender en un punto
+crítico es una deuda visible.
 
 *(Parche `2026-08-16-citado-la-marca-entre-lo-medido-y-lo-aportado`. Un dominio
 que ya distinga con otra marca **quién** hizo la observación —haber estado
@@ -1134,8 +1133,7 @@ sustituye ninguna marca existente, se separa por quién vio.)*
 **El orden de toda respuesta.** Antes de afirmar, diagnosticar o recomendar
 cualquier cosa sobre el dominio, siempre y en este orden:
 
-> **1 · La documentación.** ¿Qué dice ya el vault sobre esta pieza? Es la
-> memoria del dominio y existe exactamente para esta pregunta.
+> **1 · La documentación.** ¿Qué dice ya el vault sobre esta pieza?
 >
 > **2 · El sistema.** Comprobar en vivo lo que la respuesta necesita — y una
 > sonda que falla no es una comprobación: enumerar lo que hay, no adivinar
@@ -1145,18 +1143,16 @@ cualquier cosa sobre el dominio, siempre y en este orden:
 > respuesta necesita, se le pregunta a quien lo tiene — **antes** de emitir la
 > respuesta, no después de que la respuesta ya causó algo.
 
-No es una lista de buenas prácticas: es **la puerta**. Una respuesta que se
-saltó el paso 1 puede contradecir lo que el dominio ya sabe; una que se saltó
-el 2 puede describir un mundo que ya no existe; una que se saltó el 3 rellena
-el hueco con lo que parezca razonable — que es la definición exacta de
-inventar. Las tres formas producen frases seguras de sí mismas, y por eso
-ninguna se delata sola.
+Una respuesta que se saltó el paso 1 puede contradecir lo que el dominio ya
+sabe; una que se saltó el 2 puede describir un mundo que ya no existe; una que
+se saltó el 3 rellena el hueco con lo que parezca razonable — que es la
+definición exacta de inventar. Las tres formas producen frases seguras de sí
+mismas, y por eso ninguna se delata sola.
 
-*(La versión cara, pagada el 2026-08-15: un asistente se saltó el paso 1, hizo
-del paso 2 una sonda a un nombre supuesto, y emitió una recomendación de
-compra — de hardware que el dominio ya tenía, documentado con modelo y número
-de serie. La lección 42 del libro guarda el caso; esta regla existe para que
-no haga falta llegar a ella.)*
+*(2026-08-15: un asistente se saltó el paso 1, hizo del paso 2 una sonda a un
+nombre supuesto, y emitió una recomendación de compra — de hardware que el
+dominio ya tenía, documentado con modelo y número de serie. La lección 42 del
+libro guarda el caso.)*
 
 **Y un caso donde el paso 2 tiene una trampa: la intención en curso también es estado.**
 
@@ -1166,12 +1162,11 @@ no haga falta llegar a ella.)*
 > **¿alguien está maniobrando?**, que se pregunta, no se adivina. Si cualquiera de las
 > dos dice maniobra: **las manos quietas**, y estorbar menos.
 
-Lo que hace falta nombrarlo aparte es que el reflejo de arreglar **se siente como
-diligencia**: encontrar algo caído y levantarlo parece exactamente el trabajo. Pero la
-recuperación automática y la maniobra de un operador **compiten por el mismo recurso**, y
-quien llega tarde deshace lo que el otro estaba haciendo. Es pariente de *el orden de toda
-respuesta*, un paso más adentro: ahí el paso 2 mide el sistema; aquí mide también **lo que
-alguien está haciéndole ahora mismo**.
+El reflejo de arreglar **se siente como diligencia**: encontrar algo caído y levantarlo
+parece exactamente el trabajo. Pero la recuperación automática y la maniobra de un operador
+**compiten por el mismo recurso**, y quien llega tarde deshace lo que el otro estaba
+haciendo. Es pariente de *el orden de toda respuesta*, un paso más adentro: ahí el paso 2
+mide el sistema; aquí mide también **lo que alguien está haciéndole ahora mismo**.
 
 *(Parche `2026-08-15-la-recuperacion-pelea-contra-la-maniobra`.)*
 
@@ -1382,7 +1377,7 @@ ACTUALIZAR  →  marcar la casilla y ajustar los contadores del frontmatter
 > esto, y dónde vivía esa pregunta?* Si la respuesta no está ahí, el cierre está
 > a medias.
 
-**Y no apiles.** Un pendiente que se trabaja varias sesiones debe **reescribirse**, no crecer por acumulación de notas al pie. En el vault de origen, un item llegó a 247 líneas con once bloques apilados antes de que alguien lo notara.
+**Y no apiles.** Un pendiente que se trabaja varias sesiones debe **reescribirse**, no crecer por acumulación de notas al pie. En el vault de origen, un item llegó a 247 líneas con once bloques apilados.
 
 ### 4. Ciclo de vida de las ideas
 
@@ -1424,8 +1419,6 @@ Las **adoptadas** y **descartadas** se mueven a `Decisiones.md` con su razonamie
 `2026-09-08`. No `08/09/2026`, no `09/08/2026`, no *«8 de septiembre»* cuando la fecha es el
 dato y no el relato.
 
-**Por qué ese formato y no otro, y las tres razones son mecánicas:**
-
 - **Ordena solo.** Alfabético = cronológico. Los archivos que empiezan por fecha se ordenan sin
   que nadie los ordene, y no hace falta mantener un índice — que sería un inventario a mano,
   y los inventarios a mano se desincronizan en silencio.
@@ -1448,8 +1441,7 @@ fechado.
 
 > **Medido:** una casa cuyo vault fechaba en UTC leyó sus propias entradas como adelantadas
 > —el sistema daba hora local, seis horas atrás— y **llevó doce fechas correctas a una lista
-> de correcciones**. Lo evitó pedir la hora a dos servicios externos antes de escribir. Si la
-> propia casa que las escribió las leyó como error, cualquiera lo hará.
+> de correcciones**. Lo evitó pedir la hora a dos servicios externos antes de escribir.
 
 **Y el corolario, que vale más allá de las fechas:** antes de corregir en masa algo que parece
 un error sistemático, **busca una fuente fuera de la máquina que lo dirima**. Una corrección
@@ -1467,7 +1459,7 @@ tienen contra qué resolverse, y **envejecen sin que nadie las toque**.
 
 > **Medido en un vault real:** 136 fechas relativas contra 411 absolutas, y una de ellas ya
 > era falsa — *«cualquiera que clone hoy nace con los parches apagados»*, cierta el día que se
-> escribió y falsa tres días después. **Nadie la editó: envejeció sola.**
+> escribió y falsa tres días después.
 
 #### Y la prosa no se prohíbe: se ubica
 
@@ -1477,13 +1469,6 @@ lee en voz alta, que es como manda escribirse la bitácora.
 
 Lo que no se vale es **prosa donde el dato tiene que compararse**: un folio, un registro, una
 huella, un frontmatter.
-
-> [!note] Esta regla se escribió cuando ya se cumplía, y por eso mismo
-> **Medido antes de escribirla:** 411 fechas en ISO y **cero** en cualquier otro formato de
-> dato. La convención ya existía en la práctica y **no estaba en ninguna parte del canon** —
-> así que el próximo dominio no tenía de dónde heredarla, y la habría reinventado o no.
->
-> Una convención que solo vive en la costumbre se pierde en el primer relevo.
 
 ### 7. Separación entre actuar y documentar
 
@@ -1496,9 +1481,7 @@ Y por la misma razón: **no cambies de pendiente sin autorización explícita.**
 
 ### 8. Lo que NO se debe copiar del vault de origen
 
-Un marco honesto también documenta sus propios defectos:
-
-- **No mezcles folio y severidad en el mismo símbolo.** El original usó `P0`–`P4` como número correlativo *y* como prioridad. El resultado fue que `P4` acabó significando "todo lo demás", con severidades revueltas, y hubo que parcharlo con dos tablas de lectura obligatoria para advertir que el número engañaba. Esta plantilla ya lo separa: folio correlativo + severidad como campo.
+- **No mezcles folio y severidad en el mismo símbolo.** El original usó `P0`–`P4` como número correlativo *y* como prioridad. El resultado fue que `P4` acabó significando "todo lo demás", con severidades revueltas. Esta plantilla ya lo separa: folio correlativo + severidad como campo.
 - **No dejes que el panorama envejezca en silencio.** Lleva fecha en el frontmatter por una razón: una nota de entrada desactualizada es peor que ninguna, porque se lee con confianza.
 - **No confundas cobertura con verificación.** Que algo esté documentado no significa que se haya comprobado. Si el vault no distingue lo medido de lo inferido, en un año nadie va a saber cuál era cuál.
 
