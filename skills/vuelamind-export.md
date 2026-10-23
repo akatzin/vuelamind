@@ -52,11 +52,11 @@ En el destino, solo el primer nivel se corrige sin discusión. Los otros dos se 
 
 **Un enlace simbólico no se sigue**: se anota adónde apunta. Seguirlo mete en el zip algo que no es del dominio, o lo mismo dos veces.
 
-**Una ruta del manifiesto que no existe en esta máquina, con la pieza en otra ruta de esta máquina, es un alias**: pasa en una réplica y en un dominio que vive en varias máquinas. Se empaca lo que existe, y la ruta declarada va en `alias` de su entrada de `fuera`. La raíz del proyecto con que la nombra otra máquina va en `raiz_alias`: es la ruta absoluta de una pieza que el manifiesto declara dentro del proyecto, menos la parte que coincide exacta con donde quedó aquí. Dónde está la pieza lo dicen la persona, la configuración de sincronización o esa coincidencia exacta; nunca se elige por parecido, y lo que no se sepa se pregunta en el paso 6.
+**Una ruta del manifiesto que no existe en esta máquina, con la pieza en otra ruta de esta máquina, es un alias**: pasa en una réplica y en un dominio que vive en varias máquinas. Se empaca lo que existe, y la ruta declarada va en `alias` de su entrada de `fuera`, o de `canon` si es el clon del canon. La raíz del proyecto con que la nombra otra máquina va en `raiz_alias`: es la ruta absoluta de una pieza que el manifiesto declara dentro del proyecto, menos la parte que coincide exacta con donde quedó aquí. Dónde está la pieza lo dicen la persona, la configuración de sincronización o esa coincidencia exacta; nunca se elige por parecido, y lo que no se sepa se pregunta en el paso 6.
 
 ### 4. Barrer las rutas absolutas
 
-En cada archivo de texto que entra, buscar la ruta raíz del proyecto, la de cada pieza de `_fuera/`, cada `alias` y `raiz_alias`, `$HOME` expandido y `~/`. Cada hallazgo, con archivo, renglón y ruta.
+En cada archivo de texto que entra, buscar la ruta raíz del proyecto, la de cada pieza de `_fuera/`, el `origen` del clon del canon, cada `alias` y `raiz_alias`, `$HOME` expandido y `~/`. Cada hallazgo, con archivo, renglón y ruta.
 
 **La nota declara el patrón con que se buscó**, para que una lista vacía signifique «no hay» y no «no se buscó». Lo encontrado se **declara**, no se reescribe: reescribir es del destino.
 
@@ -134,7 +134,7 @@ piezas:                        # pieza estándar → ruta dentro del zip | no-ex
 fuera:                         # ruta dentro del zip → ruta original
   - {zip: _fuera/<clave>/, origen: <ruta absoluta>, alias: [<ruta>, ...]}
 memoria_origen: <ruta absoluta de la memoria en el origen>
-canon: {zip: <ruta del clon dentro del zip> | no-existe, ref: <commit en que está>, remoto: <url de origin>}
+canon: {zip: <ruta del clon dentro del zip> | no-existe, ref: <commit en que está>, remoto: <url de origin>, origen: <ruta absoluta del clon>, alias: [<ruta>, ...]}
 desviaciones:
   - {nivel: regla | declarado | desorden, pieza: <pieza o ruta>, detalle: <una línea>}
 rutas: {archivo: RUTAS.tsv, patron: <expresión con que se buscó>}
@@ -158,7 +158,7 @@ Toda ruta de `piezas`, `respaldos_manuales` y `se_ejecuta` es relativa a la raí
 
 Los nombres de archivo se comparan en NFC, en el zip, en `HUELLAS.txt`, en `RUTAS.tsv` y en el frontmatter: macOS puede guardarlos en NFD.
 
-El exportador escribe siempre `raiz_alias` y el `alias` de cada entrada de `fuera`, con `[]` si no hay. Siguen en el `formato: 1`: una clave ausente es de un paquete anterior y el importador puede deducirla; una presente manda sobre lo que deduzca, clave por clave.
+El exportador escribe siempre `raiz_alias`, el `alias` de cada entrada de `fuera` y el `origen` y el `alias` de `canon`, con `[]` si no hay alias. Siguen en el `formato: 1`: una clave ausente es de un paquete anterior y el importador puede deducirla; una presente manda sobre lo que deduzca, clave por clave.
 
 ## Qué NO hace
 
