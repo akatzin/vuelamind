@@ -1075,8 +1075,7 @@ Estas quedan escritas en el vault y rigen todas las sesiones. Son el marco propi
 > contamina todo lo que se construya encima sin dejar rastro.
 
 **La escala de procedencia: cinco marcas, todas con fecha, ordenadas por distancia al
-hecho.** Distinguir dos no alcanza, porque hay material que no es ninguna de las dos y
-acaba escrito con la marca equivocada:
+hecho:**
 
 > - **medido** — lo corriste y viste la salida: lo viste tú, con instrumento.
 > - **atestiguado** — lo viste tú, sin instrumento: presenciaste, no mediste.
