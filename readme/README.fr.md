@@ -14,7 +14,7 @@ Un assistant IA oublie : sa fenêtre de contexte se remplit et le début se diss
 
 Et une documentation jamais confrontée au réel **ment avec assurance**. Six mois plus tard, la moitié de ce qu'affirment vos notes est faux, et rien n'indique quelle moitié.
 
-vuelamind est une méthode qui casse les deux à la fois — non par une application, mais par une discipline écrite : **on n'affirme rien qui n'ait été vérifié**, et chaque affirmation conserve sa provenance : **mesuré**, **cité**, **inféré** ou **rapporté**.
+vuelamind est une méthode qui casse les deux à la fois — non par une application, mais par une discipline écrite : **on n'affirme rien qui n'ait été vérifié**, et chaque affirmation conserve sa provenance : **mesuré**, **constaté**, **cité**, **inféré** ou **rapporté**.
 
 ## Ce que vous obtenez
 

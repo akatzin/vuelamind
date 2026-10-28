@@ -14,7 +14,7 @@ Um assistente de IA esquece: a janela de contexto enche e o começo se dissolve,
 
 E documentação que nunca é reconciliada com a realidade **mente com confiança**. Seis meses depois, metade do que suas notas afirmam é falso e nada indica qual metade.
 
-vuelamind é um método que quebra as duas coisas ao mesmo tempo — não com um aplicativo, mas com disciplina escrita: **nada se afirma sem ter sido comprovado**, e toda afirmação guarda sua procedência: **medido**, **citado**, **inferido** ou **relatado**.
+vuelamind é um método que quebra as duas coisas ao mesmo tempo — não com um aplicativo, mas com disciplina escrita: **nada se afirma sem ter sido comprovado**, e toda afirmação guarda sua procedência: **medido**, **testemunhado**, **citado**, **inferido** ou **relatado**.
 
 ## O que você obtém
 
