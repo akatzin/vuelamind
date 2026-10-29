@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.12.1
+version: 3.13.0
 
 > [!important] El aprendizaje es local
 > Cada dominio escribe sus lecciones en su propio vault —el libro de errores, las decisiones y
@@ -1074,12 +1074,12 @@ Estas quedan escritas en el vault y rigen todas las sesiones. Son el marco propi
 > tono de medición es el error más caro que existe en este marco, porque
 > contamina todo lo que se construya encima sin dejar rastro.
 
-**La escala de procedencia: cuatro marcas, todas con fecha.** Distinguir dos no
-alcanza, porque hay material que no es ninguna de las dos y acaba escrito con la
-marca equivocada:
+**La escala de procedencia: cinco marcas, todas con fecha, ordenadas por distancia al
+hecho:**
 
-> - **medido** — lo corriste y viste la salida.
-> - **citado** — lo dice una fuente identificable y fechada que no es primaria:
+> - **medido** — lo corriste y viste la salida: lo viste tú, con instrumento.
+> - **atestiguado** — lo viste tú, sin instrumento: presenciaste, no mediste.
+> - **citado** — alguien atestiguó que lo vio, y hay una fuente identificable y fechada que no es primaria:
 >   el registro de otro dominio, un acta vieja, la nota de un tercero. **La marca
 >   incluye la fuente**: citado sin cita es inferido con mejor ropa.
 > - **inferido** — lo dedujiste; no hay observación detrás.
@@ -1097,10 +1097,9 @@ comprobación uno mismo — y si la fuente es alcanzable y la afirmación import
 ascenderlo es obligación. Un citado que lleva meses sin ascender en un punto
 crítico es una deuda visible.
 
-*(Parche `2026-08-16-citado-la-marca-entre-lo-medido-y-lo-aportado`. Un dominio
-que ya distinga con otra marca **quién** hizo la observación —haber estado
-presente frente a repetir lo que otro cuenta— conserva la suya: `citado` no
-sustituye ninguna marca existente, se separa por quién vio.)*
+**Atestiguado y citado se separan por quién vio:** haber estado presente frente a repetir
+lo que otro cuenta. Marcar como citado lo que uno presenció lo rebaja; marcar como
+atestiguado lo que contó otro se lo apropia.
 
 **El orden de toda respuesta.** Antes de afirmar, diagnosticar o recomendar
 cualquier cosa sobre el dominio, siempre y en este orden:
