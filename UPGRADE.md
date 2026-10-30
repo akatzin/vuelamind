@@ -79,9 +79,9 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 ```
   v3.0 ──┬── v3.4  el canal        RETIRADO en la v3.9.2 (2026-10-12)
          │
-         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0
+         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0 ──▶ v3.13.1
          │
-         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0   sin pasar por la v3.5
+         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0 ──▶ v3.13.1   sin pasar por la v3.5
 ```
 
 > [!important] Las versiones se comparan por segmentos, como enteros — nunca como decimales
@@ -113,6 +113,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 > La v3.12.0 reinstala `vuelamind-commit`, `vuelamind-load` y `vuelamind-export`, y migra la cola con `herramientas/pendientes.py`.
 > La v3.12.1 reinstala `vuelamind-export`.
 > La v3.13.0 solo pide traer el canon.
+> La v3.13.1 reinstala `vuelamind-commit`.
 
 | Salto | Documento | Estado |
 |---|---|---|
@@ -135,6 +136,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 | v3.11.0 → v3.12.0 | `UPGRADE_v3.12.0.md` | **Liberado** — un archivo por pendiente con un índice generado, y `herramientas/pendientes.py revisar` sale con 1 si un cerrado se queda en abiertos o sin su párrafo. Menor. **Requiere la v3.11.0**; la cola se migra con `pendientes.py migrar` |
 | v3.12.0 → v3.12.1 | `UPGRADE_v3.12.1.md` | **Liberado** — `vuelamind-export`: la entrada `canon` de `MIGRACION.md` declara el `origen` del clon y sus `alias`, y el barrido de rutas los busca. Menor. **Requiere la v3.12.0**; no cambia el manifiesto |
 | v3.12.1 → v3.13.0 | `UPGRADE_v3.13.0.md` | **Liberado** — la escala de procedencia pasa a cinco marcas: entra **atestiguado** (lo viste, sin instrumento) entre medido y citado. Menor. **Requiere la v3.12.1**; solo se trae el canon |
+| v3.13.0 → v3.13.1 | `UPGRADE_v3.13.1.md` | **Liberado** — el reporte del cierre termina con la instrucción de sesión limpia: `/clear` y luego `/vuelamind-load`. Menor. **Requiere la v3.13.0**; no cambia el manifiesto |
 
 ## Fuera de la cadena: lo que salió del canon
 
