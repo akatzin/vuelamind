@@ -251,14 +251,22 @@ Si el manifiesto declara `despues_de_escribir`, córrelo ahora. Y si el cierre t
 
 Si no había nada que corregir, decir eso: es un resultado válido y significa que el marco se está manteniendo solo.
 
-**Y la última línea del reporte, solo cuando el cierre terminó** —el paso 4 escrito, el validador
-otra vez en verde, la instantánea renovada y el candado suelto—: *«Lo de esta sesión ya está en el
-vault. Si sigues trabajando: `/clear` y luego `/vuelamind-load`.»* En otra herramienta, `/clear`
-es su conversación nueva. **Después de ella no va nada, tampoco una pregunta.** Si el cierre se
-detuvo antes —esperando el «Sí, continúa», abortado o con algo sin escribir—, la línea no sale:
-afirmaría algo falso. **La primera frase va letra por letra, con su punto**: una herramienta puede
-buscarla para ofrecer la sesión limpia. Cargar lee el vault ya escrito y corre el validador;
-compactar no lo sustituye: deja un resumen que escribe el modelo y pierde detalle.
+**Y el final del reporte, solo cuando el cierre terminó** —el paso 4 escrito, el validador otra
+vez en verde, la instantánea renovada y el candado suelto—, dos líneas:
+
+    Lo de esta sesión ya está en el vault. Si sigues trabajando: /clear y luego /vuelamind-load.
+    vuelamind:cierre-ok
+
+- **La primera es para la persona** y va en el idioma del dominio. En otra herramienta, `/clear` es
+  su conversación nueva.
+- **La segunda es para las herramientas:** va tal cual, sola en su línea, sin comillas ni formato,
+  y no se traduce.
+- **Después de ella no va nada**, tampoco una pregunta. Si el cierre se detuvo antes —esperando el
+  «Sí, continúa», abortado o con algo sin escribir—, no sale ninguna de las dos: afirmarían algo
+  falso.
+
+Cargar lee el vault ya escrito y corre el validador; compactar no lo sustituye: deja un resumen que
+escribe el modelo y pierde detalle.
 
 ---
 
