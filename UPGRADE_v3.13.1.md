@@ -16,7 +16,7 @@ para: dominios en la v3.13.0
 | Pieza | Cambio | Qué te toca |
 |---|---|---|
 | `MARCO_Inicial.md` | `version: 3.13.1`. **Ninguna regla cambia** | Traerlo (paso 1) |
-| `skills/vuelamind-commit.md` | La última línea del reporte del cierre dice: *«Lo de esta sesión ya está en el vault. Si sigues trabajando: `/clear` y luego `/vuelamind-load`.»* | Reinstalarlo (paso 2) |
+| `skills/vuelamind-commit.md` | La última línea del reporte del cierre dice: *«Lo de esta sesión ya está en el vault. Si sigues trabajando: `/clear` y luego `/vuelamind-load`.»* La primera frase va letra por letra: una herramienta puede buscarla | Reinstalarlo (paso 2) |
 | Los demás skills, `ALMA.md` y el manifiesto | Sin cambios | Nada |
 
 ## Cómo saltar

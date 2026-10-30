@@ -253,8 +253,9 @@ Si no había nada que corregir, decir eso: es un resultado válido y significa q
 
 **Y la última línea del reporte, siempre:** *«Lo de esta sesión ya está en el vault. Si sigues
 trabajando: `/clear` y luego `/vuelamind-load`.»* En otra herramienta, `/clear` es su
-conversación nueva. Cargar lee el vault ya escrito y corre el validador; compactar no lo
-sustituye: deja un resumen que escribe el modelo y pierde detalle.
+conversación nueva. **La primera frase va letra por letra, con su punto**: una herramienta puede
+buscarla para ofrecer la sesión limpia. Cargar lee el vault ya escrito y corre el validador;
+compactar no lo sustituye: deja un resumen que escribe el modelo y pierde detalle.
 
 ---
 
