@@ -166,6 +166,13 @@ En los **tres** sitios: el registro de decisiones, la nota del componente y **el
 
 Con **`AskUserQuestion`**, no con una pregunta suelta — así el visto bueno es un clic sin ambigüedad. Dos opciones: **"Sí, continúa"** y **"No, tengo comentarios"**. Con la segunda: ajustar, **volver a presentar la lista completa** y preguntar de nuevo. **No se escribe nada hasta el "Sí, continúa".**
 
+**Si la herramienta no tiene `AskUserQuestion`**, las mismas dos opciones van al final del mensaje,
+sin texto después, en el bloque que fija el master («Los códigos que leen las herramientas»):
+
+    vuelamind:opciones
+    - Sí, continúa
+    - No, tengo comentarios
+
 ## 4. Escribir la documentación
 
 El **único** paso que escribe en el vault. En este orden, porque cada uno depende del anterior — los nombres reales los da el manifiesto:

@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.14.0
+version: 3.15.0
 
 > [!important] El aprendizaje es local
 > Cada dominio escribe sus lecciones en su propio vault —el libro de errores, las decisiones y
@@ -1772,6 +1772,42 @@ usuario puede traer otra cosa.
 > número miente**, así que puede llevar meses así. Mismo defecto que el arranque
 > de sesión, que estaba en un diagrama y no lo generaba ninguna fase: **lo que
 > solo está dibujado no se construye.**
+
+### Los códigos que leen las herramientas
+
+Una señal que lee una herramienta va como **código fijo**, nunca como frase en el idioma del
+dominio. Los códigos del marco llevan el prefijo `vuelamind:` y **esta tabla es la lista completa**:
+ningún dominio ni paquete crea otro con ese prefijo.
+
+| Código | Quién lo escribe | Qué dice |
+|---|---|---|
+| `vuelamind:cierre-ok` | El cierre, al terminar (paso 5 de `/vuelamind-commit`) | El cierre terminó: paso 4 escrito, validador en verde, instantánea renovada y candado suelto |
+| `vuelamind:opciones` | Quien pregunta con opciones en una herramienta sin `AskUserQuestion` | La persona elige **una** opción |
+| `vuelamind:opciones-varias` | Lo mismo | La persona elige **varias** |
+
+**La forma, común a todos:**
+
+- El código va **solo en su línea**, sin comillas ni formato, y **no se traduce**. Lo que lee la
+  persona va aparte, en el idioma del dominio.
+- **Cuenta solo al final del mensaje**, sin texto después. Citado a media explicación no es una señal.
+- `vuelamind:cierre-ok` y un bloque de opciones **no van en el mismo mensaje**: un cierre que espera
+  respuesta no ha terminado.
+
+**El bloque de opciones** va debajo de la pregunta, que se escribe en prosa:
+
+    ¿Escribo estos cambios en el vault?
+
+    vuelamind:opciones
+    - Sí, continúa
+    - No, tengo comentarios — ajusto la lista y te la vuelvo a presentar
+
+- Una opción por línea, con `- `, en el idioma del dominio. Si hace falta, una explicación corta
+  después de ` — `.
+- **«Otro» no se escribe**: lo agrega la herramienta.
+- Si son varias preguntas, un bloque por pregunta, en el orden en que se hacen.
+- **Con `AskUserQuestion` disponible, se usa ella.** El bloque es para las herramientas que no la
+  tienen, como `claude -p`.
+- Una herramienta que no reconoce el bloque lo muestra como texto, y la pregunta se sigue leyendo.
 
 ---
 
