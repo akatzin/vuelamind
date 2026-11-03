@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.15.0
+version: 3.16.0
 
 > [!important] El aprendizaje es local
 > Cada dominio escribe sus lecciones en su propio vault —el libro de errores, las decisiones y
@@ -980,6 +980,7 @@ Y dos corolarios:
 | `acta` | dónde vive el acta de la entrevista inicial — la fuente de `vuelamind-whoiam` |
 | `alma` | dónde se instaló `ALMA.md` en este dominio —el texto canónico del marco más las atestiguaciones locales—, la fuente de `vuelamind-soul` |
 | `instancias` | quién trabaja en el dominio: la sección `## instancias`, con una tabla `nombre · acceso · carril · dónde` y una fila por instancia; `acceso` es `escribe` o `lee`. Opcional con una sola instancia. Con dos o más que escriben, el cierre lleva candado (Fase 3) |
+| `paquetes` | los paquetes premium instalados en el dominio: `<paquete> <versión>`, separados por ` · ` (p. ej. `vmp-watchers 0.1.0`). Opcional; la escribe la instalación de cada paquete. Lo instalado vive en `.claude/<paquete>/` y `.claude/commands/<paquete>-*.md`: el export lo deja fuera y se lleva solo esta declaración. Un nombre sin el prefijo `vmp-` no se excluye |
 
 **Los dos enganches son los únicos puntos de inyección.** Un dominio que necesite reordenar los pasos no necesita un manifiesto más flexible: necesita revisar por qué quiere escribir antes de medir.
 

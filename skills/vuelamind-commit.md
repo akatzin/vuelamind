@@ -31,6 +31,7 @@ Declara, como mínimo:
 | `despues_de_escribir` | enganche opcional: qué correr tras el paso 4 |
 | `avisos_del_dominio` | lista corta de trampas propias que el motor debe respetar al escribir |
 | `instancias` | quién trabaja en el dominio: la sección `## instancias`, con una tabla `nombre · acceso · carril · dónde` y una fila por instancia; `acceso` es `escribe` o `lee`. Opcional con una sola instancia |
+| `paquetes` | los paquetes premium instalados en el dominio: `<paquete> <versión>`, separados por ` · ` (p. ej. `vmp-watchers 0.1.0`). Opcional; la escribe la instalación de cada paquete. Lo instalado vive en `.claude/<paquete>/` y `.claude/commands/<paquete>-*.md`: el export lo deja fuera y se lleva solo esta declaración. Un nombre sin el prefijo `vmp-` no se excluye |
 
 **Si el manifiesto no existe, detente y dilo.** Ofrece generarlo desde este contrato preguntando las claves una a una — no inventes rutas ni corras un checkpoint "genérico" sin él: reconciliar el vault equivocado es peor que no reconciliar.
 
