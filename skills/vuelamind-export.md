@@ -14,6 +14,9 @@ Lee `.claude/vuelamind-commit.manifiesto.md` en el directorio de trabajo. **Sin 
 
 Del manifiesto salen las rutas: `vault`, `validador`, las seis `notas:`, `acta`, `alma` y `marco` (el registro de parches). Una clave ausente se anota como hueco; no se adivina.
 
+Y `paquetes`, si la declara: los paquetes premium instalados. Es opcional, así que su ausencia no es
+hueco: quiere decir que no hay paquetes que dejar fuera.
+
 ### 2. Hacer el mapa de piezas
 
 La estructura de referencia es la del master: la topología de la Fase 1.0, los archivos de la 1.1 y lo que el mismo master pone dentro del vault (el acta, `ALMA.md`, el registro de parches, `borradores/0_Borradores.md`). **Se lee del master, no de este archivo.**
@@ -48,7 +51,11 @@ En el destino, solo el primer nivel se corrige sin discusión. Los otros dos se 
 | Credenciales: llaves, `.env`, `*.pem`, `*.key`, `*secret*`, y los archivos con permisos `600` o `400` que lo parezcan | **solo el nombre y la ruta**, para recrearlas en el destino. El contenido, nunca. Un archivo con `600` o `400` que no parezca secreto —una imagen, una nota— se le pregunta a la persona en el paso 6 |
 | Cualquier otro clon público que no sea del dominio | de dónde se vuelve a clonar |
 | `.git/worktrees/` de cualquier repositorio: son copias de trabajo de esta máquina | que se excluyeron; en el destino, `git worktree prune` |
+| Los archivos de cada paquete que declara `paquetes`: `.claude/<paquete>/` y `.claude/commands/<paquete>-*.md` del proyecto | su nombre y su versión, en `paquetes` del frontmatter, con las rutas que se dejaron fuera. Del otro lado se reinstala con licencia. Un nombre sin el prefijo `vmp-` no se excluye: va a `desviaciones` como `regla` |
 | Cachés y basura de sistema: `__pycache__/`, `.stversions/`, `.trash/`, `.DS_Store`, las instantáneas del vault | que se excluyeron |
+
+**Una carpeta `.claude/vmp-*/` que `paquetes` no declara se le pregunta a la persona en el paso 6**: puede
+ser un paquete instalado sin declarar, y empacarlo sería distribuirlo.
 
 **Un enlace simbólico no se sigue**: se anota adónde apunta. Seguirlo mete en el zip algo que no es del dominio, o lo mismo dos veces.
 
@@ -93,6 +100,8 @@ Se empaca solo con su sí.
 - Toda entrada con un nombre que no sea ASCII tiene la marca UTF-8.
 - **Por nombre, no por conteo:** los nombres del zip, en NFC, son exactamente los de `HUELLAS.txt` más él mismo. Un conteo cuadra aunque los nombres lleguen cambiados.
 - Cada archivo de la primera columna de `RUTAS.tsv` está en el zip.
+- Ninguna entrada del zip está bajo `.claude/<paquete>/` ni es `.claude/commands/<paquete>-*.md` de un
+  paquete de `paquetes`.
 - Solo con todo en verde se renombra `<nombre>.zip.parcial` a `<nombre>.zip`, con `mv` en la misma carpeta, que es un solo paso. Si alguna falla, se borra el `.parcial` y se reporta `NO EXPORTADO`.
 - Reportar la ruta y el tamaño del zip, cuántos archivos lleva, qué se excluyó y lo que no se pudo verificar.
 - **La última línea del reporte es exactamente `EXPORTADO: <ruta absoluta del zip>`**, para que un programa que invoque el skill recoja el zip sin adivinar. Si no se exportó, la última línea es `NO EXPORTADO: <motivo>`.
@@ -143,6 +152,8 @@ no_viaja:
 excluido:
   credenciales: [<ruta original>, ...]   # solo el nombre: el contenido nunca
   otros: [<patrón o ruta>, ...]
+paquetes:                      # la declaración del manifiesto; sus archivos no viajan
+  - {nombre: <paquete>, version: <versión>, excluido: [<ruta original>, ...]}
 respaldos_manuales: [<ruta dentro del zip>, ...]
 se_ejecuta: [<ruta dentro del zip>, ...]  # todo archivo bajo cualquier .claude/ menos el manifiesto, y .mcp.json
 huellas: HUELLAS.txt
@@ -158,7 +169,7 @@ Toda ruta de `piezas`, `respaldos_manuales` y `se_ejecuta` es relativa a la raí
 
 Los nombres de archivo se comparan en NFC, en el zip, en `HUELLAS.txt`, en `RUTAS.tsv` y en el frontmatter: macOS puede guardarlos en NFD.
 
-El exportador escribe siempre `raiz_alias`, el `alias` de cada entrada de `fuera` y el `origen` y el `alias` de `canon`, con `[]` si no hay alias. Siguen en el `formato: 1`: una clave ausente es de un paquete anterior y el importador puede deducirla; una presente manda sobre lo que deduzca, clave por clave.
+El exportador escribe siempre `raiz_alias`, el `alias` de cada entrada de `fuera` y el `origen` y el `alias` de `canon`, con `[]` si no hay alias, y `paquetes`, con `[]` si el manifiesto no declara ninguno. Siguen en el `formato: 1`: una clave ausente es de un paquete anterior y el importador puede deducirla; una presente manda sobre lo que deduzca, clave por clave.
 
 ## Qué NO hace
 
