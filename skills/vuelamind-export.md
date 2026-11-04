@@ -19,7 +19,7 @@ hueco: quiere decir que no hay paquetes que dejar fuera.
 
 ### 2. Hacer el mapa de piezas
 
-La estructura de referencia es la del master: la topología de la Fase 1.0, los archivos de la 1.1 y lo que el mismo master pone dentro del vault (el acta, `ALMA.md`, el registro de parches, `borradores/0_Borradores.md`). **Se lee del master, no de este archivo.**
+La estructura de referencia es la del master: la topología de la Fase 1.0, los archivos de la 1.1 y lo que el mismo master pone dentro del vault (el acta, `ALMA.md`, el registro de parches, `borradores/0_Borradores.md`, `artefactos/0_Artefactos.md`). **Se lee del master, no de este archivo.**
 
 Para cada pieza, una fila: dónde está en el origen, dónde queda en el zip, o `no existe`.
 
@@ -27,7 +27,7 @@ Cada diferencia con la referencia se clasifica en uno de tres niveles:
 
 | Nivel | Qué es | Ejemplo |
 |---|---|---|
-| **Viola una regla** | El master lo manda y el dominio no lo cumple | el acta fuera del vault (regla desde la v3.9) · borradores fuera del vault |
+| **Viola una regla** | El master lo manda y el dominio no lo cumple | el acta fuera del vault (regla desde la v3.9) · borradores fuera del vault · entregables fuera del vault (regla desde la v3.17) |
 | **Declarado** | Fuera de la convención, pero permitido porque el manifiesto lo declara | el vault fuera del proyecto · un validador con otro nombre |
 | **Desorden** | Ni regla ni declaración | respaldos manuales sueltos · instantáneas viejas |
 
@@ -137,6 +137,7 @@ piezas:                        # pieza estándar → ruta dentro del zip | no-ex
   alma: <ruta>
   registro_parches: <ruta>
   borradores_indice: <ruta>
+  artefactos_indice: <ruta>
   validador: <ruta>
   init: [<ruta>, ...]
   memoria: <ruta>

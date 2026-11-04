@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.16.0
+version: 3.17.0
 
 > [!important] El aprendizaje es local
 > Cada dominio escribe sus lecciones en su propio vault —el libro de errores, las decisiones y
@@ -613,10 +613,11 @@ Todo vive en el proyecto (Bloque E), y nada se comparte entre dominios:
     ├── Bitacora.md
     ├── initPrompt.md
     ├── Entidades/
+    ├── artefactos/             ← lo entregado: reportes, PDF, imágenes, páginas; con su índice
     └── borradores/             ← el taller: ideas y features en progreso, con su índice
 ```
 
-**Las cuatro reglas que hacen que esto escale:**
+**Las cinco reglas que hacen que esto escale:**
 
 1. **Los comandos de dominio viven en el proyecto, y el nivel personal se queda VACÍO de ellos.** Las dos mitades importan, y la segunda es la que se olvida.
 
@@ -654,6 +655,13 @@ Todo vive en el proyecto (Bloque E), y nada se comparte entre dominios:
    borra. *(Parche `los-borradores-viven-en-el-vault`: medido en el dominio de origen, un
    modelo de diseño fuera del vault no apareció en una búsqueda desde el nodo correcto, y
    43 de 50 borradores estaban huérfanos.)*
+5. **Los artefactos viven EN el vault, y se referencian.** Todo entregable —lo que el asistente
+   produce para alguien: un reporte, un PDF, una imagen, una página HTML— se guarda en
+   `artefactos/`, por la misma razón que la regla 4: fuera del vault no entra al grafo. Cada uno
+   con fila en su índice (`artefactos/0_Artefactos.md`: artefacto · qué es · para quién · dónde
+   se publicó · nota dueña). **Si se publica, el original se queda aquí** y la fila lleva el
+   enlace: la copia publicada no lo sustituye. Lo que está a medio hacer es borrador; lo
+   entregado, artefacto. Al reemplazarse, la fila lo declara — no se borra.
 
 > [!warning] Lo que pasa si te saltas esto
 > Medido en el vault de origen: **cuatro carpetas** para un solo
@@ -677,6 +685,7 @@ Con las respuestas, el asistente crea estos archivos. Los nombres son sugerencia
 | `Bitacora.md` | *¿Cómo llegamos hasta aquí?* | Voz humana, sin jerga. Es lo único que se lee de corrido |
 | `initPrompt.md` | *¿Cómo retomo el trabajo?* | Se actualiza al cerrar cada sesión |
 | `Entidades/` | Una nota por pieza | El detalle vive aquí, no en el panorama |
+| `artefactos/` | *¿Qué entregué, a quién, y dónde está?* | Un archivo por entregable y una fila por archivo en `0_Artefactos.md`. Lo publicado conserva aquí su original |
 
 **Y cada nota tiene un GÉNERO, que es lo que decide cómo envejece.** Mezclarlos es
 el defecto que no se detecta escribiendo, solo leyendo meses después:
@@ -1878,6 +1887,7 @@ Cuando el asistente termine, debe entregar:
 - [ ] `Decisiones.md` y `Bitacora.md` vacíos, con su encabezado
 - [ ] `Errores.md` con la semilla heredada
 - [ ] `Entidades/` con una nota por pieza, aunque sea de tres líneas
+- [ ] `artefactos/` creada, con `0_Artefactos.md` y su tabla vacía
 - [ ] `init_<host>.sh` **generado y corrido una vez**, con sus comprobaciones pasando o avisando (Fase 1.2)
 - [ ] **El ciclo enseñado con un caso del propio dominio**, y los comandos que existen en esta máquina, mostrados con su nombre exacto
 - [ ] **Tres o cuatro entregables escritos en `initPrompt.md`**, para proponerlos como preguntas en la segunda sesión, tras el comando de retomar
