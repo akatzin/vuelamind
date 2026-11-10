@@ -79,9 +79,9 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 ```
   v3.0 ──┬── v3.4  el canal        RETIRADO en la v3.9.2 (2026-10-12)
          │
-         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0 ──▶ v3.13.1 ──▶ v3.13.2 ──▶ v3.14.0 ──▶ v3.15.0 ──▶ v3.16.0 ──▶ v3.17.0 ──▶ v3.18.0 ──▶ v3.19.0
+         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0 ──▶ v3.13.1 ──▶ v3.13.2 ──▶ v3.14.0 ──▶ v3.15.0 ──▶ v3.16.0 ──▶ v3.17.0 ──▶ v3.18.0 ──▶ v3.19.0 ──▶ v3.20.0
          │
-         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0 ──▶ v3.13.1 ──▶ v3.13.2 ──▶ v3.14.0 ──▶ v3.15.0 ──▶ v3.16.0 ──▶ v3.17.0 ──▶ v3.18.0 ──▶ v3.19.0   sin pasar por la v3.5
+         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0 ──▶ v3.13.1 ──▶ v3.13.2 ──▶ v3.14.0 ──▶ v3.15.0 ──▶ v3.16.0 ──▶ v3.17.0 ──▶ v3.18.0 ──▶ v3.19.0 ──▶ v3.20.0   sin pasar por la v3.5
 ```
 
 > [!important] Las versiones se comparan por segmentos, como enteros — nunca como decimales
@@ -121,6 +121,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 > La v3.17.0 reinstala `vuelamind-export` y crea `artefactos/` en el vault.
 > La v3.18.0 solo pide traer el canon.
 > La v3.19.0 solo pide traer el canon.
+> La v3.20.0 instala `vuelamind-chat` y reinstala `vuelamind-load`.
 
 | Salto | Documento | Estado |
 |---|---|---|
@@ -151,6 +152,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 | v3.16.0 → v3.17.0 | `UPGRADE_v3.17.0.md` | **Liberado** — el vault suma `artefactos/`: todo entregable (reporte, PDF, imagen, página) vive ahí con fila en `0_Artefactos.md`, y lo publicado conserva su original. Menor. **Requiere la v3.16.0**; no cambia el manifiesto |
 | v3.17.0 → v3.18.0 | `UPGRADE_v3.18.0.md` | **Liberado** — la entrevista marca su tramo con `vuelamind:entrevista <tramo>` y su final con `vuelamind:entrevista-fin`, y el master suma «Los papeles de un agente»: la lista cerrada de papeles (`master`, `vigia`) con su documento. Menor. **Requiere la v3.17.0**; no cambia el manifiesto ni los skills |
 | v3.18.0 → v3.19.0 | `UPGRADE_v3.19.0.md` | **Liberado** — la entrevista en voz alta: una pregunta por mensaje, cinco partes anunciadas, sin jerga del método, opciones obligatorias al elegir, aviso antes de construir, y un cierre corto con los avisos de privacidad primero y el traspaso según la herramienta. Menor. **Requiere la v3.18.0**; no cambia el manifiesto, los skills ni los códigos |
+| v3.19.0 → v3.20.0 | `UPGRADE_v3.20.0.md` | **Liberado** — `/vuelamind-chat`: un agente entra a las salas con la URL y la llave que le da su persona, manda mensajes y lee su buzón, y acusa lo leído solo cuando ya está en su contexto; lo hace `herramientas/salas.py`, y `/vuelamind-load` avisa al arrancar si hay mensajes sin leer. Menor. **Requiere la v3.19.0**; no cambia el manifiesto ni los códigos |
 
 ## Fuera de la cadena: lo que salió del canon
 
