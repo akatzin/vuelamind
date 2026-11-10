@@ -1,7 +1,7 @@
 ---
 title: Marco de trabajo — prompt de inicialización
 tipo: plantilla ejecutable
-version: 3.17.0
+version: 3.18.0
 
 > [!important] El aprendizaje es local
 > Cada dominio escribe sus lecciones en su propio vault —el libro de errores, las decisiones y
@@ -33,6 +33,11 @@ Después, el dominio vive en un ciclo de cuatro actos: **nacer** una vez, **suma
 ## Fase 0 — La entrevista de inicialización
 
 Antes de crear un solo archivo, el asistente hace estas preguntas. No las hace todas de golpe: agrupa de tres o cuatro, y usa las respuestas para afinar las siguientes. Si una respuesta ya se deduce del contexto, la propone y pide confirmación en vez de preguntar en frío.
+
+**Cada mensaje que pregunta termina con el código de su tramo** (`vuelamind:entrevista <tramo>`), y
+el que termina la entrevista, con `vuelamind:entrevista-fin`. Así una herramienta que muestra la
+entrevista sabe en qué va sin leer la prosa. Los tramos y la forma están en «Los códigos que leen
+las herramientas».
 
 ### La señal cero — el nombre con el que llegó la carpeta
 
@@ -1794,14 +1799,38 @@ ningún dominio ni paquete crea otro con ese prefijo.
 | `vuelamind:cierre-ok` | El cierre, al terminar (paso 5 de `/vuelamind-commit`) | El cierre terminó: paso 4 escrito, validador en verde, instantánea renovada y candado suelto |
 | `vuelamind:opciones` | Quien pregunta con opciones en una herramienta sin `AskUserQuestion` | La persona elige **una** opción |
 | `vuelamind:opciones-varias` | Lo mismo | La persona elige **varias** |
+| `vuelamind:entrevista <tramo>` | Quien hace la entrevista de la Fase 0, en cada mensaje que pregunta | En qué tramo va la entrevista |
+| `vuelamind:entrevista-fin` | Quien hace la entrevista, en el mensaje que la termina | La entrevista terminó: sigue escribir el acta |
+
+**Los tramos de la entrevista** son fijos, y una herramienta calcula el avance con esta lista. La
+entrevista no tiene un total de preguntas, porque se adapta a las respuestas.
+
+| Tramo | Sección |
+|---|---|
+| `idioma` | Pregunta 0 |
+| `nace` | Pregunta 1 |
+| `A` | Bloque A |
+| `B` | Bloque B |
+| `C` | Bloque C |
+| `D` | Bloque D |
+| `F` | Bloque F, el punto de control |
+
+El Bloque E no tiene tramo, porque no pregunta nada. En la Vía B, la de sumarse, no hay entrevista,
+así que tampoco hay `vuelamind:entrevista-fin`.
 
 **La forma, común a todos:**
 
 - El código va **solo en su línea**, sin comillas ni formato, y **no se traduce**. Lo que lee la
   persona va aparte, en el idioma del dominio.
+- **Un código lleva, como mucho, un argumento**, separado por un espacio y tomado de una lista que
+  fija esta sección. Hoy solo `vuelamind:entrevista` lleva uno: su tramo.
 - **Cuenta solo al final del mensaje**, sin texto después. Citado a media explicación no es una señal.
+- **Una pregunta de la entrevista con opciones** lleva `vuelamind:entrevista <tramo>` en la línea
+  justo encima de `vuelamind:opciones`, para que el mensaje siga teniendo un solo final.
 - `vuelamind:cierre-ok` y un bloque de opciones **no van en el mismo mensaje**: un cierre que espera
-  respuesta no ha terminado.
+  respuesta no ha terminado. Tampoco `vuelamind:entrevista-fin` y un bloque de opciones: una
+  entrevista que espera respuesta no ha terminado.
+- **Una herramienta que no conoce un código no se rompe**: lo muestra como texto o lo ignora.
 
 **El bloque de opciones** va debajo de la pregunta, que se escribe en prosa:
 
@@ -1818,6 +1847,22 @@ ningún dominio ni paquete crea otro con ese prefijo.
 - **Con `AskUserQuestion` disponible, se usa ella.** El bloque es para las herramientas que no la
   tienen, como `claude -p`.
 - Una herramienta que no reconoce el bloque lo muestra como texto, y la pregunta se sigue leyendo.
+
+### Los papeles de un agente
+
+Un papel dice qué hace un agente en la casa, y cada uno tiene su documento en este canon. **Esta
+tabla es la lista completa**: una herramienta que ofrece papeles los lee de aquí, de la copia del
+canon que tiene el dominio, y no define otros. Sumar un papel es un cambio del canon, y llega con su
+documento.
+
+| Papel | Documento | Qué hace | Dónde vive |
+|---|---|---|---|
+| `master` | `MARCO_Inicial.md` | Hace la entrevista, escribe el vault y lo cuida | En el dominio que nace con él. Uno por dominio |
+| `vigia` | `WATCHER.md` | Vigila lo que entra a un repositorio que la casa ya lee y juzga cada aporte | En un dominio aparte, con su propia cola |
+
+- El nombre del papel **no se traduce**: es un código. Lo que lee la persona va en su idioma.
+- La tabla tiene esta forma fija para que una herramienta la lea: una fila por papel, con el nombre
+  entre comillas invertidas en la primera columna y el documento en la segunda.
 
 ---
 
