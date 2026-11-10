@@ -79,9 +79,9 @@ deshacer del paso 1 comprobado, y escribe lo que duela.
 ```
   v3.0 ──┬── v3.4  el canal        RETIRADO en la v3.9.2 (2026-10-12)
          │
-         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0 ──▶ v3.13.1 ──▶ v3.13.2 ──▶ v3.14.0 ──▶ v3.15.0 ──▶ v3.16.0 ──▶ v3.17.0
+         ├── v3.5 ──▶ v3.6 ──▶ v3.7 ──▶ v3.8 ──▶ v3.9 ──▶ v3.9.1 ──▶ v3.9.2 ──▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0 ──▶ v3.13.1 ──▶ v3.13.2 ──▶ v3.14.0 ──▶ v3.15.0 ──▶ v3.16.0 ──▶ v3.17.0 ──▶ v3.18.0
          │
-         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0 ──▶ v3.13.1 ──▶ v3.13.2 ──▶ v3.14.0 ──▶ v3.15.0 ──▶ v3.16.0 ──▶ v3.17.0   sin pasar por la v3.5
+         └──────────────────────────────────────────────────────────────────▶ v3.9.3 ──▶ v3.10.0 ──▶ v3.10.1 ──▶ v3.10.2 ──▶ v3.10.3 ──▶ v3.10.4 ──▶ v3.11.0 ──▶ v3.12.0 ──▶ v3.12.1 ──▶ v3.13.0 ──▶ v3.13.1 ──▶ v3.13.2 ──▶ v3.14.0 ──▶ v3.15.0 ──▶ v3.16.0 ──▶ v3.17.0 ──▶ v3.18.0   sin pasar por la v3.5
 ```
 
 > [!important] Las versiones se comparan por segmentos, como enteros — nunca como decimales
@@ -119,6 +119,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 > La v3.15.0 reinstala `vuelamind-commit`.
 > La v3.16.0 reinstala `vuelamind-commit` y `vuelamind-export`.
 > La v3.17.0 reinstala `vuelamind-export` y crea `artefactos/` en el vault.
+> La v3.18.0 solo pide traer el canon.
 
 | Salto | Documento | Estado |
 |---|---|---|
@@ -147,6 +148,7 @@ se retiran, y a la v3.9.3 se llega desde cualquier v3.
 | v3.14.0 → v3.15.0 | `UPGRADE_v3.15.0.md` | **Liberado** — el master lista los códigos `vuelamind:` y fija el bloque `vuelamind:opciones`; el paso 3 del cierre lo usa cuando la herramienta no tiene `AskUserQuestion`. Menor. **Requiere la v3.14.0**; no cambia el manifiesto |
 | v3.15.0 → v3.16.0 | `UPGRADE_v3.16.0.md` | **Liberado** — el contrato del manifiesto suma `paquetes`: los paquetes premium instalados, con su versión. El export deja fuera sus archivos y se lleva solo la declaración. Menor. **Requiere la v3.15.0**; la clave es opcional |
 | v3.16.0 → v3.17.0 | `UPGRADE_v3.17.0.md` | **Liberado** — el vault suma `artefactos/`: todo entregable (reporte, PDF, imagen, página) vive ahí con fila en `0_Artefactos.md`, y lo publicado conserva su original. Menor. **Requiere la v3.16.0**; no cambia el manifiesto |
+| v3.17.0 → v3.18.0 | `UPGRADE_v3.18.0.md` | **Liberado** — la entrevista marca su tramo con `vuelamind:entrevista <tramo>` y su final con `vuelamind:entrevista-fin`, y el master suma «Los papeles de un agente»: la lista cerrada de papeles (`master`, `vigia`) con su documento. Menor. **Requiere la v3.17.0**; no cambia el manifiesto ni los skills |
 
 ## Fuera de la cadena: lo que salió del canon
 
