@@ -78,6 +78,15 @@ deriva, nómbrala. Si no, no se dice nada.
 > mientras los archivos iban trece commits atrás. **Este paso lee lo publicado y no modifica
 > nada local**, que es más barato y no tiene ese efecto.
 
+### 4c. El buzón de las salas — solo si el dominio entra a ellas
+
+Si existe `.claude/vuelamind-chat/config.json`, corre `python3 <canon>/herramientas/salas.py aviso`
+desde la raíz del dominio. Dice en una línea cuántos mensajes hay sin leer, o no dice nada; esa
+línea va al estado del paso 5.
+
+**No los lee ni los acusa**: leerlos es de `/vuelamind-chat`, cuando la persona quiera. Como el
+paso 4b, no escribe nada y no bloquea: sin red, una línea, y se sigue.
+
 ### 5. Presentar el estado, no un resumen del archivo
 
 Cerrar con lo que el usuario necesita para decidir en qué trabajar:
@@ -87,6 +96,7 @@ Cerrar con lo que el usuario necesita para decidir en qué trabajar:
 - **Qué cambió desde la última sesión**, si el validador lo delata.
 - **Qué está esperando algo externo** — un reinicio, una decisión, una sesión interactiva.
 - **Los parches**, si hay.
+- **La línea del buzón de las salas**, si el paso 4c la dio.
 
 > [!important] Las ideas también se presentan, y hay que hacerlo a propósito
 > El marco separa **defectos** de **oportunidades**: lo que está mal va a la cola
